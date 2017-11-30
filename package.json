@@ -1,0 +1,7 @@
+{
+  "name": "drf-swagger",
+  "dependencies": {
+    "redoc": "^2.0.0-alpha.4",
+    "swagger-ui-dist": "^3.5.0"
+  }
+}

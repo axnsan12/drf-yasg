@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+recursive-include drf_swagger/static *
+recursive-include drf_swagger/templates *
