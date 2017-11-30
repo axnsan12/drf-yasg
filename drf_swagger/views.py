@@ -14,12 +14,9 @@ from .generators import OpenAPISchemaGenerator
 from .renderers import (
     SwaggerJSONRenderer, SwaggerYAMLRenderer, SwaggerUIRenderer, ReDocRenderer, OpenAPIRenderer,
 )
+from .openapi import Info
 
 SPEC_RENDERERS = (SwaggerYAMLRenderer, SwaggerJSONRenderer, OpenAPIRenderer)
-SPEC_RENDERERS = {
-    False: tuple(renderer.with_validators([]) for renderer in SPEC_RENDERERS),
-    True: SPEC_RENDERERS,
-}
 UI_RENDERERS = {
     'swagger': (SwaggerUIRenderer, ReDocRenderer),
     'redoc': (ReDocRenderer, SwaggerUIRenderer),
@@ -50,41 +47,57 @@ def deferred_never_cache(view_func):
     return _wrapped_view_func
 
 
-def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False, validate=False,
+def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False, validators=None,
                     authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
                     permission_classes=api_settings.DEFAULT_PERMISSION_CLASSES):
+    """
+    Create a SchemaView class with default renderers and generators.
+
+    :param Info info: Required. Swagger API Info object
+    :param str url: API base url; if left blank will be deduced from the location the view is served at
+    :param str patterns: passed to SchemaGenerator
+    :param str urlconf: passed to SchemaGenerator
+    :param bool public: if False, includes only endpoints the current user has access to
+    :param list validators: a list of validator names to apply on the generated schema; allowed values are `flex`, `ssv`
+    :param tuple authentication_classes: authentication classes for the schema view itself
+    :param tuple permission_classes: permission classes for the schema view itself
+    :return: SchemaView class
+    """
     _auth_classes = authentication_classes
     _perm_classes = permission_classes
     _public = public
+    validators = validators or []
+    _spec_renderers = tuple(renderer.with_validators(validators) for renderer in SPEC_RENDERERS)
 
     class SchemaView(APIView):
         _ignore_model_permissions = True
         schema = None  # exclude from schema
         public = _public
+        generator_class = OpenAPISchemaGenerator
         authentication_classes = _auth_classes
         permission_classes = _perm_classes
-        renderer_classes = SPEC_RENDERERS[bool(validate)]
-
-        def __init__(self, **kwargs):
-            super(SchemaView, self).__init__(**kwargs)
-            if self.renderer_classes is None:
-                if renderers.BrowsableAPIRenderer in api_settings.DEFAULT_RENDERER_CLASSES:
-                    self.renderer_classes = [
-                        renderers.CoreJSONRenderer,
-                        renderers.BrowsableAPIRenderer,
-                    ]
-                else:
-                    self.renderer_classes = [renderers.CoreJSONRenderer]
+        renderer_classes = _spec_renderers
 
         def get(self, request, version='', format=None):
-            generator = OpenAPISchemaGenerator(info, version, url, patterns, urlconf)
+            generator = self.generator_class(info, version, url, patterns, urlconf)
             schema = generator.get_schema(request, self.public)
             if schema is None:
                 raise exceptions.PermissionDenied()
             return Response(schema)
 
         @classmethod
-        def _cached(cls, view, cache_timeout, cache_kwargs):
+        def as_cached_view(cls, cache_timeout=0, cache_kwargs=None, **initkwargs):
+            """
+            Calls .as_view() and wraps the result in a cache_page decorator.
+            See https://docs.djangoproject.com/en/1.11/topics/cache/
+
+            :param int cache_timeout: same as cache_page; set to 0 for no cache
+            :param dict cache_kwargs: dictionary of kwargs to be passed to cache_page
+            :param initkwargs: kwargs for .as_view()
+            :return: a view instance
+            """
+            cache_kwargs = cache_kwargs or {}
+            view = cls.as_view(**initkwargs)
             if cache_timeout != 0:
                 view = vary_on_headers('Cookie', 'Authorization', 'Accept')(view)
                 view = cache_page(cache_timeout, **cache_kwargs)(view)
@@ -94,20 +107,31 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False
             return view
 
         @classmethod
-        def as_cached_view(cls, cache_timeout=0, **cache_kwargs):
-            return cls._cached(cls.as_view(), cache_timeout, cache_kwargs)
+        def without_ui(cls, cache_timeout=0, cache_kwargs=None):
+            """
+            Instantiate this view with just JSON and YAML renderers, optionally wrapped with cache_page.
+            See https://docs.djangoproject.com/en/1.11/topics/cache/.
+
+            :param int cache_timeout: same as cache_page; set to 0 for no cache
+            :param dict cache_kwargs: dictionary of kwargs to be passed to cache_page
+            :return: a view instance
+            """
+            return cls.as_cached_view(cache_timeout, cache_kwargs, renderer_classes=_spec_renderers)
 
         @classmethod
-        def without_ui(cls, cache_timeout=0, **cache_kwargs):
-            renderer_classes = SPEC_RENDERERS[bool(validate)]
-            return cls._cached(cls.as_view(renderer_classes=renderer_classes), cache_timeout, cache_kwargs)
+        def with_ui(cls, renderer='swagger', cache_timeout=0, cache_kwargs=None):
+            """
+            Instantiate this view with a Web UI renderer, optionally wrapped with cache_page.
+            See https://docs.djangoproject.com/en/1.11/topics/cache/.
 
-        @classmethod
-        def with_ui(cls, renderer='swagger', cache_timeout=0, **cache_kwargs):
+            :param str renderer: UI renderer; allowed values are `swagger`, `redoc`
+            :param int cache_timeout: same as cache_page; set to 0 for no cache
+            :param dict cache_kwargs: dictionary of kwargs to be passed to cache_page
+            :return: a view instance
+            """
             assert renderer in UI_RENDERERS, "supported default renderers are " + ", ".join(UI_RENDERERS)
-            renderer_classes = (*UI_RENDERERS[renderer], *SPEC_RENDERERS[bool(validate)])
+            renderer_classes = (*UI_RENDERERS[renderer], *_spec_renderers)
 
-            view = cls.as_view(renderer_classes=renderer_classes)
-            return cls._cached(view, cache_timeout, cache_kwargs)
+            return cls.as_cached_view(cache_timeout, cache_kwargs, renderer_classes=renderer_classes)
 
     return SchemaView

@@ -159,7 +159,7 @@
         }
         window.ui = SwaggerUIBundle(swaggerConfig);
 
-        insertionQ('.auth-wrapper .authorize').every(function (element) {
+        insertionQ('.auth-wrapper .authorize').every(function () {
             var authWrapper = document.querySelector('.auth-wrapper');
             var authorizeButton = document.querySelector('.auth-wrapper .authorize');
             var djangoSessionAuth = document.querySelector('#django-session-auth');

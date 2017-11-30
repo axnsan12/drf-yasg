@@ -10,13 +10,16 @@ def read_req(req_file):
 
 requirements = read_req('requirements.txt')
 requirements_validation = read_req('requirements_validation.txt')
-
+requirements_dev = read_req('requirements_dev.txt')
+requirements_test = read_req('requirements_test.txt')
+0
 setup(
     name='drf-swagger',
     version='1.0.0rc1',
     packages=find_packages(include=['drf_swagger']),
     include_package_data=True,
     install_requires=requirements,
+    tests_require=requirements_test,
     extras_require={
         'validation': requirements_validation
     },

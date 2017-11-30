@@ -10,8 +10,8 @@ SWAGGER_DEFAULTS = {
     },
     'LOGIN_URL': getattr(settings, 'LOGIN_URL', None),
     'LOGOUT_URL': getattr(settings, 'LOGOUT_URL', None),
-
     'VALIDATOR_URL': '',
+
     'OPERATIONS_SORTER': None,
     'TAGS_SORTER': None,
     'DOC_EXPANSION': 'list',

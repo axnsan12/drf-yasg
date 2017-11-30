@@ -5,6 +5,13 @@ import coreapi
 
 
 class Contact(object):
+    """Swagger Contact object
+    At least one of the following fields is required:
+
+    :param str name: contact name
+    :param str url: contact url
+    :param str email: contact e-mail
+    """
     def __init__(self, name=None, url=None, email=None):
         self.name = name
         self.url = url
@@ -25,6 +32,11 @@ class Contact(object):
 
 
 class License(object):
+    """Swagger License object
+
+    :param str name: Requird. License name
+    :param str url: link to detailed license information
+    """
     def __init__(self, name, url=None):
         self.name = name
         self.url = url
@@ -41,6 +53,15 @@ class License(object):
 
 
 class Info(object):
+    """Swagger Info object
+
+    :param str title: Required. API title.
+    :param str default_version: Required. API version string (not to be confused with Swagger spec version)
+    :param str description: API description; markdown supported
+    :param str terms_of_service: API terms of service; should be a URL
+    :param Contact contact: contact object
+    :param License license: license object
+    """
     def __init__(self, title, default_version, description=None, terms_of_service=None, contact=None, license=None):
         if title is None or default_version is None:
             raise ValueError("title and version are required for Swagger info object")

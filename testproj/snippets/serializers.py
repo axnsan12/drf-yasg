@@ -24,11 +24,6 @@ class SnippetSerializer(serializers.Serializer):
     lines = serializers.ListField(child=serializers.IntegerField(), allow_empty=True, allow_null=True, required=False)
     example_projects = serializers.ListSerializer(child=ExampleProjectsSerializer())
 
-    class Meta:
-        error_status_codes = {
-            HTTP_400_BAD_REQUEST: 'Bad Request'
-        }
-
     def create(self, validated_data):
         """
         Create and return a new `Snippet` instance, given the validated data.
