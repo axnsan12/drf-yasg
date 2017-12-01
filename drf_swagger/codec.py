@@ -1,41 +1,37 @@
 import json
 from collections import OrderedDict
 
-from coreapi.codecs import BaseCodec
-from coreapi.compat import force_bytes, urlparse
-from drf_swagger.app_settings import swagger_settings
-from openapi_codec import encode
+from coreapi.compat import force_bytes
 from ruamel import yaml
 
+from drf_swagger.app_settings import swagger_settings
 from . import openapi
 
 
 class SwaggerValidationError(Exception):
-    def __init__(self, msg, validator_name, spec, *args) -> None:
+    def __init__(self, msg, validator_name, spec, source_codec, *args) -> None:
         super(SwaggerValidationError, self).__init__(msg, *args)
         self.validator_name = validator_name
         self.spec = spec
-
-    def __str__(self):
-        return str(self.validator_name) + ": " + super(SwaggerValidationError, self).__str__()
+        self.source_codec = source_codec
 
 
-def _validate_flex(spec):
+def _validate_flex(spec, codec):
     from flex.core import parse as validate_flex
     from flex.exceptions import ValidationError
     try:
         validate_flex(spec)
     except ValidationError as ex:
-        raise SwaggerValidationError(str(ex), 'flex', spec) from ex
+        raise SwaggerValidationError(str(ex), 'flex', spec, codec) from ex
 
 
-def _validate_swagger_spec_validator(spec):
+def _validate_swagger_spec_validator(spec, codec):
     from swagger_spec_validator.validator20 import validate_spec as validate_ssv
     from swagger_spec_validator.common import SwaggerValidationError as SSVErr
     try:
         validate_ssv(spec)
     except SSVErr as ex:
-        raise SwaggerValidationError(str(ex), 'swagger_spec_validator', spec) from ex
+        raise SwaggerValidationError(str(ex), 'swagger_spec_validator', spec, codec) from ex
 
 
 VALIDATORS = {
@@ -45,8 +41,9 @@ VALIDATORS = {
 }
 
 
-class _OpenAPICodec(BaseCodec):
+class _OpenAPICodec(object):
     format = 'openapi'
+    media_type = None
 
     def __init__(self, validators):
         self._validators = validators
@@ -61,10 +58,13 @@ class _OpenAPICodec(BaseCodec):
 
         spec = self.generate_swagger_object(document)
         for validator in self.validators:
-            VALIDATORS[validator](spec)
-        return force_bytes(self._dump_spec(spec))
+            VALIDATORS[validator](spec, self)
+        return force_bytes(self._dump_dict(spec))
 
-    def _dump_spec(self, spec):
+    def encode_error(self, err):
+        return force_bytes(self._dump_dict(err))
+
+    def _dump_dict(self, spec):
         return NotImplementedError("override this method")
 
     def generate_swagger_object(self, swagger):
@@ -74,30 +74,14 @@ class _OpenAPICodec(BaseCodec):
         :param openapi.Swagger swagger:
         :return OrderedDict: swagger spec as dict
         """
-        parsed_url = urlparse.urlparse(swagger.url)
-
-        spec = OrderedDict()
-
-        spec['swagger'] = '2.0'
-        spec['info'] = swagger.info.to_swagger(swagger.version)
-
-        if parsed_url.netloc:
-            spec['host'] = parsed_url.netloc
-        if parsed_url.scheme:
-            spec['schemes'] = [parsed_url.scheme]
-        spec['basePath'] = '/'
-
-        spec['paths'] = encode._get_paths_object(swagger)
-
-        spec['securityDefinitions'] = swagger_settings.SECURITY_DEFINITIONS
-
-        return spec
+        swagger.security_definitions = swagger_settings.SECURITY_DEFINITIONS
+        return swagger
 
 
 class OpenAPICodecJson(_OpenAPICodec):
     media_type = 'application/openapi+json'
 
-    def _dump_spec(self, spec):
+    def _dump_dict(self, spec):
         return json.dumps(spec)
 
 
@@ -142,11 +126,11 @@ class SaneYamlDumper(yaml.SafeDumper):
         return node
 
 
-SaneYamlDumper.add_representer(OrderedDict, SaneYamlDumper.represent_odict)
+SaneYamlDumper.add_multi_representer(OrderedDict, SaneYamlDumper.represent_odict)
 
 
 class OpenAPICodecYaml(_OpenAPICodec):
     media_type = 'application/openapi+yaml'
 
-    def _dump_spec(self, spec):
+    def _dump_dict(self, spec):
         return yaml.dump(spec, Dumper=SaneYamlDumper, default_flow_style=False, encoding='utf-8')

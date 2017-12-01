@@ -45,17 +45,17 @@ class _UIRenderer(BaseRenderer):
     charset = 'utf-8'
     template = ''
 
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        self.set_context(renderer_context, data)
+    def render(self, swagger, accepted_media_type=None, renderer_context=None):
+        self.set_context(renderer_context, swagger)
         return render(
             renderer_context['request'],
             self.template,
             renderer_context
         )
 
-    def set_context(self, renderer_context, data):
-        renderer_context['title'] = data.title
-        renderer_context['version'] = data.version
+    def set_context(self, renderer_context, swagger):
+        renderer_context['title'] = swagger.info.title
+        renderer_context['version'] = swagger.info.version
         renderer_context['swagger_settings'] = json.dumps(self.get_swagger_ui_settings())
         renderer_context['redoc_settings'] = json.dumps(self.get_redoc_settings())
         renderer_context['USE_SESSION_AUTH'] = swagger_settings.USE_SESSION_AUTH
