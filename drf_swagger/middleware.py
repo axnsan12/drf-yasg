@@ -3,7 +3,8 @@ import json
 from django.http import HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 
-from .codec import SwaggerValidationError, _OpenAPICodec
+from .codec import _OpenAPICodec
+from drf_swagger.errors import SwaggerValidationError
 
 
 class SwaggerExceptionMiddleware(MiddlewareMixin):

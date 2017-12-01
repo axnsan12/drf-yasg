@@ -5,15 +5,8 @@ from coreapi.compat import force_bytes
 from ruamel import yaml
 
 from drf_swagger.app_settings import swagger_settings
+from drf_swagger.errors import SwaggerValidationError
 from . import openapi
-
-
-class SwaggerValidationError(Exception):
-    def __init__(self, msg, validator_name, spec, source_codec, *args) -> None:
-        super(SwaggerValidationError, self).__init__(msg, *args)
-        self.validator_name = validator_name
-        self.spec = spec
-        self.source_codec = source_codec
 
 
 def _validate_flex(spec, codec):

@@ -4,6 +4,36 @@ from coreapi.compat import urlparse
 from inflection import camelize
 
 
+TYPE_OBJECT = "object"
+TYPE_STRING = "string"
+TYPE_NUMBER = "number"
+TYPE_INTEGER = "integer"
+TYPE_BOOLEAN = "boolean"
+TYPE_ARRAY = "array"
+TYPE_FILE = "file"
+
+# officially supported by Swagger 2.0 spec
+FORMAT_DATE = "date"
+FORMAT_DATETIME = "date-time"
+FORMAT_PASSWORD = "password"
+FORMAT_BINARY = "binary"
+FORMAT_BASE64 = "bytes"
+FORMAT_FLOAT = "float"
+FORMAT_DOUBLE = "double"
+FORMAT_INT32 = "int32"
+FORMAT_INT64 = "int64"
+
+# defined in JSON-schema
+FORMAT_EMAIL = "email"
+FORMAT_IPV4 = "ipv4"
+FORMAT_IPV6 = "ipv6"
+FORMAT_URI = "uri"
+
+# pulled out of my ass
+FORMAT_UUID = "uuid"
+FORMAT_SLUG = "slug"
+
+
 def make_swagger_name(attribute_name):
     """
     Convert a python variable name into a Swagger spec attribute name.
