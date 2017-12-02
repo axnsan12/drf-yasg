@@ -1,4 +1,5 @@
 # Packages required for development and CI
 tox>=2.9.1
 tox-battery>=0.5
+tox-travis>=0.10
 python-coveralls>=2.9.1

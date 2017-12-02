@@ -1,15 +1,13 @@
 language: python
 python:
+ - '3.5'
  - '3.6'
-env:
- - TOX_ENV=py35
- - TOX_ENV=py36
- - TOX_ENV=py37
+ - '3.7'
 install:
  - pip install -r requirements_dev.txt
 before_script:
  - coverage erase
 script:
- - tox -e $TOX_ENV
+ - tox
 after_success:
  - coveralls
