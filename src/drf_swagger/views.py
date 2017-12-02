@@ -5,7 +5,7 @@ from django.utils.cache import add_never_cache_headers
 from django.utils.decorators import available_attrs
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
-from rest_framework import exceptions, renderers
+from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
@@ -14,7 +14,6 @@ from .generators import OpenAPISchemaGenerator
 from .renderers import (
     SwaggerJSONRenderer, SwaggerYAMLRenderer, SwaggerUIRenderer, ReDocRenderer, OpenAPIRenderer,
 )
-from .openapi import Info
 
 SPEC_RENDERERS = (SwaggerYAMLRenderer, SwaggerJSONRenderer, OpenAPIRenderer)
 UI_RENDERERS = {
@@ -53,7 +52,7 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False
     """
     Create a SchemaView class with default renderers and generators.
 
-    :param Info info: Required. Swagger API Info object
+    :param drf_swagger.openapi.Info info: Required. Swagger API Info object
     :param str url: API base url; if left blank will be deduced from the location the view is served at
     :param str patterns: passed to SchemaGenerator
     :param str urlconf: passed to SchemaGenerator

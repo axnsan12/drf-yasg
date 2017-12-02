@@ -1,11 +1,11 @@
-from rest_framework.schemas.generators import distribute_links, SchemaGenerator
+from rest_framework.schemas.generators import SchemaGenerator
 
 from . import openapi
 
 
 class OpenAPISchemaGenerator(object):
     def __init__(self, info, version, url=None, patterns=None, urlconf=None):
-        self._gen = SchemaGenerator(info.title, url, info.description, patterns, urlconf)
+        self._gen = SchemaGenerator(info.title, url, info.get('description', ''), patterns, urlconf)
         self.info = info
         self.version = version
         self.endpoints = None
@@ -45,17 +45,14 @@ class OpenAPISchemaGenerator(object):
     def get_paths(self):
         if not self.endpoints:
             return []
-        prefix = self._gen.determine_path_prefix(ve[0] for ve in self.endpoints)
+        self._gen.determine_path_prefix(ve[0] for ve in self.endpoints)
         operations = []
 
         for path, method, view in self.endpoints:
             if not self._gen.has_view_permissions(path, method, view):
                 continue
+            # TODO: get_path?
             # link = view.schema.get_link(path, method, base_url=self.url)
             operations.append((path, method))
 
         return {}
-
-
-
-

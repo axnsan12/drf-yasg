@@ -1,6 +1,5 @@
-from rest_framework.status import HTTP_400_BAD_REQUEST
-
 from rest_framework import serializers
+
 from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 
 
@@ -15,11 +14,15 @@ class ExampleProjectsSerializer(serializers.Serializer):
 
 
 class SnippetSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
+    """SnippetSerializer classdoc
+
+    create: docstring for create from serializer classdoc
+    """
+    id = serializers.IntegerField(read_only=True, help_text="id help text")
     title = serializers.CharField(required=False, allow_blank=True, max_length=100)
     code = serializers.CharField(style={'base_template': 'textarea.html'})
     linenos = serializers.BooleanField(required=False)
-    language = LanguageSerializer()
+    language = LanguageSerializer(help_text="Sample help text for language")
     style = serializers.ChoiceField(choices=STYLE_CHOICES, default='friendly')
     lines = serializers.ListField(child=serializers.IntegerField(), allow_empty=True, allow_null=True, required=False)
     example_projects = serializers.ListSerializer(child=ExampleProjectsSerializer())

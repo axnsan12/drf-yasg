@@ -3,7 +3,6 @@ from collections import OrderedDict
 
 from django.core.validators import RegexValidator
 from rest_framework import serializers
-from rest_framework.serializers import Field
 from rest_framework.schemas import AutoSchema
 from django.utils.encoding import force_text
 
@@ -27,7 +26,7 @@ def find_regex(regex_field):
 def field_to_swagger(field, swagger_object_type):
     """Convert a Django Rest Framework serializer Field into a Swagger definition.
 
-    :param Field field: the source field
+    :param rest_framework.serializers.Field field: the source field
     :param type swagger_object_type: should be one of Schema, Parameter, Items
     :return: the swagger object
     """
