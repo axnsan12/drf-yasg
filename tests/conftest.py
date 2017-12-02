@@ -1,8 +1,7 @@
 import pytest
-from ruamel import yaml
-
 from drf_swagger import openapi, codecs
 from drf_swagger.generators import OpenAPISchemaGenerator
+from ruamel import yaml
 
 
 @pytest.fixture

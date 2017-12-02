@@ -1,9 +1,10 @@
 import os
 
+
 class PytestTestRunner(object):
     """Runs pytest to discover and run tests."""
 
-    def __init__(self, verbosity=1, failfast=False, keepdb=False, **kwargs):
+    def __init__(self, verbosity=1, failfast=False, keepdb=False, **_):
         self.verbosity = verbosity
         self.failfast = failfast
         self.keepdb = keepdb
