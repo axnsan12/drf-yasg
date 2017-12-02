@@ -1,17 +1,27 @@
 language: python
+cache: pip
 python:
  - '3.5'
  - '3.6'
- - '3.7'
-env:
- - TOX_ENV=py35
- - TOX_ENV=py36
- - TOX_ENV=py37
+ - '3.7-dev'
+
+matrix:
+    fast_finish: true
+    include:
+      - python: "3.5"
+        env: TOXENV=flake8
+
+    allow_failures:
+      - env: TOXENV=flake8
+
 install:
- - pip install requirements_dev.txt
+ - pip install -r requirements_dev.txt
+
 before_script:
  - coverage erase
+
 script:
- - tox -e $TOX_ENV
+ - tox
+
 after_success:
  - coveralls

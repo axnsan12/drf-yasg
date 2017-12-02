@@ -1,11 +1,9 @@
 import json
 
-from ruamel import yaml
-
+import pytest
 from drf_swagger import openapi, codecs
 from drf_swagger.generators import OpenAPISchemaGenerator
-
-import pytest
+from ruamel import yaml
 
 
 def validate_schema(swagger):
@@ -14,8 +12,8 @@ def validate_schema(swagger):
 
     validate_flex(swagger)
     validate_ssv(swagger)
-    
-    
+
+
 def test_schema_generates_without_errors(generator):
     generator.get_schema(None, True)
 

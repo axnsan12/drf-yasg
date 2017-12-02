@@ -25,5 +25,5 @@ urlpatterns = [
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=None), name='schema-redoc'),
 
     url(r'^admin/', admin.site.urls),
-    url(f'^snippets/', include('snippets.urls')),
+    url(r'^snippets/', include('snippets.urls')),
 ]

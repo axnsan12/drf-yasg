@@ -55,7 +55,7 @@ class _OpenAPICodec(BaseCodec):
     def validators(self):
         return self._validators
 
-    def encode(self, document, **options):
+    def encode(self, document, **_):
         if not isinstance(document, openapi.Swagger):
             raise TypeError('Expected a `openapi.Swagger` instance')
 

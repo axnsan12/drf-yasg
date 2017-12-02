@@ -1,6 +1,5 @@
-from rest_framework.status import HTTP_400_BAD_REQUEST
-
 from rest_framework import serializers
+
 from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 
 
