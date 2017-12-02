@@ -1,9 +1,9 @@
-from rest_framework.schemas import SchemaGenerator
+from rest_framework.schemas import SchemaGenerator as _SchemaGenerator
 
 from . import openapi
 
 
-class OpenAPISchemaGenerator(SchemaGenerator):
+class OpenAPISchemaGenerator(_SchemaGenerator):
     def __init__(self, info, version, url=None, patterns=None, urlconf=None):
         super(OpenAPISchemaGenerator, self).__init__(info.title, url, info.description, patterns, urlconf)
         self.info = info

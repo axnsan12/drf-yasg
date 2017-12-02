@@ -102,9 +102,9 @@ class Swagger(coreapi.Document):
         :param string version: API version string
         :return: an openapi.Swagger
         """
-        if document.title != info.title:
+        if document.title and document.title != info.title:
             warnings.warn("document title is overriden by Swagger Info")
-        if document.description != info.description:
+        if document.description and document.description != info.description:
             warnings.warn("document description is overriden by Swagger Info")
         return Swagger(
             info=info,
