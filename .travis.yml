@@ -24,4 +24,8 @@ script:
  - tox
 
 after_success:
- - coveralls
+ - codecov
+
+branches:
+  only:
+    - master
