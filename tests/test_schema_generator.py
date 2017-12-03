@@ -24,6 +24,7 @@ def test_schema_is_valid(generator, codec_yaml):
 
 
 def test_invalid_schema_fails(codec_json):
+    # noinspection PyTypeChecker
     bad_generator = OpenAPISchemaGenerator(
         info=openapi.Info(
             title="Test generator", default_version="v1",
