@@ -33,6 +33,12 @@ FORMAT_URI = "uri"
 FORMAT_UUID = "uuid"
 FORMAT_SLUG = "slug"
 
+IN_BODY = 'body'
+IN_PATH = 'path'
+IN_QUERY = 'query'
+IN_FORM = 'formData'
+IN_HEADER = 'header'
+
 
 def make_swagger_name(attribute_name):
     """
@@ -49,14 +55,14 @@ def make_swagger_name(attribute_name):
     if attribute_name == 'ref':
         return "$ref"
     if attribute_name.startswith("x_"):
-        return "x-" + camelize(attribute_name, uppercase_first_letter=False)
-    return camelize(attribute_name.strip('_'), uppercase_first_letter=False)
+        return "x-" + camelize(attribute_name[2:], uppercase_first_letter=False)
+    return camelize(attribute_name.rstrip('_'), uppercase_first_letter=False)
 
 
 class SwaggerDict(OrderedDict):
     def __init__(self, **attrs):
         super().__init__()
-        for attr, val in attrs:
+        for attr, val in attrs.items():
             setattr(self, attr, val)
 
     def __setattr__(self, key, value):
@@ -182,9 +188,11 @@ class PathItem(SwaggerDict):
 
 
 class Operation(SwaggerDict):
-    def __init__(self, *, operation_id, responses, consumes=None, produces=None, description=None, tags=None, **extra):
+    def __init__(self, *, operation_id, responses, parameters=None, consumes=None,
+                 produces=None, description=None, tags=None, **extra):
         self.operation_id = operation_id
         self.responses = responses
+        self.parameters = parameters
         self.consumes = consumes
         self.produces = produces
         self.description = description
@@ -203,9 +211,9 @@ class Items(SwaggerDict):
 
 
 class Parameter(SwaggerDict):
-    def __init__(self, *, name, in_, description, required, schema=None,
+    def __init__(self, *, name, in_, description=None, required=None, schema=None,
                  type=None, format=None, enum=None, pattern=None, items=None, **extra):
-        if not schema and not type:
+        if (not schema and not type) or (schema and type):
             raise ValueError("either schema or type are required for Parameter object!")
         self.name = name
         self.in_ = in_

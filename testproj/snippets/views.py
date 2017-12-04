@@ -1,4 +1,6 @@
 from rest_framework import generics
+from rest_framework.viewsets import ModelViewSet
+
 from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer
 
@@ -33,3 +35,8 @@ class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         """delete method docstring"""
         return super().patch(request, *args, **kwargs)
+
+
+class SnippetViewSet(ModelViewSet):
+    queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
