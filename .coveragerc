@@ -1,5 +1,5 @@
 [run]
-source = src/drf_swagger
+source = drf_swagger
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -9,7 +9,7 @@ exclude_lines =
 
     # Don't complain about missing debug-only code:
     def __repr__
-    if self\.debug
+    if self/.debug
 
     # Don't complain if tests don't hit defensive assertion code:
     raise AssertionError
@@ -21,3 +21,9 @@ exclude_lines =
 
 ignore_errors = True
 precision = 0
+
+[paths]
+source =
+    src/drf_swagger/
+    .tox/*/Lib/site-packages/drf_swagger/
+    /home/travis/virtualenv/*/lib/*/site-packages/drf_swagger/
