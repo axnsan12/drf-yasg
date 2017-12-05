@@ -70,7 +70,7 @@ class OpenAPISchemaGenerator(object):
                 operation_keys = self._gen.get_keys(path[len(prefix):], method, view)
                 operations[method.lower()] = schema.get_operation(operation_keys, path, method)
 
-            paths[path] = openapi.PathItem(**operations, parameters=path_parameters)
+            paths[path] = openapi.PathItem(parameters=path_parameters, **operations)
 
         return openapi.Paths(paths=paths)
 

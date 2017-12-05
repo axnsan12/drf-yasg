@@ -27,7 +27,7 @@ def find_regex(regex_field):
 
 class SwaggerAutoSchema(object):
     def __init__(self, view):
-        super().__init__()
+        super(SwaggerAutoSchema, self).__init__()
         self._sch = AutoSchema()
         self.view = view
         self._sch.view = view

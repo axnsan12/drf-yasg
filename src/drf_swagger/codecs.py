@@ -2,6 +2,7 @@ import json
 from collections import OrderedDict
 
 from coreapi.compat import force_bytes
+from future.utils import raise_from
 from ruamel import yaml
 
 from drf_swagger.app_settings import swagger_settings
@@ -15,7 +16,7 @@ def _validate_flex(spec, codec):
     try:
         validate_flex(spec)
     except ValidationError as ex:
-        raise SwaggerValidationError(str(ex), 'flex', spec, codec) from ex
+        raise_from(SwaggerValidationError(str(ex), 'flex', spec, codec), ex)
 
 
 def _validate_swagger_spec_validator(spec, codec):
@@ -24,7 +25,7 @@ def _validate_swagger_spec_validator(spec, codec):
     try:
         validate_ssv(spec)
     except SSVErr as ex:
-        raise SwaggerValidationError(str(ex), 'swagger_spec_validator', spec, codec) from ex
+        raise_from(SwaggerValidationError(str(ex), 'swagger_spec_validator', spec, codec), ex)
 
 
 VALIDATORS = {

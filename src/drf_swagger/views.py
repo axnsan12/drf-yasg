@@ -132,7 +132,7 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False
             :return: a view instance
             """
             assert renderer in UI_RENDERERS, "supported default renderers are " + ", ".join(UI_RENDERERS)
-            renderer_classes = (*UI_RENDERERS[renderer], *_spec_renderers)
+            renderer_classes = UI_RENDERERS[renderer] + _spec_renderers
 
             return cls.as_cached_view(cache_timeout, cache_kwargs, renderer_classes=renderer_classes)
 

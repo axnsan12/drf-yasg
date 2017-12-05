@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from coreapi.compat import urlparse
+from future.utils import raise_from
 from inflection import camelize
 
 TYPE_OBJECT = "object"
@@ -60,13 +61,13 @@ def make_swagger_name(attribute_name):
 
 class SwaggerDict(OrderedDict):
     def __init__(self, **attrs):
-        super().__init__()
+        super(SwaggerDict, self).__init__()
         for attr, val in attrs.items():
             setattr(self, attr, val)
 
     def __setattr__(self, key, value):
         if key.startswith('_'):
-            super().__setattr__(key, value)
+            super(SwaggerDict, self).__setattr__(key, value)
             return
         if value is not None:
             self[make_swagger_name(key)] = value
@@ -75,11 +76,11 @@ class SwaggerDict(OrderedDict):
         try:
             return self[make_swagger_name(item)]
         except KeyError as e:
-            raise AttributeError("no attribute " + item) from e
+            raise_from(AttributeError("no attribute " + item), e)
 
     def __delattr__(self, item):
         if item.startswith('_'):
-            super().__delattr__(item)
+            super(SwaggerDict, self).__delattr__(item)
             return
         del self[make_swagger_name(item)]
 
@@ -99,7 +100,7 @@ class Contact(SwaggerDict):
         self.name = name
         self.url = url
         self.email = email
-        super().__init__(**extra)
+        super(Contact, self).__init__(**extra)
 
 
 class License(SwaggerDict):
@@ -114,7 +115,7 @@ class License(SwaggerDict):
             raise ValueError("name is required for Swagger License object")
         self.name = name
         self.url = url
-        super().__init__(**extra)
+        super(License, self).__init__(**extra)
 
 
 class Info(SwaggerDict):
@@ -142,7 +143,7 @@ class Info(SwaggerDict):
         self.terms_of_service = terms_of_service
         self.contact = contact
         self.license = license
-        super().__init__(**extra)
+        super(Info, self).__init__(**extra)
 
 
 class Swagger(SwaggerDict):
@@ -159,7 +160,7 @@ class Swagger(SwaggerDict):
             self.schemes = [url.scheme]
 
         self.base_path = '/'
-        super().__init__(**extra)
+        super(Swagger, self).__init__(**extra)
 
 
 class Paths(SwaggerDict):
@@ -168,7 +169,7 @@ class Paths(SwaggerDict):
             assert path.startswith("/")
             if path_obj is not None:
                 self[path] = path_obj
-        super().__init__(**extra)
+        super(Paths, self).__init__(**extra)
 
 
 class PathItem(SwaggerDict):
@@ -182,7 +183,7 @@ class PathItem(SwaggerDict):
         self.head = head
         self.patch = patch
         self.parameters = parameters
-        super().__init__(**extra)
+        super(PathItem, self).__init__(**extra)
 
 
 class Operation(SwaggerDict):
@@ -195,7 +196,7 @@ class Operation(SwaggerDict):
         self.produces = produces
         self.description = description
         self.tags = tags
-        super().__init__(**extra)
+        super(Operation, self).__init__(**extra)
 
 
 class Items(SwaggerDict):
@@ -205,7 +206,7 @@ class Items(SwaggerDict):
         self.enum = enum
         self.pattern = pattern
         self.items = items
-        super().__init__(**extra)
+        super(Items, self).__init__(**extra)
 
 
 class Parameter(SwaggerDict):
@@ -223,7 +224,7 @@ class Parameter(SwaggerDict):
         self.enum = enum
         self.pattern = pattern
         self.items = items
-        super().__init__(**extra)
+        super(Parameter, self).__init__(**extra)
 
 
 class Schema(SwaggerDict):
@@ -238,13 +239,13 @@ class Schema(SwaggerDict):
         self.enum = enum
         self.pattern = pattern
         self.items = items
-        super().__init__(**extra)
+        super(Schema, self).__init__(**extra)
 
 
 class Ref(SwaggerDict):
     def __init__(self, ref):
         self.ref = ref
-        super().__init__()
+        super(Ref, self).__init__()
 
 
 class Responses(SwaggerDict):
@@ -253,7 +254,7 @@ class Responses(SwaggerDict):
             if response is not None:
                 self[str(status)] = response
         self.default = default
-        super().__init__(**extra)
+        super(Responses, self).__init__(**extra)
 
 
 class Response(SwaggerDict):
@@ -261,4 +262,4 @@ class Response(SwaggerDict):
         self.description = description
         self.schema = schema
         self.examples = examples
-        super().__init__(**extra)
+        super(Response, self).__init__(**extra)
