@@ -67,12 +67,11 @@ class OpenAPISchemaGenerator(object):
 
                 schema = SwaggerAutoSchema(view)
                 operation_keys = self._gen.get_keys(path[len(prefix):], method, view)
-                operation_id = '_'.join(operation_keys)
-                operations[method.lower()] = schema.get_operation(operation_id, path, method)
+                operations[method.lower()] = schema.get_operation(operation_keys, path, method)
 
             paths[path] = openapi.PathItem(**operations, parameters=path_parameters)
 
-        return paths
+        return openapi.Paths(paths=paths)
 
     def get_path_parameters(self, path, view_cls):
         """Return a list of Parameter instances corresponding to any templated path variables.
@@ -81,7 +80,7 @@ class OpenAPISchemaGenerator(object):
         :param type view_cls: the view class associated with the path
         :return list[openapi.Parameter]: path parameters
         """
-        fields = []
+        parameters = []
         model = getattr(getattr(view_cls, 'queryset', None), 'model', None)
 
         for variable in uritemplate.variables(path):
@@ -113,6 +112,6 @@ class OpenAPISchemaGenerator(object):
                 pattern=pattern,
                 description=description,
             )
-            fields.append(field)
+            parameters.append(field)
 
-        return fields
+        return parameters
