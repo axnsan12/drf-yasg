@@ -3,7 +3,6 @@ from collections import OrderedDict
 from coreapi.compat import urlparse
 from inflection import camelize
 
-
 TYPE_OBJECT = "object"
 TYPE_STRING = "string"
 TYPE_NUMBER = "number"
@@ -73,8 +72,6 @@ class SwaggerDict(OrderedDict):
             self[make_swagger_name(key)] = value
 
     def __getattr__(self, item):
-        if item.startswith('_'):
-            raise AttributeError
         try:
             return self[make_swagger_name(item)]
         except KeyError as e:
@@ -169,7 +166,8 @@ class Paths(SwaggerDict):
     def __init__(self, paths, **extra):
         for path, path_obj in paths.items():
             assert path.startswith("/")
-            self[path] = path_obj
+            if path_obj is not None:
+                self[path] = path_obj
         super().__init__(**extra)
 
 
@@ -192,7 +190,7 @@ class Operation(SwaggerDict):
                  produces=None, description=None, tags=None, **extra):
         self.operation_id = operation_id
         self.responses = responses
-        self.parameters = parameters
+        self.parameters = [param for param in parameters if param is not None]
         self.consumes = consumes
         self.produces = produces
         self.description = description
@@ -252,7 +250,8 @@ class Ref(SwaggerDict):
 class Responses(SwaggerDict):
     def __init__(self, responses, default=None, **extra):
         for status, response in responses.items():
-            self[str(status)] = response
+            if response is not None:
+                self[str(status)] = response
         self.default = default
         super().__init__(**extra)
 

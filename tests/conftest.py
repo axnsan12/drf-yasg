@@ -1,7 +1,8 @@
 import pytest
+from ruamel import yaml
+
 from drf_swagger import openapi, codecs
 from drf_swagger.generators import OpenAPISchemaGenerator
-from ruamel import yaml
 
 
 @pytest.fixture
@@ -27,3 +28,28 @@ def swagger_dict():
     swagger = generator().get_schema(None, True)
     json_bytes = codec_yaml().encode(swagger)
     return yaml.safe_load(json_bytes.decode('utf-8'))
+
+
+@pytest.fixture
+def validate_schema():
+    def validate_schema(swagger):
+        from flex.core import parse as validate_flex
+        from swagger_spec_validator.validator20 import validate_spec as validate_ssv
+
+        validate_flex(swagger)
+        validate_ssv(swagger)
+
+    return validate_schema
+
+
+@pytest.fixture
+def bad_settings():
+    from drf_swagger.app_settings import swagger_settings, SWAGGER_DEFAULTS
+    bad_security = {
+        'bad': {
+            'bad_attribute': 'should not be accepted'
+        }
+    }
+    SWAGGER_DEFAULTS['SECURITY_DEFINITIONS'].update(bad_security)
+    yield swagger_settings
+    del SWAGGER_DEFAULTS['SECURITY_DEFINITIONS']['bad']

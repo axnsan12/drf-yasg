@@ -39,6 +39,7 @@
           <option value="license" />
           <option value="format" />
           <option value="type" />
+          <option value="filter" />
         </list>
       </option>
     </inspection_tool>

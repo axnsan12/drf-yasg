@@ -29,7 +29,6 @@ def _validate_swagger_spec_validator(spec, codec):
 
 VALIDATORS = {
     'flex': _validate_flex,
-    'swagger_spec_validator': _validate_swagger_spec_validator,
     'ssv': _validate_swagger_spec_validator,
 }
 
@@ -58,11 +57,11 @@ class _OpenAPICodec(object):
         return force_bytes(self._dump_dict(err))
 
     def _dump_dict(self, spec):
-        return NotImplementedError("override this method")
+        raise NotImplementedError("override this method")
 
     def generate_swagger_object(self, swagger):
         """
-        Generates root of the Swagger spec.
+        Generates the root Swagger object.
 
         :param openapi.Swagger swagger:
         :return OrderedDict: swagger spec as dict
@@ -72,7 +71,7 @@ class _OpenAPICodec(object):
 
 
 class OpenAPICodecJson(_OpenAPICodec):
-    media_type = 'application/openapi+json'
+    media_type = 'application/json'
 
     def _dump_dict(self, spec):
         return json.dumps(spec)
@@ -86,7 +85,7 @@ class SaneYamlDumper(yaml.SafeDumper):
         return super(SaneYamlDumper, self).increase_indent(flow=flow, indentless=False, **kwargs)
 
     @staticmethod
-    def represent_odict(dump, mapping, flow_style=None):
+    def represent_odict(dump, mapping, flow_style=None):  # pragma: no cover
         """https://gist.github.com/miracle2k/3184458
         Make PyYAML output an OrderedDict.
 
@@ -123,7 +122,7 @@ SaneYamlDumper.add_multi_representer(OrderedDict, SaneYamlDumper.represent_odict
 
 
 class OpenAPICodecYaml(_OpenAPICodec):
-    media_type = 'application/openapi+yaml'
+    media_type = 'application/yaml'
 
     def _dump_dict(self, spec):
         return yaml.dump(spec, Dumper=SaneYamlDumper, default_flow_style=False, encoding='utf-8')

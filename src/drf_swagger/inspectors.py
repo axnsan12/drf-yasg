@@ -1,4 +1,3 @@
-import collections
 import functools
 from collections import OrderedDict
 
@@ -7,6 +6,7 @@ from django.core.validators import RegexValidator
 from django.utils.encoding import force_text
 from rest_framework import serializers
 from rest_framework.schemas import AutoSchema
+from rest_framework.schemas.utils import is_list_view
 
 from drf_swagger.errors import SwaggerGenerationError
 from . import openapi
@@ -179,10 +179,15 @@ class SwaggerAutoSchema(object):
         :param str method: HTTP request method
         :return list[openapi.Parameter]: the filter query parameters
         """
-        return [
-            self.coreapi_field_to_parameter(field)
-            for field in self._sch.get_filter_fields(path, method)
-        ]
+        if not self._sch._allows_filters(path, method):
+            return []
+
+        fields = []
+        for filter_backend in self.view.filter_backends:
+            filter = filter_backend()
+            if hasattr(filter, 'get_schema_fields'):
+                fields += filter.get_schema_fields(self.view)
+        return [self.coreapi_field_to_parameter(field) for field in fields]
 
     def get_pagination_parameters(self, path, method):
         """Return the parameters added to the view by its paginator.
@@ -191,9 +196,16 @@ class SwaggerAutoSchema(object):
         :param str method: HTTP request method
         :return list[openapi.Parameter]: the pagination query parameters
         """
+        if not is_list_view(path, method, self.view):
+            return []
+
+        paginator = getattr(self.view, 'paginator', None)
+        if paginator is None:
+            return []
+
         return [
             self.coreapi_field_to_parameter(field)
-            for field in self._sch.get_pagination_fields(path, method)
+            for field in paginator.get_schema_fields(self.view)
         ]
 
     def coreapi_field_to_parameter(self, field):

@@ -19,6 +19,7 @@ class SnippetSerializer(serializers.Serializer):
     create: docstring for create from serializer classdoc
     """
     id = serializers.IntegerField(read_only=True, help_text="id serializer help text")
+    owner = serializers.ReadOnlyField(source='owner.username')
     title = serializers.CharField(required=False, allow_blank=True, max_length=100)
     code = serializers.CharField(style={'base_template': 'textarea.html'})
     linenos = serializers.BooleanField(required=False)

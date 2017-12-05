@@ -1,5 +1,6 @@
 [run]
 source = drf_swagger
+branch = True
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -14,6 +15,7 @@ exclude_lines =
     # Don't complain if tests don't hit defensive assertion code:
     raise AssertionError
     raise NotImplementedError
+    warnings.warn
 
     # Don't complain if non-runnable code isn't run:
     if 0:
@@ -26,4 +28,5 @@ precision = 0
 source =
     src/drf_swagger/
     .tox/*/Lib/site-packages/drf_swagger/
+    .tox/*/lib/*/site-packages/drf_swagger/
     /home/travis/virtualenv/*/lib/*/site-packages/drf_swagger/

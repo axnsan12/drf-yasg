@@ -1,6 +1,10 @@
-# Packages required for running the tests
-pygments>=2.2.0
-django-cors-headers>=2.1.0
+# Required for running the tests
 pytest-django>=3.1.2
 pytest-pythonpath>=0.7.1
 pytest-cov>=2.5.1
+
+# Required by the test django project
+Pillow>=4.3.0
+pygments>=2.2.0
+django-cors-headers>=2.1.0
+django-filter>=1.1.0

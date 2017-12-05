@@ -15,6 +15,7 @@ class OpenAPISchemaGenerator(object):
     This class iterates over all registered API endpoints and returns an appropriate OpenAPI 2.0 compliant schema.
     Method implementations shamelessly stolen and adapted from rest_framework SchemaGenerator.
     """
+
     def __init__(self, info, version, url=None, patterns=None, urlconf=None):
         self._gen = SchemaGenerator(info.title, url, info.get('description', ''), patterns, urlconf)
         self.info = info
@@ -55,7 +56,7 @@ class OpenAPISchemaGenerator(object):
     def get_paths(self):
         if not self.endpoints:
             return []
-        prefix = self._gen.determine_path_prefix(ve[0] for ve in self.endpoints)
+        prefix = self._gen.determine_path_prefix(self.endpoints.keys())
         paths = {}
 
         for path, (view_cls, methods) in self.endpoints.items():
