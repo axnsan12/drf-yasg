@@ -46,7 +46,8 @@ def deferred_never_cache(view_func):
     return _wrapped_view_func
 
 
-def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False, validators=None,
+def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, validators=None,
+                    generator_class=OpenAPISchemaGenerator,
                     authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
                     permission_classes=api_settings.DEFAULT_PERMISSION_CLASSES):
     """
@@ -58,13 +59,15 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False
     :param str urlconf: passed to SchemaGenerator
     :param bool public: if False, includes only endpoints the current user has access to
     :param list validators: a list of validator names to apply on the generated schema; allowed values are `flex`, `ssv`
+    :param type generator_class: schema generator class to use; should be a subclass of OpenAPISchemaGenerator
     :param tuple authentication_classes: authentication classes for the schema view itself
     :param tuple permission_classes: permission classes for the schema view itself
     :return: SchemaView class
     """
+    _public = public
+    _generator_class = generator_class
     _auth_classes = authentication_classes
     _perm_classes = permission_classes
-    _public = public
     validators = validators or []
     _spec_renderers = tuple(renderer.with_validators(validators) for renderer in SPEC_RENDERERS)
 
@@ -72,7 +75,7 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False
         _ignore_model_permissions = True
         schema = None  # exclude from schema
         public = _public
-        generator_class = OpenAPISchemaGenerator
+        generator_class = _generator_class
         authentication_classes = _auth_classes
         permission_classes = _perm_classes
         renderer_classes = _spec_renderers
@@ -129,7 +132,7 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False
             :return: a view instance
             """
             assert renderer in UI_RENDERERS, "supported default renderers are " + ", ".join(UI_RENDERERS)
-            renderer_classes = (*UI_RENDERERS[renderer], *_spec_renderers)
+            renderer_classes = UI_RENDERERS[renderer] + _spec_renderers
 
             return cls.as_cached_view(cache_timeout, cache_kwargs, renderer_classes=renderer_classes)
 

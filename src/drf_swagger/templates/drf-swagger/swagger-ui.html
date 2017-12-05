@@ -35,7 +35,7 @@
             margin-right: 8px;
         }
 
-        #django-session-auth.hidden {
+        .hidden {
             display: none;
         }
 
@@ -126,14 +126,31 @@
 </svg>
 
 <div id="swagger-ui"></div>
+<div id="spec-error" class="hidden alert alert-danger"></div>
 
-<script src="{% static 'drf-swagger/swagger-ui-dist/swagger-ui-bundle.js' %}"></script>
-<script src="{% static 'drf-swagger/swagger-ui-dist/swagger-ui-standalone-preset.js' %}"></script>
-<script src="{% static 'drf-swagger/insQ.min.js' %}"></script>
 <script>
-    window.onload = function () {
-        var currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
-        var specURL = currentPath + '?format=openapi';
+    "use strict";
+    var currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    var specURL = currentPath + '?format=openapi';
+
+    function patchSwaggerUi() {
+        var authWrapper = document.querySelector('.auth-wrapper');
+        var authorizeButton = document.querySelector('.auth-wrapper .authorize');
+        var djangoSessionAuth = document.querySelector('#django-session-auth');
+        if (document.querySelector('.auth-wrapper #django-session-auth')) {
+            console.log("session auth already patched");
+            return;
+        }
+
+        authWrapper.insertBefore(djangoSessionAuth, authorizeButton);
+        djangoSessionAuth.classList.remove("hidden");
+
+        var divider = document.createElement("div");
+        divider.classList.add("divider");
+        authWrapper.insertBefore(divider, authorizeButton);
+    }
+
+    function initSwaggerUi() {
         var swaggerConfig = {
             url: specURL,
             dom_id: '#swagger-ui',
@@ -158,21 +175,17 @@
             }
         }
         window.ui = SwaggerUIBundle(swaggerConfig);
-
-        insertionQ('.auth-wrapper .authorize').every(function () {
-            var authWrapper = document.querySelector('.auth-wrapper');
-            var authorizeButton = document.querySelector('.auth-wrapper .authorize');
-            var djangoSessionAuth = document.querySelector('#django-session-auth');
-
-            authWrapper.insertBefore(djangoSessionAuth, authorizeButton);
-            djangoSessionAuth.classList.remove("hidden");
-
-            var divider = document.createElement("div");
-            divider.classList.add("divider");
-            authWrapper.insertBefore(divider, authorizeButton);
-        });
     }
+
+    window.onload = function () {
+        insertionQ('.auth-wrapper .authorize').every(patchSwaggerUi);
+        initSwaggerUi();
+    };
 </script>
+
+<script src="{% static 'drf-swagger/swagger-ui-dist/swagger-ui-bundle.js' %}"></script>
+<script src="{% static 'drf-swagger/swagger-ui-dist/swagger-ui-standalone-preset.js' %}"></script>
+<script src="{% static 'drf-swagger/insQ.min.js' %}"></script>
 
 <div id="django-session-auth" class="hidden">
     {% if USE_SESSION_AUTH %}

@@ -1,0 +1,3 @@
+# requirements for local development
+tox>=2.9.1
+tox-battery>=0.5

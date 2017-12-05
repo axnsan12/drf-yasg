@@ -1,5 +1,5 @@
 include README.md
 include LICENSE
-include requirements*
+recursive-include requirements *
 recursive-include src/drf_swagger/static *
 recursive-include src/drf_swagger/templates *
