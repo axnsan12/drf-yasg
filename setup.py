@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
+
 from setuptools import setup, find_packages
 
 
 def read_req(req_file):
-    with open(req_file) as req:
+    with open(os.path.join('requirements', req_file)) as req:
         return [line for line in req.readlines() if line and not line.isspace()]
 
 
-requirements = read_req('requirements.txt')
-requirements_validation = read_req('requirements_validation.txt')
-requirements_dev = read_req('requirements_dev.txt')
-requirements_test = read_req('requirements_test.txt')
+requirements = ['djangorestframework>=3.7.3'] + read_req('base.txt')
+requirements_validation = read_req('validation.txt')
+requirements_test = read_req('test.txt')
 
 setup(
     name='drf-swagger',
@@ -24,7 +25,6 @@ setup(
     extras_require={
         'validation': requirements_validation,
         'test': requirements_test,
-        'dev': requirements_dev,
     },
     license='BSD License',
     description='Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code.',

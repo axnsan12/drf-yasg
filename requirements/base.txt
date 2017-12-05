@@ -1,4 +1,3 @@
-djangorestframework>=3.7.3
 coreapi>=2.3.3
 coreschema>=0.0.4
 openapi_codec>=1.3.2
