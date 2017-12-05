@@ -46,7 +46,7 @@ def deferred_never_cache(view_func):
     return _wrapped_view_func
 
 
-def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False, validators=None,
+def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, validators=None,
                     generator_class=OpenAPISchemaGenerator,
                     authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
                     permission_classes=api_settings.DEFAULT_PERMISSION_CLASSES):
@@ -132,7 +132,7 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False
             :return: a view instance
             """
             assert renderer in UI_RENDERERS, "supported default renderers are " + ", ".join(UI_RENDERERS)
-            renderer_classes = (*UI_RENDERERS[renderer], *_spec_renderers)
+            renderer_classes = UI_RENDERERS[renderer] + _spec_renderers
 
             return cls.as_cached_view(cache_timeout, cache_kwargs, renderer_classes=renderer_classes)
 

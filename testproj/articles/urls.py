@@ -1,5 +1,4 @@
-from django.conf.urls import url
-from django.urls import include
+from django.conf.urls import include, url
 from rest_framework.routers import SimpleRouter
 
 from articles import views

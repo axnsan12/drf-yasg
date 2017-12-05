@@ -1,0 +1,4 @@
+# requirements for CI test suite
+-r dev.txt
+tox-travis>=0.10
+codecov>=2.0.9
