@@ -6,7 +6,7 @@ from ruamel import yaml
 def _validate_text_schema_view(client, validate_schema, path, loader):
     response = client.get(path)
     assert response.status_code == 200
-    validate_schema(loader(response.content))
+    validate_schema(loader(response.content.decode('utf-8')))
 
 
 def _validate_ui_schema_view(client, path, string):
@@ -26,7 +26,7 @@ def test_swagger_yaml(client, validate_schema):
 def test_exception_middleware(client, bad_settings):
     response = client.get('/swagger.json')
     assert response.status_code == 500
-    assert 'errors' in json.loads(response.content)
+    assert 'errors' in json.loads(response.content.decode('utf-8'))
 
 
 def test_swagger_ui(client, validate_schema):
