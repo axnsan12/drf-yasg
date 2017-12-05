@@ -46,7 +46,7 @@ def deferred_never_cache(view_func):
     return _wrapped_view_func
 
 
-def get_schema_view(info, url=None, patterns=None, urlconf=None, *, public=False, validators=None,
+def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, validators=None,
                     generator_class=OpenAPISchemaGenerator,
                     authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
                     permission_classes=api_settings.DEFAULT_PERMISSION_CLASSES):
