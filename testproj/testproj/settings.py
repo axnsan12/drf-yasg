@@ -13,7 +13,9 @@ SECRET_KEY = '!z1yj(9uz)zk0gg@5--j)bc4h^i!8))r^dezco8glf190e0&#p'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'test.local'
+    '127.0.0.1',
+    'localhost',
+    'test.local',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 
