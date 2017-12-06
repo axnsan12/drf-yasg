@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 import django.db.models
 import uritemplate
@@ -57,9 +57,9 @@ class OpenAPISchemaGenerator(object):
         if not self.endpoints:
             return []
         prefix = self._gen.determine_path_prefix(self.endpoints.keys())
-        paths = {}
+        paths = OrderedDict()
 
-        for path, (view_cls, methods) in self.endpoints.items():
+        for path, (view_cls, methods) in sorted(self.endpoints.items()):
             path_parameters = self.get_path_parameters(path, view_cls)
             operations = {}
             for method, view in methods:
