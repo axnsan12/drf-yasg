@@ -255,6 +255,9 @@ class Schema(SwaggerDict):
     def __init__(self, description=None, required=None, type=None, properties=None, additional_properties=None,
                  format=None, enum=None, pattern=None, items=None, **extra):
         super(Schema, self).__init__(**extra)
+        if required is True or required is False:
+            # common error
+            raise ValueError("the requires attribute of schema must be an array of required properties, not a boolean!")
         self.description = description
         self.required = required
         self.type = type

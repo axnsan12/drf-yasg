@@ -1,150 +1,17 @@
-import functools
 import inspect
 from collections import OrderedDict
 
 import coreschema
-from django.core.validators import RegexValidator
-from django.utils.encoding import force_text
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework.request import is_form_media_type
 from rest_framework.schemas import AutoSchema
+from rest_framework.status import is_success
 from rest_framework.viewsets import GenericViewSet
 
 from drf_swagger.errors import SwaggerGenerationError
+from drf_swagger.utils import serializer_field_to_swagger
 from . import openapi
 from .utils import no_body, is_list_view
-
-
-def serializer_field_to_swagger(field, swagger_object_type, **kwargs):
-    """Convert a drf Serializer or Field instance into a Swagger object.
-
-    :param rest_framework.serializers.Field field: the source field
-    :param type swagger_object_type: should be one of Schema, Parameter, Items
-    :param kwargs: extra attributes for constructing the object;
-       if swagger_object_type is Parameter, `name` and `in_` should be provided
-    :return Swagger,Parameter,Items: the swagger object
-    """
-    assert swagger_object_type in (openapi.Schema, openapi.Parameter, openapi.Items)
-    title = force_text(field.label) if field.label else None
-    title = title if swagger_object_type == openapi.Schema else None  # only Schema has title
-    title = None
-    description = force_text(field.help_text) if field.help_text else None
-    description = description if swagger_object_type != openapi.Items else None  # Items has no description either
-
-    SwaggerType = functools.partial(swagger_object_type, title=title, description=description, **kwargs)
-    # arrays in Schema have Schema elements, arrays in Parameter and Items have Items elements
-    ChildSwaggerType = openapi.Schema if swagger_object_type == openapi.Schema else openapi.Items
-
-    # ------ NESTED
-    if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
-        child_schema = serializer_field_to_swagger(field.child, ChildSwaggerType)
-        return SwaggerType(
-            type=openapi.TYPE_ARRAY,
-            items=child_schema,
-        )
-    elif isinstance(field, serializers.Serializer):
-        if swagger_object_type != openapi.Schema:
-            raise SwaggerGenerationError("cannot instantiate nested serializer as "
-                                         + swagger_object_type.__name__)
-        return SwaggerType(
-            type=openapi.TYPE_OBJECT,
-            properties=OrderedDict(
-                (key, serializer_field_to_swagger(value, ChildSwaggerType))
-                for key, value
-                in field.fields.items()
-            )
-        )
-    elif isinstance(field, serializers.ManyRelatedField):
-        child_schema = serializer_field_to_swagger(field.child_relation, ChildSwaggerType)
-        return SwaggerType(
-            type=openapi.TYPE_ARRAY,
-            items=child_schema,
-            unique_items=True,  # is this OK?
-        )
-    elif isinstance(field, serializers.RelatedField):
-        # TODO: infer type for PrimaryKeyRelatedField?
-        return SwaggerType(type=openapi.TYPE_STRING)
-    # ------ CHOICES
-    elif isinstance(field, serializers.MultipleChoiceField):
-        return SwaggerType(
-            type=openapi.TYPE_ARRAY,
-            items=ChildSwaggerType(
-                type=openapi.TYPE_STRING,
-                enum=list(field.choices.keys())
-            )
-        )
-    elif isinstance(field, serializers.ChoiceField):
-        return SwaggerType(type=openapi.TYPE_STRING, enum=list(field.choices.keys()))
-    # ------ BOOL
-    elif isinstance(field, serializers.BooleanField):
-        return SwaggerType(type=openapi.TYPE_BOOLEAN)
-    # ------ NUMERIC
-    elif isinstance(field, (serializers.DecimalField, serializers.FloatField)):
-        # TODO: min_value max_value
-        return SwaggerType(type=openapi.TYPE_NUMBER)
-    elif isinstance(field, serializers.IntegerField):
-        # TODO: min_value max_value
-        return SwaggerType(type=openapi.TYPE_INTEGER)
-    # ------ STRING
-    elif isinstance(field, serializers.EmailField):
-        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_EMAIL)
-    elif isinstance(field, serializers.RegexField):
-        return SwaggerType(type=openapi.TYPE_STRING, pattern=find_regex(field))
-    elif isinstance(field, serializers.SlugField):
-        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_SLUG)
-    elif isinstance(field, serializers.URLField):
-        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)
-    elif isinstance(field, serializers.IPAddressField):
-        format = {'ipv4': openapi.FORMAT_IPV4, 'ipv6': openapi.FORMAT_IPV6}.get(field.protocol, None)
-        return SwaggerType(type=openapi.TYPE_STRING, format=format)
-    elif isinstance(field, serializers.CharField):
-        # TODO: min_length max_length (for all CharField subclasses above too)
-        return SwaggerType(type=openapi.TYPE_STRING)
-    elif isinstance(field, serializers.UUIDField):
-        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_UUID)
-    # ------ DATE & TIME
-    elif isinstance(field, serializers.DateField):
-        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE)
-    elif isinstance(field, serializers.DateTimeField):
-        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATETIME)
-    # ------ OTHERS
-    elif isinstance(field, serializers.FileField):
-        # swagger 2.0 does not support specifics about file fields, so ImageFile gets no special treatment
-        # OpenAPI 3.0 does support it, so a future implementation could handle this better
-        # TODO: appropriate produces/consumes somehow/somewhere?
-        if swagger_object_type != openapi.Parameter:
-            raise SwaggerGenerationError("parameter of type file is supported only in formData Parameter")
-        return SwaggerType(type=openapi.TYPE_FILE)
-    elif isinstance(field, serializers.JSONField):
-        return SwaggerType(
-            type=openapi.TYPE_STRING,
-            format=openapi.FORMAT_BINARY if field.binary else None
-        )
-    elif isinstance(field, serializers.DictField) and swagger_object_type == openapi.Schema:
-        child_schema = serializer_field_to_swagger(field.child, ChildSwaggerType)
-        return SwaggerType(
-            type=openapi.TYPE_OBJECT,
-            additional_properties=child_schema
-        )
-
-    # TODO unhandled fields: TimeField DurationField HiddenField ModelField NullBooleanField?
-    # TODO: return info about required/allowed empty
-
-    # everything else gets string by default
-    return SwaggerType(type=openapi.TYPE_STRING)
-
-
-def find_regex(regex_field):
-    regex_validator = None
-    for validator in regex_field.validators:
-        if isinstance(validator, RegexValidator):
-            if regex_validator is not None:
-                # bail if multiple validators are found - no obvious way to choose
-                return None
-            regex_validator = validator
-
-    # regex_validator.regex should be a compiled re object...
-    return getattr(getattr(regex_validator, 'regex', None), 'pattern', None)
 
 
 class SwaggerAutoSchema(object):
@@ -177,7 +44,7 @@ class SwaggerAutoSchema(object):
         description = self.get_description()
 
         responses = self.get_responses()
-        # manual_responses = self.overrides.get('responses', None) or {}
+
         return openapi.Operation(
             operation_id='_'.join(operation_keys),
             description=description,
@@ -260,7 +127,7 @@ class SwaggerAutoSchema(object):
 
         :param openapi.Schema schema: the request body schema
         """
-        return openapi.Parameter(name='data', in_=openapi.IN_BODY, schema=schema)
+        return openapi.Parameter(name='data', in_=openapi.IN_BODY, required=True, schema=schema)
 
     def add_manual_parameters(self, parameters):
         """Add/replace parameters from the given list of automatically generated request parameters.
@@ -291,6 +158,48 @@ class SwaggerAutoSchema(object):
             responses=self.get_response_schemas(response_serializers)
         )
 
+    def get_paged_response_schema(self, response_schema):
+        """Add appropriate paging fields to a response Schema.
+
+        :param openapi.Schema response_schema: the response schema that must be paged.
+        """
+        assert response_schema.type == openapi.TYPE_ARRAY
+        paged_schema = openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'count': openapi.Schema(type=openapi.TYPE_INTEGER),
+                'next': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI),
+                'previous': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI),
+                'results': response_schema,
+            },
+            required=['count', 'results']
+        )
+
+        return paged_schema
+
+    def get_default_responses(self):
+        method = self.method.lower()
+
+        default_status = status.HTTP_200_OK
+        default_schema = ''
+        if method == 'post':
+            default_status = status.HTTP_201_CREATED
+            default_schema = self.get_request_serializer()
+        elif method == 'delete':
+            default_status = status.HTTP_204_NO_CONTENT
+        elif method in ('get', 'put', 'patch'):
+            default_schema = self.get_request_serializer()
+
+        default_schema = default_schema or ''
+        if default_schema:
+            default_schema = self.field_to_swagger(default_schema, openapi.Schema)
+            if is_list_view(self.path, self.method, self.view):
+                default_schema = openapi.Schema(type=openapi.TYPE_ARRAY, items=default_schema)
+            if self.should_page():
+                default_schema = self.get_paged_response_schema(default_schema)
+
+        return {str(default_status): default_schema}
+
     def get_response_serializers(self):
         """Return the response codes that this view is expected to return, and the serializer for each response body.
         The return value should be a dict where the keys are possible status codes, and values are either strings,
@@ -298,11 +207,15 @@ class SwaggerAutoSchema(object):
 
         :return dict: the response serializers
         """
-        if self.method.lower() == 'post':
-            return {'201': ''}
-        if self.method.lower() == 'delete':
-            return {'204': ''}
-        return {'200': ''}
+        manual_responses = self.overrides.get('responses', None) or {}
+        manual_responses = OrderedDict((str(sc), resp) for sc, resp in manual_responses.items())
+
+        responses = {}
+        if not any(is_success(int(sc)) for sc in manual_responses if sc != 'default'):
+            responses = self.get_default_responses()
+
+        responses.update((str(sc), resp) for sc, resp in manual_responses.items())
+        return responses
 
     def get_response_schemas(self, response_serializers):
         """Return the `openapi.Response` objects calculated for this view.
@@ -311,20 +224,27 @@ class SwaggerAutoSchema(object):
         :return dict[str, openapi.Response]: a dictionary of status code to Response object
         """
         responses = {}
-        for status, serializer in response_serializers.items():
+        for sc, serializer in response_serializers.items():
             if isinstance(serializer, str):
                 response = openapi.Response(
                     description=serializer
                 )
             elif isinstance(serializer, openapi.Response):
                 response = serializer
+                if isinstance(response.schema, serializers.Serializer):
+                    response.schema = self.field_to_swagger(response.schema, openapi.Schema)
+            elif isinstance(serializer, openapi.Schema):
+                response = openapi.Response(
+                    description='',
+                    schema=serializer,
+                )
             else:
                 response = openapi.Response(
                     description='',
-                    schema=self.field_to_swagger(serializer, openapi.Schema)
+                    schema=self.field_to_swagger(serializer, openapi.Schema),
                 )
 
-            responses[str(status)] = response
+            responses[str(sc)] = response
 
         return responses
 
@@ -333,16 +253,26 @@ class SwaggerAutoSchema(object):
         return self.get_filter_parameters() + self.get_pagination_parameters()
 
     def should_filter(self):
-        if getattr(self.view, 'filter_backends', None) is None:
+        if not getattr(self.view, 'filter_backends', None):
             return False
 
-        if self.method.lower() not in ["get", "put", "patch", "delete"]:
+        if self.method.lower() not in ["get", "delete"]:
             return False
 
         if not isinstance(self.view, GenericViewSet):
             return True
 
         return is_list_view(self.path, self.method, self.view)
+
+    def get_filter_backend_parameters(self, filter_backend):
+        """Get the filter parameters for a single filter backend **instance**.
+
+        :param BaseFilterBackend filter_backend: the filter backend
+        """
+        fields = []
+        if hasattr(filter_backend, 'get_schema_fields'):
+            fields = filter_backend.get_schema_fields(self.view)
+        return [self.coreapi_field_to_parameter(field) for field in fields]
 
     def get_filter_parameters(self):
         """Return the parameters added to the view by its filter backends."""
@@ -351,27 +281,39 @@ class SwaggerAutoSchema(object):
 
         fields = []
         for filter_backend in self.view.filter_backends:
-            filter = filter_backend()
-            if hasattr(filter, 'get_schema_fields'):
-                fields += filter.get_schema_fields(self.view)
-        return [self.coreapi_field_to_parameter(field) for field in fields]
+            fields += self.get_filter_backend_parameters(filter_backend())
+
+        return fields
 
     def should_page(self):
         if not hasattr(self.view, 'paginator'):
             return False
 
+        if self.view.paginator is None:
+            return False
+
+        if self.method.lower() != 'get':
+            return False
+
         return is_list_view(self.path, self.method, self.view)
+
+    def get_paginator_parameters(self, paginator):
+        """Get the pagination parameters for a single paginator **instance**.
+
+        :param BasePagination paginator: the paginator
+        """
+        fields = []
+        if hasattr(paginator, 'get_schema_fields'):
+            fields = paginator.get_schema_fields(self.view)
+
+        return [self.coreapi_field_to_parameter(field) for field in fields]
 
     def get_pagination_parameters(self):
         """Return the parameters added to the view by its paginator."""
         if not self.should_page():
             return []
 
-        paginator = self.view.paginator
-        if not hasattr(paginator, 'get_schema_fields'):
-            return []
-
-        return [self.coreapi_field_to_parameter(field) for field in paginator.get_schema_fields(self.view)]
+        return self.get_paginator_parameters(self.view.paginator)
 
     def coreapi_field_to_parameter(self, field):
         """Convert an instance of `coreapi.Field` to a swagger Parameter object.

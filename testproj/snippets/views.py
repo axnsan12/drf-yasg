@@ -29,6 +29,7 @@ class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
+    pagination_class = None
 
     def patch(self, request, *args, **kwargs):
         """patch method docstring"""

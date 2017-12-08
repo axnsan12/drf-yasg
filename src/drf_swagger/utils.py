@@ -1,10 +1,14 @@
-from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin
+from collections import OrderedDict
+
+from django.core.validators import RegexValidator
+from django.utils.encoding import force_text
+from rest_framework import serializers
+from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
+
+from drf_swagger import openapi
+from drf_swagger.errors import SwaggerGenerationError
 
 no_body = object()
-
-
-class UpdateModelMixing(object):
-    pass
 
 
 def is_list_view(path, method, view):
@@ -22,7 +26,7 @@ def is_list_view(path, method, view):
         return False
 
     # for APIView, if it's a detail view it can't also be a list view
-    if isinstance(view, (RetrieveModelMixin, UpdateModelMixing, DestroyModelMixin)):
+    if isinstance(view, (RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin)):
         return False
 
     # if the last component in the path is parameterized it's probably not a list view
@@ -88,3 +92,144 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
         return view_method
 
     return decorator
+
+
+def serializer_field_to_swagger(field, swagger_object_type, **kwargs):
+    """Convert a drf Serializer or Field instance into a Swagger object.
+
+    :param rest_framework.serializers.Field field: the source field
+    :param type swagger_object_type: should be one of Schema, Parameter, Items
+    :param kwargs: extra attributes for constructing the object;
+       if swagger_object_type is Parameter, `name` and `in_` should be provided
+    :return Swagger,Parameter,Items: the swagger object
+    """
+    assert swagger_object_type in (openapi.Schema, openapi.Parameter, openapi.Items)
+    title = force_text(field.label) if field.label else None
+    title = title if swagger_object_type == openapi.Schema else None  # only Schema has title
+    title = None
+    description = force_text(field.help_text) if field.help_text else None
+    description = description if swagger_object_type != openapi.Items else None  # Items has no description either
+
+    def SwaggerType(**instance_kwargs):
+        if swagger_object_type == openapi.Parameter:
+            instance_kwargs['required'] = field.required
+        instance_kwargs.update(kwargs)
+        return swagger_object_type(title=title, description=description, **instance_kwargs)
+
+    # arrays in Schema have Schema elements, arrays in Parameter and Items have Items elements
+    ChildSwaggerType = openapi.Schema if swagger_object_type == openapi.Schema else openapi.Items
+
+    # ------ NESTED
+    if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
+        child_schema = serializer_field_to_swagger(field.child, ChildSwaggerType)
+        return SwaggerType(
+            type=openapi.TYPE_ARRAY,
+            items=child_schema,
+        )
+    elif isinstance(field, serializers.Serializer):
+        if swagger_object_type != openapi.Schema:
+            raise SwaggerGenerationError("cannot instantiate nested serializer as "
+                                         + swagger_object_type.__name__)
+        properties = OrderedDict()
+        required = []
+        for key, value in field.fields.items():
+            properties[key] = serializer_field_to_swagger(value, ChildSwaggerType)
+            if value.read_only:
+                properties[key].read_only = value.read_only
+            if value.required:
+                required.append(key)
+
+        return SwaggerType(
+            type=openapi.TYPE_OBJECT,
+            properties=properties,
+            required=required or None,
+        )
+    elif isinstance(field, serializers.ManyRelatedField):
+        child_schema = serializer_field_to_swagger(field.child_relation, ChildSwaggerType)
+        return SwaggerType(
+            type=openapi.TYPE_ARRAY,
+            items=child_schema,
+            unique_items=True,  # is this OK?
+        )
+    elif isinstance(field, serializers.RelatedField):
+        # TODO: infer type for PrimaryKeyRelatedField?
+        return SwaggerType(type=openapi.TYPE_STRING)
+    # ------ CHOICES
+    elif isinstance(field, serializers.MultipleChoiceField):
+        return SwaggerType(
+            type=openapi.TYPE_ARRAY,
+            items=ChildSwaggerType(
+                type=openapi.TYPE_STRING,
+                enum=list(field.choices.keys())
+            )
+        )
+    elif isinstance(field, serializers.ChoiceField):
+        return SwaggerType(type=openapi.TYPE_STRING, enum=list(field.choices.keys()))
+    # ------ BOOL
+    elif isinstance(field, serializers.BooleanField):
+        return SwaggerType(type=openapi.TYPE_BOOLEAN)
+    # ------ NUMERIC
+    elif isinstance(field, (serializers.DecimalField, serializers.FloatField)):
+        # TODO: min_value max_value
+        return SwaggerType(type=openapi.TYPE_NUMBER)
+    elif isinstance(field, serializers.IntegerField):
+        # TODO: min_value max_value
+        return SwaggerType(type=openapi.TYPE_INTEGER)
+    # ------ STRING
+    elif isinstance(field, serializers.EmailField):
+        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_EMAIL)
+    elif isinstance(field, serializers.RegexField):
+        return SwaggerType(type=openapi.TYPE_STRING, pattern=find_regex(field))
+    elif isinstance(field, serializers.SlugField):
+        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_SLUG)
+    elif isinstance(field, serializers.URLField):
+        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)
+    elif isinstance(field, serializers.IPAddressField):
+        format = {'ipv4': openapi.FORMAT_IPV4, 'ipv6': openapi.FORMAT_IPV6}.get(field.protocol, None)
+        return SwaggerType(type=openapi.TYPE_STRING, format=format)
+    elif isinstance(field, serializers.CharField):
+        # TODO: min_length max_length (for all CharField subclasses above too)
+        return SwaggerType(type=openapi.TYPE_STRING)
+    elif isinstance(field, serializers.UUIDField):
+        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_UUID)
+    # ------ DATE & TIME
+    elif isinstance(field, serializers.DateField):
+        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE)
+    elif isinstance(field, serializers.DateTimeField):
+        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_DATETIME)
+    # ------ OTHERS
+    elif isinstance(field, serializers.FileField):
+        # swagger 2.0 does not support specifics about file fields, so ImageFile gets no special treatment
+        # OpenAPI 3.0 does support it, so a future implementation could handle this better
+        if swagger_object_type != openapi.Parameter:
+            raise SwaggerGenerationError("parameter of type file is supported only in formData Parameter")
+        return SwaggerType(type=openapi.TYPE_FILE)
+    elif isinstance(field, serializers.JSONField):
+        return SwaggerType(
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_BINARY if field.binary else None
+        )
+    elif isinstance(field, serializers.DictField) and swagger_object_type == openapi.Schema:
+        child_schema = serializer_field_to_swagger(field.child, ChildSwaggerType)
+        return SwaggerType(
+            type=openapi.TYPE_OBJECT,
+            additional_properties=child_schema
+        )
+
+    # TODO unhandled fields: TimeField DurationField HiddenField ModelField NullBooleanField?
+
+    # everything else gets string by default
+    return SwaggerType(type=openapi.TYPE_STRING)
+
+
+def find_regex(regex_field):
+    regex_validator = None
+    for validator in regex_field.validators:
+        if isinstance(validator, RegexValidator):
+            if regex_validator is not None:
+                # bail if multiple validators are found - no obvious way to choose
+                return None
+            regex_validator = validator
+
+    # regex_validator.regex should be a compiled re object...
+    return getattr(getattr(regex_validator, 'regex', None), 'pattern', None)
