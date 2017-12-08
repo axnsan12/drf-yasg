@@ -1,3 +1,6 @@
+import json
+import os
+
 import pytest
 from ruamel import yaml
 
@@ -53,3 +56,9 @@ def bad_settings():
     SWAGGER_DEFAULTS['SECURITY_DEFINITIONS'].update(bad_security)
     yield swagger_settings
     del SWAGGER_DEFAULTS['SECURITY_DEFINITIONS']['bad']
+
+
+@pytest.fixture
+def reference_schema():
+    with open(os.path.join(os.path.dirname(__file__), 'reference.json')) as reference:
+        return json.load(reference)

@@ -212,11 +212,11 @@ class Operation(SwaggerDict):
                  produces=None, description=None, tags=None, **extra):
         super(Operation, self).__init__(**extra)
         self.operation_id = operation_id
-        self.responses = responses
+        self.description = description
         self.parameters = [param for param in parameters if param is not None]
+        self.responses = responses
         self.consumes = consumes
         self.produces = produces
-        self.description = description
         self.tags = tags
         self._insert_extras__()
 
