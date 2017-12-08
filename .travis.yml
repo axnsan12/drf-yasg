@@ -22,7 +22,7 @@ matrix:
       - env: TOXENV=flake8
       - env: DRF=master
       - python: '2.7'
-      - python: '3.7'
+      - python: '3.7-dev'
 
 install:
  - pip install -r requirements/ci.txt
