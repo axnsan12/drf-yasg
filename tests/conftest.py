@@ -2,7 +2,6 @@ import json
 import os
 
 import pytest
-from ruamel import yaml
 
 from drf_swagger import openapi, codecs
 from drf_swagger.generators import OpenAPISchemaGenerator
@@ -29,8 +28,8 @@ def codec_yaml():
 @pytest.fixture
 def swagger_dict():
     swagger = generator().get_schema(None, True)
-    json_bytes = codec_yaml().encode(swagger)
-    return yaml.safe_load(json_bytes.decode('utf-8'))
+    json_bytes = codec_json().encode(swagger)
+    return json.loads(json_bytes.decode('utf-8'))
 
 
 @pytest.fixture

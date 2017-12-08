@@ -24,8 +24,6 @@ coverage:
 
     changes:
       default:
-        enabled: yes
-        if_no_uploads: error
-        if_ci_failed: error
+        enabled: no
 
 comment: false

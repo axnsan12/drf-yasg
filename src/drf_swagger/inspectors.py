@@ -14,6 +14,15 @@ from . import openapi
 from .utils import no_body, is_list_view
 
 
+def force_serializer_instance(serializer):
+    if inspect.isclass(serializer):
+        assert issubclass(serializer, serializers.BaseSerializer), "Serializer class or instance required"
+        return serializer()
+
+    assert isinstance(serializer, serializers.BaseSerializer), "Serializer class or instance required"
+    return serializer
+
+
 class SwaggerAutoSchema(object):
     def __init__(self, view, path, method, overrides):
         super(SwaggerAutoSchema, self).__init__()
@@ -94,10 +103,9 @@ class SwaggerAutoSchema(object):
         if body_override is not None:
             if body_override is no_body:
                 return None
-            if inspect.isclass(body_override):
-                assert issubclass(body_override, serializers.Serializer)
-                return body_override()
-            return body_override
+            if isinstance(body_override, openapi.Schema):
+                return body_override
+            return force_serializer_instance(body_override)
         else:
             if not hasattr(self.view, 'get_serializer'):
                 return None
@@ -163,7 +171,7 @@ class SwaggerAutoSchema(object):
 
         :param openapi.Schema response_schema: the response schema that must be paged.
         """
-        assert response_schema.type == openapi.TYPE_ARRAY
+        assert response_schema.type == openapi.TYPE_ARRAY, "array return expected for paged response"
         paged_schema = openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
@@ -192,8 +200,9 @@ class SwaggerAutoSchema(object):
 
         default_schema = default_schema or ''
         if default_schema:
-            default_schema = self.field_to_swagger(default_schema, openapi.Schema)
-            if is_list_view(self.path, self.method, self.view):
+            if not isinstance(default_schema, openapi.Schema):
+                default_schema = self.field_to_swagger(default_schema, openapi.Schema)
+            if is_list_view(self.path, self.method, self.view) and self.method.lower() == 'get':
                 default_schema = openapi.Schema(type=openapi.TYPE_ARRAY, items=default_schema)
             if self.should_page():
                 default_schema = self.get_paged_response_schema(default_schema)
@@ -231,14 +240,16 @@ class SwaggerAutoSchema(object):
                 )
             elif isinstance(serializer, openapi.Response):
                 response = serializer
-                if isinstance(response.schema, serializers.Serializer):
-                    response.schema = self.field_to_swagger(response.schema, openapi.Schema)
+                if not isinstance(response.schema, openapi.Schema):
+                    serializer = force_serializer_instance(response.schema)
+                    response.schema = self.field_to_swagger(serializer, openapi.Schema)
             elif isinstance(serializer, openapi.Schema):
                 response = openapi.Response(
                     description='',
                     schema=serializer,
                 )
             else:
+                serializer = force_serializer_instance(serializer)
                 response = openapi.Response(
                     description='',
                     schema=self.field_to_swagger(serializer, openapi.Schema),

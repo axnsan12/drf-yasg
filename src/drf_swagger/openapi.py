@@ -79,7 +79,7 @@ class SwaggerDict(OrderedDict):
         try:
             return self[make_swagger_name(item)]
         except KeyError as e:
-            raise_from(AttributeError("no attribute " + item), e)
+            raise_from(AttributeError("object of class " + self.__class__.__name__ + " has no attribute " + item), e)
 
     def __delattr__(self, item):
         if item.startswith('_'):
@@ -111,7 +111,7 @@ class Contact(SwaggerDict):
     def __init__(self, name=None, url=None, email=None, **extra):
         super(Contact, self).__init__(**extra)
         if name is None and url is None and email is None:
-            raise ValueError("one of name, url or email is requires for Swagger Contact object")
+            raise AssertionError("one of name, url or email is requires for Swagger Contact object")
         self.name = name
         self.url = url
         self.email = email
@@ -128,7 +128,7 @@ class License(SwaggerDict):
     def __init__(self, name, url=None, **extra):
         super(License, self).__init__(**extra)
         if name is None:
-            raise ValueError("name is required for Swagger License object")
+            raise AssertionError("name is required for Swagger License object")
         self.name = name
         self.url = url
         self._insert_extras__()
@@ -149,11 +149,11 @@ class Info(SwaggerDict):
                  **extra):
         super(Info, self).__init__(**extra)
         if title is None or default_version is None:
-            raise ValueError("title and version are required for Swagger info object")
+            raise AssertionError("title and version are required for Swagger info object")
         if contact is not None and not isinstance(contact, Contact):
-            raise ValueError("contact must be a Contact object")
+            raise AssertionError("contact must be a Contact object")
         if license is not None and not isinstance(license, License):
-            raise ValueError("license must be a License object")
+            raise AssertionError("license must be a License object")
         self.title = title
         self._default_version = default_version
         self.description = description
@@ -237,7 +237,7 @@ class Parameter(SwaggerDict):
                  type=None, format=None, enum=None, pattern=None, items=None, **extra):
         super(Parameter, self).__init__(**extra)
         if (not schema and not type) or (schema and type):
-            raise ValueError("either schema or type are required for Parameter object!")
+            raise AssertionError("either schema or type are required for Parameter object!")
         self.name = name
         self.in_ = in_
         self.description = description
@@ -257,7 +257,8 @@ class Schema(SwaggerDict):
         super(Schema, self).__init__(**extra)
         if required is True or required is False:
             # common error
-            raise ValueError("the requires attribute of schema must be an array of required properties, not a boolean!")
+            raise AssertionError(
+                "the requires attribute of schema must be an array of required properties, not a boolean!")
         self.description = description
         self.required = required
         self.type = type

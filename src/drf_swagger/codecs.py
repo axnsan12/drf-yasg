@@ -119,6 +119,7 @@ class SaneYamlDumper(yaml.SafeDumper):
         return node
 
 
+SaneYamlDumper.add_representer(OrderedDict, SaneYamlDumper.represent_odict)
 SaneYamlDumper.add_multi_representer(OrderedDict, SaneYamlDumper.represent_odict)
 
 

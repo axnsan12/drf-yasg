@@ -3,14 +3,20 @@ import datetime
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route
+from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
-from rest_framework.filters import OrderingFilter
 
 from articles import serializers
 from articles.models import Article
+from drf_swagger.inspectors import SwaggerAutoSchema
 from drf_swagger.utils import swagger_auto_schema
+
+
+class NoPagingAutoSchema(SwaggerAutoSchema):
+    def should_page(self):
+        return False
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
@@ -28,6 +34,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     """
     queryset = Article.objects.all()
     lookup_field = 'slug'
+    lookup_value_regex = r'[a-z0-9]+(?:-[a-z0-9]+)'
     serializer_class = serializers.ArticleSerializer
 
     pagination_class = LimitOffsetPagination
@@ -37,6 +44,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     ordering_fields = ('date_modified',)
     ordering = ('username',)
 
+    @swagger_auto_schema(auto_schema=NoPagingAutoSchema)
     @list_route(methods=['get'])
     def today(self, request):
         today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)

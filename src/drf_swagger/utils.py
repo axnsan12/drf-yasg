@@ -75,7 +75,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
                     _methods = [method.lower()]
                 else:
                     _methods = [mth.lower() for mth in methods]
-                assert not isinstance(_methods, str)
+                assert not isinstance(_methods, str), "`methods` expects to receive; use `method` for a single arg"
                 assert not any(mth in existing_data for mth in _methods), "method defined multiple times"
                 assert all(mth in available_methods for mth in _methods), "method not bound to %s" % _route
 
@@ -104,6 +104,7 @@ def serializer_field_to_swagger(field, swagger_object_type, **kwargs):
     :return Swagger,Parameter,Items: the swagger object
     """
     assert swagger_object_type in (openapi.Schema, openapi.Parameter, openapi.Items)
+    assert not isinstance(field, openapi.SwaggerDict), "passed field is already a SwaggerDict object"
     title = force_text(field.label) if field.label else None
     title = title if swagger_object_type == openapi.Schema else None  # only Schema has title
     title = None
