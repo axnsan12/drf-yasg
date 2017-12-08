@@ -9,6 +9,7 @@ from rest_framework.response import Response
 
 from articles import serializers
 from articles.models import Article
+from drf_swagger.utils import swagger_auto_schema
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
@@ -20,6 +21,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     destroy:
     destroy class docstring
+
+    partial_update:
+    partial_update class docstring
     """
     queryset = Article.objects.all()
     lookup_field = 'slug'
@@ -40,11 +44,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(articles, many=True)
         return Response(serializer.data)
 
-    @detail_route(
-        methods=['get', 'post'],
-        parser_classes=(MultiPartParser,),
-        serializer_class=serializers.ImageUploadSerializer,
-    )
+    @swagger_auto_schema(method='get', operation_description="image GET description override")
+    @swagger_auto_schema(method='post', request_body=serializers.ImageUploadSerializer)
+    @detail_route(methods=['get', 'post'], parser_classes=(MultiPartParser,))
     def image(self, request, slug=None):
         """
         image method docstring
@@ -54,6 +56,11 @@ class ArticleViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         """update method docstring"""
         return super(ArticleViewSet, self).update(request, *args, **kwargs)
+
+    @swagger_auto_schema(operation_description="partial_update description override")
+    def partial_update(self, request, *args, **kwargs):
+        """partial_update method docstring"""
+        return super(ArticleViewSet, self).partial_update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         """destroy method docstring"""
