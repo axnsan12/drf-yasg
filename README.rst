@@ -5,7 +5,7 @@
 drf-swagger
 ###########
 
-Generates *real* Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
+Generate *real* Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
 
 ********
 Features
@@ -30,24 +30,27 @@ Features
    :figwidth: image
    :alt: redoc screenshot
 
-   Fully nested request and response schemas.
+   *Fully nested request and response schemas.*
 
 .. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/docs/screenshots/swagger-ui-list.png
    :width: 100%
    :figwidth: image
    :alt: swagger-ui screenshot
 
-   Choose between redoc and swagger-ui.
+   *Choose between redoc and swagger-ui.*
 
 .. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/docs/screenshots/swagger-ui-models.png
    :width: 100%
    :figwidth: image
    :alt: model definitions screenshot
 
-   Real Model definitions.
+   *Real Model definitions.*
 
+*****************
+Table of contents
+*****************
 
-.. contents:: Table of Contents
+.. contents::
    :depth: 4
 
 *****

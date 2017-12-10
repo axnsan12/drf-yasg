@@ -21,10 +21,17 @@ class OpenAPISchemaGenerator(object):
         self._gen = SchemaGenerator(info.title, url, info.get('description', ''), patterns, urlconf)
         self.info = info
         self.version = version
-        self.url = url
 
     def get_schema(self, request=None, public=False):
-        """Generate an openapi.Swagger representing the API schema."""
+        """Generate an :class:`drf_swagger.openapi.Swagger` representing the API schema.
+
+        :param rest_framework.request.Request request: the request used for filtering
+            accesible endpoints and finding the spec URI
+        :param bool public: if True, all endpoints are included regardless of access through `request`
+
+        :return: the generated Swagger specification
+        :rtype: openapi.Swagger
+        """
         endpoints = self.get_endpoints(None if public else request)
         components = ReferenceResolver(openapi.SCHEMA_DEFINITIONS)
         paths = self.get_paths(endpoints, components)
@@ -35,11 +42,17 @@ class OpenAPISchemaGenerator(object):
 
         return openapi.Swagger(
             info=self.info, paths=paths,
-            _url=url, _version=self.version, **components
+            _url=url, _version=self.version, **dict(components)
         )
 
     def create_view(self, callback, method, request=None):
-        """Create a view instance from a view callback as registered in urlpatterns."""
+        """Create a view instance from a view callback as registered in urlpatterns.
+
+        :param callable callback: view callback registered in urlpatterns
+        :param str method: HTTP method
+        :param rest_framework.request.Request request: request to bind to the view
+        :return: the view instance
+        """
         view = self._gen.create_view(callback, method, request)
         overrides = getattr(callback, 'swagger_auto_schema', None)
         if overrides is not None:
@@ -54,7 +67,9 @@ class OpenAPISchemaGenerator(object):
         """Iterate over all the registered endpoints in the API.
 
         :param rest_framework.request.Request request: used for returning only endpoints available to the given request
-        :return: {path: (view_class, list[(http_method, view_instance)])"""
+        :return: {path: (view_class, list[(http_method, view_instance)])
+        :rtype: dict
+        """
         inspector = self._gen.endpoint_inspector_cls(self._gen.patterns, self._gen.urlconf)
         endpoints = inspector.get_api_endpoints()
 
@@ -68,16 +83,21 @@ class OpenAPISchemaGenerator(object):
         return {path: (view_cls[path], methods) for path, methods in view_paths.items()}
 
     def get_operation_keys(self, subpath, method, view):
-        """
-        Return a list of keys that should be used to layout a link within
-        the schema document.
+        """Return a list of keys that should be used to group an operation within the specification.
 
-        /users/                   ("users", "list"), ("users", "create")
-        /users/{pk}/              ("users", "read"), ("users", "update"), ("users", "delete")
-        /users/enabled/           ("users", "enabled")  # custom viewset list action
-        /users/{pk}/star/         ("users", "star")     # custom viewset detail action
-        /users/{pk}/groups/       ("users", "groups", "list"), ("users", "groups", "create")
-        /users/{pk}/groups/{pk}/  ("users", "groups", "read"), ("users", "groups", "update")
+        ::
+
+          /users/                   ("users", "list"), ("users", "create")
+          /users/{pk}/              ("users", "read"), ("users", "update"), ("users", "delete")
+          /users/enabled/           ("users", "enabled")  # custom viewset list action
+          /users/{pk}/star/         ("users", "star")     # custom viewset detail action
+          /users/{pk}/groups/       ("users", "groups", "list"), ("users", "groups", "create")
+          /users/{pk}/groups/{pk}/  ("users", "groups", "read"), ("users", "groups", "update")
+
+        :param str subpath: path to the operation with any common prefix/base path removed
+        :param str method: HTTP method
+        :param view: the view associated with the operation
+        :rtype: tuple
         """
         return self._gen.get_keys(subpath, method, view)
 
@@ -86,6 +106,7 @@ class OpenAPISchemaGenerator(object):
 
         :param dict endpoints: endpoints as returned by get_endpoints
         :param ReferenceResolver components: resolver/container for Swagger References
+        :rtype: openapi.Paths
         """
         if not endpoints:
             return openapi.Paths(paths={})
@@ -112,6 +133,13 @@ class OpenAPISchemaGenerator(object):
         return openapi.Paths(paths=paths)
 
     def get_overrides(self, view, method):
+        """Get overrides specified for a given operation.
+
+        :param view: the view associated with the operation
+        :param str method: HTTP method
+        :return: a dictionary containing any overrides set by @\ :func:`drf_swagger.utils.swagger_auto_schema`
+        :rtype: dict
+        """
         method = method.lower()
         action = getattr(view, 'action', method)
         action_method = getattr(view, action, None)
@@ -126,7 +154,8 @@ class OpenAPISchemaGenerator(object):
 
         :param str path: templated request path
         :param type view_cls: the view class associated with the path
-        :return list[openapi.Parameter]: path parameters
+        :return: path parameters
+        :rtype: list[openapi.Parameter]
         """
         parameters = []
         model = getattr(getattr(view_cls, 'queryset', None), 'model', None)

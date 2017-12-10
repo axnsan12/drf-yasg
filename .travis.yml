@@ -13,6 +13,8 @@ env:
 matrix:
   fast_finish: true
   include:
+    - python: '3.6'
+      env: TOXENV=docs
     - python: '2.7'
       env: TOXENV=flake8
     - python: '3.6'

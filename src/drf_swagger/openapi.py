@@ -109,16 +109,15 @@ class SwaggerDict(OrderedDict):
 
 
 class Contact(SwaggerDict):
-    """Swagger Contact object
-
-    At least one of the following fields is required:
-
-    :param str name: contact name
-    :param str url: contact url
-    :param str email: contact e-mail
-    """
-
     def __init__(self, name=None, url=None, email=None, **extra):
+        """Swagger Contact object
+
+        At least one of the following fields is required:
+
+        :param str name: contact name
+        :param str url: contact url
+        :param str email: contact e-mail
+        """
         super(Contact, self).__init__(**extra)
         if name is None and url is None and email is None:
             raise AssertionError("one of name, url or email is requires for Swagger Contact object")
@@ -129,13 +128,12 @@ class Contact(SwaggerDict):
 
 
 class License(SwaggerDict):
-    """Swagger License object
-
-    :param str name: Requird. License name
-    :param str url: link to detailed license information
-    """
-
     def __init__(self, name, url=None, **extra):
+        """Swagger License object
+
+        :param str name: Required. License name
+        :param str url: link to detailed license information
+        """
         super(License, self).__init__(**extra)
         if name is None:
             raise AssertionError("name is required for Swagger License object")
@@ -145,18 +143,17 @@ class License(SwaggerDict):
 
 
 class Info(SwaggerDict):
-    """Swagger Info object
-
-    :param str title: Required. API title.
-    :param str default_version: Required. API version string (not to be confused with Swagger spec version)
-    :param str description: API description; markdown supported
-    :param str terms_of_service: API terms of service; should be a URL
-    :param Contact contact: contact object
-    :param License license: license object
-    """
-
     def __init__(self, title, default_version, description=None, terms_of_service=None, contact=None, license=None,
                  **extra):
+        """Swagger Info object
+
+        :param str title: Required. API title.
+        :param str default_version: Required. API version string (not to be confused with Swagger spec version)
+        :param str description: API description; markdown supported
+        :param str terms_of_service: API terms of service; should be a URL
+        :param Contact contact: contact object
+        :param License license: license object
+        """
         super(Info, self).__init__(**extra)
         if title is None or default_version is None:
             raise AssertionError("title and version are required for Swagger info object")

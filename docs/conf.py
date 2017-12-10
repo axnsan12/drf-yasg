@@ -171,9 +171,40 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-sys.path.insert(0, os.path.abspath('../src'))
-sys.path.insert(0, os.path.abspath('../testproj'))
-os.putenv('DJANGO_SETTINGS_MODULE', 'testproj.settings')
+autodoc_default_flags = ['private-members']
+autodoc_member_order = 'bysource'
+autoclass_content = 'both'
+autodoc_mock_imports = [
+    'django',
+    'rest_framework',
+    'coreapi',
+    'coreschema',
+    'openapi_codec',
+    'ruamel',
+    'inflection',
+    'uritemplate'
+]
 
-from django.conf import settings
-settings.configure()
+nitpick_ignore = [
+    ('py:class', 'object'),
+    ('py:class', 'Exception'),
+    ('py:class', 'collections.OrderedDict'),
+
+    ('py:obj', 'coreapi.Field'),
+    ('py:obj', 'BaseFilterBackend'),
+    ('py:obj', 'BasePagination'),
+    ('py:obj', 'rest_framework.request.Request'),
+    ('py:obj', 'rest_framework.serializers.Field'),
+    ('py:obj', 'serializers.BaseSerializer'),
+
+    ('py:obj', 'bool'),
+    ('py:obj', 'dict'),
+    ('py:obj', 'list'),
+    ('py:obj', 'str'),
+    ('py:obj', 'tuple'),
+    ('py:obj', 'tuple'),
+    ('py:obj', 'type'),
+    ('py:obj', 'OrderedDict'),
+]
+
+sys.path.insert(0, os.path.abspath('../src'))

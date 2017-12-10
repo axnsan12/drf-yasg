@@ -98,11 +98,12 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
     """Convert a drf Serializer or Field instance into a Swagger object.
 
     :param rest_framework.serializers.Field field: the source field
-    :param type swagger_object_type: should be one of Schema, Parameter, Items
+    :param type[openapi.SwaggerDict] swagger_object_type: should be one of Schema, Parameter, Items
     :param drf_swagger.openapi.ReferenceResolver definitions: used to serialize Schemas by reference
     :param kwargs: extra attributes for constructing the object;
        if swagger_object_type is Parameter, `name` and `in_` should be provided
-    :return Swagger,Parameter,Items: the swagger object
+    :return: the swagger object
+    :rtype: openapi.Parameter, openapi.Items, openapi.Schema
     """
     assert swagger_object_type in (openapi.Schema, openapi.Parameter, openapi.Items)
     assert not isinstance(field, openapi.SwaggerDict), "passed field is already a SwaggerDict object"

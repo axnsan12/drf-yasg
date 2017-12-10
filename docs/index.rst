@@ -18,7 +18,6 @@ drf-swagger
    contributing.rst
    license.rst
 
-
 Source code documentation
 =========================
 
