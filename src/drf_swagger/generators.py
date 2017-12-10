@@ -6,8 +6,9 @@ from coreapi.compat import force_text
 from rest_framework.schemas.generators import SchemaGenerator
 from rest_framework.schemas.inspectors import get_pk_description
 
-from drf_swagger.inspectors import SwaggerAutoSchema
 from . import openapi
+from .inspectors import SwaggerAutoSchema
+from .openapi import ReferenceResolver
 
 
 class OpenAPISchemaGenerator(object):
@@ -20,17 +21,13 @@ class OpenAPISchemaGenerator(object):
         self._gen = SchemaGenerator(info.title, url, info.get('description', ''), patterns, urlconf)
         self.info = info
         self.version = version
-        self.endpoints = None
         self.url = url
 
     def get_schema(self, request=None, public=False):
         """Generate an openapi.Swagger representing the API schema."""
-        if self.endpoints is None:
-            inspector = self._gen.endpoint_inspector_cls(self._gen.patterns, self._gen.urlconf)
-            self.endpoints = inspector.get_api_endpoints()
-
-        self.clean_endpoints(None if public else request)
-        paths = self.get_paths()
+        endpoints = self.get_endpoints(None if public else request)
+        components = ReferenceResolver(openapi.SCHEMA_DEFINITIONS)
+        paths = self.get_paths(endpoints, components)
 
         url = self._gen.url
         if not url and request is not None:
@@ -38,30 +35,37 @@ class OpenAPISchemaGenerator(object):
 
         return openapi.Swagger(
             info=self.info, paths=paths,
-            _url=url, _version=self.version,
+            _url=url, _version=self.version, **components
         )
 
-    def create_view(self, callback, method, request):
+    def create_view(self, callback, method, request=None):
+        """Create a view instance from a view callback as registered in urlpatterns."""
         view = self._gen.create_view(callback, method, request)
         overrides = getattr(callback, 'swagger_auto_schema', None)
         if overrides is not None:
-            # decorated function based view
+            # decorated function based view must have its decorator information passed on to th re-instantiated view
             for method, _ in overrides.items():
                 view_method = getattr(view, method, None)
                 if view_method is not None:
                     setattr(view_method.__func__, 'swagger_auto_schema', overrides)
         return view
 
-    def clean_endpoints(self, request):
-        """Generate {path: (view_class, [(method, view)]) given (path, method, callback)."""
+    def get_endpoints(self, request=None):
+        """Iterate over all the registered endpoints in the API.
+
+        :param rest_framework.request.Request request: used for returning only endpoints available to the given request
+        :return: {path: (view_class, list[(http_method, view_instance)])"""
+        inspector = self._gen.endpoint_inspector_cls(self._gen.patterns, self._gen.urlconf)
+        endpoints = inspector.get_api_endpoints()
+
         view_paths = defaultdict(list)
         view_cls = {}
-        for path, method, callback in self.endpoints:
+        for path, method, callback in endpoints:
             view = self.create_view(callback, method, request)
             path = self._gen.coerce_path(path, method, view)
             view_paths[path].append((method, view))
             view_cls[path] = callback.cls
-        self.endpoints = {path: (view_cls[path], methods) for path, methods in view_paths.items()}
+        return {path: (view_cls[path], methods) for path, methods in view_paths.items()}
 
     def get_operation_keys(self, subpath, method, view):
         """
@@ -77,14 +81,20 @@ class OpenAPISchemaGenerator(object):
         """
         return self._gen.get_keys(subpath, method, view)
 
-    def get_paths(self):
-        if not self.endpoints:
-            return []
-        prefix = self._gen.determine_path_prefix(self.endpoints.keys())
+    def get_paths(self, endpoints, components):
+        """Generate the Swagger Paths for the API from the given endpoints.
+
+        :param dict endpoints: endpoints as returned by get_endpoints
+        :param ReferenceResolver components: resolver/container for Swagger References
+        """
+        if not endpoints:
+            return openapi.Paths(paths={})
+
+        prefix = self._gen.determine_path_prefix(endpoints.keys())
         paths = OrderedDict()
 
         default_schema_cls = SwaggerAutoSchema
-        for path, (view_cls, methods) in sorted(self.endpoints.items()):
+        for path, (view_cls, methods) in sorted(endpoints.items()):
             path_parameters = self.get_path_parameters(path, view_cls)
             operations = {}
             for method, view in methods:
@@ -94,7 +104,7 @@ class OpenAPISchemaGenerator(object):
                 operation_keys = self.get_operation_keys(path[len(prefix):], method, view)
                 overrides = self.get_overrides(view, method)
                 auto_schema_cls = overrides.get('auto_schema', default_schema_cls)
-                schema = auto_schema_cls(view, path, method, overrides)
+                schema = auto_schema_cls(view, path, method, overrides, components)
                 operations[method.lower()] = schema.get_operation(operation_keys)
 
             paths[path] = openapi.PathItem(parameters=path_parameters, **operations)

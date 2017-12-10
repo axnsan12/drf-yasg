@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 
-from drf_swagger.errors import SwaggerValidationError
 from .codecs import _OpenAPICodec
+from .errors import SwaggerValidationError
 
 
 class SwaggerExceptionMiddleware(MiddlewareMixin):

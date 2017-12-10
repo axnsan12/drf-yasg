@@ -5,8 +5,8 @@ from django.utils.encoding import force_text
 from rest_framework import serializers
 from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
 
-from drf_swagger import openapi
-from drf_swagger.errors import SwaggerGenerationError
+from . import openapi
+from .errors import SwaggerGenerationError
 
 no_body = object()
 
@@ -94,11 +94,12 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
     return decorator
 
 
-def serializer_field_to_swagger(field, swagger_object_type, **kwargs):
+def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **kwargs):
     """Convert a drf Serializer or Field instance into a Swagger object.
 
     :param rest_framework.serializers.Field field: the source field
     :param type swagger_object_type: should be one of Schema, Parameter, Items
+    :param drf_swagger.openapi.ReferenceResolver definitions: used to serialize Schemas by reference
     :param kwargs: extra attributes for constructing the object;
        if swagger_object_type is Parameter, `name` and `in_` should be provided
     :return Swagger,Parameter,Items: the swagger object
@@ -122,31 +123,41 @@ def serializer_field_to_swagger(field, swagger_object_type, **kwargs):
 
     # ------ NESTED
     if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
-        child_schema = serializer_field_to_swagger(field.child, ChildSwaggerType)
+        child_schema = serializer_field_to_swagger(field.child, ChildSwaggerType, definitions)
         return SwaggerType(
             type=openapi.TYPE_ARRAY,
             items=child_schema,
         )
     elif isinstance(field, serializers.Serializer):
         if swagger_object_type != openapi.Schema:
-            raise SwaggerGenerationError("cannot instantiate nested serializer as "
-                                         + swagger_object_type.__name__)
-        properties = OrderedDict()
-        required = []
-        for key, value in field.fields.items():
-            properties[key] = serializer_field_to_swagger(value, ChildSwaggerType)
-            if value.read_only:
-                properties[key].read_only = value.read_only
-            if value.required:
-                required.append(key)
+            raise SwaggerGenerationError("cannot instantiate nested serializer as " + swagger_object_type.__name__)
+        assert definitions is not None, "ReferenceResolver required when instantiating Schema"
 
-        return SwaggerType(
-            type=openapi.TYPE_OBJECT,
-            properties=properties,
-            required=required or None,
-        )
+        serializer = field
+        ref_name = type(serializer).__name__
+        if ref_name.endswith('Serializer'):
+            ref_name = ref_name[:-len('Serializer')]
+
+        def make_schema_definition():
+            properties = OrderedDict()
+            required = []
+            for key, value in serializer.fields.items():
+                properties[key] = serializer_field_to_swagger(value, ChildSwaggerType, definitions)
+                if value.read_only:
+                    properties[key].read_only = value.read_only
+                if value.required:
+                    required.append(key)
+
+            return SwaggerType(
+                type=openapi.TYPE_OBJECT,
+                properties=properties,
+                required=required or None,
+            )
+
+        definitions.setdefault(ref_name, make_schema_definition)
+        return openapi.SchemaRef(definitions, ref_name)
     elif isinstance(field, serializers.ManyRelatedField):
-        child_schema = serializer_field_to_swagger(field.child_relation, ChildSwaggerType)
+        child_schema = serializer_field_to_swagger(field.child_relation, ChildSwaggerType, definitions)
         return SwaggerType(
             type=openapi.TYPE_ARRAY,
             items=child_schema,
@@ -211,7 +222,7 @@ def serializer_field_to_swagger(field, swagger_object_type, **kwargs):
             format=openapi.FORMAT_BINARY if field.binary else None
         )
     elif isinstance(field, serializers.DictField) and swagger_object_type == openapi.Schema:
-        child_schema = serializer_field_to_swagger(field.child, ChildSwaggerType)
+        child_schema = serializer_field_to_swagger(field.child, ChildSwaggerType, definitions)
         return SwaggerType(
             type=openapi.TYPE_OBJECT,
             additional_properties=child_schema

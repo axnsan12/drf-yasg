@@ -8,29 +8,38 @@ from rest_framework.schemas import AutoSchema
 from rest_framework.status import is_success
 from rest_framework.viewsets import GenericViewSet
 
-from drf_swagger.errors import SwaggerGenerationError
-from drf_swagger.utils import serializer_field_to_swagger
 from . import openapi
-from .utils import no_body, is_list_view
+from .errors import SwaggerGenerationError
+from .utils import serializer_field_to_swagger, no_body, is_list_view
 
 
 def force_serializer_instance(serializer):
     if inspect.isclass(serializer):
-        assert issubclass(serializer, serializers.BaseSerializer), "Serializer class or instance required"
+        assert issubclass(serializer, serializers.BaseSerializer), "Serializer required, not %s" % serializer.__name__
         return serializer()
 
-    assert isinstance(serializer, serializers.BaseSerializer), "Serializer class or instance required"
+    assert isinstance(serializer, serializers.BaseSerializer), \
+        "Serializer class or instance required, not %s" % type(serializer).__name__
     return serializer
 
 
 class SwaggerAutoSchema(object):
-    def __init__(self, view, path, method, overrides):
+    def __init__(self, view, path, method, overrides, components):
+        """Inspector class responsible for providing Operation definitions given a
+
+        :param view: the view associated with this endpoint
+        :param str path: the path component of the operation URL
+        :param str method: the http method of the operation
+        :param dict overrides: manual overrides as passed to @swagger_auto_schema
+        :param openapi.ReferenceResolver components: referenceable components
+        """
         super(SwaggerAutoSchema, self).__init__()
         self._sch = AutoSchema()
         self.view = view
         self.path = path
         self.method = method
         self.overrides = overrides
+        self.components = components
         self._sch.view = view
 
     def get_operation(self, operation_keys):
@@ -39,7 +48,7 @@ class SwaggerAutoSchema(object):
 
         :param tuple[str] operation_keys: an array of keys describing the hierarchical layout of this view in the API;
           e.g. ('snippets', 'list'), ('snippets', 'retrieve'), etc.
-        :return openapi.Operation: the resulting Operation object
+        :return: the resulting Operation object
         """
         consumes = self.get_consumes()
 
@@ -70,7 +79,8 @@ class SwaggerAutoSchema(object):
           - a list of primitive Parameters parsed as form data
 
         :param list[str] consumes: a list of MIME types this request accepts as body
-        :return list[Parameter]: a (potentially empty) list of openapi.Parameter in: either `body` or `formData`
+        :return: a (potentially empty) list of openapi.Parameter in: either `body` or `formData`
+        :rtype: list[openapi.Parameter]
         """
         # only PUT, PATCH or POST can have a request body
         if self.method not in ('PUT', 'PATCH', 'POST'):
@@ -81,7 +91,7 @@ class SwaggerAutoSchema(object):
         if serializer is None:
             return []
 
-        if isinstance(serializer, openapi.Schema):
+        if isinstance(serializer, openapi.Schema.OR_REF):
             schema = serializer
 
         if any(is_form_media_type(encoding) for encoding in consumes):
@@ -96,14 +106,15 @@ class SwaggerAutoSchema(object):
     def get_request_serializer(self):
         """Return the request serializer (used for parsing the request payload) for this endpoint.
 
-        :return serializers.Serializer: the request serializer
+        :return: the request serializer
+        :rtype: serializers.BaseSerializer
         """
         body_override = self.overrides.get('request_body', None)
 
         if body_override is not None:
             if body_override is no_body:
                 return None
-            if isinstance(body_override, openapi.Schema):
+            if isinstance(body_override, openapi.Schema.OR_REF):
                 return body_override
             return force_serializer_instance(body_override)
         else:
@@ -115,20 +126,23 @@ class SwaggerAutoSchema(object):
         """Given a Serializer, return a list of in: formData Parameters.
 
         :param serializer: the view's request serialzier
+        :rtype: list[openapi.Parameter]
         """
+        fields = getattr(serializer, 'fields', {})
         return [
-            self.field_to_swagger(value, openapi.Parameter, name=key, in_=openapi.IN_FORM)
+            self.field_to_parameter(value, key, openapi.IN_FORM)
             for key, value
-            in serializer.fields.items()
+            in fields.items()
         ]
 
     def get_request_body_schema(self, serializer):
         """Return the Schema for a given request's body data. Only applies to PUT, PATCH and POST requests.
 
-        :param serializer: the view's request serialzier
-        :return openapi.Schema: the request body schema
+        :param serializers.BaseSerializer serializer: the view's request serialzier
+        :return: the request body schema
+        :rtype: openapi.Schema
         """
-        return self.field_to_swagger(serializer, openapi.Schema)
+        return self.serializer_to_schema(serializer)
 
     def make_body_parameter(self, schema):
         """Given a Schema object, create an in: body Parameter.
@@ -141,7 +155,8 @@ class SwaggerAutoSchema(object):
         """Add/replace parameters from the given list of automatically generated request parameters.
 
         :param list[openapi.Parameter] parameters: genereated parameters
-        :return list[openapi.Parameter]: modified parameters
+        :return: modified parameters
+        :rtype: list[openapi.Parameter]
         """
         parameters = OrderedDict(((param.name, param.in_), param) for param in parameters)
         manual_parameters = self.overrides.get('manual_parameters', None) or []
@@ -159,7 +174,7 @@ class SwaggerAutoSchema(object):
     def get_responses(self):
         """Get the possible responses for this view as a swagger Responses object.
 
-        :return Responses: the documented responses
+        :return: the documented responses
         """
         response_serializers = self.get_response_serializers()
         return openapi.Responses(
@@ -201,7 +216,7 @@ class SwaggerAutoSchema(object):
         default_schema = default_schema or ''
         if default_schema:
             if not isinstance(default_schema, openapi.Schema):
-                default_schema = self.field_to_swagger(default_schema, openapi.Schema)
+                default_schema = self.serializer_to_schema(default_schema)
             if is_list_view(self.path, self.method, self.view) and self.method.lower() == 'get':
                 default_schema = openapi.Schema(type=openapi.TYPE_ARRAY, items=default_schema)
             if self.should_page():
@@ -240,10 +255,10 @@ class SwaggerAutoSchema(object):
                 )
             elif isinstance(serializer, openapi.Response):
                 response = serializer
-                if not isinstance(response.schema, openapi.Schema):
+                if not isinstance(response.schema, openapi.Schema.OR_REF):
                     serializer = force_serializer_instance(response.schema)
-                    response.schema = self.field_to_swagger(serializer, openapi.Schema)
-            elif isinstance(serializer, openapi.Schema):
+                    response.schema = self.serializer_to_schema(serializer)
+            elif isinstance(serializer, openapi.Schema.OR_REF):
                 response = openapi.Response(
                     description='',
                     schema=serializer,
@@ -252,7 +267,7 @@ class SwaggerAutoSchema(object):
                 serializer = force_serializer_instance(serializer)
                 response = openapi.Response(
                     description='',
-                    schema=self.field_to_swagger(serializer, openapi.Schema),
+                    schema=self.serializer_to_schema(serializer),
                 )
 
             responses[str(sc)] = response
@@ -260,7 +275,9 @@ class SwaggerAutoSchema(object):
         return responses
 
     def get_query_parameters(self):
-        """Return the query parameters accepted by this view."""
+        """Return the query parameters accepted by this view.
+
+        :rtype: list[openapi.Parameter]"""
         return self.get_filter_parameters() + self.get_pagination_parameters()
 
     def should_filter(self):
@@ -279,6 +296,7 @@ class SwaggerAutoSchema(object):
         """Get the filter parameters for a single filter backend **instance**.
 
         :param BaseFilterBackend filter_backend: the filter backend
+        :rtype: list[openapi.Parameter]
         """
         fields = []
         if hasattr(filter_backend, 'get_schema_fields'):
@@ -286,7 +304,10 @@ class SwaggerAutoSchema(object):
         return [self.coreapi_field_to_parameter(field) for field in fields]
 
     def get_filter_parameters(self):
-        """Return the parameters added to the view by its filter backends."""
+        """Return the parameters added to the view by its filter backends.
+
+        :rtype: list[openapi.Parameter]
+        """
         if not self.should_filter():
             return []
 
@@ -312,6 +333,7 @@ class SwaggerAutoSchema(object):
         """Get the pagination parameters for a single paginator **instance**.
 
         :param BasePagination paginator: the paginator
+        :rtype: list[openapi.Parameter]
         """
         fields = []
         if hasattr(paginator, 'get_schema_fields'):
@@ -320,16 +342,59 @@ class SwaggerAutoSchema(object):
         return [self.coreapi_field_to_parameter(field) for field in fields]
 
     def get_pagination_parameters(self):
-        """Return the parameters added to the view by its paginator."""
+        """Return the parameters added to the view by its paginator.
+
+        :rtype: list[openapi.Parameter]"""
         if not self.should_page():
             return []
 
         return self.get_paginator_parameters(self.view.paginator)
 
+    def get_description(self):
+        """Return an operation description determined as appropriate from the view's method and class docstrings.
+
+        :return: the operation description
+        :rtype: str
+        """
+        description = self.overrides.get('operation_description', None)
+        if description is None:
+            description = self._sch.get_description(self.path, self.method)
+        return description
+
+    def get_consumes(self):
+        """Return the MIME types this endpoint can consume.
+
+        :rtype: list[str]
+        """
+        media_types = [parser.media_type for parser in getattr(self.view, 'parser_classes', [])]
+        if all(is_form_media_type(encoding) for encoding in media_types):
+            return media_types
+        return media_types[:1]
+
+    def serializer_to_schema(self, serializer):
+        """Convert a DRF Serializer instance to an openapi.Schema.
+
+        :param serializers.BaseSerializer serializer:
+        :rtype: openapi.Schema
+        """
+        definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
+        return serializer_field_to_swagger(serializer, openapi.Schema, definitions)
+
+    def field_to_parameter(self, field, name, in_):
+        """Convert a DRF serializer Field to a swagger Parameter object.
+
+        :param coreapi.Field field:
+        :param str name: the name of the parameter
+        :param str in_: the location of the parameter, one of the `openapi.IN_*` constants
+        :rtype: openapi.Parameter
+        """
+        return serializer_field_to_swagger(field, openapi.Parameter, name=name, in_=in_)
+
     def coreapi_field_to_parameter(self, field):
         """Convert an instance of `coreapi.Field` to a swagger Parameter object.
 
-        :param coreapi.Field field: the coreapi field
+        :param coreapi.Field field:
+        :rtype: openapi.Parameter
         """
         location_to_in = {
             'query': openapi.IN_QUERY,
@@ -346,27 +411,7 @@ class SwaggerAutoSchema(object):
         return openapi.Parameter(
             name=field.name,
             in_=location_to_in[field.location],
-            type=coreapi_types.get(field.schema.__class__, openapi.TYPE_STRING),
+            type=coreapi_types.get(type(field.schema), openapi.TYPE_STRING),
             required=field.required,
             description=field.schema.description,
         )
-
-    def get_description(self):
-        """Return an operation description determined as appropriate from the view's method and class docstrings.
-
-        :return str: the operation description
-        """
-        description = self.overrides.get('operation_description', None)
-        if description is None:
-            description = self._sch.get_description(self.path, self.method)
-        return description
-
-    def get_consumes(self):
-        """Return the MIME types this endpoint can consume."""
-        media_types = [parser.media_type for parser in getattr(self.view, 'parser_classes', [])]
-        if all(is_form_media_type(encoding) for encoding in media_types):
-            return media_types
-        return media_types[:1]
-
-    def field_to_swagger(self, field, swagger_object_type, **kwargs):
-        return serializer_field_to_swagger(field, swagger_object_type, **kwargs)

@@ -2,6 +2,7 @@ import json
 import os
 
 import pytest
+from ruamel import yaml
 
 from drf_swagger import openapi, codecs
 from drf_swagger.generators import OpenAPISchemaGenerator
@@ -59,5 +60,5 @@ def bad_settings():
 
 @pytest.fixture
 def reference_schema():
-    with open(os.path.join(os.path.dirname(__file__), 'reference.json')) as reference:
-        return json.load(reference)
+    with open(os.path.join(os.path.dirname(__file__), 'reference.yaml')) as reference:
+        return yaml.safe_load(reference)
