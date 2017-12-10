@@ -134,9 +134,12 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
         assert definitions is not None, "ReferenceResolver required when instantiating Schema"
 
         serializer = field
-        ref_name = type(serializer).__name__
-        if ref_name.endswith('Serializer'):
-            ref_name = ref_name[:-len('Serializer')]
+        if hasattr(serializer, '__ref_name__'):
+            ref_name = serializer.__ref_name__
+        else:
+            ref_name = type(serializer).__name__
+            if ref_name.endswith('Serializer'):
+                ref_name = ref_name[:-len('Serializer')]
 
         def make_schema_definition():
             properties = OrderedDict()
@@ -153,6 +156,9 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
                 properties=properties,
                 required=required or None,
             )
+
+        if not ref_name:
+            return make_schema_definition()
 
         definitions.setdefault(ref_name, make_schema_definition)
         return openapi.SchemaRef(definitions, ref_name)

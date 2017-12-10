@@ -4,11 +4,15 @@ from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 
 
 class LanguageSerializer(serializers.Serializer):
+    __ref_name__ = None
+
     name = serializers.ChoiceField(
         choices=LANGUAGE_CHOICES, default='python', help_text='The name of the programming language')
 
 
 class ExampleProjectSerializer(serializers.Serializer):
+    __ref_name__ = 'Project'
+
     project_name = serializers.CharField(help_text='Name of the project')
     github_repo = serializers.CharField(required=True, help_text='Github repository of the project')
 
