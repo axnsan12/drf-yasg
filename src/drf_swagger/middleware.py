@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 
-from drf_swagger.errors import SwaggerValidationError
 from .codecs import _OpenAPICodec
+from .errors import SwaggerValidationError
 
 
 class SwaggerExceptionMiddleware(MiddlewareMixin):
@@ -15,4 +15,4 @@ class SwaggerExceptionMiddleware(MiddlewareMixin):
                 content_type = codec.media_type
                 return HttpResponse(err, status=500, content_type=content_type)
 
-        return None
+        return None  # pragma: no cover

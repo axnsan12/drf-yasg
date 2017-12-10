@@ -1,3 +1,4 @@
+import copy
 from collections import OrderedDict
 
 from coreapi.compat import urlparse
@@ -39,6 +40,8 @@ IN_QUERY = 'query'
 IN_FORM = 'formData'
 IN_HEADER = 'header'
 
+SCHEMA_DEFINITIONS = 'definitions'
+
 
 def make_swagger_name(attribute_name):
     """
@@ -63,7 +66,7 @@ class SwaggerDict(OrderedDict):
     def __init__(self, **attrs):
         super(SwaggerDict, self).__init__()
         self._extras__ = attrs
-        if self.__class__ == SwaggerDict:
+        if type(self) == SwaggerDict:
             self._insert_extras__()
 
     def __setattr__(self, key, value):
@@ -79,7 +82,7 @@ class SwaggerDict(OrderedDict):
         try:
             return self[make_swagger_name(item)]
         except KeyError as e:
-            raise_from(AttributeError("no attribute " + item), e)
+            raise_from(AttributeError("object of class " + type(self).__name__ + " has no attribute " + item), e)
 
     def __delattr__(self, item):
         if item.startswith('_'):
@@ -98,6 +101,12 @@ class SwaggerDict(OrderedDict):
         for attr, val in self._extras__.items():
             setattr(self, attr, val)
 
+    # noinspection PyArgumentList,PyDefaultArgument
+    def __deepcopy__(self, memodict={}):
+        result = OrderedDict(list(self.items()))
+        result.update(copy.deepcopy(result, memodict))
+        return result
+
 
 class Contact(SwaggerDict):
     """Swagger Contact object
@@ -111,7 +120,7 @@ class Contact(SwaggerDict):
     def __init__(self, name=None, url=None, email=None, **extra):
         super(Contact, self).__init__(**extra)
         if name is None and url is None and email is None:
-            raise ValueError("one of name, url or email is requires for Swagger Contact object")
+            raise AssertionError("one of name, url or email is requires for Swagger Contact object")
         self.name = name
         self.url = url
         self.email = email
@@ -128,7 +137,7 @@ class License(SwaggerDict):
     def __init__(self, name, url=None, **extra):
         super(License, self).__init__(**extra)
         if name is None:
-            raise ValueError("name is required for Swagger License object")
+            raise AssertionError("name is required for Swagger License object")
         self.name = name
         self.url = url
         self._insert_extras__()
@@ -149,11 +158,11 @@ class Info(SwaggerDict):
                  **extra):
         super(Info, self).__init__(**extra)
         if title is None or default_version is None:
-            raise ValueError("title and version are required for Swagger info object")
+            raise AssertionError("title and version are required for Swagger info object")
         if contact is not None and not isinstance(contact, Contact):
-            raise ValueError("contact must be a Contact object")
+            raise AssertionError("contact must be a Contact object")
         if license is not None and not isinstance(license, License):
-            raise ValueError("license must be a License object")
+            raise AssertionError("license must be a License object")
         self.title = title
         self._default_version = default_version
         self.description = description
@@ -164,12 +173,11 @@ class Info(SwaggerDict):
 
 
 class Swagger(SwaggerDict):
-    def __init__(self, info=None, _url=None, _version=None, paths=None, **extra):
+    def __init__(self, info=None, _url=None, _version=None, paths=None, definitions=None, **extra):
         super(Swagger, self).__init__(**extra)
         self.swagger = '2.0'
         self.info = info
         self.info.version = _version or info._default_version
-        self.paths = paths
 
         if _url:
             url = urlparse.urlparse(_url)
@@ -177,8 +185,10 @@ class Swagger(SwaggerDict):
                 self.host = url.netloc
             if url.scheme:
                 self.schemes = [url.scheme]
-
         self.base_path = '/'
+
+        self.paths = paths
+        self.definitions = definitions
         self._insert_extras__()
 
 
@@ -237,7 +247,7 @@ class Parameter(SwaggerDict):
                  type=None, format=None, enum=None, pattern=None, items=None, **extra):
         super(Parameter, self).__init__(**extra)
         if (not schema and not type) or (schema and type):
-            raise ValueError("either schema or type are required for Parameter object!")
+            raise AssertionError("either schema or type are required for Parameter object!")
         self.name = name
         self.in_ = in_
         self.description = description
@@ -252,9 +262,15 @@ class Parameter(SwaggerDict):
 
 
 class Schema(SwaggerDict):
+    OR_REF = ()
+
     def __init__(self, description=None, required=None, type=None, properties=None, additional_properties=None,
                  format=None, enum=None, pattern=None, items=None, **extra):
         super(Schema, self).__init__(**extra)
+        if required is True or required is False:
+            # common error
+            raise AssertionError(
+                "the requires attribute of schema must be an array of required properties, not a boolean!")
         self.description = description
         self.required = required
         self.type = type
@@ -267,11 +283,37 @@ class Schema(SwaggerDict):
         self._insert_extras__()
 
 
-class Ref(SwaggerDict):
-    def __init__(self, ref):
-        super(Ref, self).__init__()
-        self.ref = ref
-        self._insert_extras__()
+class _Ref(SwaggerDict):
+    def __init__(self, resolver, name, scope, expected_type):
+        super(_Ref, self).__init__()
+        assert not type(self) == _Ref, "do not instantiate _Ref directly"
+        ref_name = "#/{scope}/{name}".format(scope=scope, name=name)
+        obj = resolver.get(name, scope)
+        assert isinstance(obj, expected_type), ref_name + " is a {actual}, not a {expected}" \
+            .format(actual=type(obj).__name__, expected=expected_type.__name__)
+        self.ref = ref_name
+
+    def __setitem__(self, key, value, **kwargs):
+        if key == "$ref":
+            return super(_Ref, self).__setitem__(key, value, **kwargs)
+        raise NotImplementedError("only $ref can be set on Reference objects (not %s)" % key)
+
+    def __delitem__(self, key, **kwargs):
+        raise NotImplementedError("cannot delete property of Reference object")
+
+
+class SchemaRef(_Ref):
+    def __init__(self, resolver, schema_name):
+        """Add a reference to a named Schema defined in the #/definitions/ object.
+
+        :param ReferenceResolver resolver: component resolver which must contain the definition
+        :param str schema_name: schema name
+        """
+        assert SCHEMA_DEFINITIONS in resolver.scopes
+        super(SchemaRef, self).__init__(resolver, schema_name, SCHEMA_DEFINITIONS, Schema)
+
+
+Schema.OR_REF = (Schema, SchemaRef)
 
 
 class Responses(SwaggerDict):
@@ -291,3 +333,92 @@ class Response(SwaggerDict):
         self.schema = schema
         self.examples = examples
         self._insert_extras__()
+
+
+class ReferenceResolver(object):
+    """A mapping type intended for storing objects pointed at by Swagger Refs.
+    Provides support and checks for different refernce scopes, e.g. 'definitions'.
+
+    For example:
+      > components = ReferenceResolver('definitions', 'parameters')
+      > definitions = ReferenceResolver.with_scope('definitions')
+      > definitions.set('Article', Schema(...))
+      > print(components)
+      {'definitions': OrderedDict([('Article', Schema(...)]), 'parameters': OrderedDict()}
+    """
+
+    def __init__(self, *scopes):
+        self._objects = OrderedDict()
+        self._force_scope = None
+        for scope in scopes:
+            assert isinstance(scope, str), "scope names must be strings"
+            self._objects[scope] = OrderedDict()
+
+    def with_scope(self, scope):
+        assert scope in self.scopes, "unknown scope %s" % scope
+        ret = ReferenceResolver()
+        ret._objects = self._objects
+        ret._force_scope = scope
+        return ret
+
+    def _check_scope(self, scope):
+        real_scope = self._force_scope or scope
+        if scope is not None:
+            assert not self._force_scope or scope == self._force_scope, "cannot overrride forced scope"
+        assert real_scope and real_scope in self._objects, "invalid scope %s" % scope
+        return real_scope
+
+    def set(self, name, obj, scope=None):
+        scope = self._check_scope(scope)
+        assert obj is not None, "referenced objects cannot be None/null"
+        assert name not in self._objects[scope], "#/%s/%s already exists" % (scope, name)
+        self._objects[scope][name] = obj
+
+    def setdefault(self, name, maker, scope=None):
+        scope = self._check_scope(scope)
+        assert callable(maker), "setdefault expects a callable, not %s" % type(maker).__name__
+        ret = self.getdefault(name, None, scope)
+        if ret is None:
+            ret = maker()
+            assert ret is not None, "maker returned None; referenced objects cannot be None/null"
+            self.set(name, ret, scope)
+
+        return ret
+
+    def get(self, name, scope=None):
+        scope = self._check_scope(scope)
+        assert name in self._objects[scope], "#/%s/%s is not defined" % (scope, name)
+        return self._objects[scope][name]
+
+    def getdefault(self, name, default=None, scope=None):
+        scope = self._check_scope(scope)
+        return self._objects[scope].get(name, default)
+
+    def has(self, name, scope=None):
+        scope = self._check_scope(scope)
+        return name in self._objects[scope]
+
+    def __iter__(self):
+        if self._force_scope:
+            return iter(self._objects[self._force_scope])
+        return iter(self._objects)
+
+    @property
+    def scopes(self):
+        if self._force_scope:
+            return [self._force_scope]
+        return list(self._objects.keys())
+
+    # act as mapping
+    def keys(self):
+        if self._force_scope:
+            return self._objects[self._force_scope].keys()
+        return self._objects.keys()
+
+    def __getitem__(self, item):
+        if self._force_scope:
+            return self._objects[self._force_scope][item]
+        return self._objects[item]
+
+    def __str__(self):
+        return str(dict(self))

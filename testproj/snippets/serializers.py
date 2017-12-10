@@ -4,11 +4,15 @@ from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 
 
 class LanguageSerializer(serializers.Serializer):
+    __ref_name__ = None
+
     name = serializers.ChoiceField(
         choices=LANGUAGE_CHOICES, default='python', help_text='The name of the programming language')
 
 
-class ExampleProjectsSerializer(serializers.Serializer):
+class ExampleProjectSerializer(serializers.Serializer):
+    __ref_name__ = 'Project'
+
     project_name = serializers.CharField(help_text='Name of the project')
     github_repo = serializers.CharField(required=True, help_text='Github repository of the project')
 
@@ -26,7 +30,7 @@ class SnippetSerializer(serializers.Serializer):
     language = LanguageSerializer(help_text="Sample help text for language")
     style = serializers.ChoiceField(choices=STYLE_CHOICES, default='friendly')
     lines = serializers.ListField(child=serializers.IntegerField(), allow_empty=True, allow_null=True, required=False)
-    example_projects = serializers.ListSerializer(child=ExampleProjectsSerializer())
+    example_projects = serializers.ListSerializer(child=ExampleProjectSerializer())
 
     def create(self, validated_data):
         """

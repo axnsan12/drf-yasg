@@ -1,3 +1,4 @@
+import copy
 import json
 from collections import OrderedDict
 
@@ -5,9 +6,9 @@ from coreapi.compat import force_bytes
 from future.utils import raise_from
 from ruamel import yaml
 
-from drf_swagger.app_settings import swagger_settings
-from drf_swagger.errors import SwaggerValidationError
 from . import openapi
+from .app_settings import swagger_settings
+from .errors import SwaggerValidationError
 
 
 def _validate_flex(spec, codec):
@@ -51,7 +52,9 @@ class _OpenAPICodec(object):
 
         spec = self.generate_swagger_object(document)
         for validator in self.validators:
-            VALIDATORS[validator](spec, self)
+            # validate a deepcopy of the spec to prevent the validator from messing with it
+            # for example, swagger_spec_validator adds an x-scope property to all references
+            VALIDATORS[validator](copy.deepcopy(spec), self)
         return force_bytes(self._dump_dict(spec))
 
     def encode_error(self, err):
@@ -119,6 +122,7 @@ class SaneYamlDumper(yaml.SafeDumper):
         return node
 
 
+SaneYamlDumper.add_representer(OrderedDict, SaneYamlDumper.represent_odict)
 SaneYamlDumper.add_multi_representer(OrderedDict, SaneYamlDumper.represent_odict)
 
 

@@ -1,15 +1,22 @@
 import datetime
 
-from django_filters.rest_framework import DjangoFilterBackend, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route
+from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
 from articles import serializers
 from articles.models import Article
+from drf_swagger.inspectors import SwaggerAutoSchema
 from drf_swagger.utils import swagger_auto_schema
+
+
+class NoPagingAutoSchema(SwaggerAutoSchema):
+    def should_page(self):
+        return False
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
@@ -27,15 +34,17 @@ class ArticleViewSet(viewsets.ModelViewSet):
     """
     queryset = Article.objects.all()
     lookup_field = 'slug'
+    lookup_value_regex = r'[a-z0-9]+(?:-[a-z0-9]+)'
     serializer_class = serializers.ArticleSerializer
 
     pagination_class = LimitOffsetPagination
     max_page_size = 5
-    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_fields = ('title',)
     ordering_fields = ('date_modified',)
     ordering = ('username',)
 
+    @swagger_auto_schema(auto_schema=NoPagingAutoSchema)
     @list_route(methods=['get'])
     def today(self, request):
         today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
@@ -45,7 +54,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @swagger_auto_schema(method='get', operation_description="image GET description override")
-    @swagger_auto_schema(method='post', request_body=serializers.ImageUploadSerializer)
+    @swagger_auto_schema(method='post', request_body=serializers.ImageUploadSerializer, responses={200: 'success'})
     @detail_route(methods=['get', 'post'], parser_classes=(MultiPartParser,))
     def image(self, request, slug=None):
         """
@@ -57,7 +66,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
         """update method docstring"""
         return super(ArticleViewSet, self).update(request, *args, **kwargs)
 
-    @swagger_auto_schema(operation_description="partial_update description override")
+    @swagger_auto_schema(operation_description="partial_update description override", responses={404: 'slug not found'})
     def partial_update(self, request, *args, **kwargs):
         """partial_update method docstring"""
         return super(ArticleViewSet, self).partial_update(request, *args, **kwargs)

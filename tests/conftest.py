@@ -29,8 +29,8 @@ def codec_yaml():
 @pytest.fixture
 def swagger_dict():
     swagger = generator().get_schema(None, True)
-    json_bytes = codec_yaml().encode(swagger)
-    return yaml.safe_load(json_bytes.decode('utf-8'))
+    json_bytes = codec_json().encode(swagger)
+    return json.loads(json_bytes.decode('utf-8'))
 
 
 @pytest.fixture
@@ -60,5 +60,5 @@ def bad_settings():
 
 @pytest.fixture
 def reference_schema():
-    with open(os.path.join(os.path.dirname(__file__), 'reference.json')) as reference:
-        return json.load(reference)
+    with open(os.path.join(os.path.dirname(__file__), 'reference.yaml')) as reference:
+        return yaml.safe_load(reference)

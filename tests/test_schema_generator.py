@@ -39,5 +39,6 @@ def test_json_codec_roundtrip(codec_json, generator, validate_schema):
 
 def test_yaml_codec_roundtrip(codec_yaml, generator, validate_schema):
     swagger = generator.get_schema(None, True)
-    json_bytes = codec_yaml.encode(swagger)
-    validate_schema(yaml.safe_load(json_bytes.decode('utf-8')))
+    yaml_bytes = codec_yaml.encode(swagger)
+    assert b'omap' not in yaml_bytes
+    validate_schema(yaml.safe_load(yaml_bytes.decode('utf-8')))

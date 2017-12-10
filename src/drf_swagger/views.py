@@ -84,7 +84,7 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, v
             generator = self.generator_class(info, version, url, patterns, urlconf)
             schema = generator.get_schema(request, self.public)
             if schema is None:
-                raise exceptions.PermissionDenied()
+                raise exceptions.PermissionDenied()  # pragma: no cover
             return Response(schema)
 
         @classmethod
