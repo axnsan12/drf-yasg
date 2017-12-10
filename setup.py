@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import io
 import os
 
 from setuptools import setup, find_packages
@@ -10,7 +11,10 @@ def read_req(req_file):
         return [line for line in req.readlines() if line and not line.isspace()]
 
 
-requirements = ['djangorestframework>=3.7.3'] + read_req('base.txt')
+with io.open('README.rst', encoding='utf-8') as readme:
+    description = readme.read()
+
+requirements = ['djangorestframework>=3.7.0'] + read_req('base.txt')
 requirements_validation = read_req('validation.txt')
 requirements_test = read_req('test.txt')
 
@@ -28,19 +32,29 @@ setup(
     },
     license='BSD License',
     description='Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code.',
-    long_description='',
+    long_description=description,
     url='https://github.com/axnsan12/drf-swagger',
     author='Cristi V.',
     author_email='cristi@cvjd.me',
-    keywords='drf-swagger drf django rest-framework schema swagger openapi ',
+    keywords='drf django django-rest-framework schema swagger openapi codegen swagger-codegen '
+             'documentation drf-swagger django-rest-swagger drf-openapi',
     classifiers=[
-        'Framework :: Django',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
+        'Development Status :: 4 - Beta',
         'Operating System :: OS Independent',
+        'Environment :: Web Environment'
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Framework :: Django',
+        'Framework :: Django :: 1.11',
+        'Framework :: Django :: 2.0',
+        'Topic :: Documentation',
+        'Topic :: Software Development :: Code Generators',
     ],
 )
