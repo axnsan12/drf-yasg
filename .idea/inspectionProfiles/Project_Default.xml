@@ -42,6 +42,7 @@
           <option value="format" />
           <option value="type" />
           <option value="filter" />
+          <option value="copyright" />
         </list>
       </option>
     </inspection_tool>

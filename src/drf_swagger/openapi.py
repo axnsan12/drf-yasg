@@ -48,7 +48,7 @@ def make_swagger_name(attribute_name):
     Convert a python variable name into a Swagger spec attribute name.
 
     In particular,
-     * if name starts with x_, return "x-{camelCase}"
+     * if name starts with x\_, return "x-{camelCase}"
      * if name is 'ref', return "$ref"
      * else return the name converted to camelCase, with trailing underscores stripped
 
@@ -110,6 +110,7 @@ class SwaggerDict(OrderedDict):
 
 class Contact(SwaggerDict):
     """Swagger Contact object
+
     At least one of the following fields is required:
 
     :param str name: contact name
@@ -340,11 +341,14 @@ class ReferenceResolver(object):
     Provides support and checks for different refernce scopes, e.g. 'definitions'.
 
     For example:
-      > components = ReferenceResolver('definitions', 'parameters')
-      > definitions = ReferenceResolver.with_scope('definitions')
-      > definitions.set('Article', Schema(...))
-      > print(components)
-      {'definitions': OrderedDict([('Article', Schema(...)]), 'parameters': OrderedDict()}
+
+    ::
+
+        > components = ReferenceResolver('definitions', 'parameters')
+        > definitions = ReferenceResolver.with_scope('definitions')
+        > definitions.set('Article', Schema(...))
+        > print(components)
+        {'definitions': OrderedDict([('Article', Schema(...)]), 'parameters': OrderedDict()}
     """
 
     def __init__(self, *scopes):

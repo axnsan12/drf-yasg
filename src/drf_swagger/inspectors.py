@@ -75,8 +75,9 @@ class SwaggerAutoSchema(object):
     def get_request_body_parameters(self, consumes):
         """Return the request body parameters for this view.
         This is either:
-          - a list with a single object Parameter with a Schema derived from the request serializer
-          - a list of primitive Parameters parsed as form data
+
+        -  a list with a single object Parameter with a Schema derived from the request serializer
+        -  a list of primitive Parameters parsed as form data
 
         :param list[str] consumes: a list of MIME types this request accepts as body
         :return: a (potentially empty) list of openapi.Parameter in: either `body` or `formData`
@@ -229,7 +230,8 @@ class SwaggerAutoSchema(object):
         The return value should be a dict where the keys are possible status codes, and values are either strings,
         `Serializer` or `openapi.Response` objects.
 
-        :return dict: the response serializers
+        :return: the response serializers
+        :rtype: dict
         """
         manual_responses = self.overrides.get('responses', None) or {}
         manual_responses = OrderedDict((str(sc), resp) for sc, resp in manual_responses.items())
@@ -245,7 +247,8 @@ class SwaggerAutoSchema(object):
         """Return the `openapi.Response` objects calculated for this view.
 
         :param dict response_serializers: result of get_response_serializers
-        :return dict[str, openapi.Response]: a dictionary of status code to Response object
+        :return: a dictionary of status code to Response object
+        :rtype: dict[str, openapi.Response]
         """
         responses = {}
         for sc, serializer in response_serializers.items():

@@ -35,6 +35,10 @@ Usage
 1. Quickstart
 =============
 
+.. code:: console
+
+   pip install drf-swagger[validation]
+
 In ``settings.py``:
 
 .. code:: python
@@ -77,7 +81,7 @@ In ``urls.py``:
         ...
     ]
 
-This exposes 4 cached, publicly available endpoints:
+This exposes 4 cached, validated and publicly available endpoints:
 
 * A JSON view of your API specification at ``/swagger.json``
 * A YAML view of your API specification at ``/swagger.yaml``
@@ -168,19 +172,15 @@ file. The possible settings and their default values are as follows:
 3. More customization
 =====================
 
-Should you have need of more fine-grained customization over the schema
-view and generation, you are on your own to figure out where you need to
-subclass and plug your functionality. Here are a few high-level hints:
+If you need more customization, you can subclass one of the classes involved in the spec generation process:
 
--  ``OpenAPISchemaGenerator`` enumerates all the API endpoints
-   registered in Django Rest Framework, inspects their view classes and
-   generates an appropriate ``Swagger`` object describing the API
-   structure
+-  ``OpenAPISchemaGenerator`` enumerates all the API endpoints registered in Django Rest Framework, inspects their
+   view classes and generates an appropriate ``Swagger`` object describing the API structure
+- ``SwaggerAutoSchema``
 -  ``SchemaView`` gets a ``drf_swagger.openapi.Swagger`` schema object
    from a generator and renders it into an HTTP response
 
-   -  you can subclass ``SchemaView`` by extending the return value of
-      ``get_schema_view``, e.g.:
+   -  you can subclass ``SchemaView`` by extending the return value of ``get_schema_view``, e.g.:
 
       .. code:: python
 
@@ -190,12 +190,9 @@ subclass and plug your functionality. Here are a few high-level hints:
               generator_class = CustomSchemaGenerator
               renderer_classes = (CustomRenderer1, CustomRenderer2,)
 
--  ``drf_swagger.renderers`` take a ``Swagger`` object and transform it
-   into an OpenAPI 2.0 specification document using
-   ``OpenAPICodecJson``, ``OpenAPICodecYaml``, or into a web interface
-   using an OpenAPI renderer library.
--  ``drf_swagger.codecs`` take a ``Swagger`` object and encode it in an
-   exportable format (json or yaml by default).
+-  ``drf_swagger.renderers`` take a ``Swagger`` object and render it into an HTTP response;
+   renderers for JSON, YAML and HTML web UI are provided by default
+-  ``drf_swagger.codecs`` take a ``Swagger`` object and encode it into a text format (json or yaml by default).
 
 4. Caching
 ==========
@@ -252,7 +249,7 @@ If your schema is not accessible from the internet, you can run a local copy of
         ...
     }
 
-.. code:: bash
+.. code:: console
 
     $ docker run --name swagger-validator -d -p 8189:8080 --add-host test.local:10.0.75.1 swaggerapi/swagger-validator
     84dabd52ba967c32ae6b660934fa6a429ca6bc9e594d56e822a858b57039c8a2
@@ -266,7 +263,7 @@ Using ``swagger-cli``
 
 https://www.npmjs.com/package/swagger-cli
 
-.. code:: bash
+.. code:: console
 
     $ npm install -g swagger-cli
     [...]
@@ -310,8 +307,8 @@ support and features. In particular, the OpenAPI codec/compatibility layer provi
 
 In short this makes the generated schema unusable for code generation, and mediocre at best for documentation.
 
-Third-party libraries
-=====================
+Other libraries
+===============
 
 There are currently two decent Swagger schema generators that I could
 find for django-rest-framework:

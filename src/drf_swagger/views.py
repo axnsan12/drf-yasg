@@ -101,7 +101,8 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, v
             cache_kwargs = cache_kwargs or {}
             view = cls.as_view(**initkwargs)
             if cache_timeout != 0:
-                view = vary_on_headers('Cookie', 'Authorization', 'Accept')(view)
+                if not public:
+                    view = vary_on_headers('Cookie', 'Authorization')(view)
                 view = cache_page(cache_timeout, **cache_kwargs)(view)
                 view = deferred_never_cache(view)  # disable in-browser caching
             elif cache_kwargs:
