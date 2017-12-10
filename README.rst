@@ -25,6 +25,28 @@ Features
    `flex <https://github.com/pipermerriam/flex>`__
 
 
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/docs/screenshots/redoc-nested-response.png
+   :width: 100%
+   :figwidth: image
+   :alt: redoc screenshot
+
+   Fully nested request and response schemas.
+
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/docs/screenshots/swagger-ui-list.png
+   :width: 100%
+   :figwidth: image
+   :alt: swagger-ui screenshot
+
+   Choose between redoc and swagger-ui.
+
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/docs/screenshots/swagger-ui-models.png
+   :width: 100%
+   :figwidth: image
+   :alt: model definitions screenshot
+
+   Real Model definitions.
+
+
 .. contents:: Table of Contents
    :depth: 4
 
@@ -136,19 +158,19 @@ file. The possible settings and their default values are as follows:
         'USE_SESSION_AUTH': True,  # add Django Login and Django Logout buttons, CSRF token to swagger UI page
         'LOGIN_URL': getattr(django.conf.settings, 'LOGIN_URL', None),  # URL for the login button
         'LOGOUT_URL': getattr(django.conf.settings, 'LOGOUT_URL', None),  # URL for the logout button
-        
-        # Swagger security definitions to include in the schema; 
+
+        # Swagger security definitions to include in the schema;
         # see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#security-definitions-object
-        'SECURITY_DEFINITIONS': {  
+        'SECURITY_DEFINITIONS': {
             'basic': {
                 'type': 'basic'
             }
         },
-        
+
         # url to an external Swagger validation service; defaults to 'http://online.swagger.io/validator/'
         # set to None to disable the schema validation badge in the UI
-        'VALIDATOR_URL': '', 
-        
+        'VALIDATOR_URL': '',
+
         # swagger-ui configuration settings, see https://github.com/swagger-api/swagger-ui#parameters of the same name
         'OPERATIONS_SORTER': None,
         'TAGS_SORTER': None,

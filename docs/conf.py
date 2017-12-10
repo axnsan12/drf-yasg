@@ -177,4 +177,3 @@ os.putenv('DJANGO_SETTINGS_MODULE', 'testproj.settings')
 
 from django.conf import settings
 settings.configure()
-print(sys.path)
