@@ -1,6 +1,6 @@
 {
   "name": "drf-swagger",
   "dependencies": {
-    "swagger-ui-dist": "^3.5.0"
+    "swagger-ui-dist": "^3.6.1"
   }
 }
