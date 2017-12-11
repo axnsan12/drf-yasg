@@ -201,8 +201,9 @@ nitpick_ignore = [
     ('py:obj', 'dict'),
     ('py:obj', 'list'),
     ('py:obj', 'str'),
+    ('py:obj', 'bytes'),
     ('py:obj', 'tuple'),
-    ('py:obj', 'tuple'),
+    ('py:obj', 'callable'),
     ('py:obj', 'type'),
     ('py:obj', 'OrderedDict'),
 ]

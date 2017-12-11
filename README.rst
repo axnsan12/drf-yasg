@@ -4,8 +4,18 @@
 ###########
 drf-swagger
 ###########
+|travis| |nbsp| |codecov|
 
-Generate *real* Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
+Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
+
+Compatible with
+
+- **Django Rest Framework**: 3.7
+- **Django**: 1.11, 2.0
+- **Python**: 2.7, 3.4, 3.5, 3.6
+
+**Source**: https://github.com/axnsan12/drf-swagger/ |br|
+**Documentation**: https://drf-swagger.readthedocs.io/en/latest/
 
 ********
 Features
@@ -30,21 +40,22 @@ Features
    :figwidth: image
    :alt: redoc screenshot
 
-   *Fully nested request and response schemas.*
+   **Fully nested request and response schemas.**
 
 .. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/docs/screenshots/swagger-ui-list.png
    :width: 100%
    :figwidth: image
    :alt: swagger-ui screenshot
 
-   *Choose between redoc and swagger-ui.*
+   **Choose between redoc and swagger-ui.**
 
 .. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/docs/screenshots/swagger-ui-models.png
    :width: 100%
    :figwidth: image
    :alt: model definitions screenshot
 
-   *Real Model definitions.*
+   **Real Model definitions.**
+
 
 *****************
 Table of contents
@@ -67,7 +78,6 @@ Usage
 In ``settings.py``:
 
 .. code:: python
-
 
     INSTALLED_APPS = [
         ...
@@ -119,19 +129,14 @@ This exposes 4 cached, validated and publicly available endpoints:
 a. ``get_schema_view`` parameters
 ---------------------------------
 
--  ``info`` - Required. Swagger API Info object
--  ``url`` - API base url; if left blank will be deduced from the
-   location the view is served at
--  ``patterns`` - passed to SchemaGenerator
--  ``urlconf`` - passed to SchemaGenerator
--  ``public`` - if False, includes only endpoints the current user has
-   access to
--  ``validators`` - a list of validator names to apply on the generated
-   schema; allowed values are ``flex``, ``ssv``
--  ``authentication_classes`` - authentication classes for the schema
-   view itself
--  ``permission_classes`` - permission classes for the schema view
-   itself
+- ``info`` - Required. Swagger API Info object
+- ``url`` - API base url; if left blank will be deduced from the location the view is served at
+- ``patterns`` - passed to SchemaGenerator
+- ``urlconf`` - passed to SchemaGenerator
+- ``public`` - if False, includes only endpoints the current user has access to
+- ``validators`` - a list of validator names to apply on the generated schema; allowed values are ``flex``, ``ssv``
+- ``authentication_classes`` - authentication classes for the schema view itself
+- ``permission_classes`` - permission classes for the schema view itself
 
 b. ``SchemaView`` options
 -------------------------------
@@ -147,13 +152,13 @@ b. ``SchemaView`` options
 All of the first 3 methods take two optional arguments,
 ``cache_timeout`` and ``cache_kwargs``; if present, these are passed on
 to Django’s :python:`cached_page` decorator in order to enable caching on the
-resulting viewl. See `4. Caching`_.
+resulting viewl. See `3. Caching`_.
 
 c. ``SWAGGER_SETTINGS`` and ``REDOC_SETTINGS``
 ----------------------------------------------
 
-Additionally, you can include some more settings in your ``settings.py``
-file. The possible settings and their default values are as follows:
+Additionally, you can include some more settings in your ``settings.py`` file.
+The possible settings and their default values are as follows:
 
 .. code:: python
 
@@ -174,7 +179,7 @@ file. The possible settings and their default values are as follows:
         # set to None to disable the schema validation badge in the UI
         'VALIDATOR_URL': '',
 
-        # swagger-ui configuration settings, see https://github.com/swagger-api/swagger-ui#parameters of the same name
+        # swagger-ui configuration settings, see https://github.com/swagger-api/swagger-ui/blob/112bca906553a937ac67adc2e500bdeed96d067b/docs/usage/configuration.md#parameters of the same name
         'OPERATIONS_SORTER': None,
         'TAGS_SORTER': None,
         'DOC_EXPANSION': 'list',
@@ -194,32 +199,7 @@ file. The possible settings and their default values are as follows:
         'PATH_IN_MIDDLE': False,
     }
 
-3. More customization
-=====================
-
-If you need more customization, you can subclass one of the classes involved in the spec generation process:
-
--  ``OpenAPISchemaGenerator`` enumerates all the API endpoints registered in Django Rest Framework, inspects their
-   view classes and generates an appropriate ``Swagger`` object describing the API structure
-- ``SwaggerAutoSchema``
--  ``SchemaView`` gets a ``drf_swagger.openapi.Swagger`` schema object
-   from a generator and renders it into an HTTP response
-
-   -  you can subclass ``SchemaView`` by extending the return value of ``get_schema_view``, e.g.:
-
-      .. code:: python
-
-          SchemaView = get_schema_view(info, ...)
-
-          class CustomSchemaView(SchemaView):
-              generator_class = CustomSchemaGenerator
-              renderer_classes = (CustomRenderer1, CustomRenderer2,)
-
--  ``drf_swagger.renderers`` take a ``Swagger`` object and render it into an HTTP response;
-   renderers for JSON, YAML and HTML web UI are provided by default
--  ``drf_swagger.codecs`` take a ``Swagger`` object and encode it into a text format (json or yaml by default).
-
-4. Caching
+3. Caching
 ==========
 
 Since the schema does not usually change during the lifetime of the
@@ -234,7 +214,7 @@ view in-memory, with some sane defaults:
   will have a separate schema cached in memory.
 
 
-5. Validation
+4. Validation
 =============
 
 Given the numerous methods to manually customzie the generated schema, it makes sense to validate the result to ensure
@@ -347,3 +327,18 @@ schemas, but ultimately still falls short in code
 generation because the responses are plain ``object``\ s.
 
 Both projects are also currently unmantained.
+
+.. |travis| image:: https://travis-ci.org/axnsan12/drf-swagger.svg?branch=master
+   :target: https://travis-ci.org/axnsan12/drf-swagger
+   :alt: Travis CI
+
+.. |codecov| image:: https://codecov.io/gh/axnsan12/drf-swagger/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/axnsan12/drf-swagger
+   :alt: Codecov
+
+.. |nbsp| unicode:: 0xA0
+   :trim:
+
+.. |br| raw:: html
+
+   <br />
