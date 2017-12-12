@@ -166,9 +166,9 @@ class SwaggerAutoSchema(object):
         parameters = OrderedDict(((param.name, param.in_), param) for param in parameters)
         manual_parameters = self.overrides.get('manual_parameters', None) or []
 
-        if any(param.in_ == openapi.IN_BODY for param in manual_parameters):
+        if any(param.in_ == openapi.IN_BODY for param in manual_parameters):  # pragma: no cover
             raise SwaggerGenerationError("specify the body parameter as a Schema or Serializer in request_body")
-        if any(param.in_ == openapi.IN_FORM for param in manual_parameters):
+        if any(param.in_ == openapi.IN_FORM for param in manual_parameters):  # pragma: no cover
             if any(param.in_ == openapi.IN_BODY for param in parameters.values()):
                 raise SwaggerGenerationError("cannot add form parameters when the request has a request schema; "
                                              "did you forget to set an appropriate parser class on the view?")

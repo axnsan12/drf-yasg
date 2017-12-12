@@ -1,6 +1,7 @@
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import permissions
+from rest_framework.decorators import api_view
 
 from drf_swagger import openapi
 from drf_swagger.views import get_schema_view
@@ -19,6 +20,12 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
+
+@api_view(['GET'])
+def plain_view(request):
+    pass
+
+
 urlpatterns = [
     url(r'^swagger(?P<format>.json|.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
@@ -28,4 +35,5 @@ urlpatterns = [
     url(r'^snippets/', include('snippets.urls')),
     url(r'^articles/', include('articles.urls')),
     url(r'^users/', include('users.urls')),
+    url(r'^plain/', plain_view),
 ]

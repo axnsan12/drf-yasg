@@ -234,6 +234,19 @@ paths:
         required: true
         type: string
         pattern: '[a-z0-9]+(?:-[a-z0-9]+)'
+  /plain/:
+    get:
+      operationId: plain_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      consumes:
+        - application/json
+      tags:
+        - plain
+    parameters: []
   /snippets/:
     get:
       operationId: snippets_list

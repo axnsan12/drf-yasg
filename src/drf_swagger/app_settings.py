@@ -1,7 +1,5 @@
-from collections import namedtuple
-
 from django.conf import settings
-from rest_framework.settings import APISettings, perform_import
+from rest_framework.settings import perform_import
 
 SWAGGER_DEFAULTS = {
     'USE_SESSION_AUTH': True,
@@ -49,7 +47,7 @@ class AppSettings(object):
 
     def __getattr__(self, attr):
         if attr not in self.defaults:
-            raise AttributeError("Invalid setting: '%s'" % attr)
+            raise AttributeError("Invalid setting: '%s'" % attr)  # pragma: no cover
 
         try:
             # Check if present in user settings

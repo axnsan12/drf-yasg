@@ -280,6 +280,18 @@ This method is currently the only way to get both syntactic and semantic validat
 The other validators only provide JSON schema-level validation, but miss things like duplicate operation names,
 improper content types, etc
 
+5. Code generation
+==================
+
+You can use the specification outputted by this library together with
+`swagger-codegen <https://github.com/swagger-api/swagger-codegen>`_ to generate client code in your language of choice:
+
+.. code:: console
+
+   $ docker run --rm -v ${PWD}:/local swaggerapi/swagger-codegen-cli generate -i /local/tests/reference.yaml -l javascript -o /local/.codegen/js
+
+See the github page linked above for more details.
+
 **********
 Background
 **********

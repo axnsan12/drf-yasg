@@ -89,6 +89,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
           it will automatically be converted into a :class:`.Schema`
 
     """
+
     def decorator(view_method):
         data = {
             'auto_schema': auto_schema,
@@ -301,7 +302,7 @@ def find_regex(regex_field):
         if isinstance(validator, RegexValidator):
             if regex_validator is not None:
                 # bail if multiple validators are found - no obvious way to choose
-                return None
+                return None  # pragma: no cover
             regex_validator = validator
 
     # regex_validator.regex should be a compiled re object...

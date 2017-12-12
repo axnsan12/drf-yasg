@@ -5,7 +5,6 @@ from coreapi.compat import urlparse
 from future.utils import raise_from
 from inflection import camelize
 
-
 TYPE_OBJECT = "object"  #:
 TYPE_STRING = "string"  #:
 TYPE_NUMBER = "number"  #:
@@ -212,7 +211,7 @@ class Paths(SwaggerDict):
         super(Paths, self).__init__(**extra)
         for path, path_obj in paths.items():
             assert path.startswith("/")
-            if path_obj is not None:
+            if path_obj is not None:  # pragma: no cover
                 self[path] = path_obj
         self._insert_extras__()
 
@@ -403,7 +402,7 @@ class Responses(SwaggerDict):
         """
         super(Responses, self).__init__(**extra)
         for status, response in responses.items():
-            if response is not None:
+            if response is not None:  # pragma: no cover
                 self[str(status)] = response
         self.default = default
         self._insert_extras__()

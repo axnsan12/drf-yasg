@@ -1,6 +1,6 @@
 import json
 
-import copy
+import pytest
 from ruamel import yaml
 
 
@@ -44,3 +44,10 @@ def test_swagger_ui(client, validate_schema):
 def test_redoc(client, validate_schema):
     _validate_ui_schema_view(client, '/redoc/', 'redoc/redoc.min.js')
     _validate_text_schema_view(client, validate_schema, '/redoc/?format=openapi', json.loads)
+
+
+@pytest.mark.urls('urlconfs.non_public_urls')
+def test_non_public(client):
+    response = client.get('/private/swagger.yaml')
+    swagger = yaml.safe_load(response.content.decode('utf-8'))
+    assert len(swagger['paths']) == 0
