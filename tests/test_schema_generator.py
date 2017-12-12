@@ -1,10 +1,14 @@
 import json
 
 import pytest
+from requests import Request
+from rest_framework import permissions
+from rest_framework.test import APIRequestFactory
 from ruamel import yaml
 
 from drf_swagger import openapi, codecs
 from drf_swagger.generators import OpenAPISchemaGenerator
+from drf_swagger.views import get_schema_view
 
 
 def test_schema_generates_without_errors(generator):
@@ -12,8 +16,18 @@ def test_schema_generates_without_errors(generator):
 
 
 def test_schema_is_valid(generator, codec_yaml):
-    swagger = generator.get_schema(None, True)
+    swagger = generator.get_schema(request=None, public=False)
     codec_yaml.encode(swagger)
+
+
+def test_non_public(generator, codec_yaml):
+    factory = APIRequestFactory()
+    request = factory.get('/swagger.json')
+    view = get_schema_view(openapi.Info('bla', 'ble'), public=False, permission_classes=(permissions.AllowAny,))
+    view = view.without_ui()
+    response = view(request)
+    swagger = response.data
+    assert len(swagger['paths']) == 0
 
 
 def test_invalid_schema_fails(codec_json):
@@ -42,3 +56,4 @@ def test_yaml_codec_roundtrip(codec_yaml, generator, validate_schema):
     yaml_bytes = codec_yaml.encode(swagger)
     assert b'omap' not in yaml_bytes
     validate_schema(yaml.safe_load(yaml_bytes.decode('utf-8')))
+

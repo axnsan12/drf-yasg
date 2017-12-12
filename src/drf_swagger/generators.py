@@ -137,7 +137,8 @@ class OpenAPISchemaGenerator(object):
                 schema = auto_schema_cls(view, path, method, overrides, components)
                 operations[method.lower()] = schema.get_operation(operation_keys)
 
-            paths[path] = openapi.PathItem(parameters=path_parameters, **operations)
+            if operations:
+                paths[path] = openapi.PathItem(parameters=path_parameters, **operations)
 
         return openapi.Paths(paths=paths)
 
