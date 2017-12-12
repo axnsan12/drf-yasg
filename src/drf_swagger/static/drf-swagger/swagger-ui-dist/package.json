@@ -1,28 +1,28 @@
 {
-  "_from": "swagger-ui-dist",
-  "_id": "swagger-ui-dist@3.5.0",
+  "_from": "swagger-ui-dist@3.6.1",
+  "_id": "swagger-ui-dist@3.6.1",
   "_inBundle": false,
-  "_integrity": "sha1-JuvzMRqaYP6dFwYS7tUoKmW8kiY=",
+  "_integrity": "sha1-uzQgV/h2COTs2DlGMDSJxjYicgY=",
   "_location": "/swagger-ui-dist",
   "_phantomChildren": {},
   "_requested": {
-    "type": "tag",
+    "type": "version",
     "registry": true,
-    "raw": "swagger-ui-dist",
+    "raw": "swagger-ui-dist@3.6.1",
     "name": "swagger-ui-dist",
     "escapedName": "swagger-ui-dist",
-    "rawSpec": "",
+    "rawSpec": "3.6.1",
     "saveSpec": null,
-    "fetchSpec": "latest"
+    "fetchSpec": "3.6.1"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/swagger-ui-dist/-/swagger-ui-dist-3.5.0.tgz",
-  "_shasum": "26ebf3311a9a60fe9d170612eed5282a65bc9226",
-  "_spec": "swagger-ui-dist",
-  "_where": "C:\\Projects\\drf_openapi",
+  "_resolved": "https://registry.npmjs.org/swagger-ui-dist/-/swagger-ui-dist-3.6.1.tgz",
+  "_shasum": "bb342057f87608e4ecd83946303489c636227206",
+  "_spec": "swagger-ui-dist@3.6.1",
+  "_where": "C:\\Projects\\drf-swagger",
   "bugs": {
     "url": "https://github.com/swagger-api/swagger-ui/issues"
   },
@@ -68,5 +68,5 @@
     "type": "git",
     "url": "git+ssh://git@github.com/swagger-api/swagger-ui.git"
   },
-  "version": "3.5.0"
+  "version": "3.6.1"
 }

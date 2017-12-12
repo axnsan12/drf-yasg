@@ -65,10 +65,10 @@ class OpenAPISchemaGenerator(object):
         view = self._gen.create_view(callback, method, request)
         overrides = getattr(callback, 'swagger_auto_schema', None)
         if overrides is not None:
-            # decorated function based view must have its decorator information passed on to th re-instantiated view
+            # decorated function based view must have its decorator information passed on to the re-instantiated view
             for method, _ in overrides.items():
                 view_method = getattr(view, method, None)
-                if view_method is not None:
+                if view_method is not None:  # pragma: no cover
                     setattr(view_method.__func__, 'swagger_auto_schema', overrides)
         return view
 
@@ -137,7 +137,8 @@ class OpenAPISchemaGenerator(object):
                 schema = auto_schema_cls(view, path, method, overrides, components)
                 operations[method.lower()] = schema.get_operation(operation_keys)
 
-            paths[path] = openapi.PathItem(parameters=path_parameters, **operations)
+            if operations:
+                paths[path] = openapi.PathItem(parameters=path_parameters, **operations)
 
         return openapi.Paths(paths=paths)
 
@@ -178,7 +179,7 @@ class OpenAPISchemaGenerator(object):
                 try:
                     model_field = model._meta.get_field(variable)
                 except Exception:
-                    model_field = None
+                    model_field = None  # pragma: no cover
 
                 if model_field is not None and model_field.help_text:
                     description = force_text(model_field.help_text)

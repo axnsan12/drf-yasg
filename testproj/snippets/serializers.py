@@ -28,9 +28,10 @@ class SnippetSerializer(serializers.Serializer):
     code = serializers.CharField(style={'base_template': 'textarea.html'})
     linenos = serializers.BooleanField(required=False)
     language = LanguageSerializer(help_text="Sample help text for language")
-    style = serializers.ChoiceField(choices=STYLE_CHOICES, default='friendly')
+    styles = serializers.MultipleChoiceField(choices=STYLE_CHOICES, default=['friendly'])
     lines = serializers.ListField(child=serializers.IntegerField(), allow_empty=True, allow_null=True, required=False)
     example_projects = serializers.ListSerializer(child=ExampleProjectSerializer())
+    difficulty_factor = serializers.FloatField(help_text="this is here just to test FloatField")
 
     def create(self, validated_data):
         """

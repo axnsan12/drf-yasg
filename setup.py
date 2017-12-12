@@ -16,7 +16,6 @@ with io.open('README.rst', encoding='utf-8') as readme:
 
 requirements = ['djangorestframework>=3.7.0'] + read_req('base.txt')
 requirements_validation = read_req('validation.txt')
-requirements_test = read_req('test.txt')
 
 setup(
     name='drf-swagger',
@@ -25,10 +24,8 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     install_requires=requirements,
-    tests_require=requirements_test,
     extras_require={
         'validation': requirements_validation,
-        'test': requirements_test,
     },
     license='BSD License',
     description='Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code.',

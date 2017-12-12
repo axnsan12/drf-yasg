@@ -39,9 +39,6 @@ VALIDATORS = {
 class _OpenAPICodec(object):
     media_type = None
 
-    #: Allows easier mocking of settings
-    settings = swagger_settings
-
     def __init__(self, validators):
         self._validators = validators
 
@@ -89,7 +86,7 @@ class _OpenAPICodec(object):
         :return: swagger spec as dict
         :rtype: OrderedDict
         """
-        swagger.security_definitions = self.settings.SECURITY_DEFINITIONS
+        swagger.security_definitions = swagger_settings.SECURITY_DEFINITIONS
         return swagger
 
 

@@ -12,7 +12,7 @@ def test_schema_generates_without_errors(generator):
 
 
 def test_schema_is_valid(generator, codec_yaml):
-    swagger = generator.get_schema(None, True)
+    swagger = generator.get_schema(request=None, public=False)
     codec_yaml.encode(swagger)
 
 
@@ -42,3 +42,17 @@ def test_yaml_codec_roundtrip(codec_yaml, generator, validate_schema):
     yaml_bytes = codec_yaml.encode(swagger)
     assert b'omap' not in yaml_bytes
     validate_schema(yaml.safe_load(yaml_bytes.decode('utf-8')))
+
+
+def test_basepath_only():
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        version="v2",
+        url='/basepath/',
+    )
+
+    swagger = generator.get_schema(None, public=True)
+    assert 'host' not in swagger
+    assert 'schemes' not in swagger
+    assert swagger['basePath'] == '/'  # base path is not implemented for now
+    assert swagger['info']['version'] == 'v2'
