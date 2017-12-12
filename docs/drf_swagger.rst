@@ -16,6 +16,7 @@ drf\_swagger\.codecs
     :members:
     :undoc-members:
     :show-inheritance:
+    :exclude-members: SaneYamlDumper
 
 drf\_swagger\.errors
 ---------------------------
@@ -81,3 +82,6 @@ drf\_swagger\.views
     :undoc-members:
     :show-inheritance:
 
+.. |br| raw:: html
+
+   <br />

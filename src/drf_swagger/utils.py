@@ -8,17 +8,24 @@ from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin, UpdateM
 from . import openapi
 from .errors import SwaggerGenerationError
 
+#: used to forcibly remove the body of a request via :func:`.swagger_auto_schema`
 no_body = object()
 
 
 def is_list_view(path, method, view):
-    """Return True if the given path/method appears to represent a list view (as opposed to a detail/instance view)."""
-    # for ViewSets, it could be the default 'list' view, or a list_route
+    """Check if the given path/method appears to represent a list view (as opposed to a detail/instance view).
+
+    :param str path: view path
+    :param str method: http method
+    :param APIView view: target view
+    :rtype: bool
+    """
+    # for ViewSets, it could be the default 'list' action, or a list_route
     action = getattr(view, 'action', '')
     method = getattr(view, action, None)
     detail = getattr(method, 'detail', None)
     suffix = getattr(view, 'suffix', None)
-    if action == 'list' or detail is False or suffix == 'List':
+    if action in ('list', 'create') or detail is False or suffix == 'List':
         return True
 
     if action in ('retrieve', 'update', 'partial_update', 'destroy') or detail is True or suffix == 'Instance':
@@ -34,12 +41,54 @@ def is_list_view(path, method, view):
     if path_components and '{' in path_components[-1]:
         return False
 
-    # otherwise assume it's a list route
+    # otherwise assume it's a list view
     return True
 
 
 def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_body=None, manual_parameters=None,
                         operation_description=None, responses=None):
+    """Decorate a view method to customize the :class:`.Operation` object generated from it.
+
+    `method` and `methods` are mutually exclusive and must only be present when decorating a view method that accepts
+    more than one HTTP request method.
+
+    The `auto_schema` and `operation_description` arguments take precendence over view- or method-level values.
+
+    :param str method: for multi-method views, the http method the options should apply to
+    :param list[str] methods: for multi-method views, the http methods the options should apply to
+    :param .SwaggerAutoSchema auto_schema: custom class to use for generating the Operation object
+    :param .Schema,.SchemaRef,.Serializer request_body: custom request body, or :data:`.no_body`. The value given here
+        will be used as the ``schema`` property of a :class:`.Parameter` with ``in: 'body'``.
+
+        A Schema or SchemaRef is not valid if this request consumes form-data, because ``form`` and ``body`` parameters
+        are mutually exclusive in an :class:`.Operation`. If you need to set custom ``form`` parameters, you can use
+        the `manual_parameters` argument.
+
+        If a ``Serializer`` class or instance is given, it will be automatically converted into a :class:`.Schema`
+        used as a ``body`` :class:`.Parameter`, or into a list of  ``form`` :class:`.Parameter`\ s, as appropriate.
+
+    :param list[.Parameter] manual_parameters: a list of manual parameters to override the automatically generated ones
+
+        :class:`.Parameter`\ s are identified by their (``name``, ``in``) combination, and any parameters given
+        here will fully override automatically generated parameters if they collide.
+
+        It is an error to supply ``form`` parameters when the request does not consume form-data.
+
+    :param str operation_description: operation description override
+    :param dict[str,(.Schema,.SchemaRef,.Response,str,Serializer)] responses: a dict of documented manual responses
+        keyed on response status code. If no success (``2xx``) response is given, one will automatically be
+        generated from the request body and http method. If any ``2xx`` response is given the automatic response is
+        suppressed.
+
+        * if a plain string is given as value, a :class:`.Response` with no body and that string as its description
+          will be generated
+        * if a :class:`.Schema`, :class:`.SchemaRef` is given, a :class:`.Response` with the schema as its body and
+          an empty description will be generated
+        * a ``Serializer`` class or instance will be converted into a :class:`.Schema` and treated as above
+        * a :class:`.Response` object will be used as-is; however if its ``schema`` attribute is a ``Serializer``,
+          it will automatically be converted into a :class:`.Schema`
+
+    """
     def decorator(view_method):
         data = {
             'auto_schema': auto_schema,
@@ -99,9 +148,9 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
 
     :param rest_framework.serializers.Field field: the source field
     :param type[openapi.SwaggerDict] swagger_object_type: should be one of Schema, Parameter, Items
-    :param drf_swagger.openapi.ReferenceResolver definitions: used to serialize Schemas by reference
+    :param .ReferenceResolver definitions: used to serialize Schemas by reference
     :param kwargs: extra attributes for constructing the object;
-       if swagger_object_type is Parameter, `name` and `in_` should be provided
+       if swagger_object_type is Parameter, ``name`` and ``in_`` should be provided
     :return: the swagger object
     :rtype: openapi.Parameter, openapi.Items, openapi.Schema
     """
@@ -242,6 +291,12 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
 
 
 def find_regex(regex_field):
+    """Given a ``Field``, look for a ``RegexValidator`` and try to extract its pattern and return it as a string.
+
+    :param serializers.Field regex_field: the field instance
+    :return: the extracted pattern, or ``None``
+    :rtype: str
+    """
     regex_validator = None
     for validator in regex_field.validators:
         if isinstance(validator, RegexValidator):

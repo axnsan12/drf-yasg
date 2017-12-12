@@ -76,6 +76,8 @@ See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#sec
       'type': 'basic'
    }
 
+.. _swagger-ui-settings:
+
 Swagger UI settings
 ===================
 
@@ -166,6 +168,8 @@ Controls how many levels are expaned by default when showing nested models.
 ``REDOC_SETTINGS``
 ******************
 
+.. _redoc-ui-settings:
+
 ReDoc UI settings
 =================
 
@@ -195,4 +199,3 @@ PATH_IN_MIDDLE
 
 **Default**: :python:`False` |br|
 *Maps to attribute*: ``path-in-middle-panel``
-

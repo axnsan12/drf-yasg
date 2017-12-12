@@ -18,12 +18,21 @@ class OpenAPISchemaGenerator(object):
     """
 
     def __init__(self, info, version, url=None, patterns=None, urlconf=None):
+        """
+
+        :param .Info info: information about the API
+        :param str version: API version string, takes preedence over the version in `info`
+        :param str url: API
+        :param patterns: if given, only these patterns will be enumerated for inclusion in the API spec
+        :param urlconf: if patterns is not given, use this urlconf to enumerate patterns;
+            if not given, the default urlconf is used
+        """
         self._gen = SchemaGenerator(info.title, url, info.get('description', ''), patterns, urlconf)
         self.info = info
         self.version = version
 
     def get_schema(self, request=None, public=False):
-        """Generate an :class:`drf_swagger.openapi.Swagger` representing the API schema.
+        """Generate an :class:`.Swagger` representing the API schema.
 
         :param rest_framework.request.Request request: the request used for filtering
             accesible endpoints and finding the spec URI
@@ -137,7 +146,7 @@ class OpenAPISchemaGenerator(object):
 
         :param view: the view associated with the operation
         :param str method: HTTP method
-        :return: a dictionary containing any overrides set by @\ :func:`drf_swagger.utils.swagger_auto_schema`
+        :return: a dictionary containing any overrides set by :func:`@swagger_auto_schema <.swagger_auto_schema>`
         :rtype: dict
         """
         method = method.lower()

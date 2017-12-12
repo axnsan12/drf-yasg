@@ -68,6 +68,8 @@ Table of contents
 Usage
 *****
 
+.. _readme-quickstart:
+
 1. Quickstart
 =============
 
@@ -152,7 +154,7 @@ b. ``SchemaView`` options
 All of the first 3 methods take two optional arguments,
 ``cache_timeout`` and ``cache_kwargs``; if present, these are passed on
 to Django’s :python:`cached_page` decorator in order to enable caching on the
-resulting viewl. See `3. Caching`_.
+resulting view. See `3. Caching`_.
 
 c. ``SWAGGER_SETTINGS`` and ``REDOC_SETTINGS``
 ----------------------------------------------
@@ -179,7 +181,7 @@ The possible settings and their default values are as follows:
         # set to None to disable the schema validation badge in the UI
         'VALIDATOR_URL': '',
 
-        # swagger-ui configuration settings, see https://github.com/swagger-api/swagger-ui/blob/112bca906553a937ac67adc2e500bdeed96d067b/docs/usage/configuration.md#parameters of the same name
+        # swagger-ui configuration settings, see https://github.com/swagger-api/swagger-ui/blob/112bca906553a937ac67adc2e500bdeed96d067b/docs/usage/configuration.md#parameters
         'OPERATIONS_SORTER': None,
         'TAGS_SORTER': None,
         'DOC_EXPANSION': 'list',
@@ -202,17 +204,15 @@ The possible settings and their default values are as follows:
 3. Caching
 ==========
 
-Since the schema does not usually change during the lifetime of the
-django process, there is out of the box support for caching the schema
-view in-memory, with some sane defaults:
+Since the schema does not usually change during the lifetime of the django process, there is out of the box support for
+caching the schema view in-memory, with some sane defaults:
 
 * caching is enabled by the `cache_page <https://docs.djangoproject.com/en/1.11/topics/cache/#the-per-view-cache>`__
   decorator, using the default Django cache backend, can be changed using the ``cache_kwargs`` argument
-* HTTP caching of the response is blocked to avoid confusing situations caused by being served stale schemas
-* the cached schema varies on the ``Cookie`` and ``Authorization`` HTTP headers to enable filtering of visible endpoints
-  according to the authentication credentials of each user; note that this means that every user accessing the schema
-  will have a separate schema cached in memory.
-
+* HTTP caching of the response is blocked to avoid confusing situations caused by being shown stale schemas
+* if `public` is set to ``False`` on the SchemaView, the cached schema varies on the ``Cookie`` and ``Authorization``
+  HTTP headers to enable filtering of visible endpoints according to the authentication credentials of each user; note
+  that this means that every user accessing the schema will have a separate schema cached in memory.
 
 4. Validation
 =============
@@ -222,14 +222,11 @@ it still conforms to OpenAPI 2.0. To this end, validation is provided at the gen
 libraries, and can be activated by passing :python:`validators=['ssv', 'flex']` to ``get_schema_view``; if the generated
 schema is not valid, a :python:`SwaggerValidationError` is raised by the handling codec.
 
-**Warning:** This internal validation can slow down your server.
-
+**Warning:** This internal validation can slow down your server. |br|
 Caching can mitigate the speed impact of validation.
 
-The provided validation will catch syntactic errors, but more subtle
-violations of the spec might slip by them. To ensure compatibility with
-code generation tools, it is recommended to also employ one or more of
-the following methods:
+The provided validation will catch syntactic errors, but more subtle violations of the spec might slip by them. To
+ensure compatibility with code generation tools, it is recommended to also employ one or more of the following methods:
 
 ``swagger-ui`` validation badge
 -------------------------------
@@ -287,24 +284,21 @@ improper content types, etc
 Background
 **********
 
-``OpenAPI 2.0``, ‘formerly known as’ ``Swagger``, is a format designed
-to encode information about a Web API into an easily parsable schema
+``OpenAPI 2.0``/``Swagger`` is a format designed to encode information about a Web API into an easily parsable schema
 that can then be used for rendering documentation, generating code, etc.
 
-More details are available on `swagger.io <https://swagger.io/>`__ and
-on the `OpenAPI 2.0 specification
+More details are available on `swagger.io <https://swagger.io/>`__ and on the `OpenAPI 2.0 specification
 page <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md>`__.
 
-From here on, the terms “OpenAPI” and “Swagger” are used
-interchangeably.
+From here on, the terms “OpenAPI” and “Swagger” are used interchangeably.
 
 Swagger in Django Rest Framework
 ================================
 
 Since Django Rest 3.7, there is now `built in support <http://www.django-rest-framework.org/api-guide/schemas/>`__ for
-automatic OpenAPI (Swagger) 2.0 schema generation. However, this generation is based on the
-`coreapi <http://www.coreapi.org/>`__ standard, which for the moment is vastly inferior to OpenAPI in both
-support and features. In particular, the OpenAPI codec/compatibility layer provided has a few major problems:
+automatic OpenAPI 2.0 schema generation. However, this generation is based on the `coreapi <http://www.coreapi.org/>`__
+standard, which for the moment is vastly inferior to OpenAPI in both features and tooling support. In particular,
+the OpenAPI codec/compatibility layer provided has a few major problems:
 
 * there is no support for documenting response schemas and status codes
 * nested schemas do not work properly
@@ -328,11 +322,16 @@ generation because the responses are plain ``object``\ s.
 
 Both projects are also currently unmantained.
 
-.. |travis| image:: https://travis-ci.org/axnsan12/drf-swagger.svg?branch=master
+Documentation, advanced usage
+=============================
+
+https://drf-swagger.readthedocs.io/en/latest/
+
+.. |travis| image:: https://img.shields.io/travis/axnsan12/drf-swagger/master.svg
    :target: https://travis-ci.org/axnsan12/drf-swagger
    :alt: Travis CI
 
-.. |codecov| image:: https://codecov.io/gh/axnsan12/drf-swagger/branch/master/graph/badge.svg
+.. |codecov| image:: https://img.shields.io/codecov/c/github/axnsan12/drf-swagger/master.svg
    :target: https://codecov.io/gh/axnsan12/drf-swagger
    :alt: Codecov
 

@@ -7,8 +7,9 @@ from .codecs import OpenAPICodecJson, VALIDATORS, OpenAPICodecYaml
 
 
 class _SpecRenderer(BaseRenderer):
+    """Base class for text renderers. Handles encoding and validation."""
     charset = None
-    validators = ['flex', 'ssv']
+    validators = ['ssv', 'flex']
     codec_class = None
 
     @classmethod
@@ -23,24 +24,28 @@ class _SpecRenderer(BaseRenderer):
 
 
 class OpenAPIRenderer(_SpecRenderer):
+    """Renders the schema as a JSON document with the ``application/openapi+json`` specific mime type."""
     media_type = 'application/openapi+json'
     format = 'openapi'
     codec_class = OpenAPICodecJson
 
 
 class SwaggerJSONRenderer(_SpecRenderer):
+    """Renders the schema as a JSON document with the generic ``application/json`` mime type."""
     media_type = 'application/json'
     format = '.json'
     codec_class = OpenAPICodecJson
 
 
 class SwaggerYAMLRenderer(_SpecRenderer):
+    """Renders the schema as a YAML document."""
     media_type = 'application/yaml'
     format = '.yaml'
     codec_class = OpenAPICodecYaml
 
 
 class _UIRenderer(BaseRenderer):
+    """Base class for web UI renderers. Handles loading an passing settings to the appropriate template."""
     media_type = 'text/html'
     charset = 'utf-8'
     template = ''
@@ -98,10 +103,16 @@ class _UIRenderer(BaseRenderer):
 
 
 class SwaggerUIRenderer(_UIRenderer):
+    """Renders a swagger-ui web interface for schema browisng.
+    Also requires :class:`.OpenAPIRenderer` as an available renderer on the same view.
+    """
     template = 'drf-swagger/swagger-ui.html'
     format = 'swagger'
 
 
 class ReDocRenderer(_UIRenderer):
+    """Renders a ReDoc web interface for schema browisng.
+    Also requires :class:`.OpenAPIRenderer` as an available renderer on the same view.
+    """
     template = 'drf-swagger/redoc.html'
     format = 'redoc'
