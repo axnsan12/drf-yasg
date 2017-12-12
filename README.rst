@@ -14,7 +14,8 @@ Compatible with
 - **Django**: 1.11, 2.0
 - **Python**: 2.7, 3.4, 3.5, 3.6
 
-**Source**: https://github.com/axnsan12/drf-swagger/ |br|
+**Source**: https://github.com/axnsan12/drf-swagger/
+
 **Documentation**: https://drf-swagger.readthedocs.io/en/latest/
 
 ********
@@ -34,22 +35,21 @@ Features
    `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`__ or
    `flex <https://github.com/pipermerriam/flex>`__
 
-
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/docs/screenshots/redoc-nested-response.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/1.0.1/screenshots/redoc-nested-response.png
    :width: 100%
    :figwidth: image
    :alt: redoc screenshot
 
    **Fully nested request and response schemas.**
 
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/docs/screenshots/swagger-ui-list.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/1.0.1/screenshots/swagger-ui-list.png
    :width: 100%
    :figwidth: image
    :alt: swagger-ui screenshot
 
    **Choose between redoc and swagger-ui.**
 
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/docs/screenshots/swagger-ui-models.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/1.0.1/screenshots/swagger-ui-models.png
    :width: 100%
    :figwidth: image
    :alt: model definitions screenshot
@@ -68,14 +68,26 @@ Table of contents
 Usage
 *****
 
-.. _readme-quickstart:
+0. Installation
+===============
 
-1. Quickstart
-=============
+The preferred instalation method is directly from pypi:
+
+.. code:: console
+
+   pip install drf-swagger
+
+Additionally, if you want to use the built-in validation mechanisms (see `4. Validation`_), you need to install
+some extra requirements:
 
 .. code:: console
 
    pip install drf-swagger[validation]
+
+.. _readme-quickstart:
+
+1. Quickstart
+=============
 
 In ``settings.py``:
 
@@ -222,7 +234,7 @@ it still conforms to OpenAPI 2.0. To this end, validation is provided at the gen
 libraries, and can be activated by passing :python:`validators=['ssv', 'flex']` to ``get_schema_view``; if the generated
 schema is not valid, a :python:`SwaggerValidationError` is raised by the handling codec.
 
-**Warning:** This internal validation can slow down your server. |br|
+**Warning:** This internal validation can slow down your server.
 Caching can mitigate the speed impact of validation.
 
 The provided validation will catch syntactic errors, but more subtle violations of the spec might slip by them. To
@@ -257,8 +269,6 @@ If your schema is not accessible from the internet, you can run a local copy of
     84dabd52ba967c32ae6b660934fa6a429ca6bc9e594d56e822a858b57039c8a2
     $ curl http://localhost:8189/debug?url=http://test.local:8002/swagger/?format=openapi
     {}
-
-
 
 Using ``swagger-cli``
 ---------------------
@@ -349,7 +359,3 @@ https://drf-swagger.readthedocs.io/en/latest/
 
 .. |nbsp| unicode:: 0xA0
    :trim:
-
-.. |br| raw:: html
-
-   <br />

@@ -178,8 +178,8 @@ class OpenAPISchemaGenerator(object):
                 # Attempt to infer a field description if possible.
                 try:
                     model_field = model._meta.get_field(variable)
-                except Exception:
-                    model_field = None  # pragma: no cover
+                except Exception:  # pragma: no cover
+                    model_field = None
 
                 if model_field is not None and model_field.help_text:
                     description = force_text(model_field.help_text)
