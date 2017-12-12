@@ -203,6 +203,18 @@ paths:
           required: true
           type: string
           pattern: ^69$
+        - name: image_styles
+          in: formData
+          description: Parameter with Items
+          required: true
+          type: array
+          items:
+            type: string
+            enum:
+              - wide
+              - tall
+              - thumb
+              - social
         - name: upload
           in: formData
           description: image serializer help_text
