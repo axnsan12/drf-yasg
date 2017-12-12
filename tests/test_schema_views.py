@@ -1,5 +1,6 @@
 import json
 
+import copy
 from ruamel import yaml
 
 
@@ -23,7 +24,13 @@ def test_swagger_yaml(client, validate_schema):
     _validate_text_schema_view(client, validate_schema, "/swagger.yaml", yaml.safe_load)
 
 
-def test_exception_middleware(client, bad_settings):
+def test_exception_middleware(client, swagger_settings):
+    swagger_settings['SECURITY_DEFINITIONS'] = {
+        'bad': {
+            'bad_attribute': 'should not be accepted'
+        }
+    }
+
     response = client.get('/swagger.json')
     assert response.status_code == 500
     assert 'errors' in json.loads(response.content.decode('utf-8'))

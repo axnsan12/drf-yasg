@@ -1,5 +1,7 @@
+from collections import namedtuple
+
 from django.conf import settings
-from rest_framework.settings import APISettings
+from rest_framework.settings import APISettings, perform_import
 
 SWAGGER_DEFAULTS = {
     'USE_SESSION_AUTH': True,
@@ -30,16 +32,49 @@ REDOC_DEFAULTS = {
 
 IMPORT_STRINGS = []
 
+
+class AppSettings(object):
+    """
+    Stolen from Django Rest Framework, removed caching for easier testing
+    """
+
+    def __init__(self, user_settings, defaults, import_strings=None):
+        self._user_settings = user_settings
+        self.defaults = defaults
+        self.import_strings = import_strings or []
+
+    @property
+    def user_settings(self):
+        return getattr(settings, self._user_settings, {})
+
+    def __getattr__(self, attr):
+        if attr not in self.defaults:
+            raise AttributeError("Invalid setting: '%s'" % attr)
+
+        try:
+            # Check if present in user settings
+            val = self.user_settings[attr]
+        except KeyError:
+            # Fall back to defaults
+            val = self.defaults[attr]
+
+        # Coerce import strings into classes
+        if attr in self.import_strings:
+            val = perform_import(val, attr)
+
+        return val
+
+
 #:
-swagger_settings = APISettings(
-    user_settings=getattr(settings, 'SWAGGER_SETTINGS', {}),
+swagger_settings = AppSettings(
+    user_settings='SWAGGER_SETTINGS',
     defaults=SWAGGER_DEFAULTS,
     import_strings=IMPORT_STRINGS,
 )
 
 #:
-redoc_settings = APISettings(
-    user_settings=getattr(settings, 'REDOC_SETTINGS', {}),
+redoc_settings = AppSettings(
+    user_settings='REDOC_SETTINGS',
     defaults=REDOC_DEFAULTS,
     import_strings=IMPORT_STRINGS,
 )

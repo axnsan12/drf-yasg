@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 
@@ -27,8 +28,13 @@ def codec_yaml():
 
 
 @pytest.fixture
-def swagger_dict():
-    swagger = generator().get_schema(None, True)
+def swagger(generator):
+    return generator.get_schema(None, True)
+
+
+@pytest.fixture
+def swagger_dict(generator):
+    swagger = generator.get_schema(None, True)
     json_bytes = codec_json().encode(swagger)
     return json.loads(json_bytes.decode('utf-8'))
 
@@ -46,16 +52,17 @@ def validate_schema():
 
 
 @pytest.fixture
-def bad_settings():
-    from drf_swagger.app_settings import swagger_settings, SWAGGER_DEFAULTS
-    bad_security = {
-        'bad': {
-            'bad_attribute': 'should not be accepted'
-        }
-    }
-    SWAGGER_DEFAULTS['SECURITY_DEFINITIONS'].update(bad_security)
-    yield swagger_settings
-    del SWAGGER_DEFAULTS['SECURITY_DEFINITIONS']['bad']
+def swagger_settings(settings):
+    swagger_settings = copy.deepcopy(settings.SWAGGER_SETTINGS)
+    settings.SWAGGER_SETTINGS = swagger_settings
+    return swagger_settings
+
+
+@pytest.fixture
+def redoc_settings(settings):
+    redoc_settings = copy.deepcopy(settings.REDOC_SETTINGS)
+    settings.REDOC_SETTINGS = redoc_settings
+    return redoc_settings
 
 
 @pytest.fixture
