@@ -35,8 +35,8 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
       $ virtualenv venv
       $ source venv/bin/activate
-      (venv) $ pip install -e .[validation,test]
-      (venv) $ pip install -r requirements/dev.txt
+      (venv) $ pip install -e .[validation]
+      (venv) $ pip install -rrequirements/dev.txt -rrequirements/test.txt
 
 #. Make your changes and check them against the test project
 
