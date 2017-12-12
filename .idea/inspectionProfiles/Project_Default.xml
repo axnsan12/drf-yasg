@@ -27,6 +27,13 @@
         </value>
       </option>
     </inspection_tool>
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E402" />
+        </list>
+      </option>
+    </inspection_tool>
     <inspection_tool class="PyPep8NamingInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false">
       <option name="ignoredErrors">
         <list>
@@ -42,6 +49,7 @@
           <option value="format" />
           <option value="type" />
           <option value="filter" />
+          <option value="copyright" />
         </list>
       </option>
     </inspection_tool>

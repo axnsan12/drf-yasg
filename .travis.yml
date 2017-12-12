@@ -11,18 +11,19 @@ env:
  - DRF=3.7
 
 matrix:
-    fast_finish: true
-    include:
-      - python: '2.7'
-        env: TOXENV=flake8
-      - python: '3.6'
-        env: DRF=master
+  fast_finish: true
+  include:
+    - python: '3.5'
+      env: TOXENV=docs
+    - python: '2.7'
+      env: TOXENV=flake8
+    - python: '3.6'
+      env: DRF=master
 
-    allow_failures:
-      - env: TOXENV=flake8
-      - env: DRF=master
-      - python: '2.7'
-      - python: '3.7-dev'
+  allow_failures:
+    - env: TOXENV=flake8
+    - env: DRF=master
+    - python: '3.7-dev'
 
 install:
  - pip install -r requirements/ci.txt

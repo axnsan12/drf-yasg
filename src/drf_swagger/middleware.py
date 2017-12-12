@@ -1,11 +1,16 @@
 from django.http import HttpResponse
-from django.utils.deprecation import MiddlewareMixin
 
 from .codecs import _OpenAPICodec
 from .errors import SwaggerValidationError
 
 
-class SwaggerExceptionMiddleware(MiddlewareMixin):
+class SwaggerExceptionMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
     def process_exception(self, request, exception):
         if isinstance(exception, SwaggerValidationError):
             err = {'errors': {exception.validator_name: str(exception)}}

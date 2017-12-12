@@ -53,16 +53,17 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, v
     """
     Create a SchemaView class with default renderers and generators.
 
-    :param drf_swagger.openapi.Info info: Required. Swagger API Info object
+    :param .Info info: Required. Swagger API Info object
     :param str url: API base url; if left blank will be deduced from the location the view is served at
-    :param str patterns: passed to SchemaGenerator
-    :param str urlconf: passed to SchemaGenerator
+    :param patterns: passed to SchemaGenerator
+    :param urlconf: passed to SchemaGenerator
     :param bool public: if False, includes only endpoints the current user has access to
-    :param list validators: a list of validator names to apply on the generated schema; allowed values are `flex`, `ssv`
-    :param type generator_class: schema generator class to use; should be a subclass of OpenAPISchemaGenerator
+    :param list validators: a list of validator names to apply; allowed values are ``flex``, ``ssv``
+    :param type generator_class: schema generator class to use; should be a subclass of :class:`.OpenAPISchemaGenerator`
     :param tuple authentication_classes: authentication classes for the schema view itself
     :param tuple permission_classes: permission classes for the schema view itself
     :return: SchemaView class
+    :rtype: type[.SchemaView]
     """
     _public = public
     _generator_class = generator_class
@@ -101,7 +102,8 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, v
             cache_kwargs = cache_kwargs or {}
             view = cls.as_view(**initkwargs)
             if cache_timeout != 0:
-                view = vary_on_headers('Cookie', 'Authorization', 'Accept')(view)
+                if not public:
+                    view = vary_on_headers('Cookie', 'Authorization')(view)
                 view = cache_page(cache_timeout, **cache_kwargs)(view)
                 view = deferred_never_cache(view)  # disable in-browser caching
             elif cache_kwargs:
@@ -126,7 +128,7 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, v
             Instantiate this view with a Web UI renderer, optionally wrapped with cache_page.
             See https://docs.djangoproject.com/en/1.11/topics/cache/.
 
-            :param str renderer: UI renderer; allowed values are `swagger`, `redoc`
+            :param str renderer: UI renderer; allowed values are ``swagger``, ``redoc``
             :param int cache_timeout: same as cache_page; set to 0 for no cache
             :param dict cache_kwargs: dictionary of kwargs to be passed to cache_page
             :return: a view instance

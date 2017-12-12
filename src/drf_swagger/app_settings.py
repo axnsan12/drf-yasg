@@ -30,12 +30,14 @@ REDOC_DEFAULTS = {
 
 IMPORT_STRINGS = []
 
+#:
 swagger_settings = APISettings(
     user_settings=getattr(settings, 'SWAGGER_SETTINGS', {}),
     defaults=SWAGGER_DEFAULTS,
     import_strings=IMPORT_STRINGS,
 )
 
+#:
 redoc_settings = APISettings(
     user_settings=getattr(settings, 'REDOC_SETTINGS', {}),
     defaults=REDOC_DEFAULTS,

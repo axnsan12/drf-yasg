@@ -14,6 +14,12 @@ from .utils import serializer_field_to_swagger, no_body, is_list_view
 
 
 def force_serializer_instance(serializer):
+    """Force `serializer` into a ``Serializer`` instance. If it is not a ``Serializer`` class or instance, raises
+    an assertion error.
+
+    :param serializer: serializer class or instance
+    :return: serializer instance
+    """
     if inspect.isclass(serializer):
         assert issubclass(serializer, serializers.BaseSerializer), "Serializer required, not %s" % serializer.__name__
         return serializer()
@@ -25,12 +31,12 @@ def force_serializer_instance(serializer):
 
 class SwaggerAutoSchema(object):
     def __init__(self, view, path, method, overrides, components):
-        """Inspector class responsible for providing Operation definitions given a
+        """Inspector class responsible for providing :class:`.Operation` definitions given a
 
         :param view: the view associated with this endpoint
         :param str path: the path component of the operation URL
         :param str method: the http method of the operation
-        :param dict overrides: manual overrides as passed to @swagger_auto_schema
+        :param dict overrides: manual overrides as passed to :func:`@swagger_auto_schema <.swagger_auto_schema>`
         :param openapi.ReferenceResolver components: referenceable components
         """
         super(SwaggerAutoSchema, self).__init__()
@@ -43,19 +49,18 @@ class SwaggerAutoSchema(object):
         self._sch.view = view
 
     def get_operation(self, operation_keys):
-        """Get an Operation for the given API endpoint (path, method).
+        """Get an :class:`.Operation` for the given API endpoint (path, method).
         This includes query, body parameters and response schemas.
 
         :param tuple[str] operation_keys: an array of keys describing the hierarchical layout of this view in the API;
-          e.g. ('snippets', 'list'), ('snippets', 'retrieve'), etc.
-        :return: the resulting Operation object
+          e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
+        :rtype: openapi.Operation
         """
         consumes = self.get_consumes()
 
         body = self.get_request_body_parameters(consumes)
         query = self.get_query_parameters()
         parameters = body + query
-
         parameters = [param for param in parameters if param is not None]
         parameters = self.add_manual_parameters(parameters)
 
@@ -73,13 +78,14 @@ class SwaggerAutoSchema(object):
         )
 
     def get_request_body_parameters(self, consumes):
-        """Return the request body parameters for this view.
+        """Return the request body parameters for this view. |br|
         This is either:
-          - a list with a single object Parameter with a Schema derived from the request serializer
-          - a list of primitive Parameters parsed as form data
 
-        :param list[str] consumes: a list of MIME types this request accepts as body
-        :return: a (potentially empty) list of openapi.Parameter in: either `body` or `formData`
+        -  a list with a single object Parameter with a :class:`.Schema` derived from the request serializer
+        -  a list of primitive Parameters parsed as form data
+
+        :param list[str] consumes: a list of accepted MIME types as returned by :meth:`.get_consumes`
+        :return: a (potentially empty) list of :class:`.Parameter`\ s either ``in: body`` or ``in: formData``
         :rtype: list[openapi.Parameter]
         """
         # only PUT, PATCH or POST can have a request body
@@ -106,8 +112,7 @@ class SwaggerAutoSchema(object):
     def get_request_serializer(self):
         """Return the request serializer (used for parsing the request payload) for this endpoint.
 
-        :return: the request serializer
-        :rtype: serializers.BaseSerializer
+        :return: the request serializer, or one of :class:`.Schema`, :class:`.SchemaRef`, ``None``
         """
         body_override = self.overrides.get('request_body', None)
 
@@ -123,9 +128,9 @@ class SwaggerAutoSchema(object):
             return self.view.get_serializer()
 
     def get_request_form_parameters(self, serializer):
-        """Given a Serializer, return a list of in: formData Parameters.
+        """Given a Serializer, return a list of ``in: formData`` :class:`.Parameter`\ s.
 
-        :param serializer: the view's request serialzier
+        :param serializer: the view's request serializer as returned by :meth:`.get_request_serializer`
         :rtype: list[openapi.Parameter]
         """
         fields = getattr(serializer, 'fields', {})
@@ -136,18 +141,18 @@ class SwaggerAutoSchema(object):
         ]
 
     def get_request_body_schema(self, serializer):
-        """Return the Schema for a given request's body data. Only applies to PUT, PATCH and POST requests.
+        """Return the :class:`.Schema` for a given request's body data. Only applies to PUT, PATCH and POST requests.
 
-        :param serializers.BaseSerializer serializer: the view's request serialzier
-        :return: the request body schema
+        :param serializer: the view's request serializer as returned by :meth:`.get_request_serializer`
         :rtype: openapi.Schema
         """
         return self.serializer_to_schema(serializer)
 
     def make_body_parameter(self, schema):
-        """Given a Schema object, create an in: body Parameter.
+        """Given a :class:`.Schema` object, create an ``in: body`` :class:`.Parameter`.
 
         :param openapi.Schema schema: the request body schema
+        :rtype: openapi.Parameter
         """
         return openapi.Parameter(name='data', in_=openapi.IN_BODY, required=True, schema=schema)
 
@@ -172,9 +177,10 @@ class SwaggerAutoSchema(object):
         return list(parameters.values())
 
     def get_responses(self):
-        """Get the possible responses for this view as a swagger Responses object.
+        """Get the possible responses for this view as a swagger :class:`.Responses` object.
 
         :return: the documented responses
+        :rtype: openapi.Responses
         """
         response_serializers = self.get_response_serializers()
         return openapi.Responses(
@@ -182,9 +188,10 @@ class SwaggerAutoSchema(object):
         )
 
     def get_paged_response_schema(self, response_schema):
-        """Add appropriate paging fields to a response Schema.
+        """Add appropriate paging fields to a response :class:`.Schema`.
 
         :param openapi.Schema response_schema: the response schema that must be paged.
+        :rtype: openapi.Schema
         """
         assert response_schema.type == openapi.TYPE_ARRAY, "array return expected for paged response"
         paged_schema = openapi.Schema(
@@ -201,6 +208,10 @@ class SwaggerAutoSchema(object):
         return paged_schema
 
     def get_default_responses(self):
+        """Get the default responses determined for this view from the request serializer and request method.
+
+        :type: dict[str, openapi.Schema]
+        """
         method = self.method.lower()
 
         default_status = status.HTTP_200_OK
@@ -227,9 +238,11 @@ class SwaggerAutoSchema(object):
     def get_response_serializers(self):
         """Return the response codes that this view is expected to return, and the serializer for each response body.
         The return value should be a dict where the keys are possible status codes, and values are either strings,
-        `Serializer` or `openapi.Response` objects.
+        ``Serializer``\ s, :class:`.Schema`, :class:`.SchemaRef` or :class:`.Response` objects. See
+        :func:`@swagger_auto_schema <.swagger_auto_schema>` for more details.
 
-        :return dict: the response serializers
+        :return: the response serializers
+        :rtype: dict
         """
         manual_responses = self.overrides.get('responses', None) or {}
         manual_responses = OrderedDict((str(sc), resp) for sc, resp in manual_responses.items())
@@ -242,10 +255,11 @@ class SwaggerAutoSchema(object):
         return responses
 
     def get_response_schemas(self, response_serializers):
-        """Return the `openapi.Response` objects calculated for this view.
+        """Return the :class:`.openapi.Response` objects calculated for this view.
 
-        :param dict response_serializers: result of get_response_serializers
-        :return dict[str, openapi.Response]: a dictionary of status code to Response object
+        :param dict response_serializers: response serializers as returned by :meth:`.get_response_serializers`
+        :return: a dictionary of status code to :class:`.Response` object
+        :rtype: dict[str, openapi.Response]
         """
         responses = {}
         for sc, serializer in response_serializers.items():
@@ -277,10 +291,15 @@ class SwaggerAutoSchema(object):
     def get_query_parameters(self):
         """Return the query parameters accepted by this view.
 
-        :rtype: list[openapi.Parameter]"""
+        :rtype: list[openapi.Parameter]
+        """
         return self.get_filter_parameters() + self.get_pagination_parameters()
 
     def should_filter(self):
+        """Determine whether filter backend parameters should be included for this request.
+
+        :rtype: bool
+        """
         if not getattr(self.view, 'filter_backends', None):
             return False
 
@@ -318,6 +337,10 @@ class SwaggerAutoSchema(object):
         return fields
 
     def should_page(self):
+        """Determine whether paging parameters and structure should be added to this operation's request and response.
+
+        :rtype: bool
+        """
         if not hasattr(self.view, 'paginator'):
             return False
 
@@ -344,7 +367,8 @@ class SwaggerAutoSchema(object):
     def get_pagination_parameters(self):
         """Return the parameters added to the view by its paginator.
 
-        :rtype: list[openapi.Parameter]"""
+        :rtype: list[openapi.Parameter]
+        """
         if not self.should_page():
             return []
 
@@ -372,7 +396,7 @@ class SwaggerAutoSchema(object):
         return media_types[:1]
 
     def serializer_to_schema(self, serializer):
-        """Convert a DRF Serializer instance to an openapi.Schema.
+        """Convert a DRF Serializer instance to an :class:`.openapi.Schema`.
 
         :param serializers.BaseSerializer serializer:
         :rtype: openapi.Schema
@@ -381,7 +405,7 @@ class SwaggerAutoSchema(object):
         return serializer_field_to_swagger(serializer, openapi.Schema, definitions)
 
     def field_to_parameter(self, field, name, in_):
-        """Convert a DRF serializer Field to a swagger Parameter object.
+        """Convert a DRF serializer Field to a swagger :class:`.Parameter` object.
 
         :param coreapi.Field field:
         :param str name: the name of the parameter
@@ -391,7 +415,7 @@ class SwaggerAutoSchema(object):
         return serializer_field_to_swagger(field, openapi.Parameter, name=name, in_=in_)
 
     def coreapi_field_to_parameter(self, field):
-        """Convert an instance of `coreapi.Field` to a swagger Parameter object.
+        """Convert an instance of `coreapi.Field` to a swagger :class:`.Parameter` object.
 
         :param coreapi.Field field:
         :rtype: openapi.Parameter

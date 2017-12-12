@@ -1,0 +1,5 @@
+Sphinx==1.6.5
+sphinx_rtd_theme==0.2.4
+Pillow==4.3.0
+
+Django==1.11.8
