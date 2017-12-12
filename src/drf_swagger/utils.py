@@ -165,6 +165,10 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
     def SwaggerType(**instance_kwargs):
         if swagger_object_type == openapi.Parameter:
             instance_kwargs['required'] = field.required
+        if swagger_object_type != openapi.Items:
+            default = getattr(field, 'default', serializers.empty)
+            if default is not serializers.empty:
+                instance_kwargs['default'] = default
         instance_kwargs.update(kwargs)
         return swagger_object_type(title=title, description=description, **instance_kwargs)
 
@@ -249,7 +253,7 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
     elif isinstance(field, serializers.RegexField):
         return SwaggerType(type=openapi.TYPE_STRING, pattern=find_regex(field))
     elif isinstance(field, serializers.SlugField):
-        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_SLUG)
+        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_SLUG, pattern=find_regex(field))
     elif isinstance(field, serializers.URLField):
         return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)
     elif isinstance(field, serializers.IPAddressField):
@@ -272,11 +276,6 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
         if swagger_object_type != openapi.Parameter:
             raise SwaggerGenerationError("parameter of type file is supported only in formData Parameter")
         return SwaggerType(type=openapi.TYPE_FILE)
-    elif isinstance(field, serializers.JSONField):
-        return SwaggerType(
-            type=openapi.TYPE_STRING,
-            format=openapi.FORMAT_BINARY if field.binary else None
-        )
     elif isinstance(field, serializers.DictField) and swagger_object_type == openapi.Schema:
         child_schema = serializer_field_to_swagger(field.child, ChildSwaggerType, definitions)
         return SwaggerType(
@@ -284,7 +283,7 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
             additional_properties=child_schema
         )
 
-    # TODO unhandled fields: TimeField DurationField HiddenField ModelField NullBooleanField?
+    # TODO unhandled fields: TimeField DurationField HiddenField ModelField NullBooleanField? JSONField
 
     # everything else gets string by default
     return SwaggerType(type=openapi.TYPE_STRING)

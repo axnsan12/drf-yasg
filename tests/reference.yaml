@@ -141,17 +141,6 @@ paths:
         - application/json
       tags:
         - articles
-    delete:
-      operationId: articles_delete
-      description: destroy method docstring
-      parameters: []
-      responses:
-        '204':
-          description: ''
-      consumes:
-        - application/json
-      tags:
-        - articles
     patch:
       operationId: articles_partial_update
       description: partial_update description override
@@ -168,6 +157,17 @@ paths:
             $ref: '#/definitions/Article'
         '404':
           description: slug not found
+      consumes:
+        - application/json
+      tags:
+        - articles
+    delete:
+      operationId: articles_delete
+      description: destroy method docstring
+      parameters: []
+      responses:
+        '204':
+          description: ''
       consumes:
         - application/json
       tags:
@@ -197,6 +197,12 @@ paths:
       operationId: articles_image_create
       description: image method docstring
       parameters:
+        - name: what_am_i_doing
+          in: formData
+          description: test
+          required: true
+          type: string
+          pattern: ^69$
         - name: upload
           in: formData
           description: image serializer help_text
@@ -283,17 +289,6 @@ paths:
         - application/json
       tags:
         - snippets
-    delete:
-      operationId: snippets_delete
-      description: delete method docstring
-      parameters: []
-      responses:
-        '204':
-          description: ''
-      consumes:
-        - application/json
-      tags:
-        - snippets
     patch:
       operationId: snippets_partial_update
       description: patch method docstring
@@ -308,6 +303,17 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/Snippet'
+      consumes:
+        - application/json
+      tags:
+        - snippets
+    delete:
+      operationId: snippets_delete
+      description: delete method docstring
+      parameters: []
+      responses:
+        '204':
+          description: ''
       consumes:
         - application/json
       tags:
@@ -329,7 +335,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/User'
+              $ref: '#/definitions/UserSerializerrr'
       consumes:
         - application/json
       tags:
@@ -381,7 +387,7 @@ paths:
         '200':
           description: response description
           schema:
-            $ref: '#/definitions/User'
+            $ref: '#/definitions/UserSerializerrr'
       consumes:
         - application/json
       tags:
@@ -394,12 +400,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/User'
+            $ref: '#/definitions/UserSerializerrr'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/User'
+            $ref: '#/definitions/UserSerializerrr'
       consumes:
         - application/json
       tags:
@@ -414,6 +420,8 @@ definitions:
     required:
       - title
       - body
+      - references
+      - uuid
     type: object
     properties:
       title:
@@ -426,6 +434,7 @@ definitions:
         description: slug model help_text
         type: string
         format: slug
+        pattern: ^[-a-zA-Z0-9_]+$
       date_created:
         type: string
         format: date-time
@@ -434,6 +443,17 @@ definitions:
         type: string
         format: date-time
         readOnly: true
+      references:
+        description: this is a really bad example
+        type: object
+        additionalProperties:
+          description: but i needed to test these 2 fields somehow
+          type: string
+          format: uri
+      uuid:
+        description: should articles have UUIDs?
+        type: string
+        format: uuid
   Project:
     required:
       - project_name
@@ -451,6 +471,7 @@ definitions:
       - code
       - language
       - example_projects
+      - difficulty_factor
     type: object
     properties:
       id:
@@ -908,38 +929,43 @@ definitions:
               - yaml
               - yaml+jinja
               - zephir
-      style:
-        type: string
-        enum:
-          - abap
-          - algol
-          - algol_nu
-          - arduino
-          - autumn
-          - borland
-          - bw
-          - colorful
-          - default
-          - emacs
+            default: python
+      styles:
+        type: array
+        items:
+          type: string
+          enum:
+            - abap
+            - algol
+            - algol_nu
+            - arduino
+            - autumn
+            - borland
+            - bw
+            - colorful
+            - default
+            - emacs
+            - friendly
+            - fruity
+            - igor
+            - lovelace
+            - manni
+            - monokai
+            - murphy
+            - native
+            - paraiso-dark
+            - paraiso-light
+            - pastie
+            - perldoc
+            - rainbow_dash
+            - rrt
+            - tango
+            - trac
+            - vim
+            - vs
+            - xcode
+        default:
           - friendly
-          - fruity
-          - igor
-          - lovelace
-          - manni
-          - monokai
-          - murphy
-          - native
-          - paraiso-dark
-          - paraiso-light
-          - pastie
-          - perldoc
-          - rainbow_dash
-          - rrt
-          - tango
-          - trac
-          - vim
-          - vs
-          - xcode
       lines:
         type: array
         items:
@@ -948,7 +974,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Project'
-  User:
+      difficulty_factor:
+        description: this is here just to test FloatField
+        type: number
+  UserSerializerrr:
     required:
       - username
       - snippets
@@ -961,11 +990,24 @@ definitions:
         description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
           only.
         type: string
+      email:
+        type: string
+        format: email
       snippets:
         type: array
         items:
           type: string
         uniqueItems: true
+      last_connected_ip:
+        description: i'm out of ideas
+        type: string
+        format: ipv4
+        readOnly: true
+      last_connected_at:
+        description: really?
+        type: string
+        format: date
+        readOnly: true
 securityDefinitions:
   basic:
     type: basic
