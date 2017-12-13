@@ -36,21 +36,21 @@ Features
    `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`__ or
    `flex <https://github.com/pipermerriam/flex>`__
 
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.1/screenshots/redoc-nested-response.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.2/screenshots/redoc-nested-response.png
    :width: 100%
    :figwidth: image
    :alt: redoc screenshot
 
    **Fully nested request and response schemas.**
 
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.1/screenshots/swagger-ui-list.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.2/screenshots/swagger-ui-list.png
    :width: 100%
    :figwidth: image
    :alt: swagger-ui screenshot
 
    **Choose between redoc and swagger-ui.**
 
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.1/screenshots/swagger-ui-models.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.2/screenshots/swagger-ui-models.png
    :width: 100%
    :figwidth: image
    :alt: model definitions screenshot
