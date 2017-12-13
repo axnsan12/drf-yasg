@@ -340,8 +340,8 @@ find for django-rest-framework:
 
 Out of the two, ``django-rest-swagger`` is just a wrapper around DRF 3.7 schema generation with an added UI, and
 thus presents the same problems. ``drf-openapi`` is a bit more involved and implements some custom handling for response
-schemas, but ultimately still falls short in code
-generation because the responses are plain ``object``\ s.
+schemas, but ultimately still falls short in code generation because the responses are plain of lacking support for
+named schemas.
 
 Both projects are also currently unmantained.
 

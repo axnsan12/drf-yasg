@@ -1,7 +1,7 @@
-drf\_swagger package
+drf\_yasg package
 ====================
 
-drf\_swagger\.app\_settings
+drf\_yasg\.app\_settings
 ----------------------------------
 
 .. automodule:: drf_yasg.app_settings
@@ -9,7 +9,7 @@ drf\_swagger\.app\_settings
     :undoc-members:
     :show-inheritance:
 
-drf\_swagger\.codecs
+drf\_yasg\.codecs
 ---------------------------
 
 .. automodule:: drf_yasg.codecs
@@ -18,7 +18,7 @@ drf\_swagger\.codecs
     :show-inheritance:
     :exclude-members: SaneYamlDumper
 
-drf\_swagger\.errors
+drf\_yasg\.errors
 ---------------------------
 
 .. automodule:: drf_yasg.errors
@@ -26,7 +26,7 @@ drf\_swagger\.errors
     :undoc-members:
     :show-inheritance:
 
-drf\_swagger\.generators
+drf\_yasg\.generators
 -------------------------------
 
 .. automodule:: drf_yasg.generators
@@ -34,7 +34,7 @@ drf\_swagger\.generators
     :undoc-members:
     :show-inheritance:
 
-drf\_swagger\.inspectors
+drf\_yasg\.inspectors
 -------------------------------
 
 .. automodule:: drf_yasg.inspectors
@@ -42,7 +42,7 @@ drf\_swagger\.inspectors
     :undoc-members:
     :show-inheritance:
 
-drf\_swagger\.middleware
+drf\_yasg\.middleware
 -------------------------------
 
 .. automodule:: drf_yasg.middleware
@@ -50,7 +50,7 @@ drf\_swagger\.middleware
     :undoc-members:
     :show-inheritance:
 
-drf\_swagger\.openapi
+drf\_yasg\.openapi
 ----------------------------
 
 .. automodule:: drf_yasg.openapi
@@ -58,7 +58,7 @@ drf\_swagger\.openapi
     :undoc-members:
     :show-inheritance:
 
-drf\_swagger\.renderers
+drf\_yasg\.renderers
 ------------------------------
 
 .. automodule:: drf_yasg.renderers
@@ -66,7 +66,7 @@ drf\_swagger\.renderers
     :undoc-members:
     :show-inheritance:
 
-drf\_swagger\.utils
+drf\_yasg\.utils
 --------------------------
 
 .. automodule:: drf_yasg.utils
@@ -74,7 +74,7 @@ drf\_swagger\.utils
     :undoc-members:
     :show-inheritance:
 
-drf\_swagger\.views
+drf\_yasg\.views
 --------------------------
 
 .. automodule:: drf_yasg.views
