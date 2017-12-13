@@ -106,7 +106,7 @@ class SwaggerUIRenderer(_UIRenderer):
     """Renders a swagger-ui web interface for schema browisng.
     Also requires :class:`.OpenAPIRenderer` as an available renderer on the same view.
     """
-    template = 'drf-swagger/swagger-ui.html'
+    template = 'drf-yasg/swagger-ui.html'
     format = 'swagger'
 
 
@@ -114,5 +114,5 @@ class ReDocRenderer(_UIRenderer):
     """Renders a ReDoc web interface for schema browisng.
     Also requires :class:`.OpenAPIRenderer` as an available renderer on the same view.
     """
-    template = 'drf-swagger/redoc.html'
+    template = 'drf-yasg/redoc.html'
     format = 'redoc'

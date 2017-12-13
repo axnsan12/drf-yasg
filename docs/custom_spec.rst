@@ -6,7 +6,7 @@
 Custom schema generation
 ########################
 
-If the default spec generation does not quite match what you were hoping to achieve, ``drf-swagger`` provides some
+If the default spec generation does not quite match what you were hoping to achieve, ``drf-yasg`` provides some
 custom behavior hooks by default.
 
 *********************

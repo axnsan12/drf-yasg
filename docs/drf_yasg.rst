@@ -4,7 +4,7 @@ drf\_swagger package
 drf\_swagger\.app\_settings
 ----------------------------------
 
-.. automodule:: drf_swagger.app_settings
+.. automodule:: drf_yasg.app_settings
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ drf\_swagger\.app\_settings
 drf\_swagger\.codecs
 ---------------------------
 
-.. automodule:: drf_swagger.codecs
+.. automodule:: drf_yasg.codecs
     :members:
     :undoc-members:
     :show-inheritance:
@@ -21,7 +21,7 @@ drf\_swagger\.codecs
 drf\_swagger\.errors
 ---------------------------
 
-.. automodule:: drf_swagger.errors
+.. automodule:: drf_yasg.errors
     :members:
     :undoc-members:
     :show-inheritance:
@@ -29,7 +29,7 @@ drf\_swagger\.errors
 drf\_swagger\.generators
 -------------------------------
 
-.. automodule:: drf_swagger.generators
+.. automodule:: drf_yasg.generators
     :members:
     :undoc-members:
     :show-inheritance:
@@ -37,7 +37,7 @@ drf\_swagger\.generators
 drf\_swagger\.inspectors
 -------------------------------
 
-.. automodule:: drf_swagger.inspectors
+.. automodule:: drf_yasg.inspectors
     :members:
     :undoc-members:
     :show-inheritance:
@@ -45,7 +45,7 @@ drf\_swagger\.inspectors
 drf\_swagger\.middleware
 -------------------------------
 
-.. automodule:: drf_swagger.middleware
+.. automodule:: drf_yasg.middleware
     :members:
     :undoc-members:
     :show-inheritance:
@@ -53,7 +53,7 @@ drf\_swagger\.middleware
 drf\_swagger\.openapi
 ----------------------------
 
-.. automodule:: drf_swagger.openapi
+.. automodule:: drf_yasg.openapi
     :members:
     :undoc-members:
     :show-inheritance:
@@ -61,7 +61,7 @@ drf\_swagger\.openapi
 drf\_swagger\.renderers
 ------------------------------
 
-.. automodule:: drf_swagger.renderers
+.. automodule:: drf_yasg.renderers
     :members:
     :undoc-members:
     :show-inheritance:
@@ -69,7 +69,7 @@ drf\_swagger\.renderers
 drf\_swagger\.utils
 --------------------------
 
-.. automodule:: drf_swagger.utils
+.. automodule:: drf_yasg.utils
     :members:
     :undoc-members:
     :show-inheritance:
@@ -77,7 +77,7 @@ drf\_swagger\.utils
 drf\_swagger\.views
 --------------------------
 
-.. automodule:: drf_swagger.views
+.. automodule:: drf_yasg.views
     :members:
     :undoc-members:
     :show-inheritance:

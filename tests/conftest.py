@@ -5,8 +5,8 @@ import os
 import pytest
 from ruamel import yaml
 
-from drf_swagger import openapi, codecs
-from drf_swagger.generators import OpenAPISchemaGenerator
+from drf_yasg import openapi, codecs
+from drf_yasg.generators import OpenAPISchemaGenerator
 
 
 @pytest.fixture

@@ -1,4 +1,4 @@
-from drf_swagger import openapi
+from drf_yasg import openapi
 
 
 def test_operation_docstrings(swagger_dict):

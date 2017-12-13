@@ -1,5 +1,5 @@
 [run]
-source = drf_swagger
+source = drf_yasg
 branch = True
 
 [report]
@@ -30,7 +30,7 @@ precision = 0
 
 [paths]
 source =
-    src/drf_swagger/
-    .tox/*/Lib/site-packages/drf_swagger/
-    .tox/*/lib/*/site-packages/drf_swagger/
-    /home/travis/virtualenv/*/lib/*/site-packages/drf_swagger/
+    src/drf_yasg/
+    .tox/*/Lib/site-packages/drf_yasg/
+    .tox/*/lib/*/site-packages/drf_yasg/
+    /home/travis/virtualenv/*/lib/*/site-packages/drf_yasg/

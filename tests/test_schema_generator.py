@@ -3,8 +3,8 @@ import json
 import pytest
 from ruamel import yaml
 
-from drf_swagger import openapi, codecs
-from drf_swagger.generators import OpenAPISchemaGenerator
+from drf_yasg import openapi, codecs
+from drf_yasg.generators import OpenAPISchemaGenerator
 
 
 def test_schema_generates_without_errors(generator):

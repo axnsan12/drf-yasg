@@ -1,9 +1,10 @@
 .. role:: python(code)
    :language: python
 
-###########
-drf-swagger
-###########
+########################################
+drf-yasg - Yet another Swagger generator
+########################################
+
 |travis| |nbsp| |codecov|
 
 Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
@@ -14,9 +15,9 @@ Compatible with
 - **Django**: 1.11, 2.0
 - **Python**: 2.7, 3.4, 3.5, 3.6
 
-**Source**: https://github.com/axnsan12/drf-swagger/
+**Source**: https://github.com/axnsan12/drf-yasg/
 
-**Documentation**: https://drf-swagger.readthedocs.io/en/latest/
+**Documentation**: https://drf-yasg.readthedocs.io/en/latest/
 
 ********
 Features
@@ -35,21 +36,21 @@ Features
    `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`__ or
    `flex <https://github.com/pipermerriam/flex>`__
 
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/1.0.1/screenshots/redoc-nested-response.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.1/screenshots/redoc-nested-response.png
    :width: 100%
    :figwidth: image
    :alt: redoc screenshot
 
    **Fully nested request and response schemas.**
 
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/1.0.1/screenshots/swagger-ui-list.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.1/screenshots/swagger-ui-list.png
    :width: 100%
    :figwidth: image
    :alt: swagger-ui screenshot
 
    **Choose between redoc and swagger-ui.**
 
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-swagger/1.0.1/screenshots/swagger-ui-models.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.1/screenshots/swagger-ui-models.png
    :width: 100%
    :figwidth: image
    :alt: model definitions screenshot
@@ -75,14 +76,14 @@ The preferred instalation method is directly from pypi:
 
 .. code:: console
 
-   pip install drf-swagger
+   pip install drf-yasg
 
 Additionally, if you want to use the built-in validation mechanisms (see `4. Validation`_), you need to install
 some extra requirements:
 
 .. code:: console
 
-   pip install drf-swagger[validation]
+   pip install drf-yasg[validation]
 
 .. _readme-quickstart:
 
@@ -95,7 +96,7 @@ In ``settings.py``:
 
     INSTALLED_APPS = [
         ...
-        'drf_swagger',
+        'drf_yasg',
         ...
     ]
 
@@ -104,8 +105,8 @@ In ``urls.py``:
 .. code:: python
 
     ...
-    from drf_swagger.views import get_schema_view
-    from drf_swagger import openapi
+    from drf_yasg.views import get_schema_view
+    from drf_yasg import openapi
 
     ...
 
@@ -347,14 +348,14 @@ Both projects are also currently unmantained.
 Documentation, advanced usage
 =============================
 
-https://drf-swagger.readthedocs.io/en/latest/
+https://drf-yasg.readthedocs.io/en/latest/
 
-.. |travis| image:: https://img.shields.io/travis/axnsan12/drf-swagger/master.svg
-   :target: https://travis-ci.org/axnsan12/drf-swagger
+.. |travis| image:: https://img.shields.io/travis/axnsan12/drf-yasg/master.svg
+   :target: https://travis-ci.org/axnsan12/drf-yasg
    :alt: Travis CI
 
-.. |codecov| image:: https://img.shields.io/codecov/c/github/axnsan12/drf-swagger/master.svg
-   :target: https://codecov.io/gh/axnsan12/drf-swagger
+.. |codecov| image:: https://img.shields.io/codecov/c/github/axnsan12/drf-yasg/master.svg
+   :target: https://codecov.io/gh/axnsan12/drf-yasg
    :alt: Codecov
 
 .. |nbsp| unicode:: 0xA0

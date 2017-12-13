@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
 
-    'drf_swagger',
+    'drf_yasg',
     'snippets',
     'users',
     'articles',
@@ -46,7 +46,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'drf_swagger.middleware.SwaggerExceptionMiddleware',
+    'drf_yasg.middleware.SwaggerExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'testproj.urls'

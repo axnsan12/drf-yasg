@@ -3,8 +3,8 @@ from django.conf.urls import include
 from rest_framework import permissions
 
 import testproj.urls
-from drf_swagger import openapi
-from drf_swagger.views import get_schema_view
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
 
 view = get_schema_view(
     openapi.Info('bla', 'ble'),

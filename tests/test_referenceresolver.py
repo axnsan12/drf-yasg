@@ -1,6 +1,6 @@
 import pytest
 
-from drf_swagger.openapi import ReferenceResolver
+from drf_yasg.openapi import ReferenceResolver
 
 
 def test_basic():

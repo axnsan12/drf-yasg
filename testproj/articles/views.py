@@ -10,8 +10,8 @@ from rest_framework.response import Response
 
 from articles import serializers
 from articles.models import Article
-from drf_swagger.inspectors import SwaggerAutoSchema
-from drf_swagger.utils import swagger_auto_schema
+from drf_yasg.inspectors import SwaggerAutoSchema
+from drf_yasg.utils import swagger_auto_schema
 
 
 class NoPagingAutoSchema(SwaggerAutoSchema):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# drf-swagger documentation build configuration file, created by
+# drf-yasg documentation build configuration file, created by
 # sphinx-quickstart on Sun Dec 10 15:20:34 2017.
 import os
 import sys
@@ -33,7 +33,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'drf-swagger'
+project = 'drf-yasg'
 copyright = '2017, Cristi V.'
 author = 'Cristi V.'
 
@@ -42,7 +42,7 @@ author = 'Cristi V.'
 # built documents.
 
 # The full version, including alpha/beta/rc tags.
-release = get_distribution('drf_swagger').version
+release = get_distribution('drf_yasg').version
 
 # The short X.Y.Z version.
 version = '.'.join(release.split('.')[:3])
@@ -62,7 +62,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-modindex_common_prefix = ['drf_swagger.']
+modindex_common_prefix = ['drf_yasg.']
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
@@ -103,7 +103,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'drf-swaggerdoc'
+htmlhelp_basename = 'drf-yasgdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -129,7 +129,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'drf-swagger.tex', 'drf-swagger Documentation',
+    (master_doc, 'drf-yasg.tex', 'drf-yasg Documentation',
      'Cristi V.', 'manual'),
 ]
 
@@ -138,7 +138,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'drf-swagger', 'drf-swagger Documentation',
+    (master_doc, 'drf-yasg', 'drf-yasg Documentation',
      [author], 1)
 ]
 
@@ -148,8 +148,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'drf-swagger', 'drf-swagger Documentation',
-     author, 'drf-swagger', 'One line description of project.',
+    (master_doc, 'drf-yasg', 'drf-yasg Documentation',
+     author, 'drf-yasg', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -200,7 +200,7 @@ from django.conf import settings  # noqa: E402
 
 settings.configure()
 
-import drf_swagger.views  # noqa: E402
+import drf_yasg.views  # noqa: E402
 
 # instantiate a SchemaView in the views module to make it available to autodoc
-drf_swagger.views.SchemaView = drf_swagger.views.get_schema_view(None)
+drf_yasg.views.SchemaView = drf_yasg.views.get_schema_view(None)

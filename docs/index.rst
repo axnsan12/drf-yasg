@@ -1,9 +1,9 @@
-.. drf-swagger documentation master file, created by
+.. drf-yasg documentation master file, created by
    sphinx-quickstart on Sun Dec 10 15:20:34 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-drf-swagger
+drf-yasg
 ===========
 
 .. toctree::
@@ -28,4 +28,4 @@ Source code documentation
 .. toctree::
    :maxdepth: 2
 
-   drf_swagger.rst
+   drf_yasg.rst

@@ -1,5 +1,5 @@
 {
-  "name": "drf-swagger",
+  "name": "drf-yasg",
   "dependencies": {
     "swagger-ui-dist": "^3.6.1"
   }
