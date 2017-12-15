@@ -46,6 +46,18 @@ def test_redoc(client, validate_schema):
     _validate_text_schema_view(client, validate_schema, '/redoc/?format=openapi', json.loads)
 
 
+def test_caching(client, validate_schema):
+    def run_once():
+        _validate_ui_schema_view(client, '/cached/redoc/', 'redoc/redoc.min.js')
+        _validate_text_schema_view(client, validate_schema, '/cached/redoc/?format=openapi', json.loads)
+        _validate_ui_schema_view(client, '/cached/swagger/', 'swagger-ui-dist/swagger-ui-bundle.js')
+        _validate_text_schema_view(client, validate_schema, '/cached/swagger/?format=openapi', json.loads)
+        _validate_text_schema_view(client, validate_schema, "/cached/swagger.yaml", yaml.safe_load)
+
+    for i in range(3):
+        run_once()
+
+
 @pytest.mark.urls('urlconfs.non_public_urls')
 def test_non_public(client):
     response = client.get('/private/swagger.yaml')
