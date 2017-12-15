@@ -50,9 +50,27 @@ is structured, starting from the root ``Swagger`` object.
    + ``operationId`` - should be unique across all operations
    + ``tags`` - used to group operations in the listing
 
-It is interesting to note that the main difference between ``Parameter`` and ``Schema`` is that Schemas can nest other
-Schemas, while Parameters are "primitives" and cannot contain other Parameters. The only exception are ``body``
-Parameters, which can contain a Schema.
+It is interesting to note the main differences between :class:`.Parameter` and :class:`.Schema` objects:
+
++----------------------------------------------------------+-----------------------------------------------------------+
+| :class:`.Schema`                                         | :class:`.Parameter`                                       |
++==========================================================+===========================================================+
+| Can nest other Schemas                                   | Cannot nest other Parameters |br|                         |
+|                                                          | Can only nest a Schema if the parameter is ``in: body``   |
++----------------------------------------------------------+-----------------------------------------------------------+
+| Cannot describe file uploads |br|                        | Can describe file uploads via ``type`` = ``file``, |br|   |
+| - ``file`` is not permitted as a value for ``type``      | but only as part of a form :class:`.Operation` [#formop]_ |
++----------------------------------------------------------+-----------------------------------------------------------+
+| Can be used in :class:`.Response`\ s                     | Cannot be used in :class:`.Response`\ s                   |
++----------------------------------------------------------+-----------------------------------------------------------+
+| Cannot be used in form :class:`.Operation`\ s [#formop]_ | Can be used in form :class:`.Operation`\ s [#formop]_     |
++----------------------------------------------------------+-----------------------------------------------------------+
+
+.. [#formop] a form Operation is an :class:`.Operation` that consumes ``multipart/form-data`` or
+   ``application/x-www-form-urlencoded``
+
+      * a form Operation cannot have ``body`` parameters
+      * a non-form operation cannot have ``form`` parameters
 
 **************************************
 The ``@swagger_auto_schema`` decorator

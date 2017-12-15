@@ -48,8 +48,8 @@ def make_swagger_name(attribute_name):
     Convert a python variable name into a Swagger spec attribute name.
 
     In particular,
-     * if name starts with x\_, return "x-{camelCase}"
-     * if name is 'ref', return "$ref"
+     * if name starts with ``x_``, return ``x-{camelCase}``
+     * if name is ``ref``, return ``$ref``
      * else return the name converted to camelCase, with trailing underscores stripped
 
     :param str attribute_name: python attribute name
@@ -64,7 +64,10 @@ def make_swagger_name(attribute_name):
 
 class SwaggerDict(OrderedDict):
     """A particular type of OrderedDict, which maps all attribute accesses to dict lookups using
-     :func:`.make_swagger_name`.  Used as a base class for all Swagger helper models.
+     :func:`.make_swagger_name`. Attribute names starting with ``_`` are set on the object as-is and are not included
+     in the specification output.
+
+     Used as a base class for all Swagger helper models.
     """
 
     def __init__(self, **attrs):
