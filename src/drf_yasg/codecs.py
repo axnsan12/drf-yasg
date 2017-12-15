@@ -87,7 +87,7 @@ class _OpenAPICodec(object):
         :rtype: OrderedDict
         """
         swagger.security_definitions = swagger_settings.SECURITY_DEFINITIONS
-        return swagger
+        return swagger.as_odict()
 
 
 class OpenAPICodecJson(_OpenAPICodec):
@@ -146,9 +146,24 @@ SaneYamlDumper.add_representer(OrderedDict, SaneYamlDumper.represent_odict)
 SaneYamlDumper.add_multi_representer(OrderedDict, SaneYamlDumper.represent_odict)
 
 
+def yaml_sane_dump(data, binary):
+    """Dump the given data dictionary into a sane format:
+
+        * OrderedDicts are dumped as regular mappings instead of non-standard !!odict
+        * multi-line mapping style instead of json-like inline style
+        * list elements are indented into their parents
+
+    :param dict data: the data to be serializers
+    :param bool binary: True to return a utf-8 encoded binary object, False to return a string
+    :return: the serialized YAML
+    :rtype: str,bytes
+    """
+    return yaml.dump(data, Dumper=SaneYamlDumper, default_flow_style=False, encoding='utf-8' if binary else None)
+
+
 class OpenAPICodecYaml(_OpenAPICodec):
     media_type = 'application/yaml'
 
     def _dump_dict(self, spec):
         """Dump ``spec`` into YAML."""
-        return yaml.dump(spec, Dumper=SaneYamlDumper, default_flow_style=False, encoding='utf-8')
+        return yaml_sane_dump(spec, binary=True)

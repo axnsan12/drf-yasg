@@ -62,6 +62,13 @@ def make_swagger_name(attribute_name):
     return camelize(attribute_name.rstrip('_'), uppercase_first_letter=False)
 
 
+def _bare_SwaggerDict(cls):
+    assert issubclass(cls, SwaggerDict)
+    result = cls.__new__(cls)
+    OrderedDict.__init__(result)  # no __init__ called for SwaggerDict subclasses!
+    return result
+
+
 class SwaggerDict(OrderedDict):
     """A particular type of OrderedDict, which maps all attribute accesses to dict lookups using
      :func:`.make_swagger_name`. Attribute names starting with ``_`` are set on the object as-is and are not included
@@ -108,11 +115,25 @@ class SwaggerDict(OrderedDict):
         for attr, val in self._extras__.items():
             setattr(self, attr, val)
 
-    # noinspection PyArgumentList,PyDefaultArgument
-    def __deepcopy__(self, memodict={}):
-        result = OrderedDict(list(self.items()))
-        result.update(copy.deepcopy(result, memodict))
-        return result
+    @staticmethod
+    def _as_odict(obj):
+        if isinstance(obj, dict):
+            result = OrderedDict()
+            for attr, val in obj.items():
+                result[attr] = SwaggerDict._as_odict(val)
+            return result
+        elif isinstance(obj, (list, tuple)):
+            return type(obj)(SwaggerDict._as_odict(elem) for elem in obj)
+
+        return obj
+
+    def as_odict(self):
+        return SwaggerDict._as_odict(self)
+
+    def __reduce__(self):
+        # for pickle supprt; this skips calls to all SwaggerDict __init__ methods and relies
+        # on the already set attributes instead
+        return _bare_SwaggerDict, (type(self),), vars(self), None, iter(self.items())
 
 
 class Contact(SwaggerDict):
