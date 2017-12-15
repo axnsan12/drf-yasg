@@ -1,4 +1,3 @@
-import copy
 from collections import OrderedDict
 
 from coreapi.compat import urlparse

@@ -17,6 +17,7 @@ drf-yasg
    settings.rst
    contributing.rst
    license.rst
+   changelog.rst
 
 Source code documentation
 =========================

@@ -7,6 +7,9 @@ import os
 import sys
 
 import sphinx_rtd_theme
+from docutils import nodes, utils
+from docutils.parsers.rst import roles
+from docutils.parsers.rst.roles import set_classes
 from pkg_resources import get_distribution
 
 # -- General configuration ------------------------------------------------
@@ -204,3 +207,41 @@ import drf_yasg.views  # noqa: E402
 
 # instantiate a SchemaView in the views module to make it available to autodoc
 drf_yasg.views.SchemaView = drf_yasg.views.get_schema_view(None)
+
+ghiss_uri = "https://github.com/axnsan12/drf-yasg/issues/%d"
+ghpr_uri = "https://github.com/axnsan12/drf-yasg/pull/%d"
+
+
+def role_github_pull_request_or_issue(name, rawtext, text, lineno, inliner, options=None, content=None):
+    options = options or {}
+    content = content or []
+    try:
+        ghid = int(text)
+        if ghid <= 0:
+            raise ValueError
+    except ValueError:
+        msg = inliner.reporter.error(
+            'GitHub pull request or issue number must be a number greater than or equal to 1; '
+            '"%s" is invalid.' % text, line=lineno
+        )
+        prb = inliner.problematic(rawtext, rawtext, msg)
+        return [prb], [msg]
+        # Base URL mainly used by inliner.rfc_reference, so this is correct:
+
+    if name == 'pr':
+        ref = ghpr_uri
+    elif name == 'issue':
+        ref = ghiss_uri
+    else:
+        msg = inliner.reporter.error('unknown tag name for GitHub reference - "%s"' % name, line=lineno)
+        prb = inliner.problematic(rawtext, rawtext, msg)
+        return [prb], [msg]
+
+    ref = ref % ghid
+    set_classes(options)
+    node = nodes.reference(rawtext, '#' + utils.unescape(text), refuri=ref, **options)
+    return [node], []
+
+
+roles.register_local_role('pr', role_github_pull_request_or_issue)
+roles.register_local_role('issue', role_github_pull_request_or_issue)
