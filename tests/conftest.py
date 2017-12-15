@@ -45,8 +45,8 @@ def validate_schema():
         from flex.core import parse as validate_flex
         from swagger_spec_validator.validator20 import validate_spec as validate_ssv
 
-        validate_flex(swagger)
-        validate_ssv(swagger)
+        validate_flex(copy.deepcopy(swagger))
+        validate_ssv(copy.deepcopy(swagger))
 
     return validate_schema
 

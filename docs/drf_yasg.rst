@@ -57,6 +57,7 @@ drf\_yasg\.openapi
     :members:
     :undoc-members:
     :show-inheritance:
+    :exclude-members: _bare_SwaggerDict
 
 drf\_yasg\.renderers
 ------------------------------

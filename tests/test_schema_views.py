@@ -1,4 +1,5 @@
 import json
+from collections import OrderedDict
 
 import pytest
 from ruamel import yaml
@@ -47,15 +48,23 @@ def test_redoc(client, validate_schema):
 
 
 def test_caching(client, validate_schema):
-    def run_once():
+    prev_schema = None
+
+    for i in range(3):
         _validate_ui_schema_view(client, '/cached/redoc/', 'redoc/redoc.min.js')
         _validate_text_schema_view(client, validate_schema, '/cached/redoc/?format=openapi', json.loads)
         _validate_ui_schema_view(client, '/cached/swagger/', 'swagger-ui-dist/swagger-ui-bundle.js')
         _validate_text_schema_view(client, validate_schema, '/cached/swagger/?format=openapi', json.loads)
-        _validate_text_schema_view(client, validate_schema, "/cached/swagger.yaml", yaml.safe_load)
 
-    for i in range(3):
-        run_once()
+        json_schema = client.get('/cached/swagger.json')
+        assert json_schema.status_code == 200
+        json_schema = json.loads(json_schema.content.decode('utf-8'), object_pairs_hook=OrderedDict)
+        if prev_schema is None:
+            validate_schema(json_schema)
+            prev_schema = json_schema
+        else:
+            from datadiff.tools import assert_equal
+            assert_equal(prev_schema, json_schema)
 
 
 @pytest.mark.urls('urlconfs.non_public_urls')
