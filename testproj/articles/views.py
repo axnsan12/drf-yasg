@@ -54,7 +54,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @swagger_auto_schema(method='get', operation_description="image GET description override")
-    @swagger_auto_schema(method='post', request_body=serializers.ImageUploadSerializer, responses={200: 'success'})
+    @swagger_auto_schema(method='post', request_body=serializers.ImageUploadSerializer)
     @detail_route(methods=['get', 'post'], parser_classes=(MultiPartParser,))
     def image(self, request, slug=None):
         """

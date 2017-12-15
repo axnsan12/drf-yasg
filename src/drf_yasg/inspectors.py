@@ -225,6 +225,8 @@ class SwaggerAutoSchema(object):
             default_schema = self.get_request_serializer()
 
         default_schema = default_schema or ''
+        if any(is_form_media_type(encoding) for encoding in self.get_consumes()):
+            default_schema = ''
         if default_schema:
             if not isinstance(default_schema, openapi.Schema):
                 default_schema = self.serializer_to_schema(default_schema)

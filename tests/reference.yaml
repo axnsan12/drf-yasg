@@ -187,8 +187,6 @@ paths:
       responses:
         '200':
           description: ''
-          schema:
-            $ref: '#/definitions/Article'
       consumes:
         - multipart/form-data
       tags:
@@ -221,8 +219,8 @@ paths:
           required: true
           type: file
       responses:
-        '200':
-          description: success
+        '201':
+          description: ''
       consumes:
         - multipart/form-data
       tags:
