@@ -196,6 +196,7 @@ nitpick_ignore = [
     ('py:obj', 'APIView'),
 ]
 
+sys.path.insert(0, os.path.abspath('../src'))
 sys.path.insert(0, os.path.abspath('../testproj'))
 os.putenv('DJANGO_SETTINGS_MODULE', 'testproj.settings')
 
@@ -208,8 +209,8 @@ import drf_yasg.views  # noqa: E402
 # instantiate a SchemaView in the views module to make it available to autodoc
 drf_yasg.views.SchemaView = drf_yasg.views.get_schema_view(None)
 
-ghiss_uri = "https://github.com/axnsan12/drf-yasg/issues/%d"
-ghpr_uri = "https://github.com/axnsan12/drf-yasg/pull/%d"
+gh_issue_uri = "https://github.com/axnsan12/drf-yasg/issues/%d"
+gh_pr_uri = "https://github.com/axnsan12/drf-yasg/pull/%d"
 
 
 def role_github_pull_request_or_issue(name, rawtext, text, lineno, inliner, options=None, content=None):
@@ -229,9 +230,9 @@ def role_github_pull_request_or_issue(name, rawtext, text, lineno, inliner, opti
         # Base URL mainly used by inliner.rfc_reference, so this is correct:
 
     if name == 'pr':
-        ref = ghpr_uri
+        ref = gh_pr_uri
     elif name == 'issue':
-        ref = ghiss_uri
+        ref = gh_issue_uri
     else:
         msg = inliner.reporter.error('unknown tag name for GitHub reference - "%s"' % name, line=lineno)
         prb = inliner.problematic(rawtext, rawtext, msg)

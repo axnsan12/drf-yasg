@@ -77,7 +77,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
 #. Push your branch and submit a pull request to the master branch on GitHub
 
-   Incomplete/Work In Progress pull requrests are encouraged, because they allow you to get feedback and help more
+   Incomplete/Work In Progress pull requests are encouraged, because they allow you to get feedback and help more
    easily.
 
 #. Your code must pass all the required travis jobs before it is merged. As of now, this includes running on
