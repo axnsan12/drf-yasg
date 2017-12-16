@@ -40,8 +40,16 @@ def test_json_codec_roundtrip(codec_json, generator, validate_schema):
 def test_yaml_codec_roundtrip(codec_yaml, generator, validate_schema):
     swagger = generator.get_schema(None, True)
     yaml_bytes = codec_yaml.encode(swagger)
-    assert b'omap' not in yaml_bytes
+    assert b'omap' not in yaml_bytes  # ensure no ugly !!omap is outputted
+    assert b'&id' not in yaml_bytes and b'*id' not in yaml_bytes  # ensure no YAML references are generated
     validate_schema(yaml.safe_load(yaml_bytes.decode('utf-8')))
+
+
+def test_yaml_and_json_match(codec_yaml, codec_json, generator):
+    swagger = generator.get_schema(None, True)
+    yaml_schema = yaml.safe_load(codec_yaml.encode(swagger).decode('utf-8'))
+    json_schema = json.loads(codec_json.encode(swagger).decode('utf-8'))
+    assert yaml_schema == json_schema
 
 
 def test_basepath_only():
