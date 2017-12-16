@@ -30,6 +30,8 @@ def force_serializer_instance(serializer):
 
 
 class SwaggerAutoSchema(object):
+    body_methods = ('PUT', 'PATCH', 'POST')  #: methods allowed to have a request body
+
     def __init__(self, view, path, method, overrides, components):
         """Inspector class responsible for providing :class:`.Operation` definitions given a
 
@@ -88,10 +90,6 @@ class SwaggerAutoSchema(object):
         :return: a (potentially empty) list of :class:`.Parameter`\ s either ``in: body`` or ``in: formData``
         :rtype: list[openapi.Parameter]
         """
-        # only PUT, PATCH or POST can have a request body
-        if self.method not in ('PUT', 'PATCH', 'POST'):
-            return []
-
         serializer = self.get_request_serializer()
         schema = None
         if serializer is None:
@@ -109,6 +107,15 @@ class SwaggerAutoSchema(object):
                 schema = self.get_request_body_schema(serializer)
             return [self.make_body_parameter(schema)]
 
+    def get_view_serializer(self):
+        """Return the serializer as defined by the view's ``get_serializer()`` method.
+
+        :return: the view's ``Serializer``
+        """
+        if not hasattr(self.view, 'get_serializer'):
+            return None
+        return self.view.get_serializer()
+
     def get_request_serializer(self):
         """Return the request serializer (used for parsing the request payload) for this endpoint.
 
@@ -119,13 +126,16 @@ class SwaggerAutoSchema(object):
         if body_override is not None:
             if body_override is no_body:
                 return None
+            if self.method not in self.body_methods:
+                raise SwaggerGenerationError("request_body can only be applied to PUT, PATCH or POST views; "
+                                             "are you looking for query_serializer or manual_parameters?")
             if isinstance(body_override, openapi.Schema.OR_REF):
                 return body_override
             return force_serializer_instance(body_override)
-        else:
-            if not hasattr(self.view, 'get_serializer'):
-                return None
-            return self.view.get_serializer()
+        elif self.method in self.body_methods:
+            return self.get_view_serializer()
+
+        return None
 
     def get_request_form_parameters(self, serializer):
         """Given a Serializer, return a list of ``in: formData`` :class:`.Parameter`\ s.
@@ -213,11 +223,11 @@ class SwaggerAutoSchema(object):
         default_schema = ''
         if method == 'post':
             default_status = status.HTTP_201_CREATED
-            default_schema = self.get_request_serializer()
+            default_schema = self.get_request_serializer() or self.get_view_serializer()
         elif method == 'delete':
             default_status = status.HTTP_204_NO_CONTENT
         elif method in ('get', 'put', 'patch'):
-            default_schema = self.get_request_serializer()
+            default_schema = self.get_request_serializer() or self.get_view_serializer()
 
         default_schema = default_schema or ''
         if any(is_form_media_type(encoding) for encoding in self.get_consumes()):
