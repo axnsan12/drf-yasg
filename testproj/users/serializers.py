@@ -12,3 +12,8 @@ class UserSerializerrr(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'snippets', 'last_connected_ip', 'last_connected_at')
+
+
+class UserListQuerySerializer(serializers.Serializer):
+    username = serializers.CharField(help_text="this field is generated from a query_serializer")
+    is_staff = serializers.BooleanField(help_text="this one too!")

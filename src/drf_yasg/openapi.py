@@ -116,6 +116,7 @@ class SwaggerDict(OrderedDict):
 
     @staticmethod
     def _as_odict(obj):
+        """Implementation detail of :meth:`.as_odict`"""
         if isinstance(obj, dict):
             result = OrderedDict()
             for attr, val in obj.items():
@@ -127,6 +128,10 @@ class SwaggerDict(OrderedDict):
         return obj
 
     def as_odict(self):
+        """Convert this object into an ``OrderedDict`` instance.
+
+        :rtype: OrderedDict
+        """
         return SwaggerDict._as_odict(self)
 
     def __reduce__(self):

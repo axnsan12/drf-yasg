@@ -10,7 +10,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from . import openapi
 from .errors import SwaggerGenerationError
-from .utils import serializer_field_to_swagger, no_body, is_list_view
+from .utils import serializer_field_to_swagger, no_body, is_list_view, param_list_to_odict
 
 
 def force_serializer_instance(serializer):
@@ -30,6 +30,8 @@ def force_serializer_instance(serializer):
 
 
 class SwaggerAutoSchema(object):
+    body_methods = ('PUT', 'PATCH', 'POST')  #: methods allowed to have a request body
+
     def __init__(self, view, path, method, overrides, components):
         """Inspector class responsible for providing :class:`.Operation` definitions given a
 
@@ -88,10 +90,6 @@ class SwaggerAutoSchema(object):
         :return: a (potentially empty) list of :class:`.Parameter`\ s either ``in: body`` or ``in: formData``
         :rtype: list[openapi.Parameter]
         """
-        # only PUT, PATCH or POST can have a request body
-        if self.method not in ('PUT', 'PATCH', 'POST'):
-            return []
-
         serializer = self.get_request_serializer()
         schema = None
         if serializer is None:
@@ -109,6 +107,15 @@ class SwaggerAutoSchema(object):
                 schema = self.get_request_body_schema(serializer)
             return [self.make_body_parameter(schema)]
 
+    def get_view_serializer(self):
+        """Return the serializer as defined by the view's ``get_serializer()`` method.
+
+        :return: the view's ``Serializer``
+        """
+        if not hasattr(self.view, 'get_serializer'):
+            return None
+        return self.view.get_serializer()
+
     def get_request_serializer(self):
         """Return the request serializer (used for parsing the request payload) for this endpoint.
 
@@ -119,13 +126,16 @@ class SwaggerAutoSchema(object):
         if body_override is not None:
             if body_override is no_body:
                 return None
+            if self.method not in self.body_methods:
+                raise SwaggerGenerationError("request_body can only be applied to PUT, PATCH or POST views; "
+                                             "are you looking for query_serializer or manual_parameters?")
             if isinstance(body_override, openapi.Schema.OR_REF):
                 return body_override
             return force_serializer_instance(body_override)
-        else:
-            if not hasattr(self.view, 'get_serializer'):
-                return None
-            return self.view.get_serializer()
+        elif self.method in self.body_methods:
+            return self.get_view_serializer()
+
+        return None
 
     def get_request_form_parameters(self, serializer):
         """Given a Serializer, return a list of ``in: formData`` :class:`.Parameter`\ s.
@@ -133,12 +143,7 @@ class SwaggerAutoSchema(object):
         :param serializer: the view's request serializer as returned by :meth:`.get_request_serializer`
         :rtype: list[openapi.Parameter]
         """
-        fields = getattr(serializer, 'fields', {})
-        return [
-            self.field_to_parameter(value, key, openapi.IN_FORM)
-            for key, value
-            in fields.items()
-        ]
+        return self.serializer_to_parameters(serializer, in_=openapi.IN_FORM)
 
     def get_request_body_schema(self, serializer):
         """Return the :class:`.Schema` for a given request's body data. Only applies to PUT, PATCH and POST requests.
@@ -163,7 +168,7 @@ class SwaggerAutoSchema(object):
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
-        parameters = OrderedDict(((param.name, param.in_), param) for param in parameters)
+        parameters = param_list_to_odict(parameters)
         manual_parameters = self.overrides.get('manual_parameters', None) or []
 
         if any(param.in_ == openapi.IN_BODY for param in manual_parameters):  # pragma: no cover
@@ -173,7 +178,7 @@ class SwaggerAutoSchema(object):
                 raise SwaggerGenerationError("cannot add form parameters when the request has a request schema; "
                                              "did you forget to set an appropriate parser class on the view?")
 
-        parameters.update(((param.name, param.in_), param) for param in manual_parameters)
+        parameters.update(param_list_to_odict(manual_parameters))
         return list(parameters.values())
 
     def get_responses(self):
@@ -218,11 +223,11 @@ class SwaggerAutoSchema(object):
         default_schema = ''
         if method == 'post':
             default_status = status.HTTP_201_CREATED
-            default_schema = self.get_request_serializer()
+            default_schema = self.get_request_serializer() or self.get_view_serializer()
         elif method == 'delete':
             default_status = status.HTTP_204_NO_CONTENT
         elif method in ('get', 'put', 'patch'):
-            default_schema = self.get_request_serializer()
+            default_schema = self.get_request_serializer() or self.get_view_serializer()
 
         default_schema = default_schema or ''
         if any(is_form_media_type(encoding) for encoding in self.get_consumes()):
@@ -290,12 +295,35 @@ class SwaggerAutoSchema(object):
 
         return responses
 
+    def get_query_serializer(self):
+        """Return the query serializer (used for parsing query parameters) for this endpoint.
+
+        :return: the query serializer, or ``None``
+        """
+        query_serializer = self.overrides.get('query_serializer', None)
+        if query_serializer is not None:
+            query_serializer = force_serializer_instance(query_serializer)
+        return query_serializer
+
     def get_query_parameters(self):
         """Return the query parameters accepted by this view.
 
         :rtype: list[openapi.Parameter]
         """
-        return self.get_filter_parameters() + self.get_pagination_parameters()
+        natural_parameters = self.get_filter_parameters() + self.get_pagination_parameters()
+
+        query_serializer = self.get_query_serializer()
+        serializer_parameters = []
+        if query_serializer is not None:
+            serializer_parameters = self.serializer_to_parameters(query_serializer, in_=openapi.IN_QUERY)
+
+            if len(set(param_list_to_odict(natural_parameters)) & set(param_list_to_odict(serializer_parameters))) != 0:
+                raise SwaggerGenerationError(
+                    "your query_serializer contains fields that conflict with the "
+                    "filter_backend or paginator_class on the view - %s %s" % (self.method, self.path)
+                )
+
+        return natural_parameters + serializer_parameters
 
     def should_filter(self):
         """Determine whether filter backend parameters should be included for this request.
@@ -400,11 +428,25 @@ class SwaggerAutoSchema(object):
     def serializer_to_schema(self, serializer):
         """Convert a DRF Serializer instance to an :class:`.openapi.Schema`.
 
-        :param serializers.BaseSerializer serializer:
+        :param serializers.BaseSerializer serializer: the ``Serializer`` instance
         :rtype: openapi.Schema
         """
         definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
         return serializer_field_to_swagger(serializer, openapi.Schema, definitions)
+
+    def serializer_to_parameters(self, serializer, in_):
+        """Convert a DRF serializer into a list of :class:`.Parameter`\ s using :meth:`.field_to_parameter`
+
+        :param serializers.BaseSerializer serializer: the ``Serializer`` instance
+        :param str in_: the location of the parameters, one of the `openapi.IN_*` constants
+        :rtype: list[openapi.Parameter]
+        """
+        fields = getattr(serializer, 'fields', {})
+        return [
+            self.field_to_parameter(value, key, in_)
+            for key, value
+            in fields.items()
+        ]
 
     def field_to_parameter(self, field, name, in_):
         """Convert a DRF serializer Field to a swagger :class:`.Parameter` object.
