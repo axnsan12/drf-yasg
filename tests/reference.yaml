@@ -351,7 +351,17 @@ paths:
     get:
       operationId: users_list
       description: UserList cbv classdoc
-      parameters: []
+      parameters:
+        - name: username
+          in: query
+          description: this field is generated from a query_serializer
+          required: true
+          type: string
+        - name: is_staff
+          in: query
+          description: this one too!
+          required: true
+          type: boolean
       responses:
         '200':
           description: ''

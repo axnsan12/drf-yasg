@@ -7,13 +7,13 @@ from rest_framework.views import APIView
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema, no_body
-from users.serializers import UserSerializerrr
+from users.serializers import UserSerializerrr, UserListQuerySerializer
 
 
 class UserList(APIView):
     """UserList cbv classdoc"""
 
-    @swagger_auto_schema(responses={200: UserSerializerrr(many=True)})
+    @swagger_auto_schema(query_serializer=UserListQuerySerializer, responses={200: UserSerializerrr(many=True)})
     def get(self, request):
         queryset = User.objects.all()
         serializer = UserSerializerrr(queryset, many=True)
