@@ -3,6 +3,7 @@
 import io
 import os
 
+import sys
 from setuptools import setup, find_packages
 import distutils.core
 
@@ -21,23 +22,24 @@ def _install_setup_requires(attrs):
         dist.fetch_build_eggs(dist.setup_requires)
 
 
-try:
-    # try to install setuptools_scm before setuptools does it, otherwise our monkey patch below will come too early
-    # (setuptools_scm adds find_files hooks into setuptools on install)
-    _install_setup_requires({'setup_requires': requirements_setup})
-except Exception:
-    pass
+if 'sdist' in sys.argv:
+    try:
+        # try to install setuptools_scm before setuptools does it, otherwise our monkey patch below will come too early
+        # (setuptools_scm adds find_files hooks into setuptools on install)
+        _install_setup_requires({'setup_requires': requirements_setup})
+    except Exception:
+        pass
 
-try:
-    # see https://github.com/pypa/setuptools_scm/issues/190, setuptools_scm includes ALL versioned files from the git
-    # repo into the sdist by default, and there is no easy way to provide an opt-out;
-    # this hack is ugly but does the job; because this is not really a documented interface of the module,
-    # the setuptools_scm version should remain pinned to ensure it keeps working
-    import setuptools_scm.integration
+    try:
+        # see https://github.com/pypa/setuptools_scm/issues/190, setuptools_scm includes ALL versioned files from
+        # the git repo into the sdist by default, and there is no easy way to provide an opt-out;
+        # this hack is ugly but does the job; because this is not really a documented interface of the module,
+        # the setuptools_scm version should remain pinned to ensure it keeps working
+        import setuptools_scm.integration
 
-    setuptools_scm.integration.find_files = lambda _: []
-except ImportError:
-    pass
+        setuptools_scm.integration.find_files = lambda _: []
+    except ImportError:
+        pass
 
 
 def read_req(req_file):

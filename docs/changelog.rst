@@ -4,6 +4,14 @@ Changelog
 
 
 *********
+**1.0.4**
+*********
+
+- **FIX:** fixed improper generation of YAML references
+- **FEATURE:** added ``query_serializer`` parameter to
+  :func:`@swagger_auto_schema <.swagger_auto_schema>` (:issue:`16`, :pr:`17`)
+
+*********
 **1.0.3**
 *********
 

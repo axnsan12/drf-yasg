@@ -5,7 +5,7 @@
 drf-yasg - Yet another Swagger generator
 ########################################
 
-|travis| |nbsp| |codecov|
+|travis| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
 
 Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
 
@@ -357,6 +357,14 @@ https://drf-yasg.readthedocs.io/en/latest/
 .. |codecov| image:: https://img.shields.io/codecov/c/github/axnsan12/drf-yasg/master.svg
    :target: https://codecov.io/gh/axnsan12/drf-yasg
    :alt: Codecov
+
+.. |pypi-version| image:: https://img.shields.io/pypi/v/drf-yasg.svg
+   :target: https://pypi.org/project/drf-yasg/
+   :alt: PyPI
+
+.. |rtd-badge| image:: https://img.shields.io/readthedocs/drf-yasg.svg
+   :target: https://drf-yasg.readthedocs.io/
+   :alt: ReadTheDocs
 
 .. |nbsp| unicode:: 0xA0
    :trim:
