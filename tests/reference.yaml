@@ -16,7 +16,7 @@ paths:
   /articles/:
     get:
       operationId: articles_list
-      description: ArticleViewSet class docstring
+      description: description from swagger_auto_schema via method_decorator
       parameters:
         - name: title
           in: query
