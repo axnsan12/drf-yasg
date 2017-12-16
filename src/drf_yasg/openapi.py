@@ -115,15 +115,19 @@ class SwaggerDict(OrderedDict):
             setattr(self, attr, val)
 
     @staticmethod
-    def _as_odict(obj):
+    def _as_odict(obj, memo):
         """Implementation detail of :meth:`.as_odict`"""
+        if id(obj) in memo:
+            return memo[id(obj)]
+
         if isinstance(obj, dict):
             result = OrderedDict()
+            memo[id(obj)] = result
             for attr, val in obj.items():
-                result[attr] = SwaggerDict._as_odict(val)
+                result[attr] = SwaggerDict._as_odict(val, memo)
             return result
         elif isinstance(obj, (list, tuple)):
-            return type(obj)(SwaggerDict._as_odict(elem) for elem in obj)
+            return type(obj)(SwaggerDict._as_odict(elem, memo) for elem in obj)
 
         return obj
 
@@ -132,7 +136,7 @@ class SwaggerDict(OrderedDict):
 
         :rtype: OrderedDict
         """
-        return SwaggerDict._as_odict(self)
+        return SwaggerDict._as_odict(self, {})
 
     def __reduce__(self):
         # for pickle supprt; this skips calls to all SwaggerDict __init__ methods and relies

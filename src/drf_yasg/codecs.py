@@ -101,6 +101,10 @@ class OpenAPICodecJson(_OpenAPICodec):
 class SaneYamlDumper(yaml.SafeDumper):
     """YamlDumper class usable for dumping ``OrderedDict`` and list instances in a standard way."""
 
+    def ignore_aliases(self, data):
+        """Disable YAML references."""
+        return True
+
     def increase_indent(self, flow=False, indentless=False, **kwargs):
         """https://stackoverflow.com/a/39681672
 
@@ -152,6 +156,7 @@ def yaml_sane_dump(data, binary):
         * OrderedDicts are dumped as regular mappings instead of non-standard !!odict
         * multi-line mapping style instead of json-like inline style
         * list elements are indented into their parents
+        * YAML references/aliases are disabled
 
     :param dict data: the data to be serializers
     :param bool binary: True to return a utf-8 encoded binary object, False to return a string

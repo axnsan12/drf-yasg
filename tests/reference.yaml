@@ -380,7 +380,7 @@ paths:
         - name: data
           in: body
           required: true
-          schema: &id001
+          schema:
             required:
               - username
             type: object
@@ -390,7 +390,13 @@ paths:
       responses:
         '201':
           description: ''
-          schema: *id001
+          schema:
+            required:
+              - username
+            type: object
+            properties:
+              username:
+                type: string
       consumes:
         - application/json
       tags:
