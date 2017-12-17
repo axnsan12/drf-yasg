@@ -8,6 +8,7 @@ Changelog
 *********
 
 - **FIX:** fixed a crash caused by having read-only Serializers nested by reference
+- **IMPROVEMENT:** updated ``swagger-ui`` to version 3.7.0
 
 *********
 **1.0.4**
