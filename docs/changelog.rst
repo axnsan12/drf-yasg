@@ -4,6 +4,12 @@ Changelog
 
 
 *********
+**1.0.5**
+*********
+
+- **FIX:** fixed a crash caused by having read-only Serializers nested by reference
+
+*********
 **1.0.4**
 *********
 

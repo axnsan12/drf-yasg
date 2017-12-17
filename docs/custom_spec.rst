@@ -242,7 +242,12 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
          url(r'^login/$', decorated_login_view, name='login')
       ]
 
-      This can allow you to avoid skipping an unnecessary *subclass* altogether.
+   This can allow you to avoid skipping an unnecessary *subclass* altogether.
+
+.. Warning::
+
+   However, do note that both of the methods above can lead to unexpected (and maybe surprising) results by
+   replacing/decorating methods on the base class itself.
 
 *************************
 Subclassing and extending
