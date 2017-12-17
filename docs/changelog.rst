@@ -8,6 +8,8 @@ Changelog
 *********
 
 - **FIX:** fixed a crash caused by having read-only Serializers nested by reference
+- **FIX:** removed erroneous backslashes in paths when routes are generated using Django 2
+  `path() <https://docs.djangoproject.com/en/2.0/ref/urls/#django.urls.path>`_
 - **IMPROVEMENT:** updated ``swagger-ui`` to version 3.7.0
 
 *********
