@@ -213,7 +213,7 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
             required = []
             for key, value in serializer.fields.items():
                 properties[key] = serializer_field_to_swagger(value, ChildSwaggerType, definitions)
-                if value.read_only:
+                if value.read_only and not isinstance(properties[key], openapi._Ref):
                     properties[key].read_only = value.read_only
                 if value.required:
                     required.append(key)
