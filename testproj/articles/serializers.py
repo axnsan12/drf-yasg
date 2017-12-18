@@ -9,11 +9,13 @@ class ArticleSerializer(serializers.ModelSerializer):
         child=serializers.URLField(help_text="but i needed to test these 2 fields somehow"),
     )
     uuid = serializers.UUIDField(help_text="should articles have UUIDs?")
+    cover_name = serializers.FileField(use_url=False, source='cover', read_only=True)
 
     class Meta:
         model = Article
-        fields = ('title', 'body', 'slug', 'date_created', 'date_modified', 'references', 'uuid')
-        read_only_fields = ('date_created', 'date_modified')
+        fields = ('title', 'body', 'slug', 'date_created', 'date_modified',
+                  'references', 'uuid', 'cover', 'cover_name')
+        read_only_fields = ('date_created', 'date_modified', 'cover')
         lookup_field = 'slug'
         extra_kwargs = {'body': {'help_text': 'body serializer help_text'}}
 

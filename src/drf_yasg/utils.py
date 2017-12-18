@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator
 from django.utils.encoding import force_text
 from rest_framework import serializers
 from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
+from rest_framework.settings import api_settings
 
 from . import openapi
 from .errors import SwaggerGenerationError
@@ -287,7 +288,13 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
         # swagger 2.0 does not support specifics about file fields, so ImageFile gets no special treatment
         # OpenAPI 3.0 does support it, so a future implementation could handle this better
         err = SwaggerGenerationError("parameter of type file is supported only in a formData Parameter")
-        if swagger_object_type != openapi.Parameter:
+        if swagger_object_type == openapi.Schema:
+            # FileField.to_representation returns URL or file name
+            result = SwaggerType(type=openapi.TYPE_STRING, read_only=True)
+            if getattr(field, 'use_url', api_settings.UPLOADED_FILES_USE_URL):
+                result.format = openapi.FORMAT_URI
+            return result
+        elif swagger_object_type != openapi.Parameter:
             raise err  # pragma: no cover
         param = SwaggerType(type=openapi.TYPE_FILE)
         if param['in'] != openapi.IN_FORM:
