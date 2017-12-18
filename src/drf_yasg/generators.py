@@ -38,7 +38,6 @@ class EndpointEnumerator(_EndpointEnumerator):
         :return: the unescaped path
         :rtype: str
         """
-        original_path = path
         clean_path = ''
         while path:
             match = PATH_PARAMETER_RE.search(path)
