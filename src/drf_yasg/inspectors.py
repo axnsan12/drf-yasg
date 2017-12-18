@@ -215,18 +215,17 @@ class DjangoRestResponsePagination(PaginatorInspector):
         assert response_schema.type == openapi.TYPE_ARRAY, "array return expected for paged response"
         paged_schema = None
         if isinstance(paginator, (LimitOffsetPagination, PageNumberPagination, CursorPagination)):
+            has_count = not isinstance(paginator, CursorPagination)
             paged_schema = openapi.Schema(
                 type=openapi.TYPE_OBJECT,
-                properties={
-                    'next': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI),
-                    'previous': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI),
-                    'results': response_schema,
-                },
+                properties=OrderedDict((
+                    ('count', openapi.Schema(type=openapi.TYPE_INTEGER) if has_count else None),
+                    ('next', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)),
+                    ('previous', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)),
+                    ('results', response_schema),
+                )),
                 required=['count', 'results']
             )
-
-            if not isinstance(paginator, CursorPagination):
-                paged_schema.properties['count'] = openapi.Schema(type=openapi.TYPE_INTEGER)
 
         return paged_schema
 
@@ -413,7 +412,7 @@ class SwaggerAutoSchema(ViewInspector):
             if self.should_page():
                 default_schema = self.get_paginated_response(default_schema) or default_schema
 
-        return {str(default_status): default_schema}
+        return OrderedDict({str(default_status): default_schema})
 
     def get_response_serializers(self):
         """Return the response codes that this view is expected to return, and the serializer for each response body.
@@ -427,7 +426,7 @@ class SwaggerAutoSchema(ViewInspector):
         manual_responses = self.overrides.get('responses', None) or {}
         manual_responses = OrderedDict((str(sc), resp) for sc, resp in manual_responses.items())
 
-        responses = {}
+        responses = OrderedDict()
         if not any(is_success(int(sc)) for sc in manual_responses if sc != 'default'):
             responses = self.get_default_responses()
 
@@ -441,7 +440,7 @@ class SwaggerAutoSchema(ViewInspector):
         :return: a dictionary of status code to :class:`.Response` object
         :rtype: dict[str, openapi.Response]
         """
-        responses = {}
+        responses = OrderedDict()
         for sc, serializer in response_serializers.items():
             if isinstance(serializer, str):
                 response = openapi.Response(
