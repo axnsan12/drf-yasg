@@ -16,7 +16,7 @@ drf\_yasg\.codecs
     :members:
     :undoc-members:
     :show-inheritance:
-    :exclude-members: SaneYamlDumper
+    :exclude-members: SaneYamlDumper,SaneYamlLoader
 
 drf\_yasg\.errors
 ---------------------------

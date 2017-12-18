@@ -1,9 +1,10 @@
 import json
+from collections import OrderedDict
 
 import pytest
-from ruamel import yaml
 
 from drf_yasg import openapi, codecs
+from drf_yasg.codecs import yaml_sane_load
 from drf_yasg.generators import OpenAPISchemaGenerator
 
 
@@ -42,13 +43,13 @@ def test_yaml_codec_roundtrip(codec_yaml, generator, validate_schema):
     yaml_bytes = codec_yaml.encode(swagger)
     assert b'omap' not in yaml_bytes  # ensure no ugly !!omap is outputted
     assert b'&id' not in yaml_bytes and b'*id' not in yaml_bytes  # ensure no YAML references are generated
-    validate_schema(yaml.safe_load(yaml_bytes.decode('utf-8')))
+    validate_schema(yaml_sane_load(yaml_bytes.decode('utf-8')))
 
 
 def test_yaml_and_json_match(codec_yaml, codec_json, generator):
     swagger = generator.get_schema(None, True)
-    yaml_schema = yaml.safe_load(codec_yaml.encode(swagger).decode('utf-8'))
-    json_schema = json.loads(codec_json.encode(swagger).decode('utf-8'))
+    yaml_schema = yaml_sane_load(codec_yaml.encode(swagger).decode('utf-8'))
+    json_schema = json.loads(codec_json.encode(swagger).decode('utf-8'), object_pairs_hook=OrderedDict)
     assert yaml_schema == json_schema
 
 
