@@ -290,10 +290,10 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
         err = SwaggerGenerationError("parameter of type file is supported only in a formData Parameter")
         if swagger_object_type == openapi.Schema:
             # FileField.to_representation returns URL or file name
+            result = SwaggerType(type=openapi.TYPE_STRING, read_only=True)
             if getattr(field, 'use_url', api_settings.UPLOADED_FILES_USE_URL):
-                return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)
-            else:
-                return SwaggerType(type=openapi.TYPE_STRING)
+                result.format = openapi.FORMAT_URI
+            return result
         elif swagger_object_type != openapi.Parameter:
             raise err  # pragma: no cover
         param = SwaggerType(type=openapi.TYPE_FILE)
