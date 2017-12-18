@@ -497,6 +497,9 @@ definitions:
         type: string
         format: uri
         readOnly: true
+      cover_name:
+        type: string
+        readOnly: true
   Project:
     required:
       - project_name
