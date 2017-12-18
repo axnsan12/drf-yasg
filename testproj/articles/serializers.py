@@ -12,8 +12,8 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('title', 'body', 'slug', 'date_created', 'date_modified', 'references', 'uuid')
-        read_only_fields = ('date_created', 'date_modified')
+        fields = ('title', 'body', 'slug', 'date_created', 'date_modified', 'references', 'uuid', 'cover')
+        read_only_fields = ('date_created', 'date_modified', 'cover')
         lookup_field = 'slug'
         extra_kwargs = {'body': {'help_text': 'body serializer help_text'}}
 
