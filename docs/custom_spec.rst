@@ -158,7 +158,9 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
       test_param = openapi.Parameter('test', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_BOOLEAN)
       user_response = openapi.Response('response description', UserSerializer)
 
+      # 'method' can be used to customize a single HTTP method of a view
       @swagger_auto_schema(method='get', manual_parameters=[test_param], responses={200: user_response})
+      # 'methods' can be used to apply the same modification to multiple methods
       @swagger_auto_schema(methods=['put', 'post'], request_body=UserSerializer)
       @api_view(['GET', 'PUT', 'POST'])
       def user_detail(request, pk):
@@ -187,6 +189,7 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
    .. code:: python
 
       class ArticleViewSet(viewsets.ModelViewSet):
+         # method or 'methods' can be skipped because the list_route only handles a single method (GET)
          @swagger_auto_schema(operation_description='GET /articles/today/')
          @list_route(methods=['get'])
          def today(self, request):
@@ -206,6 +209,45 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
          def partial_update(self, request, *args, **kwargs):
             ...
 
+.. Tip::
+
+   If you want to customize the generation of a method you are not implementing yourself, you can use
+   ``swagger_auto_schema`` in combination with Django's ``method_decorator``:
+
+   .. code:: python
+
+      @method_decorator(name='list', decorator=swagger_auto_schema(
+          operation_description="description from swagger_auto_schema via method_decorator"
+      ))
+      class ArticleViewSet(viewsets.ModelViewSet):
+         ...
+
+   This allows you to avoid unnecessarily overriding the method.
+
+.. Tip::
+
+   You can go even further and directly decorate the result of ``as_view``, in the same manner you would
+   override an ``@api_view`` as described above:
+
+   .. code:: python
+
+      decorated_login_view = \
+         swagger_auto_schema(
+            method='post',
+            responses={status.HTTP_200_OK: LoginResponseSerializer}
+         )(LoginView.as_view())
+
+      urlpatterns = [
+         ...
+         url(r'^login/$', decorated_login_view, name='login')
+      ]
+
+   This can allow you to avoid skipping an unnecessary *subclass* altogether.
+
+.. Warning::
+
+   However, do note that both of the methods above can lead to unexpected (and maybe surprising) results by
+   replacing/decorating methods on the base class itself.
 
 *************************
 Subclassing and extending

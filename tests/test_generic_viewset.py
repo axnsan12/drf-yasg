@@ -12,7 +12,7 @@ def test_appropriate_status_codes(swagger_dict):
 
 def test_operation_docstrings(swagger_dict):
     articles_list = swagger_dict['paths']['/articles/']
-    assert articles_list['get']['description'] == "ArticleViewSet class docstring"
+    assert articles_list['get']['description'] == "description from swagger_auto_schema via method_decorator"
     assert articles_list['post']['description'] == "ArticleViewSet class docstring"
 
     articles_detail = swagger_dict['paths']['/articles/{slug}/']

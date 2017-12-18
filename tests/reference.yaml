@@ -16,7 +16,7 @@ paths:
   /articles/:
     get:
       operationId: articles_list
-      description: ArticleViewSet class docstring
+      description: description from swagger_auto_schema via method_decorator
       parameters:
         - name: title
           in: query
@@ -493,6 +493,13 @@ definitions:
         description: should articles have UUIDs?
         type: string
         format: uuid
+      cover:
+        type: string
+        format: uri
+        readOnly: true
+      cover_name:
+        type: string
+        readOnly: true
   Project:
     required:
       - project_name

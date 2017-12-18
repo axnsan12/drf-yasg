@@ -40,3 +40,8 @@ after_success:
 branches:
   only:
     - master
+
+notifications:
+  email:
+    on_success: always
+    on_failure: always

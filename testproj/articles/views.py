@@ -1,5 +1,6 @@
 import datetime
 
+from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route
@@ -19,6 +20,9 @@ class NoPagingAutoSchema(SwaggerAutoSchema):
         return False
 
 
+@method_decorator(name='list', decorator=swagger_auto_schema(
+    operation_description="description from swagger_auto_schema via method_decorator"
+))
 class ArticleViewSet(viewsets.ModelViewSet):
     """
     ArticleViewSet class docstring

@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator
 from django.utils.encoding import force_text
 from rest_framework import serializers
 from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
+from rest_framework.settings import api_settings
 
 from . import openapi
 from .errors import SwaggerGenerationError
@@ -176,12 +177,15 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
     description = description if swagger_object_type != openapi.Items else None  # Items has no description either
 
     def SwaggerType(**instance_kwargs):
-        if swagger_object_type == openapi.Parameter:
+        if swagger_object_type == openapi.Parameter and 'required' not in instance_kwargs:
             instance_kwargs['required'] = field.required
-        if swagger_object_type != openapi.Items:
+        if swagger_object_type != openapi.Items and 'default' not in instance_kwargs:
             default = getattr(field, 'default', serializers.empty)
             if default is not serializers.empty:
                 instance_kwargs['default'] = default
+        if swagger_object_type == openapi.Schema and 'read_only' not in instance_kwargs:
+            if field.read_only:
+                instance_kwargs['read_only'] = True
         instance_kwargs.update(kwargs)
         return swagger_object_type(title=title, description=description, **instance_kwargs)
 
@@ -213,8 +217,6 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
             required = []
             for key, value in serializer.fields.items():
                 properties[key] = serializer_field_to_swagger(value, ChildSwaggerType, definitions)
-                if value.read_only:
-                    properties[key].read_only = value.read_only
                 if value.required:
                     required.append(key)
 
@@ -286,13 +288,20 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
     elif isinstance(field, serializers.FileField):
         # swagger 2.0 does not support specifics about file fields, so ImageFile gets no special treatment
         # OpenAPI 3.0 does support it, so a future implementation could handle this better
-        err = SwaggerGenerationError("parameter of type file is supported only in a formData Parameter")
-        if swagger_object_type != openapi.Parameter:
+        err = SwaggerGenerationError("FileField is supported only in a formData Parameter or response Schema")
+        if swagger_object_type == openapi.Schema:
+            # FileField.to_representation returns URL or file name
+            result = SwaggerType(type=openapi.TYPE_STRING, read_only=True)
+            if getattr(field, 'use_url', api_settings.UPLOADED_FILES_USE_URL):
+                result.format = openapi.FORMAT_URI
+            return result
+        elif swagger_object_type == openapi.Parameter:
+            param = SwaggerType(type=openapi.TYPE_FILE)
+            if param['in'] != openapi.IN_FORM:
+                raise err  # pragma: no cover
+            return param
+        else:
             raise err  # pragma: no cover
-        param = SwaggerType(type=openapi.TYPE_FILE)
-        if param['in'] != openapi.IN_FORM:
-            raise err  # pragma: no cover
-        return param
     elif isinstance(field, serializers.DictField) and swagger_object_type == openapi.Schema:
         child_schema = serializer_field_to_swagger(field.child, ChildSwaggerType, definitions)
         return SwaggerType(

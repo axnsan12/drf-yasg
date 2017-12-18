@@ -1,14 +1,54 @@
+import re
 from collections import defaultdict, OrderedDict
 
 import django.db.models
 import uritemplate
 from coreapi.compat import force_text
-from rest_framework.schemas.generators import SchemaGenerator
+from rest_framework.schemas.generators import SchemaGenerator, EndpointEnumerator as _EndpointEnumerator
 from rest_framework.schemas.inspectors import get_pk_description
 
 from . import openapi
 from .inspectors import SwaggerAutoSchema
 from .openapi import ReferenceResolver
+
+PATH_PARAMETER_RE = re.compile(r'{(?P<parameter>\w+)}')
+
+
+class EndpointEnumerator(_EndpointEnumerator):
+    def get_path_from_regex(self, path_regex):
+        return self.unescape_path(super(EndpointEnumerator, self).get_path_from_regex(path_regex))
+
+    def unescape(self, s):
+        """Unescape all backslash escapes from `s`.
+
+        :param str s: string with backslash escapes
+        :rtype: str
+        """
+        # unlike .replace('\\', ''), this corectly transforms a double backslash into a single backslash
+        return re.sub(r'\\(.)', r'\1', s)
+
+    def unescape_path(self, path):
+        """Remove backslashes from all path components outside {parameters}. This is needed because
+        Django>=2.0 ``path()``/``RoutePattern`` aggresively escapes all non-parameter path components.
+
+        **NOTE:** this might destructively affect some url regex patterns that contain metacharacters (e.g. \w, \d)
+        outside path parameter groups; if you are in this category, God help you
+
+        :param str path: path possibly containing
+        :return: the unescaped path
+        :rtype: str
+        """
+        clean_path = ''
+        while path:
+            match = PATH_PARAMETER_RE.search(path)
+            if not match:
+                clean_path += self.unescape(path)
+                break
+            clean_path += self.unescape(path[:match.start()])
+            clean_path += match.group()
+            path = path[match.end():]
+
+        return clean_path
 
 
 class OpenAPISchemaGenerator(object):
@@ -16,6 +56,7 @@ class OpenAPISchemaGenerator(object):
     This class iterates over all registered API endpoints and returns an appropriate OpenAPI 2.0 compliant schema.
     Method implementations shamelessly stolen and adapted from rest_framework SchemaGenerator.
     """
+    endpoint_enumerator_class = EndpointEnumerator
 
     def __init__(self, info, version, url=None, patterns=None, urlconf=None):
         """
@@ -79,8 +120,8 @@ class OpenAPISchemaGenerator(object):
         :return: {path: (view_class, list[(http_method, view_instance)])
         :rtype: dict
         """
-        inspector = self._gen.endpoint_inspector_cls(self._gen.patterns, self._gen.urlconf)
-        endpoints = inspector.get_api_endpoints()
+        enumerator = self.endpoint_enumerator_class(self._gen.patterns, self._gen.urlconf)
+        endpoints = enumerator.get_api_endpoints()
 
         view_paths = defaultdict(list)
         view_cls = {}
