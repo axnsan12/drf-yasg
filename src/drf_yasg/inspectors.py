@@ -69,7 +69,7 @@ class BaseInspector(object):
                 return result
 
         logger.warning("%s ignored because no inspector in %s handled it (operation: %s)", obj, inspectors, method_name)
-        return None
+        return None  # pragma: no cover
 
 
 class ViewInspector(BaseInspector):
