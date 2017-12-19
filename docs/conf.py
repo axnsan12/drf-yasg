@@ -186,6 +186,7 @@ nitpick_ignore = [
     ('py:obj', 'callable'),
     ('py:obj', 'type'),
     ('py:obj', 'OrderedDict'),
+    ('py:obj', 'None'),
 
     ('py:obj', 'coreapi.Field'),
     ('py:obj', 'BaseFilterBackend'),

@@ -162,7 +162,7 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
 
     :param rest_framework.serializers.Field field: the source field
     :param type[openapi.SwaggerDict] swagger_object_type: should be one of Schema, Parameter, Items
-    :param .ReferenceResolver definitions: used to serialize Schemas by reference
+    :param .ReferenceResolver definitions: optional, used to serialize Schemas by reference
     :param kwargs: extra attributes for constructing the object;
        if swagger_object_type is Parameter, ``name`` and ``in_`` should be provided
     :return: the swagger object
@@ -202,7 +202,6 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
     elif isinstance(field, serializers.Serializer):
         if swagger_object_type != openapi.Schema:
             raise SwaggerGenerationError("cannot instantiate nested serializer as " + swagger_object_type.__name__)
-        assert definitions is not None, "ReferenceResolver required when instantiating Schema"
 
         serializer = field
         if hasattr(serializer, '__ref_name__'):
@@ -226,7 +225,7 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
                 required=required or None,
             )
 
-        if not ref_name:
+        if not ref_name or definitions is None:
             return make_schema_definition()
 
         definitions.setdefault(ref_name, make_schema_definition)

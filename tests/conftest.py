@@ -1,11 +1,12 @@
 import copy
 import json
 import os
+from collections import OrderedDict
 
 import pytest
-from ruamel import yaml
 
 from drf_yasg import openapi, codecs
+from drf_yasg.codecs import yaml_sane_load
 from drf_yasg.generators import OpenAPISchemaGenerator
 
 
@@ -36,7 +37,7 @@ def swagger(generator):
 def swagger_dict(generator):
     swagger = generator.get_schema(None, True)
     json_bytes = codec_json().encode(swagger)
-    return json.loads(json_bytes.decode('utf-8'))
+    return json.loads(json_bytes.decode('utf-8'), object_pairs_hook=OrderedDict)
 
 
 @pytest.fixture
@@ -68,4 +69,4 @@ def redoc_settings(settings):
 @pytest.fixture
 def reference_schema():
     with open(os.path.join(os.path.dirname(__file__), 'reference.yaml')) as reference:
-        return yaml.safe_load(reference)
+        return yaml_sane_load(reference)

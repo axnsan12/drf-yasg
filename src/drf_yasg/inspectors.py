@@ -1,8 +1,10 @@
 import inspect
+import logging
 from collections import OrderedDict
 
 import coreschema
 from rest_framework import serializers, status
+from rest_framework.pagination import CursorPagination, PageNumberPagination, LimitOffsetPagination
 from rest_framework.request import is_form_media_type
 from rest_framework.schemas import AutoSchema
 from rest_framework.status import is_success
@@ -11,6 +13,8 @@ from rest_framework.viewsets import GenericViewSet
 from . import openapi
 from .errors import SwaggerGenerationError
 from .utils import serializer_field_to_swagger, no_body, is_list_view, param_list_to_odict
+
+logger = logging.getLogger(__name__)
 
 
 def force_serializer_instance(serializer):
@@ -29,27 +33,46 @@ def force_serializer_instance(serializer):
     return serializer
 
 
-class SwaggerAutoSchema(object):
-    body_methods = ('PUT', 'PATCH', 'POST')  #: methods allowed to have a request body
-
-    def __init__(self, view, path, method, overrides, components):
-        """Inspector class responsible for providing :class:`.Operation` definitions given a
+class BaseInspector(object):
+    def __init__(self, view, path, method, components):
+        """Base inspector
 
         :param view: the view associated with this endpoint
         :param str path: the path component of the operation URL
         :param str method: the http method of the operation
-        :param dict overrides: manual overrides as passed to :func:`@swagger_auto_schema <.swagger_auto_schema>`
         :param openapi.ReferenceResolver components: referenceable components
         """
-        super(SwaggerAutoSchema, self).__init__()
-        self._sch = AutoSchema()
         self.view = view
         self.path = path
         self.method = method
-        self.overrides = overrides
         self.components = components
-        self._sch.view = view
 
+    def probe_inspectors(self, inspectors, method_name, obj, **kwargs):
+        """Probe a list of inspectors with a given object. The first inspector in the list to return a value that
+        is not None wins.
+
+        :param list[type[BaseInspector]] inspectors: list of inspectors to probe
+        :param str method_name: name of the target method on the inspector
+        :param obj: first argument to inspector method
+        :param kwargs: additional arguments to inspector method
+        :return: the return value of the winning inspector, or ``None`` if no inspector handled the object
+        """
+        for inspector in inspectors:
+            assert hasattr(inspector, method_name), inspector.__name__ + " must implement " + method_name
+            assert inspect.isclass(inspector), "inspector must be a class, not an object"
+            assert issubclass(inspector, BaseInspector), "inspector must subclass of BaseInspector"
+
+            inspector = inspector(self.view, self.path, self.method, self.components)
+            method = getattr(inspector, method_name)
+            result = method(obj, **kwargs)
+            if result is not None:
+                return result
+
+        logger.warning("%s ignored because no inspector in %s handled it (operation: %s)", obj, inspectors, method_name)
+        return None  # pragma: no cover
+
+
+class ViewInspector(BaseInspector):
     def get_operation(self, operation_keys):
         """Get an :class:`.Operation` for the given API endpoint (path, method).
         This includes query, body parameters and response schemas.
@@ -58,6 +81,174 @@ class SwaggerAutoSchema(object):
           e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: openapi.Operation
         """
+        raise NotImplementedError("ViewInspector must implement get_operation()!")
+
+
+class SerializerInspector(BaseInspector):
+    def get_schema(self, serializer):
+        """Convert a DRF Serializer instance to an :class:`.openapi.Schema`.
+
+        Should return ``None`` if this inspector does not know how to handle the given `serializer`.
+
+        :param serializers.BaseSerializer serializer: the ``Serializer`` instance
+        :rtype: openapi.Schema
+        """
+        return None
+
+    def get_request_parameters(self, serializer, in_):
+        """Convert a DRF serializer into a list of :class:`.Parameter`\ s.
+
+        Should return ``None`` if this inspector does not know how to handle the given `serializer`.
+
+        :param serializers.BaseSerializer serializer: the ``Serializer`` instance
+        :param str in_: the location of the parameters, one of the `openapi.IN_*` constants
+        :rtype: list[openapi.Parameter]
+        """
+        return None
+
+
+class InlineSerializerInspector(SerializerInspector):
+    """Provide serializer conversions using :func:`.serializer_field_to_swagger`."""
+    use_definitions = False
+
+    def get_schema(self, serializer):
+        definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS) if self.use_definitions else None
+        return serializer_field_to_swagger(serializer, openapi.Schema, definitions)
+
+    def get_request_parameters(self, serializer, in_):
+        fields = getattr(serializer, 'fields', {})
+        return [
+            serializer_field_to_swagger(value, openapi.Parameter, name=key, in_=in_)
+            for key, value
+            in fields.items()
+        ]
+
+
+class ReferencingSerializerInspector(InlineSerializerInspector):
+    use_definitions = True
+
+
+class PaginatorInspector(BaseInspector):
+    def get_paginator_parameters(self, paginator):
+        """Get the pagination parameters for a single paginator **instance**.
+
+        Should return ``None`` if this inspector does not know how to handle the given `paginator`.
+
+        :param BasePagination paginator: the paginator
+        :rtype: list[openapi.Parameter]
+        """
+        return None
+
+    def get_paginated_response(self, paginator, response_schema):
+        """Add appropriate paging fields to a response :class:`.Schema`.
+
+        Should return ``None`` if this inspector does not know how to handle the given `paginator`.
+
+        :param BasePagination paginator: the paginator
+        :param openapi.Schema response_schema: the response schema that must be paged.
+        :rtype: openapi.Schema
+        """
+        return None
+
+
+class FilterInspector(BaseInspector):
+    def get_filter_parameters(self, filter_backend):
+        """Get the filter parameters for a single filter backend **instance**.
+
+        Should return ``None`` if this inspector does not know how to handle the given `filter_backend`.
+
+        :param BaseFilterBackend filter_backend: the filter backend
+        :rtype: list[openapi.Parameter]
+        """
+        return None
+
+
+class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
+    """Converts ``coreapi.Field``\ s to :class:`.openapi.Parameter`\ s for filters and paginators that implement a
+    ``get_schema_fields`` method.
+    """
+    def get_paginator_parameters(self, paginator):
+        fields = []
+        if hasattr(paginator, 'get_schema_fields'):
+            fields = paginator.get_schema_fields(self.view)
+
+        return [self.coreapi_field_to_parameter(field) for field in fields]
+
+    def get_filter_parameters(self, filter_backend):
+        fields = []
+        if hasattr(filter_backend, 'get_schema_fields'):
+            fields = filter_backend.get_schema_fields(self.view)
+        return [self.coreapi_field_to_parameter(field) for field in fields]
+
+    def coreapi_field_to_parameter(self, field):
+        """Convert an instance of `coreapi.Field` to a swagger :class:`.Parameter` object.
+
+        :param coreapi.Field field:
+        :rtype: openapi.Parameter
+        """
+        location_to_in = {
+            'query': openapi.IN_QUERY,
+            'path': openapi.IN_PATH,
+            'form': openapi.IN_FORM,
+            'body': openapi.IN_FORM,
+        }
+        coreapi_types = {
+            coreschema.Integer: openapi.TYPE_INTEGER,
+            coreschema.Number: openapi.TYPE_NUMBER,
+            coreschema.String: openapi.TYPE_STRING,
+            coreschema.Boolean: openapi.TYPE_BOOLEAN,
+        }
+        return openapi.Parameter(
+            name=field.name,
+            in_=location_to_in[field.location],
+            type=coreapi_types.get(type(field.schema), openapi.TYPE_STRING),
+            required=field.required,
+            description=field.schema.description,
+        )
+
+
+class DjangoRestResponsePagination(PaginatorInspector):
+    """Provides response schema pagination warpping for django-rest-framework's LimitOffsetPagination,
+    PageNumberPagination and CursorPagination
+    """
+    def get_paginated_response(self, paginator, response_schema):
+        assert response_schema.type == openapi.TYPE_ARRAY, "array return expected for paged response"
+        paged_schema = None
+        if isinstance(paginator, (LimitOffsetPagination, PageNumberPagination, CursorPagination)):
+            has_count = not isinstance(paginator, CursorPagination)
+            paged_schema = openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties=OrderedDict((
+                    ('count', openapi.Schema(type=openapi.TYPE_INTEGER) if has_count else None),
+                    ('next', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)),
+                    ('previous', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)),
+                    ('results', response_schema),
+                )),
+                required=['count', 'results']
+            )
+
+        return paged_schema
+
+
+class SwaggerAutoSchema(ViewInspector):
+    body_methods = ('PUT', 'PATCH', 'POST')  #: methods allowed to have a request body
+
+    # TODO: add settings for these
+    serializer_inspectors = [ReferencingSerializerInspector]  #:
+    filter_inspectors = [CoreAPICompatInspector]  #:
+    paginator_inspectors = [DjangoRestResponsePagination, CoreAPICompatInspector]  #:
+
+    def __init__(self, view, path, method, overrides, components):
+        """Inspector class responsible for providing :class:`.Operation` definitions given a view, path and method.
+
+        :param dict overrides: manual overrides as passed to :func:`@swagger_auto_schema <.swagger_auto_schema>`
+        """
+        super(SwaggerAutoSchema, self).__init__(view, path, method, components)
+        self.overrides = overrides
+        self._sch = AutoSchema()
+        self._sch.view = view
+
+    def get_operation(self, operation_keys):
         consumes = self.get_consumes()
 
         body = self.get_request_body_parameters(consumes)
@@ -105,7 +296,7 @@ class SwaggerAutoSchema(object):
         else:
             if schema is None:
                 schema = self.get_request_body_schema(serializer)
-            return [self.make_body_parameter(schema)]
+            return [self.make_body_parameter(schema)] if schema is not None else []
 
     def get_view_serializer(self):
         """Return the serializer as defined by the view's ``get_serializer()`` method.
@@ -192,26 +383,6 @@ class SwaggerAutoSchema(object):
             responses=self.get_response_schemas(response_serializers)
         )
 
-    def get_paged_response_schema(self, response_schema):
-        """Add appropriate paging fields to a response :class:`.Schema`.
-
-        :param openapi.Schema response_schema: the response schema that must be paged.
-        :rtype: openapi.Schema
-        """
-        assert response_schema.type == openapi.TYPE_ARRAY, "array return expected for paged response"
-        paged_schema = openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'count': openapi.Schema(type=openapi.TYPE_INTEGER),
-                'next': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI),
-                'previous': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI),
-                'results': response_schema,
-            },
-            required=['count', 'results']
-        )
-
-        return paged_schema
-
     def get_default_responses(self):
         """Get the default responses determined for this view from the request serializer and request method.
 
@@ -232,15 +403,16 @@ class SwaggerAutoSchema(object):
         default_schema = default_schema or ''
         if any(is_form_media_type(encoding) for encoding in self.get_consumes()):
             default_schema = ''
+        if default_schema and not isinstance(default_schema, openapi.Schema):
+            default_schema = self.serializer_to_schema(default_schema) or ''
+
         if default_schema:
-            if not isinstance(default_schema, openapi.Schema):
-                default_schema = self.serializer_to_schema(default_schema)
             if is_list_view(self.path, self.method, self.view) and self.method.lower() == 'get':
                 default_schema = openapi.Schema(type=openapi.TYPE_ARRAY, items=default_schema)
             if self.should_page():
-                default_schema = self.get_paged_response_schema(default_schema)
+                default_schema = self.get_paginated_response(default_schema) or default_schema
 
-        return {str(default_status): default_schema}
+        return OrderedDict({str(default_status): default_schema})
 
     def get_response_serializers(self):
         """Return the response codes that this view is expected to return, and the serializer for each response body.
@@ -254,7 +426,7 @@ class SwaggerAutoSchema(object):
         manual_responses = self.overrides.get('responses', None) or {}
         manual_responses = OrderedDict((str(sc), resp) for sc, resp in manual_responses.items())
 
-        responses = {}
+        responses = OrderedDict()
         if not any(is_success(int(sc)) for sc in manual_responses if sc != 'default'):
             responses = self.get_default_responses()
 
@@ -268,7 +440,7 @@ class SwaggerAutoSchema(object):
         :return: a dictionary of status code to :class:`.Response` object
         :rtype: dict[str, openapi.Response]
         """
-        responses = {}
+        responses = OrderedDict()
         for sc, serializer in response_serializers.items():
             if isinstance(serializer, str):
                 response = openapi.Response(
@@ -341,17 +513,6 @@ class SwaggerAutoSchema(object):
 
         return is_list_view(self.path, self.method, self.view)
 
-    def get_filter_backend_parameters(self, filter_backend):
-        """Get the filter parameters for a single filter backend **instance**.
-
-        :param BaseFilterBackend filter_backend: the filter backend
-        :rtype: list[openapi.Parameter]
-        """
-        fields = []
-        if hasattr(filter_backend, 'get_schema_fields'):
-            fields = filter_backend.get_schema_fields(self.view)
-        return [self.coreapi_field_to_parameter(field) for field in fields]
-
     def get_filter_parameters(self):
         """Return the parameters added to the view by its filter backends.
 
@@ -362,7 +523,7 @@ class SwaggerAutoSchema(object):
 
         fields = []
         for filter_backend in self.view.filter_backends:
-            fields += self.get_filter_backend_parameters(filter_backend())
+            fields += self.probe_inspectors(self.filter_inspectors, 'get_filter_parameters', filter_backend()) or []
 
         return fields
 
@@ -382,18 +543,6 @@ class SwaggerAutoSchema(object):
 
         return is_list_view(self.path, self.method, self.view)
 
-    def get_paginator_parameters(self, paginator):
-        """Get the pagination parameters for a single paginator **instance**.
-
-        :param BasePagination paginator: the paginator
-        :rtype: list[openapi.Parameter]
-        """
-        fields = []
-        if hasattr(paginator, 'get_schema_fields'):
-            fields = paginator.get_schema_fields(self.view)
-
-        return [self.coreapi_field_to_parameter(field) for field in fields]
-
     def get_pagination_parameters(self):
         """Return the parameters added to the view by its paginator.
 
@@ -402,7 +551,7 @@ class SwaggerAutoSchema(object):
         if not self.should_page():
             return []
 
-        return self.get_paginator_parameters(self.view.paginator)
+        return self.probe_inspectors(self.paginator_inspectors, 'get_paginator_parameters', self.view.paginator) or []
 
     def get_description(self):
         """Return an operation description determined as appropriate from the view's method and class docstrings.
@@ -426,60 +575,29 @@ class SwaggerAutoSchema(object):
         return media_types[:1]
 
     def serializer_to_schema(self, serializer):
-        """Convert a DRF Serializer instance to an :class:`.openapi.Schema`.
+        """Convert a serializer to an OpenAPI :class:`.Schema`.
 
         :param serializers.BaseSerializer serializer: the ``Serializer`` instance
-        :rtype: openapi.Schema
+        :returns: the converted :class:`.Schema`, or ``None`` in case of an unknown serializer
+        :rtype: openapi.Schema,openapi.SchemaRef,None
         """
-        definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
-        return serializer_field_to_swagger(serializer, openapi.Schema, definitions)
+        return self.probe_inspectors(self.serializer_inspectors, 'get_schema', serializer)
 
     def serializer_to_parameters(self, serializer, in_):
-        """Convert a DRF serializer into a list of :class:`.Parameter`\ s using :meth:`.field_to_parameter`
+        """Convert a serializer to a possibly empty list of :class:`.Parameter`\ s.
 
         :param serializers.BaseSerializer serializer: the ``Serializer`` instance
         :param str in_: the location of the parameters, one of the `openapi.IN_*` constants
         :rtype: list[openapi.Parameter]
         """
-        fields = getattr(serializer, 'fields', {})
-        return [
-            self.field_to_parameter(value, key, in_)
-            for key, value
-            in fields.items()
-        ]
+        return self.probe_inspectors(self.serializer_inspectors, 'get_request_parameters', serializer, in_=in_) or []
 
-    def field_to_parameter(self, field, name, in_):
-        """Convert a DRF serializer Field to a swagger :class:`.Parameter` object.
+    def get_paginated_response(self, response_schema):
+        """Add appropriate paging fields to a response :class:`.Schema`.
 
-        :param coreapi.Field field:
-        :param str name: the name of the parameter
-        :param str in_: the location of the parameter, one of the `openapi.IN_*` constants
-        :rtype: openapi.Parameter
+        :param openapi.Schema response_schema: the response schema that must be paged.
+        :returns: the paginated response class:`.Schema`, or ``None`` in case of an unknown pagination scheme
+        :rtype: openapi.Schema
         """
-        return serializer_field_to_swagger(field, openapi.Parameter, name=name, in_=in_)
-
-    def coreapi_field_to_parameter(self, field):
-        """Convert an instance of `coreapi.Field` to a swagger :class:`.Parameter` object.
-
-        :param coreapi.Field field:
-        :rtype: openapi.Parameter
-        """
-        location_to_in = {
-            'query': openapi.IN_QUERY,
-            'path': openapi.IN_PATH,
-            'form': openapi.IN_FORM,
-            'body': openapi.IN_FORM,
-        }
-        coreapi_types = {
-            coreschema.Integer: openapi.TYPE_INTEGER,
-            coreschema.Number: openapi.TYPE_NUMBER,
-            coreschema.String: openapi.TYPE_STRING,
-            coreschema.Boolean: openapi.TYPE_BOOLEAN,
-        }
-        return openapi.Parameter(
-            name=field.name,
-            in_=location_to_in[field.location],
-            type=coreapi_types.get(type(field.schema), openapi.TYPE_STRING),
-            required=field.required,
-            description=field.schema.description,
-        )
+        return self.probe_inspectors(self.paginator_inspectors, 'get_paginated_response',
+                                     self.view.paginator, response_schema=response_schema)

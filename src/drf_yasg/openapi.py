@@ -61,6 +61,24 @@ def make_swagger_name(attribute_name):
     return camelize(attribute_name.rstrip('_'), uppercase_first_letter=False)
 
 
+def filter_none(obj):
+    """Remove ``None`` values from tuples, lists or dictionaries. Return other objects as-is.
+
+    :param obj:
+    :return: collection with ``None`` values removed
+    """
+    if obj is None:
+        return None
+    new_obj = None
+    if isinstance(obj, dict):
+        new_obj = type(obj)((k, v) for k, v in obj.items() if k is not None and v is not None)
+    if isinstance(obj, (list, tuple)):
+        new_obj = type(obj)(v for v in obj if v is not None)
+    if new_obj is not None and len(new_obj) != len(obj):
+        return new_obj
+    return obj
+
+
 def _bare_SwaggerDict(cls):
     assert issubclass(cls, SwaggerDict)
     result = cls.__new__(cls)
@@ -230,7 +248,7 @@ class Swagger(SwaggerDict):
         self.base_path = '/'
 
         self.paths = paths
-        self.definitions = definitions
+        self.definitions = filter_none(definitions)
         self._insert_extras__()
 
 
@@ -270,7 +288,7 @@ class PathItem(SwaggerDict):
         self.patch = patch
         self.delete = delete
         self.options = options
-        self.parameters = parameters
+        self.parameters = filter_none(parameters)
         self._insert_extras__()
 
 
@@ -290,11 +308,11 @@ class Operation(SwaggerDict):
         super(Operation, self).__init__(**extra)
         self.operation_id = operation_id
         self.description = description
-        self.parameters = [param for param in parameters if param is not None]
+        self.parameters = filter_none(parameters)
         self.responses = responses
-        self.consumes = consumes
-        self.produces = produces
-        self.tags = tags
+        self.consumes = filter_none(consumes)
+        self.produces = filter_none(produces)
+        self.tags = filter_none(tags)
         self._insert_extras__()
 
 
@@ -373,9 +391,9 @@ class Schema(SwaggerDict):
             raise AssertionError(
                 "the `requires` attribute of schema must be an array of required properties, not a boolean!")
         self.description = description
-        self.required = required
+        self.required = filter_none(required)
         self.type = type
-        self.properties = properties
+        self.properties = filter_none(properties)
         self.additional_properties = additional_properties
         self.format = format
         self.enum = enum

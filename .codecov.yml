@@ -11,15 +11,15 @@ coverage:
       default:
         enabled: yes
         target: auto
-        threshold: 0%
+        threshold: 100%
         if_no_uploads: error
         if_ci_failed: error
 
     patch:
       default:
         enabled: yes
-        target: 80%
-        threshold: 0%
+        target: 100%
+        threshold: 100%
         if_no_uploads: error
         if_ci_failed: error
 

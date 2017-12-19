@@ -495,8 +495,8 @@ definitions:
         format: uuid
       cover:
         type: string
-        format: uri
         readOnly: true
+        format: uri
       cover_name:
         type: string
         readOnly: true
