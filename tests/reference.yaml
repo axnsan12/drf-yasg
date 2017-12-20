@@ -1054,6 +1054,9 @@ definitions:
         type: string
         format: date
         readOnly: true
+      owner:
+        type: string
+        default: CurrentUserDefault()
 securityDefinitions:
   basic:
     type: basic

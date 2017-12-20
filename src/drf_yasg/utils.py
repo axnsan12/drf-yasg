@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator
 from django.utils.encoding import force_text
 from rest_framework import serializers
 from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
+from rest_framework.serializers import CurrentUserDefault
 from rest_framework.settings import api_settings
 
 from . import openapi
@@ -182,6 +183,8 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
         if swagger_object_type != openapi.Items and 'default' not in instance_kwargs:
             default = getattr(field, 'default', serializers.empty)
             if default is not serializers.empty:
+                if isinstance(default, CurrentUserDefault):
+                    default = str(default)
                 instance_kwargs['default'] = default
         if swagger_object_type == openapi.Schema and 'read_only' not in instance_kwargs:
             if field.read_only:

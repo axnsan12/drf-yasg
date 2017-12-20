@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 from coreapi.compat import force_bytes
 from future.utils import raise_from
+from rest_framework.serializers import CurrentUserDefault
 from ruamel import yaml
 
 from . import openapi
