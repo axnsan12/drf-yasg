@@ -114,7 +114,8 @@ class SwaggerAutoSchema(object):
         """
         if not hasattr(self.view, 'get_serializer'):
             return None
-        return self.view.get_serializer()
+        kwargs = {'context': self.view.get_serializer_context()}
+        return self.view.get_serializer(**kwargs)
 
     def get_request_serializer(self):
         """Return the request serializer (used for parsing the request payload) for this endpoint.
