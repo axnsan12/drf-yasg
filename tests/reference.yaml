@@ -1054,6 +1054,9 @@ definitions:
         type: string
         format: date
         readOnly: true
+      owner:
+        type: string
+        description: Default to logged in user if not specified at creation time.
 securityDefinitions:
   basic:
     type: basic

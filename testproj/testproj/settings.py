@@ -128,3 +128,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 TEST_RUNNER = 'testproj.runner.PytestTestRunner'
+
+AUTH_USER_MODEL = 'users.User'
