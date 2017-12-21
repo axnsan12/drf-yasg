@@ -45,8 +45,8 @@ class ArticleViewSet(viewsets.ModelViewSet):
     max_page_size = 5
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_fields = ('title',)
-    ordering_fields = ('date_modified',)
-    ordering = ('username',)
+    ordering_fields = ('date_modified','date_created')
+    ordering = ('date_created',)
 
     @swagger_auto_schema(auto_schema=NoPagingAutoSchema)
     @list_route(methods=['get'])

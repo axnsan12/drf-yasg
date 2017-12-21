@@ -163,7 +163,14 @@
             plugins: [
                 SwaggerUIBundle.plugins.DownloadUrl
             ],
-            layout: "StandaloneLayout"
+            layout: "StandaloneLayout",
+            filter: true,
+            requestInterceptor: function(request) {
+                console.log(request);
+                var headers = request.headers || {};
+                headers["X-CSRFToken"] = document.querySelector("[name=csrfmiddlewaretoken]").value;
+                return request;
+            }
         };
 
         var swaggerSettings = {};

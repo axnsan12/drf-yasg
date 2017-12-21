@@ -30,13 +30,15 @@ class SnippetSerializer(serializers.Serializer):
     language = LanguageSerializer(help_text="Sample help text for language")
     styles = serializers.MultipleChoiceField(choices=STYLE_CHOICES, default=['friendly'])
     lines = serializers.ListField(child=serializers.IntegerField(), allow_empty=True, allow_null=True, required=False)
-    example_projects = serializers.ListSerializer(child=ExampleProjectSerializer())
-    difficulty_factor = serializers.FloatField(help_text="this is here just to test FloatField")
+    example_projects = serializers.ListSerializer(child=ExampleProjectSerializer(), read_only=True)
+    difficulty_factor = serializers.FloatField(help_text="this is here just to test FloatField", read_only=True)
 
     def create(self, validated_data):
         """
         Create and return a new `Snippet` instance, given the validated data.
         """
+        del validated_data['styles']
+        del validated_data['lines']
         return Snippet.objects.create(**validated_data)
 
     def update(self, instance, validated_data):

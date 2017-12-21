@@ -459,8 +459,6 @@ definitions:
     required:
       - title
       - body
-      - references
-      - uuid
     type: object
     properties:
       title:
@@ -489,14 +487,16 @@ definitions:
           description: but i needed to test these 2 fields somehow
           type: string
           format: uri
+        readOnly: true
       uuid:
         description: should articles have UUIDs?
         type: string
         format: uuid
+        readOnly: true
       cover:
         type: string
-        format: uri
         readOnly: true
+        format: uri
       cover_name:
         type: string
         readOnly: true
@@ -516,8 +516,6 @@ definitions:
     required:
       - code
       - language
-      - example_projects
-      - difficulty_factor
     type: object
     properties:
       id:
@@ -1020,9 +1018,11 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Project'
+        readOnly: true
       difficulty_factor:
         description: this is here just to test FloatField
         type: number
+        readOnly: true
   UserSerializerrr:
     required:
       - username
