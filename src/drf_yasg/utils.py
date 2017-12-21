@@ -238,8 +238,9 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
             items=child_schema,
             unique_items=True,  # is this OK?
         )
+    elif isinstance(field, serializers.PrimaryKeyRelatedField):
+        return SwaggerType(type=openapi.TYPE_INTEGER)
     elif isinstance(field, serializers.RelatedField):
-        # TODO: infer type for PrimaryKeyRelatedField?
         return SwaggerType(type=openapi.TYPE_STRING)
     # ------ CHOICES
     elif isinstance(field, serializers.MultipleChoiceField):
