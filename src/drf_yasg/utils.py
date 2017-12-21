@@ -182,9 +182,8 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
         if swagger_object_type != openapi.Items and 'default' not in instance_kwargs:
             default = getattr(field, 'default', serializers.empty)
             if default is not serializers.empty:
-                if callable(default) and hasattr(default, 'set_context'):
-                    default = str(default)
-                instance_kwargs['default'] = default
+                if not (callable(default) and hasattr(default, 'set_context')):
+                    instance_kwargs['default'] = default
         if swagger_object_type == openapi.Schema and 'read_only' not in instance_kwargs:
             if field.read_only:
                 instance_kwargs['read_only'] = True

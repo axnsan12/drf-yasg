@@ -10,7 +10,9 @@ class UserSerializerrr(serializers.ModelSerializer):
     last_connected_at = serializers.DateField(help_text="really?", read_only=True)
     owner = serializers.PrimaryKeyRelatedField(
         queryset=get_user_model().objects.all(),
-        default=serializers.CurrentUserDefault())
+        default=serializers.CurrentUserDefault(),
+        help_text='Default to logged in user if not specified at creation time.',
+    )
 
     class Meta:
         model = get_user_model()

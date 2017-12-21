@@ -1056,7 +1056,7 @@ definitions:
         readOnly: true
       owner:
         type: string
-        default: CurrentUserDefault()
+        description: Default to logged in user if not specified at creation time.
 securityDefinitions:
   basic:
     type: basic
