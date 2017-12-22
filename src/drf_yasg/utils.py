@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 from django.core.validators import RegexValidator
+from django.db import models
 from django.utils.encoding import force_text
 from rest_framework import serializers
 from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
@@ -11,6 +12,12 @@ from .errors import SwaggerGenerationError
 
 #: used to forcibly remove the body of a request via :func:`.swagger_auto_schema`
 no_body = object()
+
+
+def get_schema_type_from_model_field(model_field):
+    if isinstance(model_field, models.AutoField):
+        return openapi.TYPE_INTEGER
+    return openapi.TYPE_STRING
 
 
 def is_list_view(path, method, view):
@@ -239,7 +246,8 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
             unique_items=True,  # is this OK?
         )
     elif isinstance(field, serializers.PrimaryKeyRelatedField):
-        return SwaggerType(type=openapi.TYPE_INTEGER)
+        model = field.queryset.model
+        return SwaggerType(type=get_schema_type_from_model_field(model._meta.pk))
     elif isinstance(field, serializers.RelatedField):
         return SwaggerType(type=openapi.TYPE_STRING)
     # ------ CHOICES

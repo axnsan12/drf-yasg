@@ -1,7 +1,6 @@
 import re
 from collections import defaultdict, OrderedDict
 
-import django.db.models
 import uritemplate
 from coreapi.compat import force_text
 from rest_framework.schemas.generators import SchemaGenerator, EndpointEnumerator as _EndpointEnumerator
@@ -10,6 +9,7 @@ from rest_framework.schemas.inspectors import get_pk_description
 from . import openapi
 from .inspectors import SwaggerAutoSchema
 from .openapi import ReferenceResolver
+from .utils import get_schema_type_from_model_field
 
 PATH_PARAMETER_RE = re.compile(r'{(?P<parameter>\w+)}')
 
@@ -221,6 +221,8 @@ class OpenAPISchemaGenerator(object):
                     model_field = model._meta.get_field(variable)
                 except Exception:  # pragma: no cover
                     model_field = None
+                else:
+                    type = get_schema_type_from_model_field(model_field)
 
                 if model_field is not None and model_field.help_text:
                     description = force_text(model_field.help_text)
@@ -229,9 +231,6 @@ class OpenAPISchemaGenerator(object):
 
                 if hasattr(view_cls, 'lookup_value_regex') and getattr(view_cls, 'lookup_field', None) == variable:
                     pattern = view_cls.lookup_value_regex
-                elif isinstance(model_field, django.db.models.AutoField):
-                    type = openapi.TYPE_INTEGER
-
             field = openapi.Parameter(
                 name=variable,
                 required=True,
