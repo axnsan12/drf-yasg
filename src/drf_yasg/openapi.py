@@ -403,6 +403,7 @@ class Schema(SwaggerDict):
         self.enum = enum
         self.pattern = pattern
         self.items = items
+        self.read_only = extra.pop('read_only', None)
         self._insert_extras__()
 
 

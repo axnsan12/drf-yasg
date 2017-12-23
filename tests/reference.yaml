@@ -1035,8 +1035,8 @@ definitions:
       difficulty_factor:
         description: this is here just to test FloatField
         type: number
-        default: 6.9
         readOnly: true
+        default: 6.9
   UserSerializerrr:
     required:
       - username
@@ -1079,8 +1079,8 @@ definitions:
         items:
           type: string
           readOnly: true
-        uniqueItems: true
         readOnly: true
+        uniqueItems: true
 securityDefinitions:
   basic:
     type: basic
