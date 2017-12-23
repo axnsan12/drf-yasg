@@ -47,7 +47,8 @@ def is_list_view(path, method, view):
 
 
 def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_body=None, query_serializer=None,
-                        manual_parameters=None, operation_description=None, responses=None):
+                        manual_parameters=None, operation_id=None, operation_description=None, responses=None,
+                        serializer_inspectors=None, filter_inspectors=None, paginator_inspectors=None):
     """Decorate a view method to customize the :class:`.Operation` object generated from it.
 
     `method` and `methods` are mutually exclusive and must only be present when decorating a view method that accepts
@@ -84,6 +85,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
 
         It is an error to supply ``form`` parameters when the request does not consume form-data.
 
+    :param str operation_id: operation ID override; the operation ID must be unique accross the whole API
     :param str operation_description: operation description override
     :param dict[str,(.Schema,.SchemaRef,.Response,str,Serializer)] responses: a dict of documented manual responses
         keyed on response status code. If no success (``2xx``) response is given, one will automatically be
@@ -98,6 +100,12 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
         * a :class:`.Response` object will be used as-is; however if its ``schema`` attribute is a ``Serializer``,
           it will automatically be converted into a :class:`.Schema`
 
+    :param list[.SerializerInspector] serializer_inspectors: extra serializer inspectors;
+        these will be tried before :attr:`.serializer_inspectors` on the :class:`.SwaggerAutoSchema` instance
+    :param list[.FilterInspector] filter_inspectors: extra filter inspectors;
+        these will be tried before :attr:`.filter_inspectors` on the :class:`.SwaggerAutoSchema` instance
+    :param list[.PaginatorInspector] paginator_inspectors: extra paginator inspectors;
+        these will be tried before :attr:`.paginator_inspectors` on the :class:`.SwaggerAutoSchema` instance
     """
 
     def decorator(view_method):
@@ -106,8 +114,12 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
             'request_body': request_body,
             'query_serializer': query_serializer,
             'manual_parameters': manual_parameters,
+            'operation_id': operation_id,
             'operation_description': operation_description,
             'responses': responses,
+            'filter_inspectors': list(filter_inspectors) if filter_inspectors else None,
+            'paginator_inspectors': list(paginator_inspectors) if filter_inspectors else None,
+            'serializer_inspectors': list(serializer_inspectors) if serializer_inspectors else None,
         }
         data = {k: v for k, v in data.items() if v is not None}
 
@@ -120,7 +132,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
             # detail_route, list_route or api_view
             assert bool(http_method_names) != bool(bind_to_methods), "this should never happen"
             available_methods = http_method_names + bind_to_methods
-            existing_data = getattr(view_method, 'swagger_auto_schema', {})
+            existing_data = getattr(view_method, '_swagger_auto_schema', {})
 
             if http_method_names:
                 _route = "api_view"
@@ -145,12 +157,12 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
                 existing_data.update((mth.lower(), data) for mth in _methods)
             else:
                 existing_data[available_methods[0]] = data
-            view_method.swagger_auto_schema = existing_data
+            view_method._swagger_auto_schema = existing_data
         else:
             assert method is None and methods is None, \
                 "the methods argument should only be specified when decorating a detail_route or list_route; you " \
                 "should also ensure that you put the swagger_auto_schema decorator AFTER (above) the _route decorator"
-            view_method.swagger_auto_schema = data
+            view_method._swagger_auto_schema = data
 
         return view_method
 

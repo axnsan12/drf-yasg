@@ -10,6 +10,7 @@ from rest_framework.schemas import AutoSchema
 from rest_framework.status import is_success
 from rest_framework.viewsets import GenericViewSet
 
+from drf_yasg.app_settings import swagger_settings
 from . import openapi
 from .errors import SwaggerGenerationError
 from .utils import serializer_field_to_swagger, no_body, is_list_view, param_list_to_odict
@@ -70,18 +71,6 @@ class BaseInspector(object):
 
         logger.warning("%s ignored because no inspector in %s handled it (operation: %s)", obj, inspectors, method_name)
         return None  # pragma: no cover
-
-
-class ViewInspector(BaseInspector):
-    def get_operation(self, operation_keys):
-        """Get an :class:`.Operation` for the given API endpoint (path, method).
-        This includes query, body parameters and response schemas.
-
-        :param tuple[str] operation_keys: an array of keys describing the hierarchical layout of this view in the API;
-          e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
-        :rtype: openapi.Operation
-        """
-        raise NotImplementedError("ViewInspector must implement get_operation()!")
 
 
 class SerializerInspector(BaseInspector):
@@ -230,21 +219,131 @@ class DjangoRestResponsePagination(PaginatorInspector):
         return paged_schema
 
 
-class SwaggerAutoSchema(ViewInspector):
+class ViewInspector(BaseInspector):
     body_methods = ('PUT', 'PATCH', 'POST')  #: methods allowed to have a request body
 
-    # TODO: add settings for these
-    serializer_inspectors = [ReferencingSerializerInspector]  #:
-    filter_inspectors = [CoreAPICompatInspector]  #:
-    paginator_inspectors = [DjangoRestResponsePagination, CoreAPICompatInspector]  #:
+    serializer_inspectors = swagger_settings.DEFAULT_SERIALIZER_INSPECTORS  #:
+    filter_inspectors = swagger_settings.DEFAULT_FILTER_INSPECTORS  #:
+    paginator_inspectors = swagger_settings.DEFAULT_PAGINATOR_INSPECTORS  #:
 
-    def __init__(self, view, path, method, overrides, components):
+    def __init__(self, view, path, method, components, overrides):
         """Inspector class responsible for providing :class:`.Operation` definitions given a view, path and method.
 
         :param dict overrides: manual overrides as passed to :func:`@swagger_auto_schema <.swagger_auto_schema>`
         """
-        super(SwaggerAutoSchema, self).__init__(view, path, method, components)
+        super(ViewInspector, self).__init__(view, path, method, components)
         self.overrides = overrides
+        self._prepend_inspector_overrides('serializer_inspectors')
+        self._prepend_inspector_overrides('filter_inspectors')
+        self._prepend_inspector_overrides('paginator_inspectors')
+
+    def _prepend_inspector_overrides(self, inspectors):
+        extra_inspectors = self.overrides.get(inspectors, None)
+        if extra_inspectors:
+            default_inspectors = [insp for insp in getattr(self, inspectors) if insp not in extra_inspectors]
+            setattr(self, inspectors, extra_inspectors + default_inspectors)
+
+    def get_operation(self, operation_keys):
+        """Get an :class:`.Operation` for the given API endpoint (path, method).
+        This includes query, body parameters and response schemas.
+
+        :param tuple[str] operation_keys: an array of keys describing the hierarchical layout of this view in the API;
+          e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
+        :rtype: openapi.Operation
+        """
+        raise NotImplementedError("ViewInspector must implement get_operation()!")
+
+    # methods below provided as default implementations for probing inspectors
+
+    def should_filter(self):
+        """Determine whether filter backend parameters should be included for this request.
+
+        :rtype: bool
+        """
+        if not getattr(self.view, 'filter_backends', None):
+            return False
+
+        if self.method.lower() not in ["get", "delete"]:
+            return False
+
+        if not isinstance(self.view, GenericViewSet):
+            return True
+
+        return is_list_view(self.path, self.method, self.view)
+
+    def get_filter_parameters(self):
+        """Return the parameters added to the view by its filter backends.
+
+        :rtype: list[openapi.Parameter]
+        """
+        if not self.should_filter():
+            return []
+
+        fields = []
+        for filter_backend in self.view.filter_backends:
+            fields += self.probe_inspectors(self.filter_inspectors, 'get_filter_parameters', filter_backend()) or []
+
+        return fields
+
+    def should_page(self):
+        """Determine whether paging parameters and structure should be added to this operation's request and response.
+
+        :rtype: bool
+        """
+        if not hasattr(self.view, 'paginator'):
+            return False
+
+        if self.view.paginator is None:
+            return False
+
+        if self.method.lower() != 'get':
+            return False
+
+        return is_list_view(self.path, self.method, self.view)
+
+    def get_pagination_parameters(self):
+        """Return the parameters added to the view by its paginator.
+
+        :rtype: list[openapi.Parameter]
+        """
+        if not self.should_page():
+            return []
+
+        return self.probe_inspectors(self.paginator_inspectors, 'get_paginator_parameters', self.view.paginator) or []
+
+    def serializer_to_schema(self, serializer):
+        """Convert a serializer to an OpenAPI :class:`.Schema`.
+
+        :param serializers.BaseSerializer serializer: the ``Serializer`` instance
+        :returns: the converted :class:`.Schema`, or ``None`` in case of an unknown serializer
+        :rtype: openapi.Schema,openapi.SchemaRef,None
+        """
+        return self.probe_inspectors(self.serializer_inspectors, 'get_schema', serializer)
+
+    def serializer_to_parameters(self, serializer, in_):
+        """Convert a serializer to a possibly empty list of :class:`.Parameter`\ s.
+
+        :param serializers.BaseSerializer serializer: the ``Serializer`` instance
+        :param str in_: the location of the parameters, one of the `openapi.IN_*` constants
+        :rtype: list[openapi.Parameter]
+        """
+        return self.probe_inspectors(self.serializer_inspectors, 'get_request_parameters', serializer, in_=in_) or []
+
+    def get_paginated_response(self, response_schema):
+        """Add appropriate paging fields to a response :class:`.Schema`.
+
+        :param openapi.Schema response_schema: the response schema that must be paged.
+        :returns: the paginated response class:`.Schema`, or ``None`` in case of an unknown pagination scheme
+        :rtype: openapi.Schema
+        """
+        return self.probe_inspectors(self.paginator_inspectors, 'get_paginated_response',
+                                     self.view.paginator, response_schema=response_schema)
+
+
+class SwaggerAutoSchema(ViewInspector):
+
+    def __init__(self, view, path, method, components, overrides):
+        super(SwaggerAutoSchema, self).__init__(view, path, method, components, overrides)
         self._sch = AutoSchema()
         self._sch.view = view
 
@@ -257,12 +356,14 @@ class SwaggerAutoSchema(ViewInspector):
         parameters = [param for param in parameters if param is not None]
         parameters = self.add_manual_parameters(parameters)
 
+        operation_id = self.get_operation_id(operation_keys)
         description = self.get_description()
+        tags = self.get_tags(operation_keys)
 
         responses = self.get_responses()
 
         return openapi.Operation(
-            operation_id='_'.join(operation_keys),
+            operation_id=operation_id,
             description=description,
             responses=responses,
             parameters=parameters,
@@ -497,61 +598,18 @@ class SwaggerAutoSchema(ViewInspector):
 
         return natural_parameters + serializer_parameters
 
-    def should_filter(self):
-        """Determine whether filter backend parameters should be included for this request.
+    def get_operation_id(self, operation_keys):
+        """Return an unique ID for this operation. The ID must be unique across
+        all :class:`.Operation` objects in the API.
 
-        :rtype: bool
+        :param tuple[str] operation_keys: an array of keys derived from the pathdescribing the hierarchical layout
+            of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
+        :rtype: str
         """
-        if not getattr(self.view, 'filter_backends', None):
-            return False
-
-        if self.method.lower() not in ["get", "delete"]:
-            return False
-
-        if not isinstance(self.view, GenericViewSet):
-            return True
-
-        return is_list_view(self.path, self.method, self.view)
-
-    def get_filter_parameters(self):
-        """Return the parameters added to the view by its filter backends.
-
-        :rtype: list[openapi.Parameter]
-        """
-        if not self.should_filter():
-            return []
-
-        fields = []
-        for filter_backend in self.view.filter_backends:
-            fields += self.probe_inspectors(self.filter_inspectors, 'get_filter_parameters', filter_backend()) or []
-
-        return fields
-
-    def should_page(self):
-        """Determine whether paging parameters and structure should be added to this operation's request and response.
-
-        :rtype: bool
-        """
-        if not hasattr(self.view, 'paginator'):
-            return False
-
-        if self.view.paginator is None:
-            return False
-
-        if self.method.lower() != 'get':
-            return False
-
-        return is_list_view(self.path, self.method, self.view)
-
-    def get_pagination_parameters(self):
-        """Return the parameters added to the view by its paginator.
-
-        :rtype: list[openapi.Parameter]
-        """
-        if not self.should_page():
-            return []
-
-        return self.probe_inspectors(self.paginator_inspectors, 'get_paginator_parameters', self.view.paginator) or []
+        operation_id = self.overrides.get('operation_id', '')
+        if not operation_id:
+            operation_id = '_'.join(operation_keys)
+        return operation_id
 
     def get_description(self):
         """Return an operation description determined as appropriate from the view's method and class docstrings.
@@ -564,6 +622,16 @@ class SwaggerAutoSchema(ViewInspector):
             description = self._sch.get_description(self.path, self.method)
         return description
 
+    def get_tags(self, operation_keys):
+        """Get a list of tags for this operation. Tags determine how operations relate with each other, and in the UI
+        each tag will show as a group containing the operations that use it.
+
+        :param tuple[str] operation_keys: an array of keys derived from the pathdescribing the hierarchical layout
+            of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
+        :rtype: list[str]
+        """
+        return [operation_keys[0]]
+
     def get_consumes(self):
         """Return the MIME types this endpoint can consume.
 
@@ -573,31 +641,3 @@ class SwaggerAutoSchema(ViewInspector):
         if all(is_form_media_type(encoding) for encoding in media_types):
             return media_types
         return media_types[:1]
-
-    def serializer_to_schema(self, serializer):
-        """Convert a serializer to an OpenAPI :class:`.Schema`.
-
-        :param serializers.BaseSerializer serializer: the ``Serializer`` instance
-        :returns: the converted :class:`.Schema`, or ``None`` in case of an unknown serializer
-        :rtype: openapi.Schema,openapi.SchemaRef,None
-        """
-        return self.probe_inspectors(self.serializer_inspectors, 'get_schema', serializer)
-
-    def serializer_to_parameters(self, serializer, in_):
-        """Convert a serializer to a possibly empty list of :class:`.Parameter`\ s.
-
-        :param serializers.BaseSerializer serializer: the ``Serializer`` instance
-        :param str in_: the location of the parameters, one of the `openapi.IN_*` constants
-        :rtype: list[openapi.Parameter]
-        """
-        return self.probe_inspectors(self.serializer_inspectors, 'get_request_parameters', serializer, in_=in_) or []
-
-    def get_paginated_response(self, response_schema):
-        """Add appropriate paging fields to a response :class:`.Schema`.
-
-        :param openapi.Schema response_schema: the response schema that must be paged.
-        :returns: the paginated response class:`.Schema`, or ``None`` in case of an unknown pagination scheme
-        :rtype: openapi.Schema
-        """
-        return self.probe_inspectors(self.paginator_inspectors, 'get_paginated_response',
-                                     self.view.paginator, response_schema=response_schema)

@@ -294,7 +294,7 @@ class PathItem(SwaggerDict):
 
 class Operation(SwaggerDict):
     def __init__(self, operation_id, responses, parameters=None, consumes=None,
-                 produces=None, description=None, tags=None, **extra):
+                 produces=None, summary=None, description=None, tags=None, **extra):
         """Information about an API operation (path + http method combination)
 
         :param str operation_id: operation ID, should be unique across all operations
@@ -302,11 +302,13 @@ class Operation(SwaggerDict):
         :param list[.Parameter] parameters: parameters accepted
         :param list[str] consumes: content types accepted
         :param list[str] produces: content types produced
-        :param str description: operation description
+        :param str summary: operation summary; should be < 120 characters
+        :param str description: operation description; can be of any length and supports markdown
         :param list[str] tags: operation tags
         """
         super(Operation, self).__init__(**extra)
         self.operation_id = operation_id
+        self.summary = summary
         self.description = description
         self.parameters = filter_none(parameters)
         self.responses = responses
@@ -499,7 +501,7 @@ class ReferenceResolver(object):
             self._objects[scope] = OrderedDict()
 
     def with_scope(self, scope):
-        """Return a new :class:`.ReferenceResolver` whose scope is defaulted and forced to `scope`.
+        """Return a view into this :class:`.ReferenceResolver` whose scope is defaulted and forced to `scope`.
 
         :param str scope: target scope, must be in this resolver's `scopes`
         :return: the bound resolver
