@@ -4,6 +4,17 @@ Changelog
 
 
 *********
+**1.0.6**
+*********
+
+- **FIXED:** Swagger UI "Try it out!" should now work with Django login
+- **FIXED:** callable ``default`` values on serializer fields will now be properly called (:pr:`24`, :issue:`25`)
+- **IMPROVED:** updated ``swagger-ui`` to version 3.8.0
+- **IMPROVED:** ``PrimaryKeyRelatedField`` and ``SlugRelatedField`` will now have
+  appropriate types based on the related model (:pr:`26`)
+- **IMPROVED:** mock views will now have a bound request even with ``public=False`` (:pr:`23`)
+
+*********
 **1.0.5**
 *********
 

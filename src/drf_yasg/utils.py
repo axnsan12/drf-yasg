@@ -214,7 +214,7 @@ def inspect_model_field(model, model_field):
             if isinstance(model_field, model_field_class):
                 swagger_type, format = tf
                 break
-        else:
+        else:  # pragma: no cover
             swagger_type, format = None, None
 
         if format is None or format == openapi.FORMAT_SLUG:
@@ -274,7 +274,7 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
                         if hasattr(default, 'set_context'):
                             default.set_context(field)
                         default = default()
-                    except Exception as e:
+                    except Exception as e:  # pragma: no cover
                         logger.warning("default for %s is callable but it raised an exception when "
                                        "called; 'default' field will not be added to schema", field, exc_info=True)
                         default = None
@@ -285,7 +285,7 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
                         # JSON roundtrip ensures that the value is valid JSON;
                         # for example, sets get transformed into lists
                         default = json.loads(json.dumps(default, cls=encoders.JSONEncoder))
-                    except Exception:
+                    except Exception:  # pragma: no cover
                         logger.warning("'default' on schema for %s will not be set because "
                                        "to_representation raised an exception", field, exc_info=True)
                         default = None
@@ -367,7 +367,7 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
         try:
             model = field.queryset.model
             pk_field = model._meta.pk
-        except Exception:
+        except Exception:  # pragma: no cover
             logger.warning("an exception was raised when attempting to extract the primary key related to %s; "
                            "falling back to plain string" % field, exc_info=True)
         else:
