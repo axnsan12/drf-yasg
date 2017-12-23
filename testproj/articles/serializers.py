@@ -1,11 +1,12 @@
 from rest_framework import serializers
 
 from articles.models import Article
+from django.utils.translation import ugettext_lazy as _
 
 
 class ArticleSerializer(serializers.ModelSerializer):
     references = serializers.DictField(
-        help_text="this is a really bad example",
+        help_text=_("this is a really bad example"),
         child=serializers.URLField(help_text="but i needed to test these 2 fields somehow"),
         read_only=True,
     )
@@ -23,8 +24,8 @@ class ArticleSerializer(serializers.ModelSerializer):
             'body': {'help_text': 'body serializer help_text'},
             'author': {
                 'default': serializers.CurrentUserDefault(),
-                'help_text': "The ID of the user that created this article; if none is provided, "
-                             "defaults to the currently logged in user."
+                'help_text': _("The ID of the user that created this article; if none is provided, "
+                               "defaults to the currently logged in user.")
             },
         }
 

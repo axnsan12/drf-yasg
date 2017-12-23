@@ -253,11 +253,11 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
 Subclassing and extending
 *************************
 
-For more advanced control you can subclass :class:`.inspectors.SwaggerAutoSchema` - see the documentation page
+For more advanced control you can subclass :class:`~.inspectors.SwaggerAutoSchema` - see the documentation page
 for a list of methods you can override.
 
 You can put your custom subclass to use by setting it on a view method using the
-:func:`@swagger_auto_schema <.swagger_auto_schema>` decorator described above.
+:ref:`@swagger_auto_schema <custom-spec-swagger-auto-schema>` decorator described above.
 
 If you need to control things at a higher level than :class:`.Operation` objects (e.g. overall document structure,
 vendor extensions in metadata) you can also subclass :class:`.OpenAPISchemaGenerator` - again, see the documentation
@@ -265,3 +265,9 @@ page for a list of its methods.
 
 This custom generator can be put to use by setting it as the :attr:`.generator_class` of a :class:`.SchemaView` using
 :func:`.get_schema_view`.
+
+For customizing behavior related to specific field, serializer, filter or paginator classes you can implement the
+:class:`~.inspectors.FieldInspector`, :class:`~.inspectors.SerializerInspector`, :class:`~.inspectors.FilterInspector`,
+:class:`~.inspectors.PaginatorInspector` classes and use them with
+:ref:`@swagger_auto_schema <custom-spec-swagger-auto-schema>` or one of the
+:ref:`related settings <default-class-settings>`.

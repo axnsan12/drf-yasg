@@ -13,7 +13,7 @@ from ..utils import filter_none
 
 
 class InlineSerializerInspector(SerializerInspector):
-    """Provide serializer conversions using :meth:`.FieldInspector.field_to_swagger_object`."""
+    """Provides serializer conversions using :meth:`.FieldInspector.field_to_swagger_object`."""
 
     #: whether to output :class:`.Schema` definitions inline or into the ``definitions`` section
     use_definitions = False
@@ -319,7 +319,9 @@ def get_basic_type_info(field):
 
 
 class SimpleFieldInspector(FieldInspector):
-    """Provide conversions for simple fields which set only ``type``, ``format``, ``pattern`` and min/max validators."""
+    """Provides conversions for fields which can be described using just ``type``, ``format``, ``pattern``
+    and min/max validators.
+    """
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         type_info = get_basic_type_info(field)
@@ -331,7 +333,7 @@ class SimpleFieldInspector(FieldInspector):
 
 
 class ChoiceFieldInspector(FieldInspector):
-    """Provide conversions for ``ChoiceField`` and ``MultipleChoiceField``."""
+    """Provides conversions for ``ChoiceField`` and ``MultipleChoiceField``."""
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
@@ -351,7 +353,7 @@ class ChoiceFieldInspector(FieldInspector):
 
 
 class FileFieldInspector(FieldInspector):
-    """Provide conversions for ``FileField``\ s."""
+    """Provides conversions for ``FileField``\ s."""
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
@@ -378,7 +380,7 @@ class FileFieldInspector(FieldInspector):
 
 
 class DictFieldInspector(FieldInspector):
-    """Provide conversion for ``DictField``."""
+    """Provides conversion for ``DictField``."""
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)

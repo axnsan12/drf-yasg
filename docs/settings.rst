@@ -37,6 +37,59 @@ The possible settings and their default values are as follows:
 ``SWAGGER_SETTINGS``
 ********************
 
+
+.. _default-class-settings:
+
+Default classes
+===============
+
+DEFAULT_AUTO_SCHEMA_CLASS
+-------------------------
+
+:class:`~.inspectors.ViewInspector` subclass that will be used by default for generating :class:`.Operation`
+objects when iterating over endpoints. Can be overriden using the `auto_schema` argument of
+:func:`@swagger_auto_schema <.swagger_auto_schema>`.
+
+**Default**: :class:`drf_yasg.inspectors.SwaggerAutoSchema`
+
+DEFAULT_FIELD_INSPECTORS
+------------------------
+
+List of :class:`~.inspectors.FieldInspector` subclasses that will be used by default for inspecting serializers and
+serializer fields. Field inspectors given to :func:`@swagger_auto_schema <.swagger_auto_schema>` will be prepended
+to this list.
+
+**Default**: ``[``  |br| \
+:class:`'drf_yasg.inspectors.ReferencingSerializerInspector' <.inspectors.ReferencingSerializerInspector>`, |br| \
+:class:`'drf_yasg.inspectors.RelatedFieldInspector' <.inspectors.RelatedFieldInspector>`, |br| \
+:class:`'drf_yasg.inspectors.ChoiceFieldInspector' <.inspectors.ChoiceFieldInspector>`, |br| \
+:class:`'drf_yasg.inspectors.FileFieldInspector' <.inspectors.FileFieldInspector>`, |br| \
+:class:`'drf_yasg.inspectors.DictFieldInspector' <.inspectors.DictFieldInspector>`, |br| \
+:class:`'drf_yasg.inspectors.SimpleFieldInspector' <.inspectors.SimpleFieldInspector>`, |br| \
+:class:`'drf_yasg.inspectors.StringDefaultFieldInspector' <.inspectors.StringDefaultFieldInspector>`, |br| \
+``]``
+
+DEFAULT_FILTER_INSPECTORS
+-------------------------
+
+List of :class:`~.inspectors.FilterInspector` subclasses that will be used by default for inspecting filter backends.
+Filter inspectors given to :func:`@swagger_auto_schema <.swagger_auto_schema>` will be prepended to this list.
+
+**Default**: ``[``  |br| \
+:class:`'drf_yasg.inspectors.CoreAPICompatInspector' <.inspectors.CoreAPICompatInspector>`, |br| \
+``]``
+
+DEFAULT_PAGINATOR_INSPECTORS
+----------------------------
+
+List of :class:`~.inspectors.PaginatorInspector` subclasses that will be used by default for inspecting paginators.
+Paginator inspectors given to :func:`@swagger_auto_schema <.swagger_auto_schema>` will be prepended to this list.
+
+**Default**: ``[``  |br| \
+:class:`'drf_yasg.inspectors.DjangoRestResponsePagination' <.inspectors.DjangoRestResponsePagination>`, |br| \
+:class:`'drf_yasg.inspectors.CoreAPICompatInspector' <.inspectors.CoreAPICompatInspector>`, |br| \
+``]``
+
 Authorization
 =============
 
