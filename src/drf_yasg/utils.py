@@ -180,25 +180,25 @@ def get_model_field(queryset, field_name):
     return model, model_field
 
 
-model_field_to_swagger_type = {
-    models.AutoField: (openapi.TYPE_INTEGER, None),
-    models.BinaryField: (openapi.TYPE_STRING, openapi.FORMAT_BINARY),
-    models.BooleanField: (openapi.TYPE_BOOLEAN, None),
-    models.NullBooleanField: (openapi.TYPE_BOOLEAN, None),
-    models.DateTimeField: (openapi.TYPE_STRING, openapi.FORMAT_DATETIME),
-    models.DateField: (openapi.TYPE_STRING, openapi.FORMAT_DATE),
-    models.DecimalField: (openapi.TYPE_NUMBER, None),
-    models.DurationField: (openapi.TYPE_INTEGER, None),
-    models.FloatField: (openapi.TYPE_NUMBER, None),
-    models.IntegerField: (openapi.TYPE_INTEGER, None),
-    models.IPAddressField: (openapi.TYPE_STRING, openapi.FORMAT_IPV4),
-    models.GenericIPAddressField: (openapi.TYPE_STRING, openapi.FORMAT_IPV6),
-    models.SlugField: (openapi.TYPE_STRING, openapi.FORMAT_SLUG),
-    models.TextField: (openapi.TYPE_STRING, None),
-    models.TimeField: (openapi.TYPE_STRING, None),
-    models.UUIDField: (openapi.TYPE_STRING, openapi.FORMAT_UUID),
-    models.CharField: (openapi.TYPE_STRING, None),
-}
+model_field_to_swagger_type = [
+    (models.AutoField, (openapi.TYPE_INTEGER, None)),
+    (models.BinaryField, (openapi.TYPE_STRING, openapi.FORMAT_BINARY)),
+    (models.BooleanField, (openapi.TYPE_BOOLEAN, None)),
+    (models.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
+    (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
+    (models.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
+    (models.DecimalField, (openapi.TYPE_NUMBER, None)),
+    (models.DurationField, (openapi.TYPE_INTEGER, None)),
+    (models.FloatField, (openapi.TYPE_NUMBER, None)),
+    (models.IntegerField, (openapi.TYPE_INTEGER, None)),
+    (models.IPAddressField, (openapi.TYPE_STRING, openapi.FORMAT_IPV4)),
+    (models.GenericIPAddressField, (openapi.TYPE_STRING, openapi.FORMAT_IPV6)),
+    (models.SlugField, (openapi.TYPE_STRING, openapi.FORMAT_SLUG)),
+    (models.TextField, (openapi.TYPE_STRING, None)),
+    (models.TimeField, (openapi.TYPE_STRING, None)),
+    (models.UUIDField, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
+    (models.CharField, (openapi.TYPE_STRING, None)),
+]
 
 
 def inspect_model_field(model, model_field):
@@ -210,7 +210,7 @@ def inspect_model_field(model, model_field):
     :rtype: OrderedDict
     """
     if model is not None and model_field is not None:
-        for model_field_class, tf in model_field_to_swagger_type.items():
+        for model_field_class, tf in model_field_to_swagger_type:
             if isinstance(model_field, model_field_class):
                 swagger_type, format = tf
                 break
@@ -285,7 +285,7 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
                         # JSON roundtrip ensures that the value is valid JSON;
                         # for example, sets get transformed into lists
                         default = json.loads(json.dumps(default, cls=encoders.JSONEncoder))
-                    except Exception as e:
+                    except Exception:
                         logger.warning("'default' on schema for %s will not be set because "
                                        "to_representation raised an exception", field, exc_info=True)
                         default = None

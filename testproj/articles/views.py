@@ -49,7 +49,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     pagination_class = ArticlePagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_fields = ('title',)
-    ordering_fields = ('date_modified','date_created')
+    ordering_fields = ('date_modified', 'date_created')
     ordering = ('date_created',)
 
     @swagger_auto_schema(auto_schema=NoPagingAutoSchema)
