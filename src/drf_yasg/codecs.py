@@ -98,6 +98,9 @@ class OpenAPICodecJson(_OpenAPICodec):
         return json.dumps(spec)
 
 
+YAML_MAP_TAG = u'tag:yaml.org,2002:map'
+
+
 class SaneYamlDumper(yaml.SafeDumper):
     """YamlDumper class usable for dumping ``OrderedDict`` and list instances in a standard way."""
 
@@ -122,7 +125,7 @@ class SaneYamlDumper(yaml.SafeDumper):
 
         To use yaml.safe_dump(), you need the following.
         """
-        tag = u'tag:yaml.org,2002:map'
+        tag = YAML_MAP_TAG
         value = []
         node = yaml.MappingNode(tag, value, flow_style=flow_style)
         if dump.alias_key is not None:
@@ -164,6 +167,24 @@ def yaml_sane_dump(data, binary):
     :rtype: str,bytes
     """
     return yaml.dump(data, Dumper=SaneYamlDumper, default_flow_style=False, encoding='utf-8' if binary else None)
+
+
+class SaneYamlLoader(yaml.SafeLoader):
+    def construct_odict(self, node, deep=False):
+        self.flatten_mapping(node)
+        return OrderedDict(self.construct_pairs(node))
+
+
+SaneYamlLoader.add_constructor(YAML_MAP_TAG, SaneYamlLoader.construct_odict)
+
+
+def yaml_sane_load(stream):
+    """Load the given YAML stream while preserving the input order for mapping items.
+
+    :param stream: YAML stream (can be a string or a file-like object)
+    :rtype: OrderedDict
+    """
+    return yaml.load(stream, Loader=SaneYamlLoader)
 
 
 class OpenAPICodecYaml(_OpenAPICodec):

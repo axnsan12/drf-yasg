@@ -404,7 +404,7 @@ paths:
       tags:
         - users
     patch:
-      operationId: users_partial_update
+      operationId: users_dummy
       description: dummy operation
       parameters: []
       responses:

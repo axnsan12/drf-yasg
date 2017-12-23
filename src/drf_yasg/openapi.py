@@ -61,6 +61,24 @@ def make_swagger_name(attribute_name):
     return camelize(attribute_name.rstrip('_'), uppercase_first_letter=False)
 
 
+def filter_none(obj):
+    """Remove ``None`` values from tuples, lists or dictionaries. Return other objects as-is.
+
+    :param obj:
+    :return: collection with ``None`` values removed
+    """
+    if obj is None:
+        return None
+    new_obj = None
+    if isinstance(obj, dict):
+        new_obj = type(obj)((k, v) for k, v in obj.items() if k is not None and v is not None)
+    if isinstance(obj, (list, tuple)):
+        new_obj = type(obj)(v for v in obj if v is not None)
+    if new_obj is not None and len(new_obj) != len(obj):
+        return new_obj
+    return obj
+
+
 def _bare_SwaggerDict(cls):
     assert issubclass(cls, SwaggerDict)
     result = cls.__new__(cls)
@@ -230,7 +248,7 @@ class Swagger(SwaggerDict):
         self.base_path = '/'
 
         self.paths = paths
-        self.definitions = definitions
+        self.definitions = filter_none(definitions)
         self._insert_extras__()
 
 
@@ -270,13 +288,13 @@ class PathItem(SwaggerDict):
         self.patch = patch
         self.delete = delete
         self.options = options
-        self.parameters = parameters
+        self.parameters = filter_none(parameters)
         self._insert_extras__()
 
 
 class Operation(SwaggerDict):
     def __init__(self, operation_id, responses, parameters=None, consumes=None,
-                 produces=None, description=None, tags=None, **extra):
+                 produces=None, summary=None, description=None, tags=None, **extra):
         """Information about an API operation (path + http method combination)
 
         :param str operation_id: operation ID, should be unique across all operations
@@ -284,17 +302,19 @@ class Operation(SwaggerDict):
         :param list[.Parameter] parameters: parameters accepted
         :param list[str] consumes: content types accepted
         :param list[str] produces: content types produced
-        :param str description: operation description
+        :param str summary: operation summary; should be < 120 characters
+        :param str description: operation description; can be of any length and supports markdown
         :param list[str] tags: operation tags
         """
         super(Operation, self).__init__(**extra)
         self.operation_id = operation_id
+        self.summary = summary
         self.description = description
-        self.parameters = [param for param in parameters if param is not None]
+        self.parameters = filter_none(parameters)
         self.responses = responses
-        self.consumes = consumes
-        self.produces = produces
-        self.tags = tags
+        self.consumes = filter_none(consumes)
+        self.produces = filter_none(produces)
+        self.tags = filter_none(tags)
         self._insert_extras__()
 
 
@@ -375,9 +395,9 @@ class Schema(SwaggerDict):
                 "the `requires` attribute of schema must be an array of required properties, not a boolean!")
         assert type is not None, "type is required!"
         self.description = description
-        self.required = required
+        self.required = filter_none(required)
         self.type = type
-        self.properties = properties
+        self.properties = filter_none(properties)
         self.additional_properties = additional_properties
         self.format = format
         self.enum = enum
@@ -483,7 +503,7 @@ class ReferenceResolver(object):
             self._objects[scope] = OrderedDict()
 
     def with_scope(self, scope):
-        """Return a new :class:`.ReferenceResolver` whose scope is defaulted and forced to `scope`.
+        """Return a view into this :class:`.ReferenceResolver` whose scope is defaulted and forced to `scope`.
 
         :param str scope: target scope, must be in this resolver's `scopes`
         :return: the bound resolver

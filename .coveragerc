@@ -17,6 +17,7 @@ exclude_lines =
     raise TypeError
     raise NotImplementedError
     warnings.warn
+    logger.warning
 
     # Don't complain if non-runnable code isn't run:
     if 0:

@@ -4,6 +4,7 @@ from collections import defaultdict, OrderedDict
 import uritemplate
 from rest_framework.schemas.generators import SchemaGenerator, EndpointEnumerator as _EndpointEnumerator
 
+from drf_yasg.app_settings import swagger_settings
 from . import openapi
 from .inspectors import SwaggerAutoSchema
 from .openapi import ReferenceResolver
@@ -70,6 +71,10 @@ class OpenAPISchemaGenerator(object):
         self.info = info
         self.version = version
 
+    @property
+    def url(self):
+        return self._gen.url
+
     def get_schema(self, request=None, public=False):
         """Generate an :class:`.Swagger` representing the API schema.
 
@@ -84,7 +89,7 @@ class OpenAPISchemaGenerator(object):
         components = ReferenceResolver(openapi.SCHEMA_DEFINITIONS)
         paths = self.get_paths(endpoints, components, public)
 
-        url = self._gen.url
+        url = self.url
         if not url and request is not None:
             url = request.build_absolute_uri()
 
@@ -102,13 +107,13 @@ class OpenAPISchemaGenerator(object):
         :return: the view instance
         """
         view = self._gen.create_view(callback, method, request)
-        overrides = getattr(callback, 'swagger_auto_schema', None)
+        overrides = getattr(callback, '_swagger_auto_schema', None)
         if overrides is not None:
             # decorated function based view must have its decorator information passed on to the re-instantiated view
             for method, _ in overrides.items():
                 view_method = getattr(view, method, None)
                 if view_method is not None:  # pragma: no cover
-                    setattr(view_method.__func__, 'swagger_auto_schema', overrides)
+                    setattr(view_method.__func__, '_swagger_auto_schema', overrides)
         return view
 
     def get_endpoints(self, request=None):
@@ -131,9 +136,7 @@ class OpenAPISchemaGenerator(object):
         return {path: (view_cls[path], methods) for path, methods in view_paths.items()}
 
     def get_operation_keys(self, subpath, method, view):
-        """Return a list of keys that should be used to group an operation within the specification.
-
-        ::
+        """Return a list of keys that should be used to group an operation within the specification. ::
 
           /users/                   ("users", "list"), ("users", "create")
           /users/{pk}/              ("users", "read"), ("users", "update"), ("users", "delete")
@@ -149,6 +152,26 @@ class OpenAPISchemaGenerator(object):
         """
         return self._gen.get_keys(subpath, method, view)
 
+    def determine_path_prefix(self, paths):
+        """
+        Given a list of all paths, return the common prefix which should be
+        discounted when generating a schema structure.
+
+        This will be the longest common string that does not include that last
+        component of the URL, or the last component before a path parameter.
+
+        For example: ::
+
+            /api/v1/users/
+            /api/v1/users/{pk}/
+
+        The path prefix is '/api/v1/'
+
+        :param list[str] paths: list of paths
+        :rtype: str
+        """
+        return self._gen.determine_path_prefix(paths)
+
     def get_paths(self, endpoints, components, public):
         """Generate the Swagger Paths for the API from the given endpoints.
 
@@ -160,10 +183,10 @@ class OpenAPISchemaGenerator(object):
         if not endpoints:
             return openapi.Paths(paths={})
 
-        prefix = self._gen.determine_path_prefix(endpoints.keys())
+        prefix = self.determine_path_prefix(list(endpoints.keys()))
         paths = OrderedDict()
 
-        default_schema_cls = SwaggerAutoSchema
+        default_view_inspector_cls = swagger_settings.DEFAULT_AUTO_SCHEMA_CLASS
         for path, (view_cls, methods) in sorted(endpoints.items()):
             path_parameters = self.get_path_parameters(path, view_cls)
             operations = {}
@@ -173,9 +196,16 @@ class OpenAPISchemaGenerator(object):
 
                 operation_keys = self.get_operation_keys(path[len(prefix):], method, view)
                 overrides = self.get_overrides(view, method)
-                auto_schema_cls = overrides.get('auto_schema', default_schema_cls)
-                schema = auto_schema_cls(view, path, method, overrides, components)
-                operations[method.lower()] = schema.get_operation(operation_keys)
+
+                # the inspector class can be specified, in decreasing order of priorty,
+                #   1. globaly via DEFAULT_AUTO_SCHEMA_CLASS
+                #   2. on the view/viewset class
+                view_inspector_cls = getattr(view, 'swagger_auto_schema', default_view_inspector_cls)
+                #   3. on the swagger_auto_schema decorator
+                view_inspector_cls = overrides.get('auto_schema', view_inspector_cls)
+
+                view_inspector = view_inspector_cls(view, path, method, components, overrides)
+                operations[method.lower()] = view_inspector.get_operation(operation_keys)
 
             if operations:
                 paths[path] = openapi.PathItem(parameters=path_parameters, **operations)
@@ -193,7 +223,7 @@ class OpenAPISchemaGenerator(object):
         method = method.lower()
         action = getattr(view, 'action', method)
         action_method = getattr(view, action, None)
-        overrides = getattr(action_method, 'swagger_auto_schema', {})
+        overrides = getattr(action_method, '_swagger_auto_schema', {})
         if method in overrides:
             overrides = overrides[method]
 
