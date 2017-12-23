@@ -37,7 +37,17 @@ drf\_yasg\.generators
 drf\_yasg\.inspectors
 -------------------------------
 
+.. autodata:: drf_yasg.inspectors.NotHandled
+
 .. automodule:: drf_yasg.inspectors
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+drf\_yasg\.inspectors\.field
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. automodule:: drf_yasg.inspectors.field
     :members:
     :undoc-members:
     :show-inheritance:

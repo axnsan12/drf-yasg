@@ -18,6 +18,7 @@ exclude_lines =
     raise NotImplementedError
     warnings.warn
     logger.warning
+    return NotHandled
 
     # Don't complain if non-runnable code isn't run:
     if 0:

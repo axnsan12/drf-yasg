@@ -4,6 +4,8 @@ from coreapi.compat import urlparse
 from future.utils import raise_from
 from inflection import camelize
 
+from drf_yasg.utils import filter_none
+
 TYPE_OBJECT = "object"  #:
 TYPE_STRING = "string"  #:
 TYPE_NUMBER = "number"  #:
@@ -59,24 +61,6 @@ def make_swagger_name(attribute_name):
     if attribute_name.startswith("x_"):
         return "x-" + camelize(attribute_name[2:], uppercase_first_letter=False)
     return camelize(attribute_name.rstrip('_'), uppercase_first_letter=False)
-
-
-def filter_none(obj):
-    """Remove ``None`` values from tuples, lists or dictionaries. Return other objects as-is.
-
-    :param obj:
-    :return: collection with ``None`` values removed
-    """
-    if obj is None:
-        return None
-    new_obj = None
-    if isinstance(obj, dict):
-        new_obj = type(obj)((k, v) for k, v in obj.items() if k is not None and v is not None)
-    if isinstance(obj, (list, tuple)):
-        new_obj = type(obj)(v for v in obj if v is not None)
-    if new_obj is not None and len(new_obj) != len(obj):
-        return new_obj  # pragma: no cover
-    return obj
 
 
 def _bare_SwaggerDict(cls):

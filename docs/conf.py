@@ -68,9 +68,6 @@ pygments_style = 'sphinx'
 
 modindex_common_prefix = ['drf_yasg.']
 
-# If true, `todo` and `todoList` produce output, else they produce nothing.
-todo_include_todos = False
-
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -200,6 +197,8 @@ nitpick_ignore = [
     ('py:obj', 'BaseSerializer'),
     ('py:obj', 'APIView'),
 ]
+
+# TODO: inheritance aliases in sphinx 1.7
 
 # even though the package should be already installed, the sphinx build on RTD
 # for some reason needs the sources dir to be in the path in order for viewcode to work

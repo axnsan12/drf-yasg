@@ -2,14 +2,15 @@ import re
 from collections import defaultdict, OrderedDict
 
 import uritemplate
+from django.utils.encoding import force_text
 from rest_framework import versioning
 from rest_framework.schemas.generators import SchemaGenerator, EndpointEnumerator as _EndpointEnumerator
+from rest_framework.schemas.inspectors import get_pk_description
 
 from drf_yasg.app_settings import swagger_settings
 from . import openapi
-from .inspectors import SwaggerAutoSchema
+from .inspectors.field import get_queryset_field, get_basic_type_info
 from .openapi import ReferenceResolver
-from .utils import inspect_model_field, get_model_field
 
 PATH_PARAMETER_RE = re.compile(r'{(?P<parameter>\w+)}')
 
@@ -269,13 +270,21 @@ class OpenAPISchemaGenerator(object):
         model = getattr(getattr(view_cls, 'queryset', None), 'model', None)
 
         for variable in uritemplate.variables(path):
-            model, model_field = get_model_field(queryset, variable)
-            attrs = inspect_model_field(model, model_field)
+            model, model_field = get_queryset_field(queryset, variable)
+            attrs = get_basic_type_info(model_field) or {'type': openapi.TYPE_STRING}
             if hasattr(view_cls, 'lookup_value_regex') and getattr(view_cls, 'lookup_field', None) == variable:
                 attrs['pattern'] = view_cls.lookup_value_regex
 
+            if model_field and model_field.help_text:
+                description = force_text(model_field.help_text)
+            elif model_field and model_field.primary_key:
+                description = get_pk_description(model, model_field)
+            else:
+                description = None
+
             field = openapi.Parameter(
                 name=variable,
+                description=description,
                 required=True,
                 in_=openapi.IN_PATH,
                 **attrs

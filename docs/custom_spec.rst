@@ -253,8 +253,8 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
 Subclassing and extending
 *************************
 
-For more advanced control you can subclass :class:`.SwaggerAutoSchema` - see the documentation page for a list of
-methods you can override.
+For more advanced control you can subclass :class:`.inspectors.SwaggerAutoSchema` - see the documentation page
+for a list of methods you can override.
 
 You can put your custom subclass to use by setting it on a view method using the
 :func:`@swagger_auto_schema <.swagger_auto_schema>` decorator described above.

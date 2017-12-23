@@ -26,7 +26,7 @@ def test_swagger_yaml(client, validate_schema):
     _validate_text_schema_view(client, validate_schema, "/swagger.yaml", yaml_sane_load)
 
 
-def test_exception_middleware(client, swagger_settings):
+def test_exception_middleware(client, swagger_settings, db):
     swagger_settings['SECURITY_DEFINITIONS'] = {
         'bad': {
             'bad_attribute': 'should not be accepted'

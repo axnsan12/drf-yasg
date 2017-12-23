@@ -466,6 +466,7 @@ definitions:
       title:
         description: title model help_text
         type: string
+        maxLength: 255
       author:
         description: The ID of the user that created this article; if none is provided,
           defaults to the currently logged in user.
@@ -474,11 +475,13 @@ definitions:
       body:
         description: body serializer help_text
         type: string
+        maxLength: 5000
       slug:
         description: slug model help_text
         type: string
         format: slug
         pattern: ^[-a-zA-Z0-9_]+$
+        maxLength: 50
       date_created:
         type: string
         format: date-time
@@ -540,6 +543,7 @@ definitions:
         readOnly: true
       title:
         type: string
+        maxLength: 100
       code:
         type: string
       linenos:
@@ -1051,9 +1055,12 @@ definitions:
         description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
           only.
         type: string
+        pattern: ^[\w.@+-]+$
+        maxLength: 150
       email:
         type: string
         format: email
+        maxLength: 254
       articles:
         type: array
         items:
@@ -1078,6 +1085,8 @@ definitions:
         type: array
         items:
           type: string
+          format: slug
+          pattern: ^[-a-zA-Z0-9_]+\Z
           readOnly: true
         readOnly: true
         uniqueItems: true
