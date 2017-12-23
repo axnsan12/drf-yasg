@@ -2,14 +2,12 @@ import re
 from collections import defaultdict, OrderedDict
 
 import uritemplate
-from coreapi.compat import force_text
 from rest_framework.schemas.generators import SchemaGenerator, EndpointEnumerator as _EndpointEnumerator
-from rest_framework.schemas.inspectors import get_pk_description
 
 from . import openapi
 from .inspectors import SwaggerAutoSchema
 from .openapi import ReferenceResolver
-from .utils import get_schema_type_from_model_field
+from .utils import inspect_model_field, get_model_field
 
 PATH_PARAMETER_RE = re.compile(r'{(?P<parameter>\w+)}')
 
@@ -82,9 +80,9 @@ class OpenAPISchemaGenerator(object):
         :return: the generated Swagger specification
         :rtype: openapi.Swagger
         """
-        endpoints = self.get_endpoints(None if public else request)
+        endpoints = self.get_endpoints(request)
         components = ReferenceResolver(openapi.SCHEMA_DEFINITIONS)
-        paths = self.get_paths(endpoints, components)
+        paths = self.get_paths(endpoints, components, public)
 
         url = self._gen.url
         if not url and request is not None:
@@ -114,9 +112,9 @@ class OpenAPISchemaGenerator(object):
         return view
 
     def get_endpoints(self, request=None):
-        """Iterate over all the registered endpoints in the API.
+        """Iterate over all the registered endpoints in the API and return a fake view with the right parameters.
 
-        :param rest_framework.request.Request request: used for returning only endpoints available to the given request
+        :param rest_framework.request.Request request: request to bind to the endpoint views
         :return: {path: (view_class, list[(http_method, view_instance)])
         :rtype: dict
         """
@@ -151,11 +149,12 @@ class OpenAPISchemaGenerator(object):
         """
         return self._gen.get_keys(subpath, method, view)
 
-    def get_paths(self, endpoints, components):
+    def get_paths(self, endpoints, components, public):
         """Generate the Swagger Paths for the API from the given endpoints.
 
         :param dict endpoints: endpoints as returned by get_endpoints
         :param ReferenceResolver components: resolver/container for Swagger References
+        :param bool public: if True, all endpoints are included regardless of access through `request`
         :rtype: openapi.Paths
         """
         if not endpoints:
@@ -169,7 +168,7 @@ class OpenAPISchemaGenerator(object):
             path_parameters = self.get_path_parameters(path, view_cls)
             operations = {}
             for method, view in methods:
-                if not self._gen.has_view_permissions(path, method, view):
+                if not public and not self._gen.has_view_permissions(path, method, view):
                     continue
 
                 operation_keys = self.get_operation_keys(path[len(prefix):], method, view)
@@ -209,35 +208,20 @@ class OpenAPISchemaGenerator(object):
         :rtype: list[openapi.Parameter]
         """
         parameters = []
+        queryset = getattr(view_cls, 'queryset', None)
         model = getattr(getattr(view_cls, 'queryset', None), 'model', None)
 
         for variable in uritemplate.variables(path):
-            pattern = None
-            type = openapi.TYPE_STRING
-            description = None
-            if model is not None:
-                # Attempt to infer a field description if possible.
-                try:
-                    model_field = model._meta.get_field(variable)
-                except Exception:  # pragma: no cover
-                    model_field = None
-                else:
-                    type = get_schema_type_from_model_field(model_field)
+            model, model_field = get_model_field(queryset, variable)
+            attrs = inspect_model_field(model, model_field)
+            if hasattr(view_cls, 'lookup_value_regex') and getattr(view_cls, 'lookup_field', None) == variable:
+                attrs['pattern'] = view_cls.lookup_value_regex
 
-                if model_field is not None and model_field.help_text:
-                    description = force_text(model_field.help_text)
-                elif model_field is not None and model_field.primary_key:
-                    description = get_pk_description(model, model_field)
-
-                if hasattr(view_cls, 'lookup_value_regex') and getattr(view_cls, 'lookup_field', None) == variable:
-                    pattern = view_cls.lookup_value_regex
             field = openapi.Parameter(
                 name=variable,
                 required=True,
                 in_=openapi.IN_PATH,
-                type=type,
-                pattern=pattern,
-                description=description,
+                **attrs
             )
             parameters.append(field)
 

@@ -14,12 +14,19 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('title', 'body', 'slug', 'date_created', 'date_modified',
+        fields = ('title', 'author', 'body', 'slug', 'date_created', 'date_modified',
                   'references', 'uuid', 'cover', 'cover_name')
         read_only_fields = ('date_created', 'date_modified',
                             'references', 'uuid', 'cover_name')
         lookup_field = 'slug'
-        extra_kwargs = {'body': {'help_text': 'body serializer help_text'}}
+        extra_kwargs = {
+            'body': {'help_text': 'body serializer help_text'},
+            'author': {
+                'default': serializers.CurrentUserDefault(),
+                'help_text': "The ID of the user that created this article; if none is provided, "
+                             "defaults to the currently logged in user."
+            },
+        }
 
 
 class ImageUploadSerializer(serializers.Serializer):

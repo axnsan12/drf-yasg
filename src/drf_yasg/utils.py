@@ -1,3 +1,4 @@
+import logging
 from collections import OrderedDict
 
 from django.core.validators import RegexValidator
@@ -5,19 +6,17 @@ from django.db import models
 from django.utils.encoding import force_text
 from rest_framework import serializers
 from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
+from rest_framework.schemas.inspectors import get_pk_description
 from rest_framework.settings import api_settings
+from rest_framework.utils import json, encoders
 
 from . import openapi
 from .errors import SwaggerGenerationError
 
+logger = logging.getLogger(__name__)
+
 #: used to forcibly remove the body of a request via :func:`.swagger_auto_schema`
 no_body = object()
-
-
-def get_schema_type_from_model_field(model_field):
-    if isinstance(model_field, models.AutoField):
-        return openapi.TYPE_INTEGER
-    return openapi.TYPE_STRING
 
 
 def is_list_view(path, method, view):
@@ -164,6 +163,87 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
     return decorator
 
 
+def get_model_field(queryset, field_name):
+    """Try to get information about a model and model field from a queryset.
+
+    :param queryset: the queryset
+    :param field_name: the target field name
+    :returns: the model and target field from the queryset as a 2-tuple; both elements can be ``None``
+    :rtype: tuple
+    """
+    model = getattr(queryset, 'model', None)
+    try:
+        model_field = model._meta.get_field(field_name)
+    except Exception:  # pragma: no cover
+        model_field = None
+
+    return model, model_field
+
+
+model_field_to_swagger_type = {
+    models.AutoField: (openapi.TYPE_INTEGER, None),
+    models.BinaryField: (openapi.TYPE_STRING, openapi.FORMAT_BINARY),
+    models.BooleanField: (openapi.TYPE_BOOLEAN, None),
+    models.NullBooleanField: (openapi.TYPE_BOOLEAN, None),
+    models.DateTimeField: (openapi.TYPE_STRING, openapi.FORMAT_DATETIME),
+    models.DateField: (openapi.TYPE_STRING, openapi.FORMAT_DATE),
+    models.DecimalField: (openapi.TYPE_NUMBER, None),
+    models.DurationField: (openapi.TYPE_INTEGER, None),
+    models.FloatField: (openapi.TYPE_NUMBER, None),
+    models.IntegerField: (openapi.TYPE_INTEGER, None),
+    models.IPAddressField: (openapi.TYPE_STRING, openapi.FORMAT_IPV4),
+    models.GenericIPAddressField: (openapi.TYPE_STRING, openapi.FORMAT_IPV6),
+    models.SlugField: (openapi.TYPE_STRING, openapi.FORMAT_SLUG),
+    models.TextField: (openapi.TYPE_STRING, None),
+    models.TimeField: (openapi.TYPE_STRING, None),
+    models.UUIDField: (openapi.TYPE_STRING, openapi.FORMAT_UUID),
+    models.CharField: (openapi.TYPE_STRING, None),
+}
+
+
+def inspect_model_field(model, model_field):
+    """Extract information from a django model field instance.
+
+    :param model: the django model
+    :param model_field: a field on the model
+    :return: description, type, format and pattern extracted from the model field
+    :rtype: OrderedDict
+    """
+    if model is not None and model_field is not None:
+        for model_field_class, tf in model_field_to_swagger_type.items():
+            if isinstance(model_field, model_field_class):
+                swagger_type, format = tf
+                break
+        else:
+            swagger_type, format = None, None
+
+        if format is None or format == openapi.FORMAT_SLUG:
+            pattern = find_regex(model_field)
+        else:
+            pattern = None
+
+        if model_field.help_text:
+            description = force_text(model_field.help_text)
+        elif model_field.primary_key:
+            description = get_pk_description(model, model_field)
+        else:
+            description = None
+    else:
+        description = None
+        swagger_type = None
+        format = None
+        pattern = None
+
+    result = OrderedDict([
+        ('description', description),
+        ('type', swagger_type or openapi.TYPE_STRING),
+        ('format', format),
+        ('pattern', pattern)
+    ])
+    # TODO: filter none
+    return result
+
+
 def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **kwargs):
     """Convert a drf Serializer or Field instance into a Swagger object.
 
@@ -183,17 +263,50 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
     description = force_text(field.help_text) if field.help_text else None
     description = description if swagger_object_type != openapi.Items else None  # Items has no description either
 
-    def SwaggerType(**instance_kwargs):
+    def SwaggerType(existing_object=None, **instance_kwargs):
         if swagger_object_type == openapi.Parameter and 'required' not in instance_kwargs:
             instance_kwargs['required'] = field.required
         if swagger_object_type != openapi.Items and 'default' not in instance_kwargs:
             default = getattr(field, 'default', serializers.empty)
             if default is not serializers.empty:
-                instance_kwargs['default'] = default
+                if callable(default):
+                    try:
+                        if hasattr(default, 'set_context'):
+                            default.set_context(field)
+                        default = default()
+                    except Exception as e:
+                        logger.warning("default for %s is callable but it raised an exception when "
+                                       "called; 'default' field will not be added to schema", field, exc_info=True)
+                        default = None
+
+                if default is not None:
+                    try:
+                        default = field.to_representation(default)
+                        # JSON roundtrip ensures that the value is valid JSON;
+                        # for example, sets get transformed into lists
+                        default = json.loads(json.dumps(default, cls=encoders.JSONEncoder))
+                    except Exception as e:
+                        logger.warning("'default' on schema for %s will not be set because "
+                                       "to_representation raised an exception", field, exc_info=True)
+                        default = None
+
+                if default is not None:
+                    instance_kwargs['default'] = default
+
         if swagger_object_type == openapi.Schema and 'read_only' not in instance_kwargs:
             if field.read_only:
                 instance_kwargs['read_only'] = True
         instance_kwargs.update(kwargs)
+        instance_kwargs.pop('title', None)
+        instance_kwargs.pop('description', None)
+
+        if existing_object is not None:
+            existing_object.title = title
+            existing_object.description = description
+            for attr, val in instance_kwargs.items():
+                setattr(existing_object, attr, val)
+            return existing_object
+
         return swagger_object_type(title=title, description=description, **instance_kwargs)
 
     # arrays in Schema have Schema elements, arrays in Parameter and Items have Items elements
@@ -246,8 +359,27 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
             unique_items=True,  # is this OK?
         )
     elif isinstance(field, serializers.PrimaryKeyRelatedField):
-        model = field.queryset.model
-        return SwaggerType(type=get_schema_type_from_model_field(model._meta.pk))
+        if field.pk_field:
+            result = serializer_field_to_swagger(field.pk_field, swagger_object_type, definitions, **kwargs)
+            return SwaggerType(existing_object=result)
+
+        attrs = {'type': openapi.TYPE_STRING}
+        try:
+            model = field.queryset.model
+            pk_field = model._meta.pk
+        except Exception:
+            logger.warning("an exception was raised when attempting to extract the primary key related to %s; "
+                           "falling back to plain string" % field, exc_info=True)
+        else:
+            attrs.update(inspect_model_field(model, pk_field))
+
+        return SwaggerType(**attrs)
+    elif isinstance(field, serializers.HyperlinkedRelatedField):
+        return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)
+    elif isinstance(field, serializers.SlugRelatedField):
+        model, model_field = get_model_field(field.queryset, field.slug_field)
+        attrs = inspect_model_field(model, model_field)
+        return SwaggerType(**attrs)
     elif isinstance(field, serializers.RelatedField):
         return SwaggerType(type=openapi.TYPE_STRING)
     # ------ CHOICES
@@ -262,7 +394,7 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
     elif isinstance(field, serializers.ChoiceField):
         return SwaggerType(type=openapi.TYPE_STRING, enum=list(field.choices.keys()))
     # ------ BOOL
-    elif isinstance(field, serializers.BooleanField):
+    elif isinstance(field, (serializers.BooleanField, serializers.NullBooleanField)):
         return SwaggerType(type=openapi.TYPE_BOOLEAN)
     # ------ NUMERIC
     elif isinstance(field, (serializers.DecimalField, serializers.FloatField)):
@@ -270,6 +402,8 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
         return SwaggerType(type=openapi.TYPE_NUMBER)
     elif isinstance(field, serializers.IntegerField):
         # TODO: min_value max_value
+        return SwaggerType(type=openapi.TYPE_INTEGER)
+    elif isinstance(field, serializers.DurationField):
         return SwaggerType(type=openapi.TYPE_INTEGER)
     # ------ STRING
     elif isinstance(field, serializers.EmailField):
@@ -317,8 +451,10 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
             type=openapi.TYPE_OBJECT,
             additional_properties=child_schema
         )
+    elif isinstance(field, serializers.ModelField):
+        return SwaggerType(type=openapi.TYPE_STRING)
 
-    # TODO unhandled fields: TimeField DurationField HiddenField ModelField NullBooleanField? JSONField
+    # TODO unhandled fields: TimeField HiddenField JSONField
 
     # everything else gets string by default
     return SwaggerType(type=openapi.TYPE_STRING)

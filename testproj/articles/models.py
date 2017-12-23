@@ -7,5 +7,6 @@ class Article(models.Model):
     slug = models.SlugField(help_text="slug model help_text", unique=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+    author = models.ForeignKey('auth.User', related_name='articles', on_delete=models.CASCADE)
 
     cover = models.ImageField(upload_to='article/original/', blank=True)
