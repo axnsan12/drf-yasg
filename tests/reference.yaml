@@ -178,6 +178,7 @@ paths:
         description: slug model help_text
         required: true
         type: string
+        format: slug
         pattern: '[a-z0-9]+(?:-[a-z0-9]+)'
   /articles/{slug}/image/:
     get:
@@ -231,6 +232,7 @@ paths:
         description: slug model help_text
         required: true
         type: string
+        format: slug
         pattern: '[a-z0-9]+(?:-[a-z0-9]+)'
   /plain/:
     get:
@@ -355,12 +357,12 @@ paths:
         - name: username
           in: query
           description: this field is generated from a query_serializer
-          required: true
+          required: false
           type: string
         - name: is_staff
           in: query
           description: this one too!
-          required: true
+          required: false
           type: boolean
       responses:
         '200':
@@ -459,13 +461,16 @@ definitions:
     required:
       - title
       - body
-      - references
-      - uuid
     type: object
     properties:
       title:
         description: title model help_text
         type: string
+      author:
+        description: The ID of the user that created this article; if none is provided,
+          defaults to the currently logged in user.
+        type: integer
+        default: 1
       body:
         description: body serializer help_text
         type: string
@@ -489,14 +494,16 @@ definitions:
           description: but i needed to test these 2 fields somehow
           type: string
           format: uri
+        readOnly: true
       uuid:
         description: should articles have UUIDs?
         type: string
         format: uuid
+        readOnly: true
       cover:
         type: string
-        format: uri
         readOnly: true
+        format: uri
       cover_name:
         type: string
         readOnly: true
@@ -516,8 +523,6 @@ definitions:
     required:
       - code
       - language
-      - example_projects
-      - difficulty_factor
     type: object
     properties:
       id:
@@ -525,6 +530,12 @@ definitions:
         type: integer
         readOnly: true
       owner:
+        description: The ID of the user that created this snippet; if none is provided,
+          defaults to the currently logged in user.
+        type: integer
+        default: 1
+      owner_as_string:
+        description: The ID of the user that created this snippet.
         type: string
         readOnly: true
       title:
@@ -1020,12 +1031,16 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Project'
+        readOnly: true
       difficulty_factor:
         description: this is here just to test FloatField
         type: number
+        default: 6.9
+        readOnly: true
   UserSerializerrr:
     required:
       - username
+      - articles
       - snippets
     type: object
     properties:
@@ -1039,10 +1054,15 @@ definitions:
       email:
         type: string
         format: email
+      articles:
+        type: array
+        items:
+          type: integer
+        uniqueItems: true
       snippets:
         type: array
         items:
-          type: string
+          type: integer
         uniqueItems: true
       last_connected_ip:
         description: i'm out of ideas
@@ -1053,6 +1073,13 @@ definitions:
         description: really?
         type: string
         format: date
+        readOnly: true
+      article_slugs:
+        type: array
+        items:
+          type: string
+          readOnly: true
+        uniqueItems: true
         readOnly: true
 securityDefinitions:
   basic:

@@ -20,6 +20,11 @@ class NoPagingAutoSchema(SwaggerAutoSchema):
         return False
 
 
+class ArticlePagination(LimitOffsetPagination):
+    default_limit = 5
+    max_limit = 25
+
+
 @method_decorator(name='list', decorator=swagger_auto_schema(
     operation_description="description from swagger_auto_schema via method_decorator"
 ))
@@ -41,12 +46,11 @@ class ArticleViewSet(viewsets.ModelViewSet):
     lookup_value_regex = r'[a-z0-9]+(?:-[a-z0-9]+)'
     serializer_class = serializers.ArticleSerializer
 
-    pagination_class = LimitOffsetPagination
-    max_page_size = 5
+    pagination_class = ArticlePagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
     filter_fields = ('title',)
-    ordering_fields = ('date_modified',)
-    ordering = ('username',)
+    ordering_fields = ('date_modified', 'date_created')
+    ordering = ('date_created',)
 
     @swagger_auto_schema(auto_schema=NoPagingAutoSchema)
     @list_route(methods=['get'])

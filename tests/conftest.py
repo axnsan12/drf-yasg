@@ -3,6 +3,9 @@ import json
 import os
 
 import pytest
+from django.contrib.auth.models import User
+from rest_framework.test import APIRequestFactory
+from rest_framework.views import APIView
 from ruamel import yaml
 
 from drf_yasg import openapi, codecs
@@ -10,11 +13,16 @@ from drf_yasg.generators import OpenAPISchemaGenerator
 
 
 @pytest.fixture
-def generator():
-    return OpenAPISchemaGenerator(
-        info=openapi.Info(title="Test generator", default_version="v1"),
-        version="v2",
-    )
+def mock_schema_request(db):
+    from rest_framework.test import force_authenticate
+
+    factory = APIRequestFactory()
+    user = User.objects.create_user(username='admin', is_staff=True, is_superuser=True)
+
+    request = factory.get('/swagger.json')
+    force_authenticate(request, user=user)
+    request = APIView().initialize_request(request)
+    return request
 
 
 @pytest.fixture
@@ -28,19 +36,22 @@ def codec_yaml():
 
 
 @pytest.fixture
-def swagger(generator):
-    return generator.get_schema(None, True)
+def swagger(mock_schema_request):
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        version="v2",
+    )
+    return generator.get_schema(mock_schema_request, True)
 
 
 @pytest.fixture
-def swagger_dict(generator):
-    swagger = generator.get_schema(None, True)
+def swagger_dict(swagger):
     json_bytes = codec_json().encode(swagger)
     return json.loads(json_bytes.decode('utf-8'))
 
 
 @pytest.fixture
-def validate_schema():
+def validate_schema(db):
     def validate_schema(swagger):
         from flex.core import parse as validate_flex
         from swagger_spec_validator.validator20 import validate_spec as validate_ssv

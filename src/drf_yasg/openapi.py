@@ -309,6 +309,7 @@ class Items(SwaggerDict):
         :param .Items items: only valid if `type` is ``array``
         """
         super(Items, self).__init__(**extra)
+        assert type is not None, "type is required!"
         self.type = type
         self.format = format
         self.enum = enum
@@ -372,6 +373,7 @@ class Schema(SwaggerDict):
             # common error
             raise AssertionError(
                 "the `requires` attribute of schema must be an array of required properties, not a boolean!")
+        assert type is not None, "type is required!"
         self.description = description
         self.required = required
         self.type = type
