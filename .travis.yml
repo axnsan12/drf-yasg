@@ -40,6 +40,7 @@ after_success:
 branches:
   only:
     - master
+    - /^release\/.*$/
 
 notifications:
   email:
