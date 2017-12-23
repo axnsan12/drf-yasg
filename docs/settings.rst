@@ -161,7 +161,7 @@ DEFAULT_MODEL_DEPTH
 
 Controls how many levels are expaned by default when showing nested models.
 
-**Default**: :python:`2` |br|
+**Default**: :python:`3` |br|
 *Maps to parameter*: ``defaultModelExpandDepth``
 
 ******************

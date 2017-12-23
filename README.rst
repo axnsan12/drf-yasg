@@ -201,7 +201,7 @@ The possible settings and their default values are as follows:
         'DEEP_LINKING': False,
         'SHOW_EXTENSIONS': True,
         'DEFAULT_MODEL_RENDERING': 'model',
-        'DEFAULT_MODEL_DEPTH': 2,
+        'DEFAULT_MODEL_DEPTH': 3,
     }
 
 .. code:: python

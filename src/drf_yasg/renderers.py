@@ -84,6 +84,7 @@ class _UIRenderer(BaseRenderer):
             'showExtensions': swagger_settings.SHOW_EXTENSIONS,
             'defaultModelRendering': swagger_settings.DEFAULT_MODEL_RENDERING,
             'defaultModelExpandDepth': swagger_settings.DEFAULT_MODEL_DEPTH,
+            'defaultModelsExpandDepth': swagger_settings.DEFAULT_MODEL_DEPTH,
         }
         data = {k: v for k, v in data.items() if v is not None}
         if swagger_settings.VALIDATOR_URL != '':
