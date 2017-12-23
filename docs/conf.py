@@ -191,11 +191,13 @@ nitpick_ignore = [
     ('py:obj', 'coreapi.Field'),
     ('py:obj', 'BaseFilterBackend'),
     ('py:obj', 'BasePagination'),
+    ('py:obj', 'Request'),
     ('py:obj', 'rest_framework.request.Request'),
     ('py:obj', 'rest_framework.serializers.Field'),
     ('py:obj', 'serializers.Field'),
     ('py:obj', 'serializers.BaseSerializer'),
     ('py:obj', 'Serializer'),
+    ('py:obj', 'BaseSerializer'),
     ('py:obj', 'APIView'),
 ]
 

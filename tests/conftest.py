@@ -7,7 +7,6 @@ import pytest
 from django.contrib.auth.models import User
 from rest_framework.test import APIRequestFactory
 from rest_framework.views import APIView
-from ruamel import yaml
 
 from drf_yasg import openapi, codecs
 from drf_yasg.codecs import yaml_sane_load

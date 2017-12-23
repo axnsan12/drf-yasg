@@ -4,7 +4,7 @@ from collections import OrderedDict
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.encoding import force_text
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
 from rest_framework.schemas.inspectors import get_pk_description
 from rest_framework.settings import api_settings
@@ -52,9 +52,19 @@ def is_list_view(path, method, view):
     return True
 
 
+def guess_response_status(method):
+    if method == 'post':
+        return status.HTTP_201_CREATED
+    elif method == 'delete':
+        return status.HTTP_204_NO_CONTENT
+    else:
+        return status.HTTP_200_OK
+
+
 def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_body=None, query_serializer=None,
                         manual_parameters=None, operation_id=None, operation_description=None, responses=None,
-                        serializer_inspectors=None, filter_inspectors=None, paginator_inspectors=None):
+                        serializer_inspectors=None, filter_inspectors=None, paginator_inspectors=None,
+                        **extra_overrides):
     """Decorate a view method to customize the :class:`.Operation` object generated from it.
 
     `method` and `methods` are mutually exclusive and must only be present when decorating a view method that accepts
@@ -112,6 +122,8 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
         these will be tried before :attr:`.filter_inspectors` on the :class:`.SwaggerAutoSchema` instance
     :param list[.PaginatorInspector] paginator_inspectors: extra paginator inspectors;
         these will be tried before :attr:`.paginator_inspectors` on the :class:`.SwaggerAutoSchema` instance
+    :param extra_overrides: extra values that will be saved into the ``overrides`` dict; these values will be available
+        in the handling :class:`.SwaggerAutoSchema` instance via ``self.overrides``
     """
 
     def decorator(view_method):
@@ -128,6 +140,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
             'serializer_inspectors': list(serializer_inspectors) if serializer_inspectors else None,
         }
         data = {k: v for k, v in data.items() if v is not None}
+        data.update(extra_overrides)
 
         # if the method is a detail_route or list_route, it will have a bind_to_methods attribute
         bind_to_methods = getattr(view_method, 'bind_to_methods', [])
@@ -286,7 +299,7 @@ def serializer_field_to_swagger(field, swagger_object_type, definitions=None, **
                         if hasattr(default, 'set_context'):
                             default.set_context(field)
                         default = default()
-                    except Exception as e:  # pragma: no cover
+                    except Exception:  # pragma: no cover
                         logger.warning("default for %s is callable but it raised an exception when "
                                        "called; 'default' field will not be added to schema", field, exc_info=True)
                         default = None

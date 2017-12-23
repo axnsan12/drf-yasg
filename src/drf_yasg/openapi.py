@@ -75,7 +75,7 @@ def filter_none(obj):
     if isinstance(obj, (list, tuple)):
         new_obj = type(obj)(v for v in obj if v is not None)
     if new_obj is not None and len(new_obj) != len(obj):
-        return new_obj
+        return new_obj  # pragma: no cover
     return obj
 
 
