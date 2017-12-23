@@ -166,6 +166,11 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
+        'swagger_spec_validator': {
+            'handlers': ['console_log'],
+            'level': 'INFO',
+            'propagate': False,
+        }
     },
     'root': {
         'handlers': ['console_log'],

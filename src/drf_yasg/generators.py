@@ -214,31 +214,58 @@ class OpenAPISchemaGenerator(object):
         prefix = self.determine_path_prefix(list(endpoints.keys()))
         paths = OrderedDict()
 
-        default_view_inspector_cls = swagger_settings.DEFAULT_AUTO_SCHEMA_CLASS
         for path, (view_cls, methods) in sorted(endpoints.items()):
-            path_parameters = self.get_path_parameters(path, view_cls)
             operations = {}
             for method, view in methods:
                 if not public and not self._gen.has_view_permissions(path, method, view):
                     continue
 
-                operation_keys = self.get_operation_keys(path[len(prefix):], method, view)
-                overrides = self.get_overrides(view, method)
-
-                # the inspector class can be specified, in decreasing order of priorty,
-                #   1. globaly via DEFAULT_AUTO_SCHEMA_CLASS
-                #   2. on the view/viewset class
-                view_inspector_cls = getattr(view, 'swagger_auto_schema', default_view_inspector_cls)
-                #   3. on the swagger_auto_schema decorator
-                view_inspector_cls = overrides.get('auto_schema', view_inspector_cls)
-
-                view_inspector = view_inspector_cls(view, path, method, components, request, overrides)
-                operations[method.lower()] = view_inspector.get_operation(operation_keys)
+                operations[method.lower()] = self.get_operation(view, path, prefix, method, components, request)
 
             if operations:
-                paths[path] = openapi.PathItem(parameters=path_parameters, **operations)
+                paths[path] = self.get_path_item(path, view_cls, operations)
 
         return openapi.Paths(paths=paths)
+
+    def get_operation(self, view, path, prefix, method, components, request):
+        """Get an :class:`.Operation` for the given API endpoint (path, method). This method delegates to
+        :meth:`~.inspectors.ViewInspector.get_operation` of a :class:`~.inspectors.ViewInspector` determined
+        according to settings and :func:`@swagger_auto_schema <.swagger_auto_schema>` overrides.
+
+        :param view: the view associated with this endpoint
+        :param str path: the path component of the operation URL
+        :param str prefix: common path prefix among all endpoints
+        :param str method: the http method of the operation
+        :param openapi.ReferenceResolver components: referenceable components
+        :param Request request: the request made against the schema view; can be None
+        :rtype: openapi.Operation
+        """
+        default_view_inspector_cls = swagger_settings.DEFAULT_AUTO_SCHEMA_CLASS
+
+        operation_keys = self.get_operation_keys(path[len(prefix):], method, view)
+        overrides = self.get_overrides(view, method)
+
+        # the inspector class can be specified, in decreasing order of priorty,
+        #   1. globaly via DEFAULT_AUTO_SCHEMA_CLASS
+        #   2. on the view/viewset class
+        view_inspector_cls = getattr(view, 'swagger_auto_schema', default_view_inspector_cls)
+        #   3. on the swagger_auto_schema decorator
+        view_inspector_cls = overrides.get('auto_schema', view_inspector_cls)
+
+        view_inspector = view_inspector_cls(view, path, method, components, request, overrides)
+        return view_inspector.get_operation(operation_keys)
+
+    def get_path_item(self, path, view_cls, operations):
+        """Get a :class:`.PathItem` object that describes the parameters and operations related to a single path in the
+        API.
+
+        :param str path: the path
+        :param type view_cls: the view that was bound to this path in urlpatterns
+        :param dict[str,openapi.Operation] operations: operations defined on this path, keyed by lowercase HTTP method
+        :rtype: openapi.PathItem
+        """
+        path_parameters = self.get_path_parameters(path, view_cls)
+        return openapi.PathItem(parameters=path_parameters, **operations)
 
     def get_overrides(self, view, method):
         """Get overrides specified for a given operation.
