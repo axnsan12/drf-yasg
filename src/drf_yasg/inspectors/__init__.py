@@ -338,7 +338,7 @@ class SerializerInspector(FieldInspector):
         return NotHandled
 
 
-from .field import (
+from .field import (  # noqa
     InlineSerializerInspector, ReferencingSerializerInspector, RelatedFieldInspector, SimpleFieldInspector,
     FileFieldInspector, ChoiceFieldInspector, DictFieldInspector, StringDefaultFieldInspector
 )
@@ -476,7 +476,7 @@ ViewInspector.field_inspectors = swagger_settings.DEFAULT_FIELD_INSPECTORS
 ViewInspector.filter_inspectors = swagger_settings.DEFAULT_FILTER_INSPECTORS
 ViewInspector.paginator_inspectors = swagger_settings.DEFAULT_PAGINATOR_INSPECTORS
 
-from . import view
+from . import view  # noqa
 
 SwaggerAutoSchema = view.SwaggerAutoSchema
 

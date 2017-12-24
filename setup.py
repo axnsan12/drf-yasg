@@ -56,7 +56,7 @@ requirements_validation = read_req('validation.txt')
 setup(
     name='drf-yasg',
     use_scm_version=True,
-    packages=find_packages('src', include=['drf_yasg']),
+    packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
     install_requires=requirements,

@@ -37,7 +37,7 @@ class SwaggerAutoSchema(ViewInspector):
             responses=responses,
             parameters=parameters,
             consumes=consumes,
-            tags=[operation_keys[0]],
+            tags=tags,
         )
 
     def get_request_body_parameters(self, consumes):
