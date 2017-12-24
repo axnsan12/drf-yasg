@@ -82,7 +82,7 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, v
         renderer_classes = _spec_renderers
 
         def get(self, request, version='', format=None):
-            generator = self.generator_class(info, version, url, patterns, urlconf)
+            generator = self.generator_class(info, request.version or version or '', url, patterns, urlconf)
             schema = generator.get_schema(request, self.public)
             if schema is None:
                 raise exceptions.PermissionDenied()  # pragma: no cover

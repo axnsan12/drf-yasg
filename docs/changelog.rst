@@ -7,8 +7,9 @@ Changelog
 **1.1.0**
 *********
 
-- **ADDED:** added support for API versioning with ``URLPathVersioning``
+- **ADDED:** added support for APIs versioned with ``URLPathVersioning`` or ``NamespaceVersioning``
 - **ADDED:** added ability to customize schema generation using pluggable inspector classes
+- **ADDED:** added ``operation_id`` parameter to :func:`@swagger_auto_schema <.swagger_auto_schema>`
 - **IMPROVED:** strings, arrays and integers will now have min/max validation attributes inferred from the
   field-level validators
 - **FIXED:** fixed a bug that caused ``title`` to never be generated for Schemas; ``title`` is now correctly

@@ -107,33 +107,35 @@ def get_model_field(model, field_name):
         return None
 
 
-class RelatedFieldInspector(FieldInspector):
-    """Provides conversions for ``RelatedField``\ s."""
+def get_parent_serializer(field):
+    """Get the nearest parent ``Serializer`` instance for the given field.
 
-    def _get_parent_serializer(self, field):
-        """Get the nearest parent ``Serializer`` instance for the given field.
+    :return: ``Serializer`` or ``None``
+    """
+    while field is not None:
+        if isinstance(field, serializers.Serializer):
+            return field
 
-        :return: ``Serializer`` or ``None``
-        """
-        while field is not None:
-            if isinstance(field, serializers.Serializer):
-                return field
+        field = field.parent
 
-            field = field.parent
+    return None  # pragma: no cover
 
+
+def get_related_model(model, source):
+    """Try to find the other side of a model relationship given the name of a related field.
+
+    :param model: one side of the relationship
+    :param str source: related field name
+    :return: related model or ``None``
+    """
+    try:
+        return getattr(model, source).rel.related_model
+    except Exception:  # pragma: no cover
         return None
 
-    def _get_related_model(self, model, source):
-        """Try to find the other side of a model relationship given the name of a related field.
 
-        :param model: one side of the relationship
-        :param str source: related field name
-        :return: related model or ``None``
-        """
-        try:
-            return getattr(model, source).rel.related_model
-        except Exception:
-            return None
+class RelatedFieldInspector(FieldInspector):
+    """Provides conversions for ``RelatedField``\ s."""
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
@@ -168,10 +170,10 @@ class RelatedFieldInspector(FieldInspector):
                 # if the RelatedField has no queryset (e.g. read only), try to find the target model
                 # from the view queryset or ModelSerializer model, if present
                 view_queryset = getattr(self.view, 'queryset', None)
-                serializer_meta = getattr(self._get_parent_serializer(field), 'Meta', None)
+                serializer_meta = getattr(get_parent_serializer(field), 'Meta', None)
                 this_model = getattr(view_queryset, 'model', None) or getattr(serializer_meta, 'model', None)
                 source = getattr(field, 'source', '') or field.field_name
-                model = self._get_related_model(this_model, source)
+                model = get_related_model(this_model, source)
                 model_field = get_model_field(model, target_field)
 
             attrs = get_basic_type_info(model_field) or {'type': openapi.TYPE_STRING}

@@ -77,7 +77,7 @@ class OpenAPISchemaGenerator(object):
     def url(self):
         return self._gen.url
 
-    def get_schema(self, request, public=False):
+    def get_schema(self, request=None, public=False):
         """Generate an :class:`.Swagger` representing the API schema.
 
         :param rest_framework.request.Request request: the request used for filtering
