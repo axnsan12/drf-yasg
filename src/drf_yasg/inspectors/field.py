@@ -6,7 +6,7 @@ from django.db import models
 from rest_framework import serializers
 from rest_framework.settings import api_settings as rest_framework_settings
 
-from . import NotHandled, SerializerInspector, FieldInspector
+from .base import NotHandled, SerializerInspector, FieldInspector
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import filter_none

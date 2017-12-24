@@ -4,7 +4,7 @@ from coreapi.compat import urlparse
 from future.utils import raise_from
 from inflection import camelize
 
-from drf_yasg.utils import filter_none
+from .utils import filter_none
 
 TYPE_OBJECT = "object"  #:
 TYPE_STRING = "string"  #:

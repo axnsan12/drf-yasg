@@ -467,29 +467,35 @@ definitions:
         description: title model help_text
         type: string
         maxLength: 255
+        title: Title
       author:
         description: The ID of the user that created this article; if none is provided,
           defaults to the currently logged in user.
         type: integer
         default: 1
+        title: Author
       body:
         description: body serializer help_text
         type: string
         maxLength: 5000
+        title: Body
       slug:
         description: slug model help_text
         type: string
         format: slug
         pattern: ^[-a-zA-Z0-9_]+$
         maxLength: 50
+        title: Slug
       date_created:
         type: string
         format: date-time
         readOnly: true
+        title: Date created
       date_modified:
         type: string
         format: date-time
         readOnly: true
+        title: Date modified
       references:
         description: this is a really bad example
         type: object
@@ -498,18 +504,22 @@ definitions:
           type: string
           format: uri
         readOnly: true
+        title: References
       uuid:
         description: should articles have UUIDs?
         type: string
         format: uuid
         readOnly: true
+        title: Uuid
       cover:
         type: string
         readOnly: true
+        title: Cover
         format: uri
       cover_name:
         type: string
         readOnly: true
+        title: Cover name
   Project:
     required:
       - project_name
@@ -519,9 +529,11 @@ definitions:
       project_name:
         description: Name of the project
         type: string
+        title: Project name
       github_repo:
         description: Github repository of the project
         type: string
+        title: Github repo
   Snippet:
     required:
       - code
@@ -532,22 +544,28 @@ definitions:
         description: id serializer help text
         type: integer
         readOnly: true
+        title: Id
       owner:
         description: The ID of the user that created this snippet; if none is provided,
           defaults to the currently logged in user.
         type: integer
         default: 1
+        title: Owner
       owner_as_string:
         description: The ID of the user that created this snippet.
         type: string
         readOnly: true
+        title: Owner as string
       title:
         type: string
         maxLength: 100
+        title: Title
       code:
         type: string
+        title: Code
       linenos:
         type: boolean
+        title: Linenos
       language:
         description: Sample help text for language
         type: object
@@ -991,6 +1009,8 @@ definitions:
               - yaml+jinja
               - zephir
             default: python
+            title: Name
+        title: Language
       styles:
         type: array
         items:
@@ -1027,20 +1047,24 @@ definitions:
             - xcode
         default:
           - friendly
+        title: Styles
       lines:
         type: array
         items:
           type: integer
+        title: Lines
       example_projects:
         type: array
         items:
           $ref: '#/definitions/Project'
         readOnly: true
+        title: Example projects
       difficulty_factor:
         description: this is here just to test FloatField
         type: number
         readOnly: true
         default: 6.9
+        title: Difficulty factor
   UserSerializerrr:
     required:
       - username
@@ -1051,36 +1075,43 @@ definitions:
       id:
         type: integer
         readOnly: true
+        title: ID
       username:
         description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
           only.
         type: string
         pattern: ^[\w.@+-]+$
         maxLength: 150
+        title: Username
       email:
         type: string
         format: email
         maxLength: 254
+        title: Email address
       articles:
         type: array
         items:
           type: integer
         uniqueItems: true
+        title: Articles
       snippets:
         type: array
         items:
           type: integer
         uniqueItems: true
+        title: Snippets
       last_connected_ip:
         description: i'm out of ideas
         type: string
         format: ipv4
         readOnly: true
+        title: Last connected ip
       last_connected_at:
         description: really?
         type: string
         format: date
         readOnly: true
+        title: Last connected at
       article_slugs:
         type: array
         items:
@@ -1090,6 +1121,7 @@ definitions:
           readOnly: true
         readOnly: true
         uniqueItems: true
+        title: Article slugs
 securityDefinitions:
   basic:
     type: basic

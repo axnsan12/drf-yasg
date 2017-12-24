@@ -3,6 +3,7 @@
 #
 # drf-yasg documentation build configuration file, created by
 # sphinx-quickstart on Sun Dec 10 15:20:34 2017.
+import inspect
 import os
 import re
 import sys
@@ -216,6 +217,40 @@ settings.configure()
 import drf_yasg.views  # noqa: E402
 
 drf_yasg.views.SchemaView = drf_yasg.views.get_schema_view(None)
+
+# monkey patch to stop sphinx from trying to find classes by their real location instead of the
+# top-level __init__ alias; this allows us to document only `drf_yasg.inspectors` and avoid broken references or
+# double documenting
+
+import drf_yasg.inspectors  # noqa: E402
+
+
+def redirect_cls(cls):
+    if cls.__module__.startswith('drf_yasg.inspectors'):
+        return getattr(drf_yasg.inspectors, cls.__name__)
+    return cls
+
+
+for cls_name in drf_yasg.inspectors.__all__:
+    # first pass - replace all classes' module with the top level module
+    real_cls = getattr(drf_yasg.inspectors, cls_name)
+    if not inspect.isclass(real_cls):
+        continue
+
+    patched_dict = dict(real_cls.__dict__)
+    patched_dict.update({'__module__': 'drf_yasg.inspectors'})
+    patched_cls = type(cls_name, real_cls.__bases__, patched_dict)
+    setattr(drf_yasg.inspectors, cls_name, patched_cls)
+
+for cls_name in drf_yasg.inspectors.__all__:
+    # second pass - replace the inheritance bases for all classes to point to the new clean classes
+    real_cls = getattr(drf_yasg.inspectors, cls_name)
+    if not inspect.isclass(real_cls):
+        continue
+
+    patched_bases = tuple(redirect_cls(base) for base in real_cls.__bases__)
+    patched_cls = type(cls_name, patched_bases, dict(real_cls.__dict__))
+    setattr(drf_yasg.inspectors, cls_name, patched_cls)
 
 # custom interpreted role for linking to GitHub issues and pull requests
 # use as :issue:`14` or :pr:`17`

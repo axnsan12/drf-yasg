@@ -7,8 +7,8 @@ from rest_framework import versioning
 from rest_framework.schemas.generators import SchemaGenerator, EndpointEnumerator as _EndpointEnumerator
 from rest_framework.schemas.inspectors import get_pk_description
 
-from drf_yasg.app_settings import swagger_settings
 from . import openapi
+from .app_settings import swagger_settings
 from .inspectors.field import get_queryset_field, get_basic_type_info
 from .openapi import ReferenceResolver
 
@@ -192,7 +192,7 @@ class OpenAPISchemaGenerator(object):
             /api/v1/users/
             /api/v1/users/{pk}/
 
-        The path prefix is '/api/v1/'
+        The path prefix is ``/api/v1/``.
 
         :param list[str] paths: list of paths
         :rtype: str

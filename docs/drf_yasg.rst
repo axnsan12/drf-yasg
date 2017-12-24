@@ -1,14 +1,6 @@
 drf\_yasg package
 ====================
 
-drf\_yasg\.app\_settings
-----------------------------------
-
-.. automodule:: drf_yasg.app_settings
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 drf\_yasg\.codecs
 ---------------------------
 
@@ -40,14 +32,6 @@ drf\_yasg\.inspectors
 .. autodata:: drf_yasg.inspectors.NotHandled
 
 .. automodule:: drf_yasg.inspectors
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-drf\_yasg\.inspectors\.field
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: drf_yasg.inspectors.field
     :members:
     :undoc-members:
     :show-inheritance:

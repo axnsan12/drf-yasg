@@ -1,7 +1,8 @@
+import inspect
 import logging
 from collections import OrderedDict
 
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
 
 logger = logging.getLogger(__name__)
@@ -210,3 +211,19 @@ def filter_none(obj):
     if new_obj is not None and len(new_obj) != len(obj):
         return new_obj  # pragma: no cover
     return obj
+
+
+def force_serializer_instance(serializer):
+    """Force `serializer` into a ``Serializer`` instance. If it is not a ``Serializer`` class or instance, raises
+    an assertion error.
+
+    :param serializer: serializer class or instance
+    :return: serializer instance
+    """
+    if inspect.isclass(serializer):
+        assert issubclass(serializer, serializers.BaseSerializer), "Serializer required, not %s" % serializer.__name__
+        return serializer()
+
+    assert isinstance(serializer, serializers.BaseSerializer), \
+        "Serializer class or instance required, not %s" % type(serializer).__name__
+    return serializer

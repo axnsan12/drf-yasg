@@ -4,6 +4,17 @@ Changelog
 
 
 *********
+**1.1.0**
+*********
+
+- **ADDED:** added support for API versioning with ``URLPathVersioning``
+- **ADDED:** added ability to customize schema generation using pluggable inspector classes
+- **IMPROVED:** strings, arrays and integers will now have min/max validation attributes inferred from the
+  field-level validators
+- **FIXED:** fixed a bug that caused ``title`` to never be generated for Schemas; ``title`` is now correctly
+  populated from the field's ``label`` property
+
+*********
 **1.0.6**
 *********
 
