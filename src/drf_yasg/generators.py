@@ -55,7 +55,7 @@ class EndpointEnumerator(_EndpointEnumerator):
 class OpenAPISchemaGenerator(object):
     """
     This class iterates over all registered API endpoints and returns an appropriate OpenAPI 2.0 compliant schema.
-    Method implementations shamelessly stolen and adapted from rest_framework SchemaGenerator.
+    Method implementations shamelessly stolen and adapted from rest-framework ``SchemaGenerator``.
     """
     endpoint_enumerator_class = EndpointEnumerator
 
@@ -78,7 +78,7 @@ class OpenAPISchemaGenerator(object):
         return self._gen.url
 
     def get_schema(self, request=None, public=False):
-        """Generate an :class:`.Swagger` representing the API schema.
+        """Generate a :class:`.Swagger` object representing the API schema.
 
         :param Request request: the request used for filtering
             accesible endpoints and finding the spec URI
@@ -240,15 +240,15 @@ class OpenAPISchemaGenerator(object):
         :param Request request: the request made against the schema view; can be None
         :rtype: openapi.Operation
         """
-        default_view_inspector_cls = swagger_settings.DEFAULT_AUTO_SCHEMA_CLASS
 
         operation_keys = self.get_operation_keys(path[len(prefix):], method, view)
         overrides = self.get_overrides(view, method)
 
         # the inspector class can be specified, in decreasing order of priorty,
         #   1. globaly via DEFAULT_AUTO_SCHEMA_CLASS
+        view_inspector_cls = swagger_settings.DEFAULT_AUTO_SCHEMA_CLASS
         #   2. on the view/viewset class
-        view_inspector_cls = getattr(view, 'swagger_schema', default_view_inspector_cls)
+        view_inspector_cls = getattr(view, 'swagger_schema', view_inspector_cls)
         #   3. on the swagger_auto_schema decorator
         view_inspector_cls = overrides.get('auto_schema', view_inspector_cls)
 

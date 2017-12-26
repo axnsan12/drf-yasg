@@ -161,7 +161,7 @@ def yaml_sane_dump(data, binary):
         * list elements are indented into their parents
         * YAML references/aliases are disabled
 
-    :param dict data: the data to be serializers
+    :param dict data: the data to be dumped
     :param bool binary: True to return a utf-8 encoded binary object, False to return a string
     :return: the serialized YAML
     :rtype: str,bytes

@@ -43,6 +43,8 @@ You want to contribute some code? Great! Here are a few steps to get you started
    .. code:: console
 
       (venv) $ cd testproj
+      (venv) $ python manage.py migrate
+      (venv) $ cat createsuperuser.py | python manage.py shell
       (venv) $ python manage.py runserver
       (venv) $ curl localhost:8000/swagger.yaml
 

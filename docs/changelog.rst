@@ -8,7 +8,8 @@ Changelog
 *********
 
 - **ADDED:** added support for APIs versioned with ``URLPathVersioning`` or ``NamespaceVersioning``
-- **ADDED:** added ability to customize schema generation using pluggable inspector classes
+- **ADDED:** added ability to recursively customize schema generation
+  :ref:`using pluggable inspector classes <custom-spec-inspectors>`
 - **ADDED:** added ``operation_id`` parameter to :func:`@swagger_auto_schema <.swagger_auto_schema>`
 - **ADDED:** integration with `djangorestframework-camel-case
   <https://github.com/vbabiy/djangorestframework-camel-case>`_ (:issue:`28`)

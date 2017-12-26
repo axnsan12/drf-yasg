@@ -96,7 +96,7 @@ class SwaggerDict(OrderedDict):
             raise AttributeError
         try:
             return self[make_swagger_name(item)]
-        except KeyError as e:
+        except KeyError:
             # raise_from is EXTREMELY slow, replaced with plain raise
             raise AttributeError("object of class " + type(self).__name__ + " has no attribute " + item)
 

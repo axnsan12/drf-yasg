@@ -89,6 +89,18 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, v
             return Response(schema)
 
         @classmethod
+        def apply_cache(cls, view, cache_timeout, cache_kwargs):
+            """Override this method to customize how caching is applied to the view.
+
+            Arguments described in :meth:`.as_cached_view`.
+            """
+            if not cls.public:
+                view = vary_on_headers('Cookie', 'Authorization')(view)
+            view = cache_page(cache_timeout, **cache_kwargs)(view)
+            view = deferred_never_cache(view)  # disable in-browser caching
+            return view
+
+        @classmethod
         def as_cached_view(cls, cache_timeout=0, cache_kwargs=None, **initkwargs):
             """
             Calls .as_view() and wraps the result in a cache_page decorator.
@@ -102,10 +114,7 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, v
             cache_kwargs = cache_kwargs or {}
             view = cls.as_view(**initkwargs)
             if cache_timeout != 0:
-                if not public:
-                    view = vary_on_headers('Cookie', 'Authorization')(view)
-                view = cache_page(cache_timeout, **cache_kwargs)(view)
-                view = deferred_never_cache(view)  # disable in-browser caching
+                view = cls.apply_cache(view, cache_timeout, cache_kwargs)
             elif cache_kwargs:
                 warnings.warn("cache_kwargs ignored because cache_timeout is 0 (disabled)")
             return view

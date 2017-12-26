@@ -249,7 +249,7 @@ paths:
     parameters: []
   /snippets/:
     get:
-      operationId: snippets_list
+      operationId: snippetsList
       description: SnippetList classdoc
       parameters: []
       responses:
@@ -264,7 +264,7 @@ paths:
       tags:
         - snippets
     post:
-      operationId: snippets_create
+      operationId: snippetsCreate
       description: post method docstring
       parameters:
         - name: data
@@ -284,7 +284,7 @@ paths:
     parameters: []
   /snippets/{id}/:
     get:
-      operationId: snippets_read
+      operationId: snippetsRead
       description: SnippetDetail classdoc
       parameters: []
       responses:
@@ -297,7 +297,7 @@ paths:
       tags:
         - snippets
     put:
-      operationId: snippets_update
+      operationId: snippetsUpdate
       description: put class docstring
       parameters:
         - name: data
@@ -315,7 +315,7 @@ paths:
       tags:
         - snippets
     patch:
-      operationId: snippets_partial_update
+      operationId: snippetsPartialUpdate
       description: patch method docstring
       parameters:
         - name: data
@@ -333,7 +333,7 @@ paths:
       tags:
         - snippets
     delete:
-      operationId: snippets_delete
+      operationId: snippetsDelete
       description: delete method docstring
       parameters: []
       responses:

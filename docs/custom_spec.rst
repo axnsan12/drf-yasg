@@ -282,23 +282,26 @@ For more advanced control you can subclass :class:`~.inspectors.SwaggerAutoSchem
 for a list of methods you can override.
 
 You can put your custom subclass to use by setting it on a view method using the
-:ref:`@swagger_auto_schema <custom-spec-swagger-auto-schema>` decorator described above, or by setting it as a
-class-level attribute named ``swagger_schema`` on the view class.
+:ref:`@swagger_auto_schema <custom-spec-swagger-auto-schema>` decorator described above, by setting it as a
+class-level attribute named ``swagger_schema`` on the view class, or
+:ref:`globally via settings <default-class-settings>`.
 
-For example, to force an endpoint to always ignore paging parameters/response structures, you can do
+For example, to generate all operation IDs as camel case, you could do:
 
 .. code:: python
 
-   class NoPagingAutoSchema(SwaggerAutoSchema):
-      def should_page(self):
-         return False
+   from inflection import camelize
+
+   class CamelCaseOperationIDAutoSchema(SwaggerAutoSchema):
+      def get_operation_id(self, operation_keys):
+         operation_id = super(CamelCaseOperationIDAutoSchema, self).get_operation_id(operation_keys)
+         return camelize(operation_id, uppercase_first_letter=False)
 
 
-   class ArticleViewSet(viewsets.ModelViewSet):
-      @swagger_auto_schema(auto_schema=NoPagingAutoSchema)
-      @list_route(methods=['get'])
-      def today(self, request):
-         ...
+   SWAGGER_SETTINGS = {
+      'DEFAULT_AUTO_SCHEMA_CLASS': 'path.to.CamelCaseOperationIDAutoSchema',
+      ...
+   }
 
 --------------------------
 ``OpenAPISchemaGenerator``
@@ -311,9 +314,13 @@ page for a list of its methods.
 This custom generator can be put to use by setting it as the :attr:`.generator_class` of a :class:`.SchemaView` using
 :func:`.get_schema_view`.
 
+.. _custom-spec-inspectors:
+
 ---------------------
 ``Inspector`` classes
 ---------------------
+
+.. versionadded:: 1.1
 
 For customizing behavior related to specific field, serializer, filter or paginator classes you can implement the
 :class:`~.inspectors.FieldInspector`, :class:`~.inspectors.SerializerInspector`, :class:`~.inspectors.FilterInspector`,

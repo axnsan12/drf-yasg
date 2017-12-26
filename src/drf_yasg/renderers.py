@@ -14,7 +14,7 @@ class _SpecRenderer(BaseRenderer):
 
     @classmethod
     def with_validators(cls, validators):
-        assert all(vld in VALIDATORS for vld in validators), "allowed validators are" + ", ".join(VALIDATORS)
+        assert all(vld in VALIDATORS for vld in validators), "allowed validators are " + ", ".join(VALIDATORS)
         return type(cls.__name__, (cls,), {'validators': validators})
 
     def render(self, data, media_type=None, renderer_context=None):
@@ -45,7 +45,7 @@ class SwaggerYAMLRenderer(_SpecRenderer):
 
 
 class _UIRenderer(BaseRenderer):
-    """Base class for web UI renderers. Handles loading an passing settings to the appropriate template."""
+    """Base class for web UI renderers. Handles loading and passing settings to the appropriate template."""
     media_type = 'text/html'
     charset = 'utf-8'
     template = ''

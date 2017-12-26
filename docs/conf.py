@@ -310,3 +310,7 @@ def role_github_pull_request_or_issue(name, rawtext, text, lineno, inliner, opti
 roles.register_local_role('pr', role_github_pull_request_or_issue)
 roles.register_local_role('issue', role_github_pull_request_or_issue)
 roles.register_local_role('ghuser', role_github_user)
+
+
+def setup(app):
+    app.add_stylesheet('css/style.css')

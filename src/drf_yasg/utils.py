@@ -22,6 +22,12 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
 
     The `auto_schema` and `operation_description` arguments take precendence over view- or method-level values.
 
+    .. versionchanged:: 1.1
+       Added the ``extra_overrides`` and ``operatiod_id`` parameters.
+
+    .. versionchanged:: 1.1
+       Added the ``field_inspectors``, ``filter_inspectors`` and ``paginator_inspectors`` parameters.
+
     :param str method: for multi-method views, the http method the options should apply to
     :param list[str] methods: for multi-method views, the http methods the options should apply to
     :param .inspectors.SwaggerAutoSchema auto_schema: custom class to use for generating the Operation object;

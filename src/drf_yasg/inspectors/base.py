@@ -167,9 +167,11 @@ class FieldInspector(BaseInspector):
 
     def _get_partial_types(self, field, swagger_object_type, use_references, **kwargs):
         """Helper method to extract generic information from a field and return a partial constructor for the
-        appropriate openapi object. The return value is a tuple consisting of:
+        appropriate openapi object.
 
         All arguments are the same as :meth:`.field_to_swagger_object`.
+
+        The return value is a tuple consisting of:
 
         * a function for constructing objects of `swagger_object_type`; its prototype is: ::
 
