@@ -80,7 +80,7 @@ class OpenAPISchemaGenerator(object):
     def get_schema(self, request=None, public=False):
         """Generate an :class:`.Swagger` representing the API schema.
 
-        :param rest_framework.request.Request request: the request used for filtering
+        :param Request request: the request used for filtering
             accesible endpoints and finding the spec URI
         :param bool public: if True, all endpoints are included regardless of access through `request`
 
@@ -248,7 +248,7 @@ class OpenAPISchemaGenerator(object):
         # the inspector class can be specified, in decreasing order of priorty,
         #   1. globaly via DEFAULT_AUTO_SCHEMA_CLASS
         #   2. on the view/viewset class
-        view_inspector_cls = getattr(view, 'swagger_auto_schema', default_view_inspector_cls)
+        view_inspector_cls = getattr(view, 'swagger_schema', default_view_inspector_cls)
         #   3. on the swagger_auto_schema decorator
         view_inspector_cls = overrides.get('auto_schema', view_inspector_cls)
 

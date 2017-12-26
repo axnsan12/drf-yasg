@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from django.contrib import admin
-from rest_framework import permissions, versioning
+from rest_framework import permissions
 from rest_framework.decorators import api_view
 
 from drf_yasg import openapi

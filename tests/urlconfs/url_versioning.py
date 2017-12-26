@@ -9,6 +9,9 @@ from testproj.urls import SchemaView
 class SnippetSerializerV2(SnippetSerializer):
     v2field = fields.IntegerField(help_text="version 2.0 field")
 
+    class Meta:
+        ref_name = 'SnippetV2'
+
 
 class SnippetList(generics.ListCreateAPIView):
     """SnippetList classdoc"""

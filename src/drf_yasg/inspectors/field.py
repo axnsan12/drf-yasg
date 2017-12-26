@@ -43,8 +43,9 @@ class InlineSerializerInspector(SerializerInspector):
                 raise SwaggerGenerationError("cannot instantiate nested serializer as " + swagger_object_type.__name__)
 
             serializer = field
-            if hasattr(serializer, '__ref_name__'):
-                ref_name = serializer.__ref_name__
+            serializer_meta = getattr(serializer, 'Meta', None)
+            if hasattr(serializer_meta, 'ref_name'):
+                ref_name = serializer_meta.ref_name
             else:
                 ref_name = type(serializer).__name__
                 if ref_name.endswith('Serializer'):

@@ -22,9 +22,9 @@ def _check_v1(swagger, prefix):
 def _check_v2(swagger, prefix):
     assert swagger['info']['version'] == '2.0'
     versioned_post = swagger['paths'][prefix + 'snippets/']['post']
-    assert versioned_post['responses']['201']['schema']['$ref'] == '#/definitions/SnippetSerializerV2'
-    assert 'v2field' in swagger['definitions']['SnippetSerializerV2']['properties']
-    v2field = swagger['definitions']['SnippetSerializerV2']['properties']['v2field']
+    assert versioned_post['responses']['201']['schema']['$ref'] == '#/definitions/SnippetV2'
+    assert 'v2field' in swagger['definitions']['SnippetV2']['properties']
+    v2field = swagger['definitions']['SnippetV2']['properties']['v2field']
     assert v2field['description'] == 'version 2.0 field'
 
 

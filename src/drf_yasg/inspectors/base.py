@@ -30,6 +30,23 @@ class BaseInspector(object):
         self.components = components
         self.request = request
 
+    def process_result(self, result, method_name, obj, **kwargs):
+        """After an inspector handles an object (i.e. returns a value other than :data:`.NotHandled`), all inspectors
+        that were probed get the chance to alter the result, in reverse order. The inspector that handled the object
+        is the first to receive a ``process_result`` call with the object it just returned.
+
+        This behaviour is similar to the Django request/response middleware processing.
+
+        If this inspector has no post-processing to do, it should just ``return result`` (the default implementation).
+
+        :param result: the return value of the winning inspector, or ``None`` if no inspector handled the object
+        :param str method_name: name of the method that was called on the inspector
+        :param obj: first argument passed to inspector method
+        :param kwargs: additional arguments passed to inspector method
+        :return:
+        """
+        return result
+
     def probe_inspectors(self, inspectors, method_name, obj, initkwargs=None, **kwargs):
         """Probe a list of inspectors with a given object. The first inspector in the list to return a value that
         is not :data:`.NotHandled` wins.
@@ -42,20 +59,30 @@ class BaseInspector(object):
         :return: the return value of the winning inspector, or ``None`` if no inspector handled the object
         """
         initkwargs = initkwargs or {}
+        tried_inspectors = []
 
         for inspector in inspectors:
-            assert hasattr(inspector, method_name), inspector.__name__ + " must implement " + method_name
             assert inspect.isclass(inspector), "inspector must be a class, not an object"
-            assert issubclass(inspector, BaseInspector), "inspector must subclass of BaseInspector"
+            assert issubclass(inspector, BaseInspector), "inspectors must subclass BaseInspector"
 
             inspector = inspector(self.view, self.path, self.method, self.components, self.request, **initkwargs)
-            method = getattr(inspector, method_name)
+            tried_inspectors.append(inspector)
+            method = getattr(inspector, method_name, None)
+            if method is None:
+                continue
+
             result = method(obj, **kwargs)
             if result is not NotHandled:
-                return result
+                break
+        else:  # pragma: no cover
+            logger.warning("%s ignored because no inspector in %s handled it (operation: %s)",
+                           obj, inspectors, method_name)
+            result = None
 
-        logger.warning("%s ignored because no inspector in %s handled it (operation: %s)", obj, inspectors, method_name)
-        return None  # pragma: no cover
+        for inspector in reversed(tried_inspectors):
+            result = inspector.process_result(result, method_name, obj, **kwargs)
+
+        return result
 
 
 class PaginatorInspector(BaseInspector):

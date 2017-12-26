@@ -149,22 +149,22 @@ LOGGING = {
         'drf_yasg': {
             'handlers': ['console_log'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
         },
         'django': {
             'handlers': ['console_log'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
         },
         'django.db.backends': {
             'handlers': ['console_log'],
             'level': 'INFO',
-            'propagate': True,
+            'propagate': False,
         },
         'django.template': {
             'handlers': ['console_log'],
             'level': 'INFO',
-            'propagate': True,
+            'propagate': False,
         },
         'swagger_spec_validator': {
             'handlers': ['console_log'],

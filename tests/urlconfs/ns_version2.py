@@ -8,6 +8,9 @@ from .ns_version1 import SnippetList as SnippetListV1
 class SnippetSerializerV2(SnippetSerializer):
     v2field = fields.IntegerField(help_text="version 2.0 field")
 
+    class Meta:
+        ref_name = 'SnippetV2'
+
 
 class SnippetListV2(SnippetListV1):
     serializer_class = SnippetSerializerV2

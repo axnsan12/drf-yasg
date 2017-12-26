@@ -20,7 +20,7 @@ paths:
       parameters:
         - name: title
           in: query
-          description: ''
+          description: Filter the returned list by title
           required: false
           type: string
         - name: ordering
@@ -89,7 +89,7 @@ paths:
       parameters:
         - name: title
           in: query
-          description: ''
+          description: Filter the returned list by title
           required: false
           type: string
         - name: ordering
@@ -467,35 +467,29 @@ definitions:
         description: title model help_text
         type: string
         maxLength: 255
-        title: Title
       author:
         description: The ID of the user that created this article; if none is provided,
           defaults to the currently logged in user.
         type: integer
         default: 1
-        title: Author
       body:
         description: body serializer help_text
         type: string
         maxLength: 5000
-        title: Body
       slug:
         description: slug model help_text
         type: string
         format: slug
         pattern: ^[-a-zA-Z0-9_]+$
         maxLength: 50
-        title: Slug
       date_created:
         type: string
         format: date-time
         readOnly: true
-        title: Date created
       date_modified:
         type: string
         format: date-time
         readOnly: true
-        title: Date modified
       references:
         description: this is a really bad example
         type: object
@@ -504,22 +498,18 @@ definitions:
           type: string
           format: uri
         readOnly: true
-        title: References
       uuid:
         description: should articles have UUIDs?
         type: string
         format: uuid
         readOnly: true
-        title: Uuid
       cover:
         type: string
         readOnly: true
-        title: Cover
         format: uri
       cover_name:
         type: string
         readOnly: true
-        title: Cover name
   Project:
     required:
       - project_name

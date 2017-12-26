@@ -1,3 +1,4 @@
+import re
 from collections import OrderedDict
 
 from coreapi.compat import urlparse
@@ -356,7 +357,7 @@ class Parameter(SwaggerDict):
 
 
 class Schema(SwaggerDict):
-    OR_REF = ()
+    OR_REF = ()  #: useful for type-checking, e.g ``isinstance(obj, openapi.Schema.OR_REF)``
 
     def __init__(self, description=None, required=None, type=None, properties=None, additional_properties=None,
                  format=None, enum=None, pattern=None, items=None, **extra):
@@ -392,6 +393,8 @@ class Schema(SwaggerDict):
 
 
 class _Ref(SwaggerDict):
+    ref_name_re = re.compile(r"#/(?P<scope>.+)/(?P<name>[^/]+)$")
+
     def __init__(self, resolver, name, scope, expected_type):
         """Base class for all reference types. A reference object has only one property, ``$ref``, which must be a JSON
         reference to a valid object in the specification, e.g. ``#/definitions/Article`` to refer to an article model.
@@ -408,6 +411,15 @@ class _Ref(SwaggerDict):
         assert isinstance(obj, expected_type), ref_name + " is a {actual}, not a {expected}" \
             .format(actual=type(obj).__name__, expected=expected_type.__name__)
         self.ref = ref_name
+
+    def resolve(self, resolver):
+        """Get the object targeted by this reference from the given component resolver.
+
+        :param .ReferenceResolver resolver: component resolver which must contain the referneced object
+        :returns: the target object
+        """
+        ref_match = self.ref_name_re.match(self.ref)
+        return resolver.get(ref_match.group('name'), scope=ref_match.group('scope'))
 
     def __setitem__(self, key, value, **kwargs):
         if key == "$ref":
@@ -430,6 +442,17 @@ class SchemaRef(_Ref):
 
 
 Schema.OR_REF = (Schema, SchemaRef)
+
+
+def resolve_ref(ref_or_obj, resolver):
+    """Resolve `ref_or_obj` if it is a reference type. Return it unchaged if not.
+
+    :param SwaggerDict,_Ref ref_or_obj:
+    :param resolver: component resolver which must contain the referenced object
+    """
+    if isinstance(ref_or_obj, _Ref):
+        return ref_or_obj.resolve(resolver)
+    return ref_or_obj
 
 
 class Responses(SwaggerDict):

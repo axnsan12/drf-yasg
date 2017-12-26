@@ -47,8 +47,8 @@ DEFAULT_AUTO_SCHEMA_CLASS
 -------------------------
 
 :class:`~.inspectors.ViewInspector` subclass that will be used by default for generating :class:`.Operation`
-objects when iterating over endpoints. Can be overriden using the `auto_schema` argument of
-:func:`@swagger_auto_schema <.swagger_auto_schema>`.
+objects when iterating over endpoints. Can be overriden by using the `auto_schema` argument of
+:func:`@swagger_auto_schema <.swagger_auto_schema>` or by a ``swagger_schema`` attribute on the view class.
 
 **Default**: :class:`drf_yasg.inspectors.SwaggerAutoSchema`
 
