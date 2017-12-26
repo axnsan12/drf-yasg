@@ -359,19 +359,24 @@ class Parameter(SwaggerDict):
 class Schema(SwaggerDict):
     OR_REF = ()  #: useful for type-checking, e.g ``isinstance(obj, openapi.Schema.OR_REF)``
 
-    def __init__(self, description=None, required=None, type=None, properties=None, additional_properties=None,
-                 format=None, enum=None, pattern=None, items=None, **extra):
+    def __init__(self, title=None, description=None, type=None, format=None, enum=None, pattern=None, properties=None,
+                 additional_properties=None, required=None, items=None, default=None, read_only=None, **extra):
         """Describes a complex object accepted as parameter or returned as a response.
 
-        :param description: schema description
-        :param list[str] required: list of requried property names
+        :param str title: schema title
+        :param str description: schema description
         :param str type: value type; required
-        :param list[.Schema,.SchemaRef] properties: object properties; required if `type` is ``object``
-        :param bool,.Schema,.SchemaRef additional_properties: allow wildcard properties not listed in `properties`
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
-        :param .Schema,.SchemaRef items: only valid if `type` is ``array``
+        :param list[.Schema,.SchemaRef] properties: object properties; required if `type` is ``object``
+        :param bool,.Schema,.SchemaRef additional_properties: allow wildcard properties not listed in `properties`
+        :param list[str] required: list of requried property names
+        :param .Schema,.SchemaRef items: type of array items, only valid if `type` is ``array``
+        :param default: only valid when insider another ``Schema``\ 's ``properties``;
+            the default value of this property if it is not provided, must conform to the type of this Schema
+        :param read_only: only valid when insider another ``Schema``\ 's ``properties``;
+            declares the property as read only - it must only be sent as part of responses, never in requests
         """
         super(Schema, self).__init__(**extra)
         if required is True or required is False:
@@ -379,6 +384,7 @@ class Schema(SwaggerDict):
             raise AssertionError(
                 "the `requires` attribute of schema must be an array of required properties, not a boolean!")
         assert type is not None, "type is required!"
+        self.title = title
         self.description = description
         self.required = filter_none(required)
         self.type = type
@@ -388,7 +394,8 @@ class Schema(SwaggerDict):
         self.enum = enum
         self.pattern = pattern
         self.items = items
-        self.read_only = extra.pop('read_only', None)
+        self.read_only = read_only
+        self.default = default
         self._insert_extras__()
 
 

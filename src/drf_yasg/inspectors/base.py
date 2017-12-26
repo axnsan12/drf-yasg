@@ -242,7 +242,7 @@ class FieldInspector(BaseInspector):
 
             if existing_object is not None:
                 assert isinstance(existing_object, swagger_object_type)
-                for attr, val in instance_kwargs.items():
+                for attr, val in sorted(instance_kwargs.items()):
                     setattr(existing_object, attr, val)
                 return existing_object
 

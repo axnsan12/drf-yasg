@@ -517,13 +517,13 @@ definitions:
     type: object
     properties:
       project_name:
+        title: Project name
         description: Name of the project
         type: string
-        title: Project name
       github_repo:
+        title: Github repo
         description: Github repository of the project
         type: string
-        title: Github repo
   Snippet:
     required:
       - code
@@ -531,36 +531,38 @@ definitions:
     type: object
     properties:
       id:
+        title: Id
         description: id serializer help text
         type: integer
         readOnly: true
-        title: Id
       owner:
+        title: Owner
         description: The ID of the user that created this snippet; if none is provided,
           defaults to the currently logged in user.
         type: integer
         default: 1
-        title: Owner
       owner_as_string:
         description: The ID of the user that created this snippet.
         type: string
         readOnly: true
         title: Owner as string
       title:
+        title: Title
         type: string
         maxLength: 100
-        title: Title
       code:
-        type: string
         title: Code
+        type: string
       linenos:
-        type: boolean
         title: Linenos
+        type: boolean
       language:
+        title: Language
         description: Sample help text for language
         type: object
         properties:
           name:
+            title: Name
             description: The name of the programming language
             type: string
             enum:
@@ -999,9 +1001,8 @@ definitions:
               - yaml+jinja
               - zephir
             default: python
-            title: Name
-        title: Language
       styles:
+        title: Styles
         type: array
         items:
           type: string
@@ -1037,24 +1038,23 @@ definitions:
             - xcode
         default:
           - friendly
-        title: Styles
       lines:
+        title: Lines
         type: array
         items:
           type: integer
-        title: Lines
       example_projects:
+        title: Example projects
         type: array
         items:
           $ref: '#/definitions/Project'
         readOnly: true
-        title: Example projects
       difficulty_factor:
+        title: Difficulty factor
         description: this is here just to test FloatField
         type: number
         readOnly: true
         default: 6.9
-        title: Difficulty factor
   UserSerializerrr:
     required:
       - username
@@ -1063,46 +1063,47 @@ definitions:
     type: object
     properties:
       id:
+        title: ID
         type: integer
         readOnly: true
-        title: ID
       username:
+        title: Username
         description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
           only.
         type: string
         pattern: ^[\w.@+-]+$
         maxLength: 150
-        title: Username
       email:
+        title: Email address
         type: string
         format: email
         maxLength: 254
-        title: Email address
       articles:
-        type: array
-        items:
-          type: integer
-        uniqueItems: true
         title: Articles
-      snippets:
         type: array
         items:
           type: integer
         uniqueItems: true
+      snippets:
         title: Snippets
+        type: array
+        items:
+          type: integer
+        uniqueItems: true
       last_connected_ip:
+        title: Last connected ip
         description: i'm out of ideas
         type: string
         format: ipv4
         readOnly: true
-        title: Last connected ip
       last_connected_at:
+        title: Last connected at
         description: really?
         type: string
         format: date
         readOnly: true
-        title: Last connected at
       article_slugs:
+        title: Article slugs
         type: array
         items:
           type: string
@@ -1111,7 +1112,6 @@ definitions:
           readOnly: true
         readOnly: true
         uniqueItems: true
-        title: Article slugs
 securityDefinitions:
   basic:
     type: basic

@@ -1,5 +1,4 @@
-from django.conf.urls import url
-from django.urls import include
+from django.conf.urls import url, include
 from rest_framework import versioning
 
 from testproj.urls import SchemaView
