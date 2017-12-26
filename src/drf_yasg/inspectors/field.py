@@ -24,10 +24,19 @@ class InlineSerializerInspector(SerializerInspector):
     def get_request_parameters(self, serializer, in_):
         fields = getattr(serializer, 'fields', {})
         return [
-            self.probe_field_inspectors(value, openapi.Parameter, self.use_definitions, name=key, in_=in_)
+            self.probe_field_inspectors(
+                value, openapi.Parameter, self.use_definitions,
+                name=self.get_parameter_name(key), in_=in_
+            )
             for key, value
             in fields.items()
         ]
+
+    def get_property_name(self, field_name):
+        return field_name
+
+    def get_parameter_name(self, field_name):
+        return field_name
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
@@ -55,6 +64,7 @@ class InlineSerializerInspector(SerializerInspector):
                 properties = OrderedDict()
                 required = []
                 for key, value in serializer.fields.items():
+                    key = self.get_property_name(key)
                     properties[key] = self.probe_field_inspectors(value, ChildSwaggerType, use_references)
                     if value.required:
                         required.append(key)
@@ -405,3 +415,43 @@ class StringDefaultFieldInspector(FieldInspector):
         # TODO unhandled fields: TimeField HiddenField JSONField
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
         return SwaggerType(type=openapi.TYPE_STRING)
+
+
+try:
+    from djangorestframework_camel_case.parser import CamelCaseJSONParser
+    from djangorestframework_camel_case.render import CamelCaseJSONRenderer
+    from djangorestframework_camel_case.render import camelize
+except ImportError:  # pragma: no cover
+    class CamelCaseJSONFilter(FieldInspector):
+        pass
+else:
+    def camelize_string(s):
+        """Hack to force ``djangorestframework_camel_case`` to camelize a plain string."""
+        return next(iter(camelize({s: ''})))
+
+
+    def camelize_schema(schema_or_ref, components):
+        """Recursively camelize property names for the given schema using ``djangorestframework_camel_case``."""
+        schema = openapi.resolve_ref(schema_or_ref, components)
+        if getattr(schema, 'properties', {}):
+            schema.properties = OrderedDict(
+                (camelize_string(key), camelize_schema(val, components))
+                for key, val in schema.properties.items()
+            )
+
+            if getattr(schema, 'required', []):
+                schema.required = [camelize_string(p) for p in schema.required]
+
+        return schema_or_ref
+
+
+    class CamelCaseJSONFilter(FieldInspector):
+        def is_camel_case(self):
+            return any(issubclass(parser, CamelCaseJSONParser) for parser in self.view.parser_classes) \
+                   or any(issubclass(renderer, CamelCaseJSONRenderer) for renderer in self.view.renderer_classes)
+
+        def process_result(self, result, method_name, obj, **kwargs):
+            if isinstance(result, openapi.Schema.OR_REF) and self.is_camel_case():
+                return camelize_schema(result, self.components)
+
+            return result

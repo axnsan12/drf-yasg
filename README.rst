@@ -178,6 +178,26 @@ The possible settings and their default values are as follows:
 .. code:: python
 
     SWAGGER_SETTINGS = {
+         # default inspector classes, see advanced documentation
+         'DEFAULT_AUTO_SCHEMA_CLASS': 'drf_yasg.inspectors.SwaggerAutoSchema',
+         'DEFAULT_FIELD_INSPECTORS': [
+            'drf_yasg.inspectors.CamelCaseJSONFilter',
+            'drf_yasg.inspectors.ReferencingSerializerInspector',
+            'drf_yasg.inspectors.RelatedFieldInspector',
+            'drf_yasg.inspectors.ChoiceFieldInspector',
+            'drf_yasg.inspectors.FileFieldInspector',
+            'drf_yasg.inspectors.DictFieldInspector',
+            'drf_yasg.inspectors.SimpleFieldInspector',
+            'drf_yasg.inspectors.StringDefaultFieldInspector',
+         ],
+         'DEFAULT_FILTER_INSPECTORS': [
+            'drf_yasg.inspectors.CoreAPICompatInspector',
+         ],
+         'DEFAULT_PAGINATOR_INSPECTORS': [
+            'drf_yasg.inspectors.DjangoRestResponsePagination',
+            'drf_yasg.inspectors.CoreAPICompatInspector',
+         ],
+
         'USE_SESSION_AUTH': True,  # add Django Login and Django Logout buttons, CSRF token to swagger UI page
         'LOGIN_URL': getattr(django.conf.settings, 'LOGIN_URL', None),  # URL for the login button
         'LOGOUT_URL': getattr(django.conf.settings, 'LOGOUT_URL', None),  # URL for the logout button
@@ -349,6 +369,13 @@ Documentation, advanced usage
 =============================
 
 https://drf-yasg.readthedocs.io/en/latest/
+
+djangorestframework-camel-case integration
+------------------------------------------
+
+Integration with `djangorestframework-camel-case <https://github.com/vbabiy/djangorestframework-camel-case>`_ is
+provided out of the box - if you have djangorestframework-camel-case installed and your ``APIView`` uses
+``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer`` , all property names will be converted to *camelCase* by default.
 
 .. |travis| image:: https://img.shields.io/travis/axnsan12/drf-yasg/master.svg
    :target: https://travis-ci.org/axnsan12/drf-yasg

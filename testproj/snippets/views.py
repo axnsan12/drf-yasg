@@ -1,3 +1,5 @@
+from djangorestframework_camel_case.parser import CamelCaseJSONParser
+from djangorestframework_camel_case.render import CamelCaseJSONRenderer
 from rest_framework import generics
 
 from snippets.models import Snippet
@@ -8,6 +10,8 @@ class SnippetList(generics.ListCreateAPIView):
     """SnippetList classdoc"""
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
+    parser_classes = (CamelCaseJSONParser,)
+    renderer_classes = (CamelCaseJSONRenderer,)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -30,6 +34,8 @@ class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
     pagination_class = None
+    parser_classes = (CamelCaseJSONParser,)
+    renderer_classes = (CamelCaseJSONRenderer,)
 
     def patch(self, request, *args, **kwargs):
         """patch method docstring"""

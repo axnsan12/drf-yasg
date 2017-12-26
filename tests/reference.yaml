@@ -512,15 +512,15 @@ definitions:
         readOnly: true
   Project:
     required:
-      - project_name
-      - github_repo
+      - projectName
+      - githubRepo
     type: object
     properties:
-      project_name:
+      projectName:
         title: Project name
         description: Name of the project
         type: string
-      github_repo:
+      githubRepo:
         title: Github repo
         description: Github repository of the project
         type: string
@@ -541,7 +541,7 @@ definitions:
           defaults to the currently logged in user.
         type: integer
         default: 1
-      owner_as_string:
+      ownerAsString:
         description: The ID of the user that created this snippet.
         type: string
         readOnly: true
@@ -1043,13 +1043,13 @@ definitions:
         type: array
         items:
           type: integer
-      example_projects:
+      exampleProjects:
         title: Example projects
         type: array
         items:
           $ref: '#/definitions/Project'
         readOnly: true
-      difficulty_factor:
+      difficultyFactor:
         title: Difficulty factor
         description: this is here just to test FloatField
         type: number

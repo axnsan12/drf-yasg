@@ -10,6 +10,8 @@ Changelog
 - **ADDED:** added support for APIs versioned with ``URLPathVersioning`` or ``NamespaceVersioning``
 - **ADDED:** added ability to customize schema generation using pluggable inspector classes
 - **ADDED:** added ``operation_id`` parameter to :func:`@swagger_auto_schema <.swagger_auto_schema>`
+- **ADDED:** integration with `djangorestframework-camel-case
+  <https://github.com/vbabiy/djangorestframework-camel-case>`_ (:issue:`28`)
 - **IMPROVED:** strings, arrays and integers will now have min/max validation attributes inferred from the
   field-level validators
 - **FIXED:** fixed a bug that caused ``title`` to never be generated for Schemas; ``title`` is now correctly

@@ -2,7 +2,6 @@ import re
 from collections import OrderedDict
 
 from coreapi.compat import urlparse
-from future.utils import raise_from
 from inflection import camelize
 
 from .utils import filter_none
@@ -98,7 +97,8 @@ class SwaggerDict(OrderedDict):
         try:
             return self[make_swagger_name(item)]
         except KeyError as e:
-            raise_from(AttributeError("object of class " + type(self).__name__ + " has no attribute " + item), e)
+            # raise_from is EXTREMELY slow, replaced with plain raise
+            raise AttributeError("object of class " + type(self).__name__ + " has no attribute " + item)
 
     def __delattr__(self, item):
         if item.startswith('_'):
