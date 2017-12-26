@@ -141,6 +141,7 @@ This exposes 4 cached, validated and publicly available endpoints:
 2. Configuration
 ================
 
+---------------------------------
 a. ``get_schema_view`` parameters
 ---------------------------------
 
@@ -153,6 +154,7 @@ a. ``get_schema_view`` parameters
 - ``authentication_classes`` - authentication classes for the schema view itself
 - ``permission_classes`` - permission classes for the schema view itself
 
+-------------------------------
 b. ``SchemaView`` options
 -------------------------------
 
@@ -169,6 +171,7 @@ All of the first 3 methods take two optional arguments,
 to Django’s :python:`cached_page` decorator in order to enable caching on the
 resulting view. See `3. Caching`_.
 
+----------------------------------------------
 c. ``SWAGGER_SETTINGS`` and ``REDOC_SETTINGS``
 ----------------------------------------------
 
@@ -178,6 +181,26 @@ The possible settings and their default values are as follows:
 .. code:: python
 
     SWAGGER_SETTINGS = {
+         # default inspector classes, see advanced documentation
+         'DEFAULT_AUTO_SCHEMA_CLASS': 'drf_yasg.inspectors.SwaggerAutoSchema',
+         'DEFAULT_FIELD_INSPECTORS': [
+            'drf_yasg.inspectors.CamelCaseJSONFilter',
+            'drf_yasg.inspectors.ReferencingSerializerInspector',
+            'drf_yasg.inspectors.RelatedFieldInspector',
+            'drf_yasg.inspectors.ChoiceFieldInspector',
+            'drf_yasg.inspectors.FileFieldInspector',
+            'drf_yasg.inspectors.DictFieldInspector',
+            'drf_yasg.inspectors.SimpleFieldInspector',
+            'drf_yasg.inspectors.StringDefaultFieldInspector',
+         ],
+         'DEFAULT_FILTER_INSPECTORS': [
+            'drf_yasg.inspectors.CoreAPICompatInspector',
+         ],
+         'DEFAULT_PAGINATOR_INSPECTORS': [
+            'drf_yasg.inspectors.DjangoRestResponsePagination',
+            'drf_yasg.inspectors.CoreAPICompatInspector',
+         ],
+
         'USE_SESSION_AUTH': True,  # add Django Login and Django Logout buttons, CSRF token to swagger UI page
         'LOGIN_URL': getattr(django.conf.settings, 'LOGIN_URL', None),  # URL for the login button
         'LOGOUT_URL': getattr(django.conf.settings, 'LOGOUT_URL', None),  # URL for the logout button
@@ -241,6 +264,7 @@ Caching can mitigate the speed impact of validation.
 The provided validation will catch syntactic errors, but more subtle violations of the spec might slip by them. To
 ensure compatibility with code generation tools, it is recommended to also employ one or more of the following methods:
 
+-------------------------------
 ``swagger-ui`` validation badge
 -------------------------------
 
@@ -271,6 +295,7 @@ If your schema is not accessible from the internet, you can run a local copy of
     $ curl http://localhost:8189/debug?url=http://test.local:8002/swagger/?format=openapi
     {}
 
+---------------------
 Using ``swagger-cli``
 ---------------------
 
@@ -283,6 +308,7 @@ https://www.npmjs.com/package/swagger-cli
     $ swagger-cli validate http://test.local:8002/swagger.yaml
     http://test.local:8002/swagger.yaml is valid
 
+--------------------------------------------------------------
 Manually on `editor.swagger.io <https://editor.swagger.io/>`__
 --------------------------------------------------------------
 
@@ -345,10 +371,16 @@ named schemas.
 
 Both projects are also currently unmantained.
 
-Documentation, advanced usage
-=============================
+************************
+Third-party integrations
+************************
 
-https://drf-yasg.readthedocs.io/en/latest/
+djangorestframework-camel-case
+===============================
+
+Integration with `djangorestframework-camel-case <https://github.com/vbabiy/djangorestframework-camel-case>`_ is
+provided out of the box - if you have ``djangorestframework-camel-case`` installed and your ``APIView`` uses
+``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer``, all property names will be converted to *camelCase* by default.
 
 .. |travis| image:: https://img.shields.io/travis/axnsan12/drf-yasg/master.svg
    :target: https://travis-ci.org/axnsan12/drf-yasg

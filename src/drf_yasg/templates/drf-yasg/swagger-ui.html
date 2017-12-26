@@ -166,9 +166,11 @@
             layout: "StandaloneLayout",
             filter: true,
             requestInterceptor: function(request) {
-                console.log(request);
                 var headers = request.headers || {};
-                headers["X-CSRFToken"] = document.querySelector("[name=csrfmiddlewaretoken]").value;
+                var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]");
+                if (csrftoken) {
+                    headers["X-CSRFToken"] = csrftoken.value;
+                }
                 return request;
             }
         };

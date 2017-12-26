@@ -1,8 +1,10 @@
+import re
 from collections import OrderedDict
 
 from coreapi.compat import urlparse
-from future.utils import raise_from
 from inflection import camelize
+
+from .utils import filter_none
 
 TYPE_OBJECT = "object"  #:
 TYPE_STRING = "string"  #:
@@ -94,8 +96,9 @@ class SwaggerDict(OrderedDict):
             raise AttributeError
         try:
             return self[make_swagger_name(item)]
-        except KeyError as e:
-            raise_from(AttributeError("object of class " + type(self).__name__ + " has no attribute " + item), e)
+        except KeyError:
+            # raise_from is EXTREMELY slow, replaced with plain raise
+            raise AttributeError("object of class " + type(self).__name__ + " has no attribute " + item)
 
     def __delattr__(self, item):
         if item.startswith('_'):
@@ -230,7 +233,7 @@ class Swagger(SwaggerDict):
         self.base_path = '/'
 
         self.paths = paths
-        self.definitions = definitions
+        self.definitions = filter_none(definitions)
         self._insert_extras__()
 
 
@@ -270,13 +273,13 @@ class PathItem(SwaggerDict):
         self.patch = patch
         self.delete = delete
         self.options = options
-        self.parameters = parameters
+        self.parameters = filter_none(parameters)
         self._insert_extras__()
 
 
 class Operation(SwaggerDict):
     def __init__(self, operation_id, responses, parameters=None, consumes=None,
-                 produces=None, description=None, tags=None, **extra):
+                 produces=None, summary=None, description=None, tags=None, **extra):
         """Information about an API operation (path + http method combination)
 
         :param str operation_id: operation ID, should be unique across all operations
@@ -284,17 +287,19 @@ class Operation(SwaggerDict):
         :param list[.Parameter] parameters: parameters accepted
         :param list[str] consumes: content types accepted
         :param list[str] produces: content types produced
-        :param str description: operation description
+        :param str summary: operation summary; should be < 120 characters
+        :param str description: operation description; can be of any length and supports markdown
         :param list[str] tags: operation tags
         """
         super(Operation, self).__init__(**extra)
         self.operation_id = operation_id
+        self.summary = summary
         self.description = description
-        self.parameters = [param for param in parameters if param is not None]
+        self.parameters = filter_none(parameters)
         self.responses = responses
-        self.consumes = consumes
-        self.produces = produces
-        self.tags = tags
+        self.consumes = filter_none(consumes)
+        self.produces = filter_none(produces)
+        self.tags = filter_none(tags)
         self._insert_extras__()
 
 
@@ -352,21 +357,26 @@ class Parameter(SwaggerDict):
 
 
 class Schema(SwaggerDict):
-    OR_REF = ()
+    OR_REF = ()  #: useful for type-checking, e.g ``isinstance(obj, openapi.Schema.OR_REF)``
 
-    def __init__(self, description=None, required=None, type=None, properties=None, additional_properties=None,
-                 format=None, enum=None, pattern=None, items=None, **extra):
+    def __init__(self, title=None, description=None, type=None, format=None, enum=None, pattern=None, properties=None,
+                 additional_properties=None, required=None, items=None, default=None, read_only=None, **extra):
         """Describes a complex object accepted as parameter or returned as a response.
 
-        :param description: schema description
-        :param list[str] required: list of requried property names
+        :param str title: schema title
+        :param str description: schema description
         :param str type: value type; required
-        :param list[.Schema,.SchemaRef] properties: object properties; required if `type` is ``object``
-        :param bool,.Schema,.SchemaRef additional_properties: allow wildcard properties not listed in `properties`
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
-        :param .Schema,.SchemaRef items: only valid if `type` is ``array``
+        :param list[.Schema,.SchemaRef] properties: object properties; required if `type` is ``object``
+        :param bool,.Schema,.SchemaRef additional_properties: allow wildcard properties not listed in `properties`
+        :param list[str] required: list of requried property names
+        :param .Schema,.SchemaRef items: type of array items, only valid if `type` is ``array``
+        :param default: only valid when insider another ``Schema``\ 's ``properties``;
+            the default value of this property if it is not provided, must conform to the type of this Schema
+        :param read_only: only valid when insider another ``Schema``\ 's ``properties``;
+            declares the property as read only - it must only be sent as part of responses, never in requests
         """
         super(Schema, self).__init__(**extra)
         if required is True or required is False:
@@ -374,19 +384,24 @@ class Schema(SwaggerDict):
             raise AssertionError(
                 "the `requires` attribute of schema must be an array of required properties, not a boolean!")
         assert type is not None, "type is required!"
+        self.title = title
         self.description = description
-        self.required = required
+        self.required = filter_none(required)
         self.type = type
-        self.properties = properties
+        self.properties = filter_none(properties)
         self.additional_properties = additional_properties
         self.format = format
         self.enum = enum
         self.pattern = pattern
         self.items = items
+        self.read_only = read_only
+        self.default = default
         self._insert_extras__()
 
 
 class _Ref(SwaggerDict):
+    ref_name_re = re.compile(r"#/(?P<scope>.+)/(?P<name>[^/]+)$")
+
     def __init__(self, resolver, name, scope, expected_type):
         """Base class for all reference types. A reference object has only one property, ``$ref``, which must be a JSON
         reference to a valid object in the specification, e.g. ``#/definitions/Article`` to refer to an article model.
@@ -403,6 +418,15 @@ class _Ref(SwaggerDict):
         assert isinstance(obj, expected_type), ref_name + " is a {actual}, not a {expected}" \
             .format(actual=type(obj).__name__, expected=expected_type.__name__)
         self.ref = ref_name
+
+    def resolve(self, resolver):
+        """Get the object targeted by this reference from the given component resolver.
+
+        :param .ReferenceResolver resolver: component resolver which must contain the referneced object
+        :returns: the target object
+        """
+        ref_match = self.ref_name_re.match(self.ref)
+        return resolver.get(ref_match.group('name'), scope=ref_match.group('scope'))
 
     def __setitem__(self, key, value, **kwargs):
         if key == "$ref":
@@ -425,6 +449,17 @@ class SchemaRef(_Ref):
 
 
 Schema.OR_REF = (Schema, SchemaRef)
+
+
+def resolve_ref(ref_or_obj, resolver):
+    """Resolve `ref_or_obj` if it is a reference type. Return it unchaged if not.
+
+    :param SwaggerDict,_Ref ref_or_obj:
+    :param resolver: component resolver which must contain the referenced object
+    """
+    if isinstance(ref_or_obj, _Ref):
+        return ref_or_obj.resolve(resolver)
+    return ref_or_obj
 
 
 class Responses(SwaggerDict):
@@ -483,7 +518,7 @@ class ReferenceResolver(object):
             self._objects[scope] = OrderedDict()
 
     def with_scope(self, scope):
-        """Return a new :class:`.ReferenceResolver` whose scope is defaulted and forced to `scope`.
+        """Return a view into this :class:`.ReferenceResolver` whose scope is defaulted and forced to `scope`.
 
         :param str scope: target scope, must be in this resolver's `scopes`
         :return: the bound resolver

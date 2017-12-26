@@ -20,7 +20,7 @@ paths:
       parameters:
         - name: title
           in: query
-          description: ''
+          description: Filter the returned list by title
           required: false
           type: string
         - name: ordering
@@ -89,7 +89,7 @@ paths:
       parameters:
         - name: title
           in: query
-          description: ''
+          description: Filter the returned list by title
           required: false
           type: string
         - name: ordering
@@ -249,7 +249,7 @@ paths:
     parameters: []
   /snippets/:
     get:
-      operationId: snippets_list
+      operationId: snippetsList
       description: SnippetList classdoc
       parameters: []
       responses:
@@ -264,7 +264,7 @@ paths:
       tags:
         - snippets
     post:
-      operationId: snippets_create
+      operationId: snippetsCreate
       description: post method docstring
       parameters:
         - name: data
@@ -284,7 +284,7 @@ paths:
     parameters: []
   /snippets/{id}/:
     get:
-      operationId: snippets_read
+      operationId: snippetsRead
       description: SnippetDetail classdoc
       parameters: []
       responses:
@@ -297,7 +297,7 @@ paths:
       tags:
         - snippets
     put:
-      operationId: snippets_update
+      operationId: snippetsUpdate
       description: put class docstring
       parameters:
         - name: data
@@ -315,7 +315,7 @@ paths:
       tags:
         - snippets
     patch:
-      operationId: snippets_partial_update
+      operationId: snippetsPartialUpdate
       description: patch method docstring
       parameters:
         - name: data
@@ -333,7 +333,7 @@ paths:
       tags:
         - snippets
     delete:
-      operationId: snippets_delete
+      operationId: snippetsDelete
       description: delete method docstring
       parameters: []
       responses:
@@ -404,7 +404,7 @@ paths:
       tags:
         - users
     patch:
-      operationId: users_partial_update
+      operationId: users_dummy
       description: dummy operation
       parameters: []
       responses:
@@ -466,6 +466,7 @@ definitions:
       title:
         description: title model help_text
         type: string
+        maxLength: 255
       author:
         description: The ID of the user that created this article; if none is provided,
           defaults to the currently logged in user.
@@ -474,11 +475,13 @@ definitions:
       body:
         description: body serializer help_text
         type: string
+        maxLength: 5000
       slug:
         description: slug model help_text
         type: string
         format: slug
         pattern: ^[-a-zA-Z0-9_]+$
+        maxLength: 50
       date_created:
         type: string
         format: date-time
@@ -509,14 +512,16 @@ definitions:
         readOnly: true
   Project:
     required:
-      - project_name
-      - github_repo
+      - projectName
+      - githubRepo
     type: object
     properties:
-      project_name:
+      projectName:
+        title: Project name
         description: Name of the project
         type: string
-      github_repo:
+      githubRepo:
+        title: Github repo
         description: Github repository of the project
         type: string
   Snippet:
@@ -526,29 +531,38 @@ definitions:
     type: object
     properties:
       id:
+        title: Id
         description: id serializer help text
         type: integer
         readOnly: true
       owner:
+        title: Owner
         description: The ID of the user that created this snippet; if none is provided,
           defaults to the currently logged in user.
         type: integer
         default: 1
-      owner_as_string:
+      ownerAsString:
         description: The ID of the user that created this snippet.
         type: string
         readOnly: true
+        title: Owner as string
       title:
+        title: Title
         type: string
+        maxLength: 100
       code:
+        title: Code
         type: string
       linenos:
+        title: Linenos
         type: boolean
       language:
+        title: Language
         description: Sample help text for language
         type: object
         properties:
           name:
+            title: Name
             description: The name of the programming language
             type: string
             enum:
@@ -988,6 +1002,7 @@ definitions:
               - zephir
             default: python
       styles:
+        title: Styles
         type: array
         items:
           type: string
@@ -1024,19 +1039,22 @@ definitions:
         default:
           - friendly
       lines:
+        title: Lines
         type: array
         items:
           type: integer
-      example_projects:
+      exampleProjects:
+        title: Example projects
         type: array
         items:
           $ref: '#/definitions/Project'
         readOnly: true
-      difficulty_factor:
+      difficultyFactor:
+        title: Difficulty factor
         description: this is here just to test FloatField
         type: number
-        default: 6.9
         readOnly: true
+        default: 6.9
   UserSerializerrr:
     required:
       - username
@@ -1045,42 +1063,55 @@ definitions:
     type: object
     properties:
       id:
+        title: ID
         type: integer
         readOnly: true
       username:
+        title: Username
         description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
           only.
         type: string
+        pattern: ^[\w.@+-]+$
+        maxLength: 150
       email:
+        title: Email address
         type: string
         format: email
+        maxLength: 254
       articles:
+        title: Articles
         type: array
         items:
           type: integer
         uniqueItems: true
       snippets:
+        title: Snippets
         type: array
         items:
           type: integer
         uniqueItems: true
       last_connected_ip:
+        title: Last connected ip
         description: i'm out of ideas
         type: string
         format: ipv4
         readOnly: true
       last_connected_at:
+        title: Last connected at
         description: really?
         type: string
         format: date
         readOnly: true
       article_slugs:
+        title: Article slugs
         type: array
         items:
           type: string
+          format: slug
+          pattern: ^[-a-zA-Z0-9_]+\Z
           readOnly: true
-        uniqueItems: true
         readOnly: true
+        uniqueItems: true
 securityDefinitions:
   basic:
     type: basic

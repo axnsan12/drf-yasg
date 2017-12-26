@@ -2,7 +2,8 @@ import json
 from collections import OrderedDict
 
 import pytest
-from ruamel import yaml
+
+from drf_yasg.codecs import yaml_sane_load
 
 
 def _validate_text_schema_view(client, validate_schema, path, loader):
@@ -22,10 +23,10 @@ def test_swagger_json(client, validate_schema):
 
 
 def test_swagger_yaml(client, validate_schema):
-    _validate_text_schema_view(client, validate_schema, "/swagger.yaml", yaml.safe_load)
+    _validate_text_schema_view(client, validate_schema, "/swagger.yaml", yaml_sane_load)
 
 
-def test_exception_middleware(client, swagger_settings):
+def test_exception_middleware(client, swagger_settings, db):
     swagger_settings['SECURITY_DEFINITIONS'] = {
         'bad': {
             'bad_attribute': 'should not be accepted'
@@ -70,5 +71,5 @@ def test_caching(client, validate_schema):
 @pytest.mark.urls('urlconfs.non_public_urls')
 def test_non_public(client):
     response = client.get('/private/swagger.yaml')
-    swagger = yaml.safe_load(response.content.decode('utf-8'))
+    swagger = yaml_sane_load(response.content.decode('utf-8'))
     assert len(swagger['paths']) == 0

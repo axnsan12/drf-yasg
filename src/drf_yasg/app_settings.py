@@ -2,6 +2,26 @@ from django.conf import settings
 from rest_framework.settings import perform_import
 
 SWAGGER_DEFAULTS = {
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'drf_yasg.inspectors.SwaggerAutoSchema',
+
+    'DEFAULT_FIELD_INSPECTORS': [
+        'drf_yasg.inspectors.CamelCaseJSONFilter',
+        'drf_yasg.inspectors.ReferencingSerializerInspector',
+        'drf_yasg.inspectors.RelatedFieldInspector',
+        'drf_yasg.inspectors.ChoiceFieldInspector',
+        'drf_yasg.inspectors.FileFieldInspector',
+        'drf_yasg.inspectors.DictFieldInspector',
+        'drf_yasg.inspectors.SimpleFieldInspector',
+        'drf_yasg.inspectors.StringDefaultFieldInspector',
+    ],
+    'DEFAULT_FILTER_INSPECTORS': [
+        'drf_yasg.inspectors.CoreAPICompatInspector',
+    ],
+    'DEFAULT_PAGINATOR_INSPECTORS': [
+        'drf_yasg.inspectors.DjangoRestResponsePagination',
+        'drf_yasg.inspectors.CoreAPICompatInspector',
+    ],
+
     'USE_SESSION_AUTH': True,
     'SECURITY_DEFINITIONS': {
         'basic': {
@@ -28,7 +48,12 @@ REDOC_DEFAULTS = {
     'PATH_IN_MIDDLE': False,
 }
 
-IMPORT_STRINGS = []
+IMPORT_STRINGS = [
+    'DEFAULT_AUTO_SCHEMA_CLASS',
+    'DEFAULT_FIELD_INSPECTORS',
+    'DEFAULT_FILTER_INSPECTORS',
+    'DEFAULT_PAGINATOR_INSPECTORS',
+]
 
 
 class AppSettings(object):

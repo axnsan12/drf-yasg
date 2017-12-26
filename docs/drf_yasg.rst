@@ -1,14 +1,6 @@
 drf\_yasg package
 ====================
 
-drf\_yasg\.app\_settings
-----------------------------------
-
-.. automodule:: drf_yasg.app_settings
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 drf\_yasg\.codecs
 ---------------------------
 
@@ -16,7 +8,7 @@ drf\_yasg\.codecs
     :members:
     :undoc-members:
     :show-inheritance:
-    :exclude-members: SaneYamlDumper
+    :exclude-members: SaneYamlDumper,SaneYamlLoader
 
 drf\_yasg\.errors
 ---------------------------
@@ -36,6 +28,8 @@ drf\_yasg\.generators
 
 drf\_yasg\.inspectors
 -------------------------------
+
+.. autodata:: drf_yasg.inspectors.NotHandled
 
 .. automodule:: drf_yasg.inspectors
     :members:

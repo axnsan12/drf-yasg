@@ -32,7 +32,7 @@ class UserList(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @swagger_auto_schema(request_body=no_body, operation_description="dummy operation")
+    @swagger_auto_schema(request_body=no_body, operation_id="users_dummy", operation_description="dummy operation")
     def patch(self, request):
         pass
 

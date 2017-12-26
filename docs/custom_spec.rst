@@ -249,15 +249,63 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
    However, do note that both of the methods above can lead to unexpected (and maybe surprising) results by
    replacing/decorating methods on the base class itself.
 
+
+********************************
+Serializer ``Meta`` nested class
+********************************
+
+You can define some per-serializer options by adding a ``Meta`` class to your serializer, e.g.:
+
+.. code:: python
+
+   class WhateverSerializer(Serializer):
+      ...
+
+      class Meta:
+         ... options here ...
+
+Currently, the only option you can add here is
+
+   * ``ref_name`` - a string which will be used as the model definition name for this serializer class; setting it to
+     ``None`` will force the serializer to be generated as an inline model everywhere it is used
+
 *************************
 Subclassing and extending
 *************************
 
-For more advanced control you can subclass :class:`.SwaggerAutoSchema` - see the documentation page for a list of
-methods you can override.
+
+---------------------
+``SwaggerAutoSchema``
+---------------------
+
+For more advanced control you can subclass :class:`~.inspectors.SwaggerAutoSchema` - see the documentation page
+for a list of methods you can override.
 
 You can put your custom subclass to use by setting it on a view method using the
-:func:`@swagger_auto_schema <.swagger_auto_schema>` decorator described above.
+:ref:`@swagger_auto_schema <custom-spec-swagger-auto-schema>` decorator described above, by setting it as a
+class-level attribute named ``swagger_schema`` on the view class, or
+:ref:`globally via settings <default-class-settings>`.
+
+For example, to generate all operation IDs as camel case, you could do:
+
+.. code:: python
+
+   from inflection import camelize
+
+   class CamelCaseOperationIDAutoSchema(SwaggerAutoSchema):
+      def get_operation_id(self, operation_keys):
+         operation_id = super(CamelCaseOperationIDAutoSchema, self).get_operation_id(operation_keys)
+         return camelize(operation_id, uppercase_first_letter=False)
+
+
+   SWAGGER_SETTINGS = {
+      'DEFAULT_AUTO_SCHEMA_CLASS': 'path.to.CamelCaseOperationIDAutoSchema',
+      ...
+   }
+
+--------------------------
+``OpenAPISchemaGenerator``
+--------------------------
 
 If you need to control things at a higher level than :class:`.Operation` objects (e.g. overall document structure,
 vendor extensions in metadata) you can also subclass :class:`.OpenAPISchemaGenerator` - again, see the documentation
@@ -265,3 +313,88 @@ page for a list of its methods.
 
 This custom generator can be put to use by setting it as the :attr:`.generator_class` of a :class:`.SchemaView` using
 :func:`.get_schema_view`.
+
+.. _custom-spec-inspectors:
+
+---------------------
+``Inspector`` classes
+---------------------
+
+.. versionadded:: 1.1
+
+For customizing behavior related to specific field, serializer, filter or paginator classes you can implement the
+:class:`~.inspectors.FieldInspector`, :class:`~.inspectors.SerializerInspector`, :class:`~.inspectors.FilterInspector`,
+:class:`~.inspectors.PaginatorInspector` classes and use them with
+:ref:`@swagger_auto_schema <custom-spec-swagger-auto-schema>` or one of the
+:ref:`related settings <default-class-settings>`.
+
+A :class:`~.inspectors.FilterInspector` that adds a description to all ``DjangoFilterBackend`` parameters could be
+implemented like so:
+
+.. code:: python
+
+   class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
+      def get_filter_parameters(self, filter_backend):
+         if isinstance(filter_backend, DjangoFilterBackend):
+            result = super(DjangoFilterDescriptionInspector, self).get_filter_parameters(filter_backend)
+            for param in result:
+               if not param.get('description', ''):
+                  param.description = "Filter the returned list by {field_name}".format(field_name=param.name)
+
+            return result
+
+         return NotHandled
+
+   @method_decorator(name='list', decorator=swagger_auto_schema(
+      filter_inspectors=[DjangoFilterDescriptionInspector]
+   ))
+   class ArticleViewSet(viewsets.ModelViewSet):
+      filter_backends = (DjangoFilterBackend,)
+      filter_fields = ('title',)
+      ...
+
+
+A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``title`` attribute from all generated
+:class:`.Schema` objects:
+
+.. code:: python
+
+   class NoSchemaTitleInspector(FieldInspector):
+      def process_result(self, result, method_name, obj, **kwargs):
+         # remove the `title` attribute of all Schema objects
+         if isinstance(result, openapi.Schema.OR_REF):
+            # traverse any references and alter the Schema object in place
+            schema = openapi.resolve_ref(result, self.components)
+            schema.pop('title', None)
+
+            # no ``return schema`` here, because it would mean we always generate
+            # an inline `object` instead of a definition reference
+
+         # return back the same object that we got - i.e. a reference if we got a reference
+         return result
+
+
+   class NoTitleAutoSchema(SwaggerAutoSchema):
+      field_inspectors = [NoSchemaTitleInspector] + swagger_settings.DEFAULT_FIELD_INSPECTORS
+
+   class ArticleViewSet(viewsets.ModelViewSet):
+      swagger_schema = NoTitleAutoSchema
+      ...
+
+
+.. Note::
+
+   A note on references - :class:`.Schema` objects are sometimes output by reference (:class:`.SchemaRef`); in fact,
+   that is how named models are implemented in OpenAPI:
+
+      - in the output swagger document there is a ``definitions`` section containing :class:`.Schema` objects for all
+        models
+      - every usage of a model refers to that single :class:`.Schema` object - for example, in the ArticleViewSet
+        above, all requests and responses containg an ``Article`` model would refer to the same schema definition by a
+        ``'$ref': '#/definitions/Article'``
+
+   This is implemented by only generating **one** :class:`.Schema` object for every serializer **class** encountered.
+
+   This means that you should generally avoid view or method-specific ``FieldInspector``\ s if you are dealing with
+   references (a.k.a named models), because you can never know which view will be the first to generate the schema
+   for a given serializer.

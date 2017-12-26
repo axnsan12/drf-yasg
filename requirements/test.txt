@@ -12,3 +12,4 @@ pygments>=2.2.0
 django-cors-headers>=2.1.0
 django-filter>=1.1.0,<2.0; python_version == "2.7"
 django-filter>=1.1.0; python_version >= "3.4"
+djangorestframework-camel-case>=0.2.0
