@@ -10,21 +10,6 @@ python:
 env:
  - DRF=3.7
 
-matrix:
-  fast_finish: true
-  include:
-    - python: '3.5'
-      env: TOXENV=docs
-    - python: '2.7'
-      env: TOXENV=flake8
-    - python: '3.6'
-      env: DRF=master
-
-  allow_failures:
-    - env: TOXENV=flake8
-    - env: DRF=master
-    - python: '3.7-dev'
-
 install:
  - pip install -r requirements/ci.txt
 
@@ -41,8 +26,45 @@ branches:
   only:
     - master
     - /^release\/.*$/
+    - /^v?\d+\.\d+(\.\d+)?(-?\S+)?$/
 
 notifications:
   email:
     on_success: always
     on_failure: always
+
+jobs:
+  fast_finish: true
+
+  include:
+    - stage: test
+      python: '3.5'
+      env: TOXENV=docs
+    -
+      python: '2.7'
+      env: TOXENV=flake8
+    -
+      python: '3.6'
+      env: DRF=master
+
+    - stage: publish
+      python: '3.6'
+      script: skip
+      env: 
+      deploy: &pypi
+        provider: pypi
+        user: cvijdea
+        password:
+          secure: 54DvknusZ7uHlo9IJxgbNDVKYrwaScyuOZyAGZPb/PTUj8WroQZtp1bFOrAtzfcM4ctIIoLWVzmSwrxypmU4hNif2ZvJ8Vo2PnVh9G6wQ2fD2FN+kFBYczBNrzW5xhjJ53OiTYy/zzHgzxC/sp+hB4sibWl0v69PGU5v6oyBltOWZLXYpqMA6fINt62XDVwuNHVKAo1T/yoeJMQKeCKYAx8QOtve9/qcl5Td/OOM6z42hX5+q3N7RgkCFLl0KopwaPwBaL1Z3Bn+aUhiIUdrRrdigY329QtNXoa/VRBNvUSAwbvecShmgl3c9HigL2ZWmtmHaXda6YCdqmbVfSHSEDsn4AwhZ3A9WblbRtuBwP79YKiE+4BLmgLlGGA4IrAKr3woe+078q/bGqBzmeDd+jt72hhibzD5B96zo4tSNksSxSJGwMYH988fBN/ppynrzRvO0sR/THwpb0r42era8tRd3ZVBefloVas/nQZZs4+zMYoO0fbaLDXdkfaxsF5/X6WkwTYjbI3tdapUT6lYXwi1eKUM1ZGsfKpuq0lFa3qxevYBKveWStQwGyJz1KhVUHbo3OrA3U6q9yoqpzhcZBhzGAPSgumi+EkBUj69cymlYkmqXVBn4VnWsdeFefNYE6Kvh/HJEDPDaWSNgfVLN9xWVqJqM7QiWA351W9dRZA=
+        on:
+          tags: true
+        distributions: sdist
+
+  allow_failures:
+    - env: TOXENV=flake8
+    - env: DRF=master
+    - python: '3.7-dev'
+
+stages:
+  - test
+  - publish
