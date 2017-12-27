@@ -4,12 +4,13 @@ import os
 from collections import OrderedDict
 
 import pytest
+from datadiff.tools import assert_equal
 from django.contrib.auth.models import User
 from rest_framework.test import APIRequestFactory
 from rest_framework.views import APIView
 
 from drf_yasg import openapi, codecs
-from drf_yasg.codecs import yaml_sane_load
+from drf_yasg.codecs import yaml_sane_load, yaml_sane_dump
 from drf_yasg.generators import OpenAPISchemaGenerator
 
 
@@ -61,6 +62,22 @@ def validate_schema(db):
         validate_ssv(copy.deepcopy(swagger))
 
     return validate_schema
+
+
+@pytest.fixture
+def compare_schemas():
+    def compare_schemas(schema1, schema2):
+        schema1 = OrderedDict(schema1)
+        schema2 = OrderedDict(schema2)
+        ignore = ['info', 'host', 'schemes', 'basePath', 'securityDefinitions']
+        for attr in ignore:
+            schema1.pop(attr, None)
+            schema2.pop(attr, None)
+
+        # print diff between YAML strings because it's prettier
+        assert_equal(yaml_sane_dump(schema1, binary=False), yaml_sane_dump(schema2, binary=False))
+
+    return compare_schemas
 
 
 @pytest.fixture

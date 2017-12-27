@@ -4,6 +4,13 @@ Changelog
 
 
 *********
+**1.1.1**
+*********
+
+- **ADDED:** :ref:`generate_swagger management command <management-command>`
+  (:issue:`29`, :pr:`31`, thanks to :ghuser:`beaugunderson`)
+
+*********
 **1.1.0**
 *********
 

@@ -107,6 +107,8 @@ SWAGGER_SETTINGS = {
     'LOGIN_URL': '/admin/login',
     'LOGOUT_URL': '/admin/logout',
     'VALIDATOR_URL': 'http://localhost:8189',
+
+    'DEFAULT_INFO': 'testproj.urls.swagger_info'
 }
 
 # Internationalization

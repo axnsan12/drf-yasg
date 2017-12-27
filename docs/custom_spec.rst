@@ -138,7 +138,7 @@ The ``@swagger_auto_schema`` decorator
 You can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decorator on view functions to override
 some properties of the generated :class:`.Operation`. For example, in a ``ViewSet``,
 
-.. code:: python
+.. code-block:: python
 
    @swagger_auto_schema(operation_description="partial_update description override", responses={404: 'slug not found'})
    def partial_update(self, request, *args, **kwargs):
@@ -153,7 +153,7 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
 * for function based ``@api_view``\ s, because the same view can handle multiple methods, and thus represent multiple
   operations, you have to add the decorator multiple times if you want to override different operations:
 
-   .. code:: python
+   .. code-block:: python
 
       test_param = openapi.Parameter('test', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_BOOLEAN)
       user_response = openapi.Response('response description', UserSerializer)
@@ -169,7 +169,7 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
 * for class based ``APIView``, ``GenericAPIView`` and non-``ViewSet`` derivatives, you have to decorate the respective
   method of each operation:
 
-   .. code:: python
+   .. code-block:: python
 
       class UserList(APIView):
          @swagger_auto_schema(responses={200: UserSerializer(many=True)})
@@ -186,7 +186,7 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
   respond to multiple HTTP methods and thus have multiple operations that must be decorated separately:
 
 
-   .. code:: python
+   .. code-block:: python
 
       class ArticleViewSet(viewsets.ModelViewSet):
          # method or 'methods' can be skipped because the list_route only handles a single method (GET)
@@ -214,7 +214,7 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
    If you want to customize the generation of a method you are not implementing yourself, you can use
    ``swagger_auto_schema`` in combination with Django's ``method_decorator``:
 
-   .. code:: python
+   .. code-block:: python
 
       @method_decorator(name='list', decorator=swagger_auto_schema(
           operation_description="description from swagger_auto_schema via method_decorator"
@@ -229,7 +229,7 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
    You can go even further and directly decorate the result of ``as_view``, in the same manner you would
    override an ``@api_view`` as described above:
 
-   .. code:: python
+   .. code-block:: python
 
       decorated_login_view = \
          swagger_auto_schema(
@@ -256,7 +256,7 @@ Serializer ``Meta`` nested class
 
 You can define some per-serializer options by adding a ``Meta`` class to your serializer, e.g.:
 
-.. code:: python
+.. code-block:: python
 
    class WhateverSerializer(Serializer):
       ...
@@ -288,7 +288,7 @@ class-level attribute named ``swagger_schema`` on the view class, or
 
 For example, to generate all operation IDs as camel case, you could do:
 
-.. code:: python
+.. code-block:: python
 
    from inflection import camelize
 
@@ -331,7 +331,7 @@ For customizing behavior related to specific field, serializer, filter or pagina
 A :class:`~.inspectors.FilterInspector` that adds a description to all ``DjangoFilterBackend`` parameters could be
 implemented like so:
 
-.. code:: python
+.. code-block:: python
 
    class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
       def get_filter_parameters(self, filter_backend):
@@ -357,7 +357,7 @@ implemented like so:
 A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``title`` attribute from all generated
 :class:`.Schema` objects:
 
-.. code:: python
+.. code-block:: python
 
    class NoSchemaTitleInspector(FieldInspector):
       def process_result(self, result, method_name, obj, **kwargs):

@@ -22,6 +22,9 @@ SWAGGER_DEFAULTS = {
         'drf_yasg.inspectors.CoreAPICompatInspector',
     ],
 
+    'DEFAULT_INFO': None,
+    'DEFAULT_API_URL': '',
+
     'USE_SESSION_AUTH': True,
     'SECURITY_DEFINITIONS': {
         'basic': {
@@ -53,6 +56,7 @@ IMPORT_STRINGS = [
     'DEFAULT_FIELD_INSPECTORS',
     'DEFAULT_FILTER_INSPECTORS',
     'DEFAULT_PAGINATOR_INSPECTORS',
+    'DEFAULT_INFO',
 ]
 
 
