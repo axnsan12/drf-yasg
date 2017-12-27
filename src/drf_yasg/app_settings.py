@@ -22,6 +22,10 @@ SWAGGER_DEFAULTS = {
         'drf_yasg.inspectors.CoreAPICompatInspector',
     ],
 
+    'DEFAULT_INFO': None,
+    'DEFAULT_VERSION': None,
+    'DEFAULT_API_URL': None,
+
     'USE_SESSION_AUTH': True,
     'SECURITY_DEFINITIONS': {
         'basic': {
