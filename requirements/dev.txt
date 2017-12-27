@@ -1,6 +1,7 @@
 # requirements for local development
 tox>=2.9.1
 tox-battery>=0.5
+detox>=0.11
 
 # do not unpin this (see setup.py)
 setuptools_scm==1.15.6

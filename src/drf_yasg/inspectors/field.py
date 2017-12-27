@@ -430,6 +430,7 @@ try:
     from djangorestframework_camel_case.render import camelize
 except ImportError:  # pragma: no cover
     class CamelCaseJSONFilter(FieldInspector):
+        """Converts property names to camelCase if ``djangorestframework_camel_case`` is used."""
         pass
 else:
     def camelize_string(s):
@@ -451,6 +452,8 @@ else:
         return schema_or_ref
 
     class CamelCaseJSONFilter(FieldInspector):
+        """Converts property names to camelCase if ``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer`` are used."""
+
         def is_camel_case(self):
             return any(issubclass(parser, CamelCaseJSONParser) for parser in self.view.parser_classes) \
                    or any(issubclass(renderer, CamelCaseJSONRenderer) for renderer in self.view.renderer_classes)

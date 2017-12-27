@@ -4,3 +4,4 @@ Pillow==4.3.0
 readme_renderer==17.2
 
 Django==2.0
+djangorestframework_camel_case>=0.2.0
