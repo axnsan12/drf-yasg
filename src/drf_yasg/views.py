@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
+from drf_yasg.app_settings import swagger_settings
 from .generators import OpenAPISchemaGenerator
 from .renderers import (
     SwaggerJSONRenderer, SwaggerYAMLRenderer, SwaggerUIRenderer, ReDocRenderer, OpenAPIRenderer,
@@ -46,14 +47,14 @@ def deferred_never_cache(view_func):
     return _wrapped_view_func
 
 
-def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, validators=None,
+def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=False, validators=None,
                     generator_class=OpenAPISchemaGenerator,
                     authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
                     permission_classes=api_settings.DEFAULT_PERMISSION_CLASSES):
     """
     Create a SchemaView class with default renderers and generators.
 
-    :param .Info info: Required. Swagger API Info object
+    :param .Info info: Swagger API Info object; if omitted, defaults to `DEFAULT_INFO`
     :param str url: API base url; if left blank will be deduced from the location the view is served at
     :param patterns: passed to SchemaGenerator
     :param urlconf: passed to SchemaGenerator
@@ -69,6 +70,7 @@ def get_schema_view(info, url=None, patterns=None, urlconf=None, public=False, v
     _generator_class = generator_class
     _auth_classes = authentication_classes
     _perm_classes = permission_classes
+    info = info or swagger_settings.DEFAULT_INFO
     validators = validators or []
     _spec_renderers = tuple(renderer.with_validators(validators) for renderer in SPEC_RENDERERS)
 
