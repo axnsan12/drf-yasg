@@ -211,7 +211,14 @@ def find_regex(regex_field):
             regex_validator = validator
 
     # regex_validator.regex should be a compiled re object...
-    return getattr(getattr(regex_validator, 'regex', None), 'pattern', None)
+    pattern = getattr(getattr(regex_validator, 'regex', None), 'pattern', None)
+    if pattern:
+        # attempt some basic cleanup to remove regex constructs not supported by JavaScript
+        #  -- swagger uses javascript-style regexes - see https://github.com/swagger-api/swagger-editor/issues/1601
+        if pattern.endswith('\\Z') or pattern.endswith('\\z'):
+            pattern = pattern[:-2] + '$'
+
+    return pattern
 
 
 numeric_fields = (serializers.IntegerField, serializers.FloatField, serializers.DecimalField)
