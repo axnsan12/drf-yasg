@@ -1,8 +1,3 @@
-from collections import OrderedDict
-
-from datadiff.tools import assert_equal
-
-from drf_yasg.codecs import yaml_sane_dump
 from drf_yasg.inspectors import FieldInspector, SerializerInspector, PaginatorInspector, FilterInspector
 
 

@@ -126,6 +126,7 @@ class Command(BaseCommand):
         if output_file == '-':
             self.write_schema(schema, self.stdout, format)
         else:
-            mode = 'w' if overwrite else 'x'
-            with open(output_file, mode, encoding='utf-8') as stream:
+            flags = os.O_CREAT | os.O_WRONLY
+            flags = flags | (os.O_TRUNC if overwrite else os.O_EXCL)
+            with os.fdopen(os.open(output_file, flags), "w") as stream:
                 self.write_schema(schema, stream, format)
