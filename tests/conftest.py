@@ -9,8 +9,8 @@ from django.contrib.auth.models import User
 from rest_framework.test import APIRequestFactory
 from rest_framework.views import APIView
 
-from drf_yasg import openapi, codecs
-from drf_yasg.codecs import yaml_sane_load, yaml_sane_dump
+from drf_yasg import codecs, openapi
+from drf_yasg.codecs import yaml_sane_dump, yaml_sane_load
 from drf_yasg.generators import OpenAPISchemaGenerator
 
 
@@ -47,8 +47,8 @@ def swagger(mock_schema_request):
 
 
 @pytest.fixture
-def swagger_dict(swagger):
-    json_bytes = codec_json().encode(swagger)
+def swagger_dict(swagger, codec_json):
+    json_bytes = codec_json.encode(swagger)
     return json.loads(json_bytes.decode('utf-8'), object_pairs_hook=OrderedDict)
 
 
