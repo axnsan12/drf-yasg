@@ -2,6 +2,7 @@
 Serving the schema
 ##################
 
+
 ************************************************
 ``get_schema_view`` and the ``SchemaView`` class
 ************************************************
@@ -14,7 +15,7 @@ in the README for a usage example.
 
 You can also subclass :class:`.SchemaView` by extending the return value of :func:`.get_schema_view`, e.g.:
 
-.. code:: python
+.. code-block:: python
 
     SchemaView = get_schema_view(info, ...)
 
@@ -33,3 +34,25 @@ codec and the view.
 
 You can use your custom renderer classes as kwargs to :meth:`.SchemaView.as_cached_view` or by subclassing
 :class:`.SchemaView`.
+
+******************
+Management command
+******************
+
+.. versionadded:: 1.1.1
+
+If you only need a swagger spec file in YAML or JSON format, you can use the ``generate_swagger`` management command
+to get it without having to start the web server:
+
+.. code-block:: console
+
+   $ python manage.py generate_swagger swagger.json
+
+See the command help for more advanced options:
+
+.. code-block:: console
+
+   $ python manage.py generate_swagger --help
+   usage: manage.py generate_swagger [-h] [--version] [-v {0,1,2,3}]
+      ... more options ...
+

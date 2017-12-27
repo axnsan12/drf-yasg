@@ -27,9 +27,9 @@ Pull requests
 
 You want to contribute some code? Great! Here are a few steps to get you started:
 
-#. Fork the repository on GitHub
-#. Clone your fork and create a branch for the code you want to add
-#. Create a new virtualenv and install the package in development mode
+#. **Fork the repository on GitHub**
+#. **Clone your fork and create a branch for the code you want to add**
+#. **Create a new virtualenv and install the package in development mode**
 
    .. code:: console
 
@@ -38,7 +38,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
       (venv) $ pip install -e .[validation]
       (venv) $ pip install -rrequirements/dev.txt -rrequirements/test.txt
 
-#. Make your changes and check them against the test project
+#. **Make your changes and check them against the test project**
 
    .. code:: console
 
@@ -46,17 +46,24 @@ You want to contribute some code? Great! Here are a few steps to get you started
       (venv) $ python manage.py migrate
       (venv) $ cat createsuperuser.py | python manage.py shell
       (venv) $ python manage.py runserver
-      (venv) $ curl localhost:8000/swagger.yaml
+      (venv) $ firefox localhost:8000/swagger/
 
-#. Update the tests if necessary
+#. **Update the tests if necessary**
 
    You can find them in the ``tests`` directory.
 
-   If your change modifies the expected schema output, you should download the new generated ``swagger.yaml``, diff it
-   against the old reference output in ``tests/reference.yaml``, and replace it after checking that no unexpected
-   changes appeared.
+   If your change modifies the expected schema output, you should regenerate the reference schema at
+   ``tests/reference.yaml``:
 
-#. Run tests. The project is setup to use tox and pytest for testing
+   .. code:: console
+
+      (venv) $ cd testproj
+      (venv) $ python manage.py generate_swagger ../tests/reference.yaml --overwrite --user admin --url http://test.local:8002/
+
+   After checking the git diff to verify that no unexpected changes appeared, you should commit the new
+   ``reference.yaml`` together with your changes.
+
+#. **Run tests. The project is setup to use tox and pytest for testing**
 
    .. code:: console
 
@@ -65,7 +72,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
       # (optional) run tests for other python versions in separate environments
       (venv) $ tox
 
-#. Update documentation
+#. **Update documentation**
 
    If the change modifies behaviour or adds new features, you should update the documentation and ``README.rst``
    accordingly. Documentation is written in reStructuredText and built using Sphinx. You can find the sources in the
@@ -77,10 +84,11 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
       (venv) $ tox -e docs
 
-#. Push your branch and submit a pull request to the master branch on GitHub
+#. **Push your branch and submit a pull request to the master branch on GitHub**
 
    Incomplete/Work In Progress pull requests are encouraged, because they allow you to get feedback and help more
    easily.
 
-#. Your code must pass all the required travis jobs before it is merged. As of now, this includes running on
-   Python 2.7, 3.4, 3.5 and 3.6, and building the docs succesfully.
+#. **Your code must pass all the required travis jobs before it is merged**
+
+   As of now, this consists of running on Python 2.7, 3.4, 3.5 and 3.6, and building the docs succesfully.

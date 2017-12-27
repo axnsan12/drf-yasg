@@ -15,7 +15,7 @@ Example:
 
 **settings.py**
 
-.. code:: python
+.. code-block:: python
 
    SWAGGER_SETTINGS = {
        'SECURITY_DEFINITIONS': {
@@ -124,7 +124,7 @@ See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#sec
 
 **Default**:
 
-.. code:: python
+.. code-block:: python
 
    'basic': {
       'type': 'basic'
