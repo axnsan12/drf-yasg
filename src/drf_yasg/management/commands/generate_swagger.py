@@ -12,13 +12,15 @@ from ...generators import OpenAPISchemaGenerator
 
 
 class Command(BaseCommand):
+    help = 'Write the Swagger schema to disk in JSON format'
+    
     def add_arguments(self, parser):
         parser.add_argument(
             'output_file', metavar='output-file',
             nargs='?',
             default='swagger.json',
             type=argparse.FileType('w'),
-            help='output path for generated swagger document'
+            help='output path for generated swagger document, or "-" for stdout'
         )
         parser.add_argument(
             '-u', '--url', dest='api_url',
@@ -36,7 +38,7 @@ class Command(BaseCommand):
             )
 
         generator = OpenAPISchemaGenerator(
-            info=swagger_settings.DEFAULT_INFO,
+            info=info,
             url=api_url
         )
 
