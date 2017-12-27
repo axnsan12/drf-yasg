@@ -1,9 +1,10 @@
+from future.utils import raise_from
+
 import copy
 import json
 from collections import OrderedDict
 
 from coreapi.compat import force_bytes
-from future.utils import raise_from
 from ruamel import yaml
 
 from . import openapi

@@ -10,8 +10,7 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
-from drf_yasg.app_settings import swagger_settings
-
+from .app_settings import swagger_settings
 from .generators import OpenAPISchemaGenerator
 from .renderers import OpenAPIRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer
 

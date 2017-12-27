@@ -1,3 +1,5 @@
+from six import StringIO
+
 import json
 import os
 import random
@@ -8,7 +10,6 @@ from collections import OrderedDict
 import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
-from six import StringIO
 
 from drf_yasg.codecs import yaml_sane_load
 

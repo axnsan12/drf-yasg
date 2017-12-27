@@ -4,7 +4,6 @@ import distutils.core
 import io
 import os
 import sys
-
 from setuptools import find_packages, setup
 
 requirements_setup = ['setuptools_scm==1.15.6']
