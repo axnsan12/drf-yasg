@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import sys
 from collections import OrderedDict
 
 from django.contrib.auth.models import User
@@ -23,7 +22,7 @@ class Command(BaseCommand):
         parser.add_argument(
             'output_file', metavar='output-file',
             nargs='?',
-            default='swagger.json',
+            default='-',
             type=str,
             help='Output path for generated swagger document, or "-" for stdout.'
         )
@@ -78,7 +77,7 @@ class Command(BaseCommand):
             swagger_yaml = codec.encode(schema).decode('utf-8')
             # YAML is already pretty!
             stream.write(swagger_yaml)
-        else:
+        else:  # pragma: no cover
             raise ValueError("unknown format %s" % format)
 
     def get_mock_request(self, url, format, user=None):
@@ -125,7 +124,7 @@ class Command(BaseCommand):
         schema = generator.get_schema(request=request, public=not private)
 
         if output_file == '-':
-            self.write_schema(schema, sys.stdout, format)
+            self.write_schema(schema, self.stdout, format)
         else:
             mode = 'w' if overwrite else 'x'
             with open(output_file, mode, encoding='utf-8') as stream:

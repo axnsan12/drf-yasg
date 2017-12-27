@@ -6,16 +6,8 @@ from drf_yasg.codecs import yaml_sane_dump
 from drf_yasg.inspectors import FieldInspector, SerializerInspector, PaginatorInspector, FilterInspector
 
 
-def test_reference_schema(swagger_dict, reference_schema):
-    swagger_dict = OrderedDict(swagger_dict)
-    reference_schema = OrderedDict(reference_schema)
-    ignore = ['info', 'host', 'schemes', 'basePath', 'securityDefinitions']
-    for attr in ignore:
-        swagger_dict.pop(attr, None)
-        reference_schema.pop(attr, None)
-
-    # print diff between YAML strings because it's prettier
-    assert_equal(yaml_sane_dump(swagger_dict, binary=False), yaml_sane_dump(reference_schema, binary=False))
+def test_reference_schema(swagger_dict, reference_schema, compare_schemas):
+    compare_schemas(swagger_dict, reference_schema)
 
 
 class NoOpFieldInspector(FieldInspector):
@@ -34,7 +26,7 @@ class NoOpPaginatorInspector(PaginatorInspector):
     pass
 
 
-def test_noop_inspectors(swagger_settings, swagger_dict, reference_schema):
+def test_noop_inspectors(swagger_settings, swagger_dict, reference_schema, compare_schemas):
     from drf_yasg import app_settings
 
     def set_inspectors(inspectors, setting_name):
@@ -43,4 +35,4 @@ def test_noop_inspectors(swagger_settings, swagger_dict, reference_schema):
     set_inspectors([NoOpFieldInspector, NoOpSerializerInspector], 'DEFAULT_FIELD_INSPECTORS')
     set_inspectors([NoOpFilterInspector], 'DEFAULT_FILTER_INSPECTORS')
     set_inspectors([NoOpPaginatorInspector], 'DEFAULT_PAGINATOR_INSPECTORS')
-    test_reference_schema(swagger_dict, reference_schema)
+    compare_schemas(swagger_dict, reference_schema)
