@@ -91,6 +91,25 @@ Paginator inspectors given to :func:`@swagger_auto_schema <.swagger_auto_schema>
 :class:`'drf_yasg.inspectors.CoreAPICompatInspector' <.inspectors.CoreAPICompatInspector>`, |br| \
 ``]``
 
+Swagger document attributes
+===========================
+
+DEFAULT_INFO
+------------
+
+An import string to an :class:`.openapi.Info` object. This will be used when running the ``generate_swagger``
+management command, or if no ``info`` argument is passed to ``get_schema_view``.
+
+**Default**: :python:`None`
+
+DEFAULT_API_URL
+---------------
+
+A string representing the default API URL. This will be used to populate the ``host``, ``schemes`` and ``basePath``
+attributes of the Swagger document if no API URL is otherwise provided.
+
+**Default**: :python:`''`
+
 Authorization
 =============
 
