@@ -162,9 +162,7 @@ class SwaggerAutoSchema(ViewInspector):
 
         default_status = guess_response_status(method)
         default_schema = ''
-        if method == 'post':
-            default_schema = self.get_request_serializer() or self.get_view_serializer()
-        elif method in ('get', 'put', 'patch'):
+        if method in ('get', 'post', 'put', 'patch'):
             default_schema = self.get_request_serializer() or self.get_view_serializer()
 
         default_schema = default_schema or ''
