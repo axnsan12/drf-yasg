@@ -11,11 +11,14 @@ from ...openapi import Info
 
 class Command(BaseCommand):
 
+    help = 'Write the Swagger schema to disk in JSON format'
+
     def add_arguments(self, parser):
         parser.add_argument('output_file',
                             nargs='?',
                             default='swagger.json',
-                            type=argparse.FileType('wb'))
+                            type=argparse.FileType('wb'),
+                            help='the output file or "-" for stdout')
 
     def handle(self, output_file, *args, **options):
         if (not swagger_settings.DEFAULT_INFO or not
