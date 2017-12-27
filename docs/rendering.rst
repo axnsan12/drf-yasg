@@ -35,6 +35,8 @@ codec and the view.
 You can use your custom renderer classes as kwargs to :meth:`.SchemaView.as_cached_view` or by subclassing
 :class:`.SchemaView`.
 
+.. _management-command:
+
 ******************
 Management command
 ******************
