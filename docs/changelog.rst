@@ -9,6 +9,7 @@ Changelog
 
 - **ADDED:** :ref:`generate_swagger management command <management-command>`
   (:issue:`29`, :pr:`31`, thanks to :ghuser:`beaugunderson`)
+- **FIXED:** fixed improper generation of ``\Z`` regex tokens - will now be repalced by ``$``
 
 *********
 **1.1.0**

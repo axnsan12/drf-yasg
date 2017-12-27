@@ -1,5 +1,5 @@
 # coding=utf-8
-from pkg_resources import get_distribution, DistributionNotFound
+from pkg_resources import DistributionNotFound, get_distribution
 
 __author__ = """Cristi V."""
 __email__ = 'cristi@cvjd.me'
