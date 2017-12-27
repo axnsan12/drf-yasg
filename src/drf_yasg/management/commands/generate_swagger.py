@@ -15,11 +15,10 @@ class Command(BaseCommand):
         parser.add_argument('output_file',
                             nargs='?',
                             default='swagger.json',
-                            type=argparse.FileType('w'))
+                            type=argparse.FileType('wb'))
 
     def handle(self, output_file, *args, **options):
         if (not swagger_settings.DEFAULT_INFO or not
-                swagger_settings.DEFAULT_VERSION or not
                 swagger_settings.DEFAULT_API_URL):
             raise ImproperlyConfigured(
                 'Please set DEFAULT_INFO, DEFAULT_VERSION, and '
@@ -31,7 +30,8 @@ class Command(BaseCommand):
 
         generator = OpenAPISchemaGenerator(
             info=info,
-            version=swagger_settings.DEFAULT_VERSION)
+            version=swagger_settings.DEFAULT_VERSION,
+            url=swagger_settings.DEFAULT_API_URL)
 
         schema = generator.get_schema(request=None, public=True)
         codec = OpenAPICodecJson(validators=[])

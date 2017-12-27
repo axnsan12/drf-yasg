@@ -23,7 +23,7 @@ SWAGGER_DEFAULTS = {
     ],
 
     'DEFAULT_INFO': None,
-    'DEFAULT_VERSION': None,
+    'DEFAULT_VERSION': '',
     'DEFAULT_API_URL': None,
 
     'USE_SESSION_AUTH': True,
