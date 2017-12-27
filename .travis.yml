@@ -50,7 +50,7 @@ jobs:
     - stage: publish
       python: '3.6'
       script: skip
-      env: 
+      env:
       deploy: &pypi
         provider: pypi
         user: cvijdea
@@ -67,4 +67,5 @@ jobs:
 
 stages:
   - test
-  - publish
+  - name: publish
+    if: tag IS present
