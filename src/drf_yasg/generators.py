@@ -59,12 +59,12 @@ class OpenAPISchemaGenerator(object):
     """
     endpoint_enumerator_class = EndpointEnumerator
 
-    def __init__(self, info, version, url=None, patterns=None, urlconf=None):
+    def __init__(self, info, version='', url=swagger_settings.DEFAULT_API_URL, patterns=None, urlconf=None):
         """
 
         :param .Info info: information about the API
-        :param str version: API version string, takes preedence over the version in `info`
-        :param str url: API
+        :param str version: API version string; can be omitted to use `info.default_version`
+        :param str url: API url; can be empty to remove URL info from the result
         :param patterns: if given, only these patterns will be enumerated for inclusion in the API spec
         :param urlconf: if patterns is not given, use this urlconf to enumerate patterns;
             if not given, the default urlconf is used
