@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from django.contrib import admin
 from rest_framework import permissions
 from rest_framework.decorators import api_view

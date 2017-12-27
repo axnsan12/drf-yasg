@@ -1,7 +1,7 @@
+from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
 from articles.models import Article
-from django.utils.translation import ugettext_lazy as _
 
 
 class ArticleSerializer(serializers.ModelSerializer):

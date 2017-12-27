@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import distutils.core
 import io
 import os
-
 import sys
-from setuptools import setup, find_packages
-import distutils.core
+
+from setuptools import find_packages, setup
 
 requirements_setup = ['setuptools_scm==1.15.6']
 

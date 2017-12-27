@@ -4,10 +4,10 @@ from rest_framework.request import is_form_media_type
 from rest_framework.schemas import AutoSchema
 from rest_framework.status import is_success
 
-from .base import ViewInspector
 from .. import openapi
 from ..errors import SwaggerGenerationError
-from ..utils import force_serializer_instance, no_body, is_list_view, param_list_to_odict, guess_response_status
+from ..utils import force_serializer_instance, guess_response_status, is_list_view, no_body, param_list_to_odict
+from .base import ViewInspector
 
 
 class SwaggerAutoSchema(ViewInspector):

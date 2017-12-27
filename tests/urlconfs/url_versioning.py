@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from rest_framework import generics, versioning, fields
+from rest_framework import fields, generics, versioning
 
 from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer

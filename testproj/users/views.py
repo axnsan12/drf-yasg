@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema, no_body
-from users.serializers import UserSerializerrr, UserListQuerySerializer
+from drf_yasg.utils import no_body, swagger_auto_schema
+from users.serializers import UserListQuerySerializer, UserSerializerrr
 
 
 class UserList(APIView):

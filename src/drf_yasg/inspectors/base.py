@@ -3,7 +3,7 @@ import logging
 
 from django.utils.encoding import force_text
 from rest_framework import serializers
-from rest_framework.utils import json, encoders
+from rest_framework.utils import encoders, json
 from rest_framework.viewsets import GenericViewSet
 
 from .. import openapi

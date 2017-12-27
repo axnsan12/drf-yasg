@@ -1,10 +1,10 @@
 from collections import OrderedDict
 
 import coreschema
-from rest_framework.pagination import CursorPagination, PageNumberPagination, LimitOffsetPagination
+from rest_framework.pagination import CursorPagination, LimitOffsetPagination, PageNumberPagination
 
-from .base import PaginatorInspector, FilterInspector
 from .. import openapi
+from .base import FilterInspector, PaginatorInspector
 
 
 class CoreAPICompatInspector(PaginatorInspector, FilterInspector):

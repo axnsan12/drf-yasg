@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 import pytest
 
-from drf_yasg import openapi, codecs
+from drf_yasg import codecs, openapi
 from drf_yasg.codecs import yaml_sane_load
 from drf_yasg.generators import OpenAPISchemaGenerator
 

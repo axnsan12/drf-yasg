@@ -2,6 +2,7 @@ from django.conf.urls import url
 from rest_framework import fields
 
 from snippets.serializers import SnippetSerializer
+
 from .ns_version1 import SnippetList as SnippetListV1
 
 

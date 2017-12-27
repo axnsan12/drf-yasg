@@ -2,8 +2,8 @@ import inspect
 import logging
 from collections import OrderedDict
 
-from rest_framework import status, serializers
-from rest_framework.mixins import RetrieveModelMixin, DestroyModelMixin, UpdateModelMixin
+from rest_framework import serializers, status
+from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
 
 logger = logging.getLogger(__name__)
 

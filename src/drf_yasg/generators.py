@@ -1,15 +1,16 @@
 import re
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 
 import uritemplate
 from django.utils.encoding import force_text
 from rest_framework import versioning
-from rest_framework.schemas.generators import SchemaGenerator, EndpointEnumerator as _EndpointEnumerator
+from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
+from rest_framework.schemas.generators import SchemaGenerator
 from rest_framework.schemas.inspectors import get_pk_description
 
 from . import openapi
 from .app_settings import swagger_settings
-from .inspectors.field import get_queryset_field, get_basic_type_info
+from .inspectors.field import get_basic_type_info, get_queryset_field
 from .openapi import ReferenceResolver
 
 PATH_PARAMETER_RE = re.compile(r'{(?P<parameter>\w+)}')

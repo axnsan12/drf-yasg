@@ -3,5 +3,9 @@ tox>=2.9.1
 tox-battery>=0.5
 detox>=0.11
 
+isort>=4.2
+flake8>=3.5.0
+flake8-isort>=2.3
+
 # do not unpin this (see setup.py)
 setuptools_scm==1.15.6

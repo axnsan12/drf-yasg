@@ -1,7 +1,8 @@
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from rest_framework import versioning
 
 from testproj.urls import SchemaView
+
 from . import ns_version1, ns_version2
 
 VERSION_PREFIX_NS = r"^versioned/ns/"

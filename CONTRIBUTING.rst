@@ -67,6 +67,9 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
    .. code:: console
 
+      # (optional) sort imports with isort and check flake8 linting
+      (venv) $ isort --apply
+      (venv) $ flake8 src/drf_yasg testproj tests setup.py
       # run tests in the current environment, faster than tox
       (venv) $ pytest --cov
       # (optional) run tests for other python versions in separate environments

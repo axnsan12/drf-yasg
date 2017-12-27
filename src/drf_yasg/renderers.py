@@ -2,8 +2,8 @@ from django.shortcuts import render, resolve_url
 from rest_framework.renderers import BaseRenderer
 from rest_framework.utils import json
 
-from .app_settings import swagger_settings, redoc_settings
-from .codecs import OpenAPICodecJson, VALIDATORS, OpenAPICodecYaml
+from .app_settings import redoc_settings, swagger_settings
+from .codecs import VALIDATORS, OpenAPICodecJson, OpenAPICodecYaml
 
 
 class _SpecRenderer(BaseRenderer):

@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from snippets.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
+from snippets.models import LANGUAGE_CHOICES, STYLE_CHOICES, Snippet
 
 
 class LanguageSerializer(serializers.Serializer):
