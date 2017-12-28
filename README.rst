@@ -334,6 +334,12 @@ You can use the specification outputted by this library together with
 
 See the github page linked above for more details.
 
+Test project
+============
+
+For additional usage examples, take a look at the test project in the `testproj <testproj>`_ directory.
+Install the test project dependencies as listed in `contribution guidelines <CONTRIBUTING.rst>`_.
+
 **********
 Background
 **********
