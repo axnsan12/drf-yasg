@@ -4,6 +4,13 @@ Changelog
 
 
 *********
+**1.1.2**
+*********
+
+- **IMPROVED:** updated ``swagger-ui`` to version 3.8.1
+- **IMPROVED:** removed some unneeded static files
+
+*********
 **1.1.1**
 *********
 
