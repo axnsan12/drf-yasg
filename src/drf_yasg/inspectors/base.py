@@ -182,7 +182,7 @@ class FieldInspector(BaseInspector):
 
             - arguments specified by the ``kwargs`` parameter of :meth:`._get_partial_types`
             - ``instance_kwargs`` passed to the constructor function
-            - ``title``, ``description``, ``required``, ``default`` and ``read_only`` inferred from the field,
+            - ``title``, ``description``, ``required`` and ``default`` inferred from the field,
               where appropriate
 
           If ``existing_object`` is not ``None``, it is updated instead of creating a new object.
@@ -232,11 +232,6 @@ class FieldInspector(BaseInspector):
 
                     if default is not None:
                         instance_kwargs['default'] = default
-
-            if 'read_only' not in instance_kwargs and swagger_object_type == openapi.Schema:
-                # TODO: read_only is only relevant for schema `properties` - should not be generated in other cases
-                if field.read_only:
-                    instance_kwargs['read_only'] = True
 
             instance_kwargs.setdefault('title', title)
             instance_kwargs.setdefault('description', description)

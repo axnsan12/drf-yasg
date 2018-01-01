@@ -63,11 +63,18 @@ class InlineSerializerInspector(SerializerInspector):
             def make_schema_definition():
                 properties = OrderedDict()
                 required = []
-                for key, value in serializer.fields.items():
-                    key = self.get_property_name(key)
-                    properties[key] = self.probe_field_inspectors(value, ChildSwaggerType, use_references)
-                    if value.required:
-                        required.append(key)
+                for property_name, child in serializer.fields.items():
+                    property_name = self.get_property_name(property_name)
+                    prop_kwargs = {
+                        'read_only': child.read_only or None
+                    }
+                    prop_kwargs = filter_none(prop_kwargs)
+
+                    properties[property_name] = self.probe_field_inspectors(
+                        child, ChildSwaggerType, use_references, **prop_kwargs
+                    )
+                    if child.required:
+                        required.append(property_name)
 
                 return SwaggerType(
                     type=openapi.TYPE_OBJECT,

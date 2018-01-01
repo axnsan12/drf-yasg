@@ -1109,7 +1109,6 @@ definitions:
           type: string
           format: slug
           pattern: ^[-a-zA-Z0-9_]+$
-          readOnly: true
         readOnly: true
         uniqueItems: true
 securityDefinitions:
