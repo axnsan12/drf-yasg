@@ -29,12 +29,12 @@ Features
 -  customization hooks at all points in the spec generation process
 -  JSON and YAML format for spec
 -  bundles latest version of
-   `swagger-ui <https://github.com/swagger-api/swagger-ui>`__ and
-   `redoc <https://github.com/Rebilly/ReDoc>`__ for viewing the generated documentation
+   `swagger-ui <https://github.com/swagger-api/swagger-ui>`_ and
+   `redoc <https://github.com/Rebilly/ReDoc>`_ for viewing the generated documentation
 -  schema view is cacheable out of the box
 -  generated Swagger schema can be automatically validated by
-   `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`__ or
-   `flex <https://github.com/pipermerriam/flex>`__
+   `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`_ or
+   `flex <https://github.com/pipermerriam/flex>`_
 
 .. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.2/screenshots/redoc-nested-response.png
    :width: 100%

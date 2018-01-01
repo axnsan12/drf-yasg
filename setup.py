@@ -6,7 +6,18 @@ import os
 import sys
 from setuptools import find_packages, setup
 
-requirements_setup = ['setuptools_scm==1.15.6']
+
+def read_req(req_file):
+    with open(os.path.join('requirements', req_file)) as req:
+        return [line for line in req.readlines() if line and not line.isspace()]
+
+
+with io.open('README.rst', encoding='utf-8') as readme:
+    description = readme.read()
+
+requirements = ['djangorestframework>=3.7.0'] + read_req('base.txt')
+requirements_setup = read_req('setup.txt')
+requirements_validation = read_req('validation.txt')
 
 
 def _install_setup_requires(attrs):
@@ -39,18 +50,6 @@ if 'sdist' in sys.argv:
         setuptools_scm.integration.find_files = lambda _: []
     except ImportError:
         pass
-
-
-def read_req(req_file):
-    with open(os.path.join('requirements', req_file)) as req:
-        return [line for line in req.readlines() if line and not line.isspace()]
-
-
-with io.open('README.rst', encoding='utf-8') as readme:
-    description = readme.read()
-
-requirements = ['djangorestframework>=3.7.0'] + read_req('base.txt')
-requirements_validation = read_req('validation.txt')
 
 setup(
     name='drf-yasg',

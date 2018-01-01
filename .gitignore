@@ -1,4 +1,6 @@
 node_modules/
+testproj/db.sqlite3
+.vscode/
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
@@ -156,5 +158,3 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
-
-testproj/db\.sqlite3

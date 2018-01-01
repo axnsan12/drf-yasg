@@ -199,8 +199,6 @@ nitpick_ignore = [
     ('py:obj', 'APIView'),
 ]
 
-# TODO: inheritance aliases in sphinx 1.7
-
 # even though the package should be already installed, the sphinx build on RTD
 # for some reason needs the sources dir to be in the path in order for viewcode to work
 sys.path.insert(0, os.path.abspath('../src'))
