@@ -4,7 +4,6 @@ import logging
 from django.utils.encoding import force_text
 from rest_framework import serializers
 from rest_framework.utils import encoders, json
-from rest_framework.viewsets import GenericViewSet
 
 from .. import openapi
 from ..utils import is_list_view
@@ -322,9 +321,6 @@ class ViewInspector(BaseInspector):
         if self.method.lower() not in ["get", "delete"]:
             return False
 
-        if not isinstance(self.view, GenericViewSet):
-            return True
-
         return is_list_view(self.path, self.method, self.view)
 
     def get_filter_parameters(self):
@@ -346,10 +342,7 @@ class ViewInspector(BaseInspector):
 
         :rtype: bool
         """
-        if not hasattr(self.view, 'paginator'):
-            return False
-
-        if self.view.paginator is None:
+        if not getattr(self.view, 'paginator', None):
             return False
 
         if self.method.lower() != 'get':

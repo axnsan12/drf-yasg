@@ -166,7 +166,7 @@ def is_list_view(path, method, view):
         # a detail_route is surely not a list route
         return False
 
-    # for APIView, if it's a detail view it can't also be a list view
+    # for GenericAPIView, if it's a detail view it can't also be a list view
     if isinstance(view, (RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin)):
         return False
 
