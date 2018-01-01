@@ -334,6 +334,26 @@ You can use the specification outputted by this library together with
 
 See the github page linked above for more details.
 
+.. _readme-testproj:
+
+6. Example project
+==================
+
+For additional usage examples, you can take a look at the test project in the ``testproj`` directory:
+
+.. code:: console
+
+   $ git clone https://github.com/axnsan12/drf-yasg.git
+   $ cd drf-yasg
+   $ virtualenv venv
+   $ source venv/bin/activate
+   (venv) $ cd testproj
+   (venv) $ pip install -r requirements.txt
+   (venv) $ python manage.py migrate
+   (venv) $ python manage.py shell -c "import createsuperuser"
+   (venv) $ python manage.py runserver
+   (venv) $ firefox localhost:8000/swagger/
+
 **********
 Background
 **********

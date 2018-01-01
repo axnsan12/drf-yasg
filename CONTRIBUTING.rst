@@ -36,7 +36,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
       $ virtualenv venv
       $ source venv/bin/activate
       (venv) $ pip install -e .[validation]
-      (venv) $ pip install -rrequirements/dev.txt -rrequirements/test.txt
+      (venv) $ pip install -rrequirements/dev.txt -rrequirements/test.txt "Django>=1.11.7"
 
 #. **Make your changes and check them against the test project**
 
@@ -44,7 +44,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
       (venv) $ cd testproj
       (venv) $ python manage.py migrate
-      (venv) $ cat createsuperuser.py | python manage.py shell
+      (venv) $ python manage.py shell -c "import createsuperuser"
       (venv) $ python manage.py runserver
       (venv) $ firefox localhost:8000/swagger/
 

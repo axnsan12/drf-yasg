@@ -6,10 +6,4 @@ pytest-cov>=2.5.1
 git+https://github.com/pytest-dev/pytest-django.git@94cccb956435dd7a719606744ee7608397e1eafb
 datadiff==2.0.0
 
-# test project requirements
-Pillow>=4.3.0
-pygments>=2.2.0
-django-cors-headers>=2.1.0
-django-filter>=1.1.0,<2.0; python_version == "2.7"
-django-filter>=1.1.0; python_version >= "3.4"
-djangorestframework-camel-case>=0.2.0
+-r testproj.txt
