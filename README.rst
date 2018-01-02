@@ -251,9 +251,9 @@ caching the schema view in-memory, with some sane defaults:
 * caching is enabled by the `cache_page <https://docs.djangoproject.com/en/1.11/topics/cache/#the-per-view-cache>`__
   decorator, using the default Django cache backend, can be changed using the ``cache_kwargs`` argument
 * HTTP caching of the response is blocked to avoid confusing situations caused by being shown stale schemas
-* if `public` is set to ``False`` on the SchemaView, the cached schema varies on the ``Cookie`` and ``Authorization``
-  HTTP headers to enable filtering of visible endpoints according to the authentication credentials of each user; note
-  that this means that every user accessing the schema will have a separate schema cached in memory.
+* the cached schema varies on the ``Cookie`` and ``Authorization`` HTTP headers to enable filtering of visible endpoints
+  according to the authentication credentials of each user; note that this means that every user accessing the schema
+  will have a separate schema cached in memory.
 
 4. Validation
 =============

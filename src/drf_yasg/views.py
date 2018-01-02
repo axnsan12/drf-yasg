@@ -94,8 +94,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
 
             Arguments described in :meth:`.as_cached_view`.
             """
-            if not cls.public:
-                view = vary_on_headers('Cookie', 'Authorization')(view)
+            view = vary_on_headers('Cookie', 'Authorization')(view)
             view = cache_page(cache_timeout, **cache_kwargs)(view)
             view = deferred_never_cache(view)  # disable in-browser caching
             return view
