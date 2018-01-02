@@ -94,6 +94,8 @@ Paginator inspectors given to :func:`@swagger_auto_schema <.swagger_auto_schema>
 Swagger document attributes
 ===========================
 
+.. _default-swagger-settings:
+
 DEFAULT_INFO
 ------------
 

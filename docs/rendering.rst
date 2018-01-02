@@ -58,3 +58,30 @@ See the command help for more advanced options:
    usage: manage.py generate_swagger [-h] [--version] [-v {0,1,2,3}]
       ... more options ...
 
+
+.. Note::
+
+   The :ref:`DEFAULT_INFO <default-swagger-settings>` setting must be defined when using the ``generate_swagger``
+   command. For example, the :ref:`README quickstart <readme-quickstart>` code could be modified as such:
+
+   In ``settings.py``:
+
+   .. code:: python
+
+      SWAGGER_SETTINGS = {
+         'DEFAULT_INFO': 'import.path.to.urls.api_info',
+      }
+
+   In ``urls.py``:
+
+   .. code:: python
+
+      api_info = openapi.Info(
+         title="Snippets API",
+         ... other arguments ...
+      )
+
+      schema_view = get_schema_view(
+         # the info argument is no longer needed here as it will be picked up from DEFAULT_INFO
+         ... other arguments ...
+      )

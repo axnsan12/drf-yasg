@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 from rest_framework import serializers, status
 from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
         the `manual_parameters` argument.
 
         If a ``Serializer`` class or instance is given, it will be automatically converted into a :class:`.Schema`
-        used as a ``body`` :class:`.Parameter`, or into a list of  ``form`` :class:`.Parameter`\ s, as appropriate.
+        used as a ``body`` :class:`.Parameter`, or into a list of ``form`` :class:`.Parameter`\ s, as appropriate.
 
     :param .Serializer query_serializer: if you use a ``Serializer`` to parse query parameters, you can pass it here
         and have :class:`.Parameter` objects be generated automatically from it.
@@ -85,6 +86,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
     """
 
     def decorator(view_method):
+        assert not any(hm in extra_overrides for hm in APIView.http_method_names), "HTTP method names not allowed here"
         data = {
             'auto_schema': auto_schema,
             'request_body': request_body,
@@ -97,48 +99,52 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
             'paginator_inspectors': list(paginator_inspectors) if paginator_inspectors else None,
             'field_inspectors': list(field_inspectors) if field_inspectors else None,
         }
-        data = {k: v for k, v in data.items() if v is not None}
+        data = filter_none(data)
         data.update(extra_overrides)
+        if not data:  # pragma: no cover
+            # no overrides to set, no use in doing more work
+            return
 
         # if the method is a detail_route or list_route, it will have a bind_to_methods attribute
         bind_to_methods = getattr(view_method, 'bind_to_methods', [])
         # if the method is actually a function based view (@api_view), it will have a 'cls' attribute
         view_cls = getattr(view_method, 'cls', None)
         http_method_names = getattr(view_cls, 'http_method_names', [])
-        if bind_to_methods or http_method_names:
+
+        available_methods = http_method_names + bind_to_methods
+        existing_data = getattr(view_method, '_swagger_auto_schema', {})
+
+        _methods = methods
+        if methods or method:
+            assert bool(methods) != bool(method), "specify either method or methods"
+            assert not isinstance(methods, str), "`methods` expects to receive a list of methods;" \
+                                                 " use `method` for a single argument"
+            if method:
+                _methods = [method.lower()]
+            else:
+                _methods = [mth.lower() for mth in methods]
+            assert all(mth in available_methods for mth in _methods), "http method not bound to view"
+            assert not any(mth in existing_data for mth in _methods), "http method defined multiple times"
+
+        if available_methods:
             # detail_route, list_route or api_view
             assert bool(http_method_names) != bool(bind_to_methods), "this should never happen"
-            available_methods = http_method_names + bind_to_methods
-            existing_data = getattr(view_method, '_swagger_auto_schema', {})
 
-            if http_method_names:
-                _route = "api_view"
-            else:
-                _route = "detail_route" if view_method.detail else "list_route"
-
-            _methods = methods
             if len(available_methods) > 1:
-                assert methods or method, \
-                    "on multi-method %s, you must specify swagger_auto_schema on a per-method basis " \
-                    "using one of the `method` or `methods` arguments" % _route
-                assert bool(methods) != bool(method), "specify either method or methods"
-                assert not isinstance(methods, str), "`methods` expects to receive a list of methods;" \
-                                                     " use `method` for a single argument"
-                if method:
-                    _methods = [method.lower()]
-                else:
-                    _methods = [mth.lower() for mth in methods]
-                assert not any(mth in existing_data for mth in _methods), "method defined multiple times"
-                assert all(mth in available_methods for mth in _methods), "method not bound to %s" % _route
-
-                existing_data.update((mth.lower(), data) for mth in _methods)
+                assert _methods, \
+                    "on multi-method api_view, detail_route or list_route, you must specify swagger_auto_schema on " \
+                    "a per-method basis using one of the `method` or `methods` arguments"
             else:
-                existing_data[available_methods[0]] = data
+                # for a single-method view we assume that single method as the decorator target
+                _methods = _methods or available_methods
+
+            existing_data.update((mth.lower(), data) for mth in _methods)
             view_method._swagger_auto_schema = existing_data
         else:
-            assert method is None and methods is None, \
+            assert not _methods, \
                 "the methods argument should only be specified when decorating a detail_route or list_route; you " \
                 "should also ensure that you put the swagger_auto_schema decorator AFTER (above) the _route decorator"
+            assert not existing_data, "a single view method should only be decorated once"
             view_method._swagger_auto_schema = data
 
         return view_method

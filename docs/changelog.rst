@@ -4,6 +4,14 @@ Changelog
 
 
 *********
+**1.1.3**
+*********
+
+- **FIXED:** schema view cache will now always ``Vary`` on the ``Cookie`` and ``Authentication`` (the
+  ``Vary`` header was previously only added if ``public`` was set to ``True``) - this fixes issues related to Django
+  authentication in ``swagger-ui`` and ``CurrentUserDefault`` values in the schema
+
+*********
 **1.1.2**
 *********
 
