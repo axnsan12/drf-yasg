@@ -9,7 +9,7 @@ from setuptools import find_packages, setup
 
 def read_req(req_file):
     with open(os.path.join('requirements', req_file)) as req:
-        return [line for line in req.readlines() if line and not line.isspace()]
+        return [line.strip() for line in req.readlines() if line.strip() and not line.strip().startswith('#')]
 
 
 with io.open('README.rst', encoding='utf-8') as readme:

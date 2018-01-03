@@ -1,7 +1,8 @@
-Sphinx==1.6.5
-sphinx_rtd_theme==0.2.4
-Pillow==4.3.0
-readme_renderer==17.2
+# used by the 'docs' tox env for building the documentation
+Sphinx>=1.6.5
+sphinx_rtd_theme>=0.2.4
+Pillow>=4.3.0
+readme_renderer>=17.2
 
-Django==2.0
+Django>=2.0,<2.1
 djangorestframework_camel_case>=0.2.0
