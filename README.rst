@@ -15,9 +15,11 @@ Compatible with
 - **Django**: 1.11, 2.0
 - **Python**: 2.7, 3.4, 3.5, 3.6
 
-**Source**: https://github.com/axnsan12/drf-yasg/
+Resources:
 
-**Documentation**: https://drf-yasg.readthedocs.io/en/latest/
+* **Source**: https://github.com/axnsan12/drf-yasg/
+* **Documentation**: https://drf-yasg.readthedocs.io/
+* **Changelog**: https://drf-yasg.readthedocs.io/en/stable/changelog.html
 
 ********
 Features
@@ -145,12 +147,13 @@ This exposes 4 cached, validated and publicly available endpoints:
 a. ``get_schema_view`` parameters
 ---------------------------------
 
-- ``info`` - Required. Swagger API Info object
+- ``info`` - Swagger API Info object; if omitted, defaults to ``DEFAULT_INFO``
 - ``url`` - API base url; if left blank will be deduced from the location the view is served at
 - ``patterns`` - passed to SchemaGenerator
 - ``urlconf`` - passed to SchemaGenerator
 - ``public`` - if False, includes only endpoints the current user has access to
 - ``validators`` - a list of validator names to apply on the generated schema; allowed values are ``flex``, ``ssv``
+- ``generator_class`` - schema generator class to use; should be a subclass of ``OpenAPISchemaGenerator``
 - ``authentication_classes`` - authentication classes for the schema view itself
 - ``permission_classes`` - permission classes for the schema view itself
 
@@ -166,10 +169,9 @@ b. ``SchemaView`` options
    but with optional caching
 -  you can, of course, call :python:`as_view` as usual
 
-All of the first 3 methods take two optional arguments,
-``cache_timeout`` and ``cache_kwargs``; if present, these are passed on
-to Django’s :python:`cached_page` decorator in order to enable caching on the
-resulting view. See `3. Caching`_.
+All of the first 3 methods take two optional arguments, ``cache_timeout`` and ``cache_kwargs``; if present,
+these are passed on to Django’s :python:`cached_page` decorator in order to enable caching on the resulting view.
+See `3. Caching`_.
 
 ----------------------------------------------
 c. ``SWAGGER_SETTINGS`` and ``REDOC_SETTINGS``
