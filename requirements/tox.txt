@@ -1,0 +1,6 @@
+# requirements for building and running tox
+tox>=2.9.1
+tox-battery>=0.5
+detox>=0.11
+
+-r setup.txt

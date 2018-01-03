@@ -1,4 +1,4 @@
-# pytest runner + plugins
+# requirements for running the tests via pytest
 pytest>=2.9
 pytest-pythonpath>=0.7.1
 pytest-cov>=2.5.1

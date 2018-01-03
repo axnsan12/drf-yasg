@@ -1,4 +1,4 @@
-# requirements for building the distributable package
+# needed to build the package setup_requires in setup.py
 
 # do not unpin this (see setup.py)
 setuptools_scm==1.15.6

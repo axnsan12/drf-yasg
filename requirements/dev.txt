@@ -1,7 +1,4 @@
-# requirements for local development
-tox>=2.9.1
-tox-battery>=0.5
-detox>=0.11
-
+# requirements for local development to be installed via pip install -r requirements/dev.txt
+-r tox.txt
+-r test.txt
 -r lint.txt
--r setup.txt
