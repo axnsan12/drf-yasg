@@ -109,7 +109,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
         bind_to_methods = getattr(view_method, 'bind_to_methods', [])
         # if the method is actually a function based view (@api_view), it will have a 'cls' attribute
         view_cls = getattr(view_method, 'cls', None)
-        http_method_names = getattr(view_cls, 'http_method_names', [])
+        http_method_names = [m for m in getattr(view_cls, 'http_method_names', []) if hasattr(view_cls, m)]
 
         available_methods = http_method_names + bind_to_methods
         existing_data = getattr(view_method, '_swagger_auto_schema', {})
@@ -138,13 +138,16 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
                 # for a single-method view we assume that single method as the decorator target
                 _methods = _methods or available_methods
 
+            assert not any(hasattr(getattr(view_cls, mth, None), '_swagger_auto_schema') for mth in _methods), \
+                "swagger_auto_schema applied twice to method"
+            assert not any(mth in existing_data for mth in _methods), "swagger_auto_schema applied twice to method"
             existing_data.update((mth.lower(), data) for mth in _methods)
             view_method._swagger_auto_schema = existing_data
         else:
             assert not _methods, \
                 "the methods argument should only be specified when decorating a detail_route or list_route; you " \
                 "should also ensure that you put the swagger_auto_schema decorator AFTER (above) the _route decorator"
-            assert not existing_data, "a single view method should only be decorated once"
+            assert not existing_data, "swagger_auto_schema applied twice to method"
             view_method._swagger_auto_schema = data
 
         return view_method
