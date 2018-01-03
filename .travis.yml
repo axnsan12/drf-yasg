@@ -4,7 +4,6 @@ python:
  - '3.4'
  - '3.5'
  - '3.6'
- - '3.7-dev'
 
 env:
  - DRF=3.7
@@ -41,7 +40,6 @@ jobs:
   allow_failures:
     - env: TOXENV=flake8
     - env: DRF=master
-    - python: '3.7-dev'
 
   fast_finish: true
 
