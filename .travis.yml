@@ -2,22 +2,19 @@ language: python
 cache: pip
 
 python:
- - '2.7'
  - '3.4'
  - '3.5'
  - '3.6'
 
 env:
- - DRF=3.7 DJANGO=1.11
  - DRF=3.7 DJANGO=2.0
 
 jobs:
-  exclude:
-    - python: '2.7'
-      env: DJANGO=2.0
-
   include:
     - stage: test
+      python: '2.7'
+      env: DRF=3.7 DJANGO=1.11
+    -
       python: '3.5'
       env: TOXENV=docs
     -
