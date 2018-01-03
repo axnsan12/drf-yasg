@@ -1,13 +1,13 @@
 language: python
 cache: pip
+
 python:
  - '3.4'
  - '3.5'
  - '3.6'
 
 env:
- - DRF=3.7
- - DJANGO=2.0
+ - DRF=3.7 DJANGO=2.0
 
 jobs:
   include:
