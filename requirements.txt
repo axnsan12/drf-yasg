@@ -1,0 +1,2 @@
+-r testproj/requirements.txt
+
