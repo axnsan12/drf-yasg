@@ -14,7 +14,7 @@ swagger_info = openapi.Info(
 
 The `swagger-ui` view can be found [here](/cached/swagger).  
 The `ReDoc` view can be found [here](/cached/redoc).  
-The swagger YAML document can be found [here](/cached/swagger.yaml).  """,
+The swagger YAML document can be found [here](/cached/swagger.yaml).  """,  # noqa
     terms_of_service="https://www.google.com/policies/terms/",
     contact=openapi.Contact(email="contact@snippets.local"),
     license=openapi.License(name="BSD License"),

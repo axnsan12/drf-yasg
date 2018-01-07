@@ -38,7 +38,7 @@ jobs:
         distributions: sdist
 
   allow_failures:
-    - env: TOXENV=flake8
+    - env: TOXENV=lint
     - env: DRF=master
 
   fast_finish: true
