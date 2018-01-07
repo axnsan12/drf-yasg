@@ -109,10 +109,12 @@ REST_FRAMEWORK = {
 SWAGGER_SETTINGS = {
     'LOGIN_URL': '/admin/login',
     'LOGOUT_URL': '/admin/logout',
-    'VALIDATOR_URL': 'http://localhost:8189',
 
     'DEFAULT_INFO': 'testproj.urls.swagger_info'
 }
+
+if not os.environ.get('DYNO', ''):
+    SWAGGER_SETTINGS.update({'VALIDATOR_URL': 'http://localhost:8189'})
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
