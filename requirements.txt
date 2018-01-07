@@ -1,2 +1,3 @@
 -r testproj/requirements.txt
+psycopg2>=2.7.3
 
