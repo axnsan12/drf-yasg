@@ -16,8 +16,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     'test.local',
-    'drf-yasg-demo.herokuapp.com',
-    'drf-yasg-master.herokuapp.com',
+    '.herokuapp.com',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 
