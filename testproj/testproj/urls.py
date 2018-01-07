@@ -1,5 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.shortcuts import redirect
 from rest_framework import permissions
 from rest_framework.decorators import api_view
 
@@ -34,6 +35,8 @@ urlpatterns = [
     url(r'^cached/swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=None), name='cschema-json'),
     url(r'^cached/swagger/$', SchemaView.with_ui('swagger', cache_timeout=None), name='cschema-swagger-ui'),
     url(r'^cached/redoc/$', SchemaView.with_ui('redoc', cache_timeout=None), name='cschema-redoc'),
+
+    url(r'^$', lambda r: redirect('cschema-swagger-ui', permanent=True)),
 
     url(r'^admin/', admin.site.urls),
     url(r'^snippets/', include('snippets.urls')),
