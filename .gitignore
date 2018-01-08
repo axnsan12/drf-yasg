@@ -1,5 +1,6 @@
 node_modules/
 testproj/db.sqlite3
+testproj/staticfiles
 .vscode/
 
 # Created by .ignore support plugin (hsz.mobi)
