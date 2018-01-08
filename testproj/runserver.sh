@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 TESTPROJ="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 set -xe

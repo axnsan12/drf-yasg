@@ -3,22 +3,12 @@ import os
 import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '!z1yj(9uz)zk0gg@5--j)bc4h^i!8))r^dezco8glf190e0&#p'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     'test.local',
-    '.herokuapp.com',
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -41,7 +31,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -72,14 +61,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'testproj.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-db_path = os.path.join(BASE_DIR, 'db.sqlite3')
-DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600, default='sqlite:///' + db_path)
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -116,9 +97,6 @@ SWAGGER_SETTINGS = {
     'DEFAULT_INFO': 'testproj.urls.swagger_info'
 }
 
-if not os.environ.get('DYNO', ''):
-    SWAGGER_SETTINGS.update({'VALIDATOR_URL': 'http://localhost:8189'})
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -141,11 +119,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
-
-# Simplified static file serving.
-# https://warehouse.python.org/project/whitenoise/
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Testing
 

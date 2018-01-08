@@ -205,7 +205,7 @@ sys.path.insert(0, os.path.abspath('../src'))
 
 # activate the Django testproj to be able to succesfully import drf_yasg
 sys.path.insert(0, os.path.abspath('../testproj'))
-os.putenv('DJANGO_SETTINGS_MODULE', 'testproj.settings')
+os.putenv('DJANGO_SETTINGS_MODULE', 'testproj.settings.local')
 
 from django.conf import settings  # noqa: E402
 
