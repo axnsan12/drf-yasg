@@ -1,2 +1,3 @@
-web: DJANGO_SETTINGS_MODULE=testproj.settings.heroku testproj/runserver.sh
+release: python testproj/manage.py migrate && python testproj/manage.py shell -c "import createsuperuser"
+web: gunicorn --chdir testproj testproj.wsgi --log-file -
 
