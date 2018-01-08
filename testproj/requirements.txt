@@ -1,3 +1,4 @@
 drf-yasg[validation]
-Django>=1.11.7
+Django>=1.11.7,<2.0; python_version <= "2.7"
+Django>=1.11.7; python_version >= "3.4"
 -r ../requirements/testproj.txt

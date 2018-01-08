@@ -1,6 +1,6 @@
 import dj_database_url
 
-from .base import *
+from .base import *  # noqa: F403
 
 DEBUG = True
 

@@ -1,6 +1,8 @@
+import os
+
 import dj_database_url
 
-from .base import *
+from .base import *  # noqa: F403
 
 SWAGGER_SETTINGS.update({'VALIDATOR_URL': 'http://localhost:8189'})
 
@@ -20,4 +22,3 @@ SECRET_KEY = '!z1yj(9uz)zk0gg@5--j)bc4h^i!8))r^dezco8glf190e0&#p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
