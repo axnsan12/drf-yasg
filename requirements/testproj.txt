@@ -6,3 +6,4 @@ django-filter>=1.1.0,<2.0; python_version == "2.7"
 django-filter>=1.1.0; python_version >= "3.4"
 djangorestframework-camel-case>=0.2.0
 dj-database-url>=0.4.2
+whitenoise>=3.3.1

@@ -1,2 +1,2 @@
-web: testproj/runserver.sh $PORT
+web: testproj/runserver.sh
 
