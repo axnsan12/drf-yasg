@@ -1,3 +1,4 @@
+import user_agents
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.shortcuts import redirect
@@ -34,6 +35,18 @@ def plain_view(request):
     pass
 
 
+def root_redirect(request):
+    user_agent_string = request.META.get('HTTP_USER_AGENT', '')
+    user_agent = user_agents.parse(user_agent_string)
+
+    if user_agent.is_mobile:
+        schema_view = 'cschema-redoc'
+    else:
+        schema_view = 'cschema-swagger-ui'
+
+    return redirect(schema_view, permanent=True)
+
+
 urlpatterns = [
     url(r'^swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', SchemaView.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
@@ -42,7 +55,7 @@ urlpatterns = [
     url(r'^cached/swagger/$', SchemaView.with_ui('swagger', cache_timeout=None), name='cschema-swagger-ui'),
     url(r'^cached/redoc/$', SchemaView.with_ui('redoc', cache_timeout=None), name='cschema-redoc'),
 
-    url(r'^$', lambda r: redirect('cschema-swagger-ui', permanent=True)),
+    url(r'^$', root_redirect),
 
     url(r'^admin/', admin.site.urls),
     url(r'^snippets/', include('snippets.urls')),
