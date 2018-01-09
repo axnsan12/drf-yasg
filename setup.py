@@ -3,6 +3,8 @@
 import distutils.core
 import io
 import os
+import random
+import string
 import sys
 from setuptools import find_packages, setup
 
@@ -62,7 +64,8 @@ except LookupError:
     if 'sdist' in sys.argv or 'bdist_wheel' in sys.argv:
         raise
 
-    version_kwargs = {'version': '0.0.0'}
+    rnd = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(16))
+    version_kwargs = {'version': '0.0.0.dummy+' + rnd}
 
 setup(
     name='drf-yasg',
