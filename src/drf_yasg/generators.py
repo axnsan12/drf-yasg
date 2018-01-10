@@ -1,3 +1,4 @@
+import logging
 import re
 from collections import OrderedDict, defaultdict
 
@@ -13,11 +14,15 @@ from .app_settings import swagger_settings
 from .inspectors.field import get_basic_type_info, get_queryset_field
 from .openapi import ReferenceResolver
 
+logger = logging.getLogger(__name__)
+
 PATH_PARAMETER_RE = re.compile(r'{(?P<parameter>\w+)}')
 
 
 class EndpointEnumerator(_EndpointEnumerator):
     def get_path_from_regex(self, path_regex):
+        if path_regex.endswith(')'):
+            logger.warning("url pattern does not end in $ ('%s') - unexpected things might happen")
         return self.unescape_path(super(EndpointEnumerator, self).get_path_from_regex(path_regex))
 
     def unescape(self, s):
