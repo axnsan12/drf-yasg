@@ -3,12 +3,14 @@ import re
 from collections import OrderedDict, defaultdict
 
 import uritemplate
+from coreapi.compat import urlparse
 from django.utils.encoding import force_text
 from rest_framework import versioning
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
 from rest_framework.schemas.generators import SchemaGenerator
 from rest_framework.schemas.inspectors import get_pk_description
 
+from drf_yasg.errors import SwaggerGenerationError
 from . import openapi
 from .app_settings import swagger_settings
 from .inspectors.field import get_basic_type_info, get_queryset_field
@@ -65,12 +67,19 @@ class OpenAPISchemaGenerator(object):
     """
     endpoint_enumerator_class = EndpointEnumerator
 
-    def __init__(self, info, version='', url=swagger_settings.DEFAULT_API_URL, patterns=None, urlconf=None):
+    def __init__(self, info, version='', url=None, patterns=None, urlconf=None):
         """
 
         :param .Info info: information about the API
-        :param str version: API version string; can be omitted to use `info.default_version`
-        :param str url: API url; can be empty to remove URL info from the result
+        :param str version: API version string; if omitted, `info.default_version` will be used
+        :param str url: API scheme, host and port; if ``None`` is passed and ``DEFAULT_API_URL`` is not set, the url
+            will be inferred from the request made against the schema view, so you should generally not need to set
+            this parameter explicitly; if the empty string is passed, no host and scheme will be emitted
+
+            If `url` is not ``None`` or the empty string, it must be a scheme-absolute uri (i.e. starting with http://
+            or https://), and any path component is ignored;
+
+            See also: :ref:`documentation on base URL construction <custom-spec-base-url>`
         :param patterns: if given, only these patterns will be enumerated for inclusion in the API spec
         :param urlconf: if patterns is not given, use this urlconf to enumerate patterns;
             if not given, the default urlconf is used
@@ -78,6 +87,15 @@ class OpenAPISchemaGenerator(object):
         self._gen = SchemaGenerator(info.title, url, info.get('description', ''), patterns, urlconf)
         self.info = info
         self.version = version
+        if url is None and swagger_settings.DEFAULT_API_URL is not None:
+            url = swagger_settings.DEFAULT_API_URL
+
+        if url:
+            parsed_url = urlparse.urlparse(url)
+            if parsed_url.scheme not in ('http', 'https') or not parsed_url.netloc:
+                raise SwaggerGenerationError("`url` must be an absolute HTTP(S) url")
+            if parsed_url.path:
+                logger.warning("path component of api base URL %s is ignored; use FORCE_SCRIPT_NAME instead" % url)
 
     @property
     def url(self):
@@ -96,15 +114,15 @@ class OpenAPISchemaGenerator(object):
         endpoints = self.get_endpoints(request)
         endpoints = self.replace_version(endpoints, request)
         components = ReferenceResolver(openapi.SCHEMA_DEFINITIONS)
-        paths = self.get_paths(endpoints, components, request, public)
+        paths, prefix = self.get_paths(endpoints, components, request, public)
 
         url = self.url
-        if not url and request is not None:
+        if url is None and request is not None:
             url = request.build_absolute_uri()
 
         return openapi.Swagger(
             info=self.info, paths=paths,
-            _url=url, _version=self.version, **dict(components)
+            _url=url, _prefix=prefix, _version=self.version, **dict(components)
         )
 
     def create_view(self, callback, method, request=None):
@@ -212,14 +230,16 @@ class OpenAPISchemaGenerator(object):
         :param ReferenceResolver components: resolver/container for Swagger References
         :param Request request: the request made against the schema view; can be None
         :param bool public: if True, all endpoints are included regardless of access through `request`
-        :rtype: openapi.Paths
+        :returns: the :class:`.Paths` object and the longest common path prefix, as a 2-tuple
+        :rtype: tuple[openapi.Paths,str]
         """
         if not endpoints:
-            return openapi.Paths(paths={})
+            return openapi.Paths(paths={}), ''
 
-        prefix = self.determine_path_prefix(list(endpoints.keys()))
+        prefix = self.determine_path_prefix(list(endpoints.keys())) or ''
+        assert '{' not in prefix, "base path cannot be templated in swagger 2.0"
+
         paths = OrderedDict()
-
         for path, (view_cls, methods) in sorted(endpoints.items()):
             operations = {}
             for method, view in methods:
@@ -229,9 +249,14 @@ class OpenAPISchemaGenerator(object):
                 operations[method.lower()] = self.get_operation(view, path, prefix, method, components, request)
 
             if operations:
-                paths[path] = self.get_path_item(path, view_cls, operations)
+                # since the common prefix is used as the API basePath, it must be stripped
+                # from individual paths when writing them into the swagger document
+                path_suffix = path[len(prefix):]
+                if not path_suffix.startswith('/'):
+                    path_suffix = '/' + path_suffix
+                paths[path_suffix] = self.get_path_item(path, view_cls, operations)
 
-        return openapi.Paths(paths=paths)
+        return openapi.Paths(paths=paths), prefix
 
     def get_operation(self, view, path, prefix, method, components, request):
         """Get an :class:`.Operation` for the given API endpoint (path, method). This method delegates to
