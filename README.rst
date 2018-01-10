@@ -20,6 +20,11 @@ Resources:
 * **Source**: https://github.com/axnsan12/drf-yasg/
 * **Documentation**: https://drf-yasg.readthedocs.io/
 * **Changelog**: https://drf-yasg.readthedocs.io/en/stable/changelog.html
+* **Live demo**: https://drf-yasg-demo.herokuapp.com/
+
+.. image:: https://www.herokucdn.com/deploy/button.svg
+   :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg
+   :alt: heroku deploy button
 
 ********
 Features

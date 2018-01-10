@@ -462,8 +462,10 @@ else:
         """Converts property names to camelCase if ``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer`` are used."""
 
         def is_camel_case(self):
-            return any(issubclass(parser, CamelCaseJSONParser) for parser in self.view.parser_classes) \
-                   or any(issubclass(renderer, CamelCaseJSONRenderer) for renderer in self.view.renderer_classes)
+            return (
+                any(issubclass(parser, CamelCaseJSONParser) for parser in self.view.parser_classes) or
+                any(issubclass(renderer, CamelCaseJSONRenderer) for renderer in self.view.renderer_classes)
+            )
 
         def process_result(self, result, method_name, obj, **kwargs):
             if isinstance(result, openapi.Schema.OR_REF) and self.is_camel_case():

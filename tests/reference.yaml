@@ -1,7 +1,11 @@
 swagger: '2.0'
 info:
   title: Snippets API
-  description: Test description
+  description: "This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg)\
+    \ Django Rest Framework library.\n\nThe `swagger-ui` view can be found [here](/cached/swagger).\
+    \  \nThe `ReDoc` view can be found [here](/cached/redoc).  \nThe swagger YAML\
+    \ document can be found [here](/cached/swagger.yaml).  \n\nYou can log in using\
+    \ the pre-existing `admin` user with password `passwordadmin`."
   termsOfService: https://www.google.com/policies/terms/
   contact:
     email: contact@snippets.local

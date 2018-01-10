@@ -3,6 +3,8 @@
 import distutils.core
 import io
 import os
+import random
+import string
 import sys
 from setuptools import find_packages, setup
 
@@ -32,14 +34,14 @@ def _install_setup_requires(attrs):
         dist.fetch_build_eggs(dist.setup_requires)
 
 
-if 'sdist' in sys.argv:
-    try:
-        # try to install setuptools_scm before setuptools does it, otherwise our monkey patch below will come too early
-        # (setuptools_scm adds find_files hooks into setuptools on install)
-        _install_setup_requires({'setup_requires': requirements_setup})
-    except Exception:
-        pass
+try:
+    # try to install setuptools_scm before setuptools does it, otherwise our monkey patch below will come too early
+    # (setuptools_scm adds find_files hooks into setuptools on install)
+    _install_setup_requires({'setup_requires': requirements_setup})
+except Exception:
+    pass
 
+if 'sdist' in sys.argv:
     try:
         # see https://github.com/pypa/setuptools_scm/issues/190, setuptools_scm includes ALL versioned files from
         # the git repo into the sdist by default, and there is no easy way to provide an opt-out;
@@ -51,9 +53,22 @@ if 'sdist' in sys.argv:
     except ImportError:
         pass
 
+try:
+    # this is a workaround for being able to install the package from source without working from a git checkout
+    # it is needed for building succesfully on Heroku
+    from setuptools_scm import get_version
+
+    version = get_version()
+    version_kwargs = {'use_scm_version': True}
+except LookupError:
+    if 'sdist' in sys.argv or 'bdist_wheel' in sys.argv:
+        raise
+
+    rnd = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(16))
+    version_kwargs = {'version': '0.0.0.dummy+' + rnd}
+
 setup(
     name='drf-yasg',
-    use_scm_version=True,
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
@@ -89,4 +104,5 @@ setup(
         'Topic :: Documentation',
         'Topic :: Software Development :: Code Generators',
     ],
+    **version_kwargs
 )
