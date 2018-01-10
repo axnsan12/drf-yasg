@@ -5,88 +5,18 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ title }}</title>
-    <link
-            href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700"
-            rel="stylesheet">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Source+Code+Pro:300,600|Titillium+Web:400,600,700">
+    <link rel="stylesheet" type="text/css" href="{% static 'drf-yasg/style.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'drf-yasg/swagger-ui-dist/swagger-ui.css' %}">
-    <link rel="icon" type="image/png" href="{% static 'drf-yasg/swagger-ui-dist/favicon-32x32.png' %}"
-          sizes="32x32"/>
-    <link rel="icon" type="image/png" href="{% static 'drf-yasg/swagger-ui-dist/favicon-16x16.png' %}"
-          sizes="16x16"/>
-    <style>
-        html {
-            box-sizing: border-box;
-            overflow: -moz-scrollbars-vertical;
-            overflow-y: scroll;
-        }
+    <link rel="icon" type="image/png" href="{% static 'drf-yasg/swagger-ui-dist/favicon-32x32.png' %}" sizes="32x32"/>
+    <link rel="icon" type="image/png" href="{% static 'drf-yasg/swagger-ui-dist/favicon-16x16.png' %}" sizes="16x16"/>
 
-        *,
-        *:before,
-        *:after {
-            box-sizing: inherit;
-        }
-
-        body {
-            margin: 0;
-            background: #fafafa;
-        }
-
-        #django-session-auth {
-            margin-right: 8px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        #django-session-auth > div {
-            display: inline-block;
-        }
-
-        #django-session-auth .btn.authorize {
-            padding: 10px 23px;
-        }
-
-        #django-session-auth .btn.authorize a {
-            color: #49cc90;
-            text-decoration: none;
-        }
-
-        #django-session-auth .hello {
-            margin-right: 5px;
-        }
-
-        #django-session-auth .hello .django-session {
-            font-weight: bold;
-        }
-
-        .label {
-            display: inline;
-            padding: .2em .6em .3em;
-            font-weight: 700;
-            line-height: 1;
-            color: #fff;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: baseline;
-            border-radius: .25em;
-        }
-
-        .label-primary {
-            background-color: #337ab7;
-        }
-
-        .divider {
-            margin-right: 8px;
-            background: #16222c44;
-            width: 2px;
-        }
-    </style>
 </head>
 
 <body>
 
-<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0">
+<svg class="swagger-defs" xmlns="http://www.w3.org/2000/svg">
     <defs>
         <symbol viewBox="0 0 20 20" id="unlocked">
             <path
@@ -128,70 +58,10 @@
 <div id="swagger-ui"></div>
 <div id="spec-error" class="hidden alert alert-danger"></div>
 
-<script>
-    "use strict";
-    var currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
-    var specURL = currentPath + '?format=openapi';
 
-    function patchSwaggerUi() {
-        var authWrapper = document.querySelector('.auth-wrapper');
-        var authorizeButton = document.querySelector('.auth-wrapper .authorize');
-        var djangoSessionAuth = document.querySelector('#django-session-auth');
-        if (document.querySelector('.auth-wrapper #django-session-auth')) {
-            console.log("session auth already patched");
-            return;
-        }
+<script id="swagger-settings" type="application/json">{{ swagger_settings | safe }}</script>
 
-        authWrapper.insertBefore(djangoSessionAuth, authorizeButton);
-        djangoSessionAuth.classList.remove("hidden");
-
-        var divider = document.createElement("div");
-        divider.classList.add("divider");
-        authWrapper.insertBefore(divider, authorizeButton);
-    }
-
-    function initSwaggerUi() {
-        var swaggerConfig = {
-            url: specURL,
-            dom_id: '#swagger-ui',
-            displayOperationId: true,
-            displayRequestDuration: true,
-            presets: [
-                SwaggerUIBundle.presets.apis,
-                SwaggerUIStandalonePreset
-            ],
-            plugins: [
-                SwaggerUIBundle.plugins.DownloadUrl
-            ],
-            layout: "StandaloneLayout",
-            filter: true,
-            requestInterceptor: function(request) {
-                var headers = request.headers || {};
-                var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]");
-                if (csrftoken) {
-                    headers["X-CSRFToken"] = csrftoken.value;
-                }
-                return request;
-            }
-        };
-
-        var swaggerSettings = {};
-        swaggerSettings = {{ swagger_settings | safe }};
-        console.log(swaggerSettings);
-        for (var p in swaggerSettings) {
-            if (swaggerSettings.hasOwnProperty(p)) {
-                swaggerConfig[p] = swaggerSettings[p];
-            }
-        }
-        window.ui = SwaggerUIBundle(swaggerConfig);
-    }
-
-    window.onload = function () {
-        insertionQ('.auth-wrapper .authorize').every(patchSwaggerUi);
-        initSwaggerUi();
-    };
-</script>
-
+<script src="{% static 'drf-yasg/swagger-ui-init.js' %}"></script>
 <script src="{% static 'drf-yasg/swagger-ui-dist/swagger-ui-bundle.js' %}"></script>
 <script src="{% static 'drf-yasg/swagger-ui-dist/swagger-ui-standalone-preset.js' %}"></script>
 <script src="{% static 'drf-yasg/insQ.min.js' %}"></script>
