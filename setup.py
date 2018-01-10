@@ -85,6 +85,7 @@ setup(
     author_email='cristi@cvjd.me',
     keywords='drf django django-rest-framework schema swagger openapi codegen swagger-codegen '
              'documentation drf-yasg django-rest-swagger drf-openapi',
+    python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
