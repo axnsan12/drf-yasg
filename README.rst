@@ -211,7 +211,7 @@ The possible settings and their default values are as follows:
       # default api Info if none is otherwise given; should be an import string to an openapi.Info object
       'DEFAULT_INFO': None,
       # default API url if none is otherwise given
-      'DEFAULT_API_URL': '',
+      'DEFAULT_API_URL': None,
 
       'USE_SESSION_AUTH': True,  # add Django Login and Django Logout buttons, CSRF token to swagger UI page
       'LOGIN_URL': getattr(django.conf.settings, 'LOGIN_URL', None),  # URL for the login button

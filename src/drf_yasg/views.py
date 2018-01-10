@@ -52,14 +52,13 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
                     generator_class=OpenAPISchemaGenerator,
                     authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
                     permission_classes=api_settings.DEFAULT_PERMISSION_CLASSES):
-    """
-    Create a SchemaView class with default renderers and generators.
+    """Create a SchemaView class with default renderers and generators.
 
-    :param .Info info: Swagger API Info object; if omitted, defaults to `DEFAULT_INFO`
-    :param str url: API base url; if left blank will be deduced from the location the view is served at
-    :param patterns: passed to SchemaGenerator
-    :param urlconf: passed to SchemaGenerator
-    :param bool public: if False, includes only endpoints the current user has access to
+    :param .Info info: information about the API; if omitted, defaults to :ref:`DEFAULT_INFO <default-swagger-settings>`
+    :param str url: same as :class:`.OpenAPISchemaGenerator`
+    :param patterns: same as :class:`.OpenAPISchemaGenerator`
+    :param urlconf: same as :class:`.OpenAPISchemaGenerator`
+    :param bool public: if False, includes only the endpoints that are accesible by the user viewing the schema
     :param list validators: a list of validator names to apply; allowed values are ``flex``, ``ssv``
     :param type generator_class: schema generator class to use; should be a subclass of :class:`.OpenAPISchemaGenerator`
     :param tuple authentication_classes: authentication classes for the schema view itself
