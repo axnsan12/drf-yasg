@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        {% if not request.version %}
+        span.api-info-version {
+            display: none;
+        }
+        {% endif %}
+    </style>
+</head>
+<body>
+    <script id="redoc-settings" type="application/json">{{ redoc_settings | safe }}</script>
+
+    <script src="{% static 'drf-yasg/redoc-init.js' %}"> </script>
+    <script src="{% static 'drf-yasg/redoc-alpha/redoc.standalone.js' %}"> </script>
+</body>
+</html>
