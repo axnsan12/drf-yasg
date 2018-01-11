@@ -14,7 +14,7 @@
 
 </head>
 
-<body>
+<body class="swagger-body">
 
 <svg class="swagger-defs" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -61,10 +61,10 @@
 
 <script id="swagger-settings" type="application/json">{{ swagger_settings | safe }}</script>
 
-<script src="{% static 'drf-yasg/swagger-ui-init.js' %}"></script>
 <script src="{% static 'drf-yasg/swagger-ui-dist/swagger-ui-bundle.js' %}"></script>
 <script src="{% static 'drf-yasg/swagger-ui-dist/swagger-ui-standalone-preset.js' %}"></script>
 <script src="{% static 'drf-yasg/insQ.min.js' %}"></script>
+<script src="{% static 'drf-yasg/swagger-ui-init.js' %}"></script>
 
 <div id="django-session-auth" class="hidden">
     {% if USE_SESSION_AUTH %}

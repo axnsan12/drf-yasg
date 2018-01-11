@@ -7,7 +7,7 @@ function patchSwaggerUi() {
     var authorizeButton = document.querySelector('.auth-wrapper .authorize');
     var djangoSessionAuth = document.querySelector('#django-session-auth');
     if (document.querySelector('.auth-wrapper #django-session-auth')) {
-        console.log("session auth already patched");
+        console.log("WARNING: session auth already patched; skipping patchSwaggerUi()");
         return;
     }
 
@@ -20,6 +20,10 @@ function patchSwaggerUi() {
 }
 
 function initSwaggerUi() {
+    if (window.ui) {
+        console.log("WARNING: skipping initSwaggerUi() because window.ui is already defined");
+        return;
+    }
     var swaggerConfig = {
         url: specURL,
         dom_id: '#swagger-ui',
@@ -46,7 +50,6 @@ function initSwaggerUi() {
 
     var swaggerSettings = JSON.parse(document.getElementById('swagger-settings').innerHTML);
 
-    console.log(swaggerSettings);
     for (var p in swaggerSettings) {
         if (swaggerSettings.hasOwnProperty(p)) {
             swaggerConfig[p] = swaggerSettings[p];
@@ -56,6 +59,12 @@ function initSwaggerUi() {
 }
 
 window.onload = function () {
-    insertionQ('.auth-wrapper .authorize').every(patchSwaggerUi);
     initSwaggerUi();
 };
+
+if (document.querySelector('.auth-wrapper .authorize')) {
+    patchSwaggerUi();
+}
+else {
+    insertionQ('.auth-wrapper .authorize').every(patchSwaggerUi);
+}

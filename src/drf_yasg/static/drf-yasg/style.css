@@ -12,6 +12,10 @@ html {
 
 body {
     margin: 0;
+    padding: 0;
+}
+
+body.swagger-body {
     background: #fafafa;
 }
 
