@@ -321,11 +321,15 @@ class Items(SwaggerDict):
         self.pattern = pattern
         self.items = items
         self._insert_extras__()
+        if items and type != TYPE_ARRAY:
+            raise AssertionError("items can only be used when type is array")
+        if pattern and type != TYPE_STRING:
+            raise AssertionError("pattern can only be used when type is string")
 
 
 class Parameter(SwaggerDict):
     def __init__(self, name, in_, description=None, required=None, schema=None,
-                 type=None, format=None, enum=None, pattern=None, items=None, **extra):
+                 type=None, format=None, enum=None, pattern=None, items=None, default=None, **extra):
         """Describe parameters accepted by an :class:`.Operation`. Each parameter should be a unique combination of
         (`name`, `in_`). ``body`` and ``form`` parameters in the same operation are mutually exclusive.
 
@@ -339,6 +343,7 @@ class Parameter(SwaggerDict):
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
         :param .Items items: only valid if `type` is ``array``
+        :param default: default value if the parameter is not provided; must conform to parameter type
         """
         super(Parameter, self).__init__(**extra)
         if (not schema and not type) or (schema and type):
@@ -354,6 +359,18 @@ class Parameter(SwaggerDict):
         self.pattern = pattern
         self.items = items
         self._insert_extras__()
+        if self['in'] == IN_PATH:
+            # path parameters must always be required
+            assert required is not False, "path parameter cannot be optional"
+            self.required = True
+        if self['in'] != IN_BODY and schema is not None:
+            raise AssertionError("schema can only be applied to a body Parameter, not %s" % type)
+        if (format or enum or pattern or default) and not type:
+            raise AssertionError("[format, enum, pattern, default] can only be applied to non-body Parameter")
+        if items and type != TYPE_ARRAY:
+            raise AssertionError("items can only be used when type is array")
+        if pattern and type != TYPE_STRING:
+            raise AssertionError("pattern can only be used when type is string")
 
 
 class Schema(SwaggerDict):
@@ -381,9 +398,9 @@ class Schema(SwaggerDict):
         super(Schema, self).__init__(**extra)
         if required is True or required is False:
             # common error
-            raise AssertionError(
-                "the `requires` attribute of schema must be an array of required properties, not a boolean!")
-        assert type is not None, "type is required!"
+            raise AssertionError("the `requires` attribute of schema must be an "
+                                 "array of required property names, not a boolean!")
+        assert type, "type is required!"
         self.title = title
         self.description = description
         self.required = filter_none(required)
@@ -397,6 +414,14 @@ class Schema(SwaggerDict):
         self.read_only = read_only
         self.default = default
         self._insert_extras__()
+        if (properties or (additional_properties is not None)) and type != TYPE_OBJECT:
+            raise AssertionError("only object Schema can have properties")
+        if (format or enum or pattern) and type in (TYPE_OBJECT, TYPE_ARRAY):
+            raise AssertionError("[format, enum, pattern] can only be applied to primitive Schema")
+        if items and type != TYPE_ARRAY:
+            raise AssertionError("items can only be used when type is array")
+        if pattern and type != TYPE_STRING:
+            raise AssertionError("pattern can only be used when type is string")
 
 
 class _Ref(SwaggerDict):
