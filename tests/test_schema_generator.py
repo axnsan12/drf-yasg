@@ -54,7 +54,7 @@ def test_basepath_only(mock_schema_request):
             url='/basepath/',
         )
 
-        swagger = generator.get_schema(mock_schema_request, public=True)
+        generator.get_schema(mock_schema_request, public=True)
 
 
 def test_no_netloc(mock_schema_request):

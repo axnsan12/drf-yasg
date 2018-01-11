@@ -4,15 +4,15 @@ from collections import OrderedDict, defaultdict
 
 import uritemplate
 from coreapi.compat import urlparse
-from django.urls import URLResolver, URLPattern
 from django.utils.encoding import force_text
 from rest_framework import versioning
-from rest_framework.compat import get_original_route
-from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator, endpoint_ordering
-from rest_framework.schemas.generators import SchemaGenerator
+from rest_framework.compat import URLPattern, URLResolver, get_original_route
+from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
+from rest_framework.schemas.generators import SchemaGenerator, endpoint_ordering
 from rest_framework.schemas.inspectors import get_pk_description
 
 from drf_yasg.errors import SwaggerGenerationError
+
 from . import openapi
 from .app_settings import swagger_settings
 from .inspectors.field import get_basic_type_info, get_queryset_field
