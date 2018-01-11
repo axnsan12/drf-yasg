@@ -17,7 +17,7 @@ class SnippetListV2(SnippetListV1):
     serializer_class = SnippetSerializerV2
 
 
-app_name = 'test_ns_versioning'
+app_name = '2.0'
 
 urlpatterns = [
     url(r"^$", SnippetListV2.as_view())
