@@ -9,7 +9,7 @@ from .codecs import VALIDATORS, OpenAPICodecJson, OpenAPICodecYaml
 class _SpecRenderer(BaseRenderer):
     """Base class for text renderers. Handles encoding and validation."""
     charset = None
-    validators = ['ssv', 'flex']
+    validators = []
     codec_class = None
 
     @classmethod

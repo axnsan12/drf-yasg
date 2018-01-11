@@ -13,7 +13,7 @@ class SwaggerExceptionMiddleware(object):
 
     def process_exception(self, request, exception):
         if isinstance(exception, SwaggerValidationError):
-            err = {'errors': {exception.validator_name: str(exception)}}
+            err = {'errors': exception.errors, 'message': str(exception)}
             codec = exception.source_codec
             if isinstance(codec, _OpenAPICodec):
                 err = codec.encode_error(err)

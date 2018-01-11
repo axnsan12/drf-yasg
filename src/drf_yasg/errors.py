@@ -3,9 +3,9 @@ class SwaggerError(Exception):
 
 
 class SwaggerValidationError(SwaggerError):
-    def __init__(self, msg, validator_name, spec, source_codec, *args):
+    def __init__(self, msg, errors=None, spec=None, source_codec=None, *args):
         super(SwaggerValidationError, self).__init__(msg, *args)
-        self.validator_name = validator_name
+        self.errors = errors
         self.spec = spec
         self.source_codec = source_codec
 

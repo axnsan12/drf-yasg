@@ -12,22 +12,22 @@ from .app_settings import swagger_settings
 from .errors import SwaggerValidationError
 
 
-def _validate_flex(spec, codec):
+def _validate_flex(spec):
     from flex.core import parse as validate_flex
     from flex.exceptions import ValidationError
     try:
         validate_flex(spec)
     except ValidationError as ex:
-        raise_from(SwaggerValidationError(str(ex), 'flex', spec, codec), ex)
+        raise_from(SwaggerValidationError(str(ex)), ex)
 
 
-def _validate_swagger_spec_validator(spec, codec):
+def _validate_swagger_spec_validator(spec):
     from swagger_spec_validator.validator20 import validate_spec as validate_ssv
     from swagger_spec_validator.common import SwaggerValidationError as SSVErr
     try:
         validate_ssv(spec)
     except SSVErr as ex:
-        raise_from(SwaggerValidationError(str(ex), 'swagger_spec_validator', spec, codec), ex)
+        raise_from(SwaggerValidationError(str(ex)), ex)
 
 
 #:
@@ -61,10 +61,17 @@ class _OpenAPICodec(object):
             raise TypeError('Expected a `openapi.Swagger` instance')
 
         spec = self.generate_swagger_object(document)
+        errors = {}
         for validator in self.validators:
-            # validate a deepcopy of the spec to prevent the validator from messing with it
-            # for example, swagger_spec_validator adds an x-scope property to all references
-            VALIDATORS[validator](copy.deepcopy(spec), self)
+            try:
+                # validate a deepcopy of the spec to prevent the validator from messing with it
+                # for example, swagger_spec_validator adds an x-scope property to all references
+                VALIDATORS[validator](copy.deepcopy(spec))
+            except SwaggerValidationError as e:
+                errors[validator] = str(e)
+
+        if errors:
+            raise SwaggerValidationError("spec validation failed", errors, spec, self)
         return force_bytes(self._dump_dict(spec))
 
     def encode_error(self, err):
