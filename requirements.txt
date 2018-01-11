@@ -1,1 +1,2 @@
+.[validation]
 -r requirements/heroku.txt

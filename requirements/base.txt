@@ -6,3 +6,7 @@ inflection>=0.3.1
 future>=0.16.0
 six>=1.11.0
 uritemplate>=3.0.0
+
+djangorestframework>=3.7.0
+Django>=1.11.7,<2.0; python_version <= "2.7"
+Django>=1.11.7; python_version >= "3.4"
