@@ -339,7 +339,12 @@ paths:
     delete:
       operationId: snippetsDelete
       description: delete method docstring
-      parameters: []
+      parameters:
+        - name: id
+          in: path
+          description: path parameter override
+          required: true
+          type: integer
       responses:
         '204':
           description: ''

@@ -3,7 +3,9 @@ from djangorestframework_camel_case.render import CamelCaseJSONRenderer
 from inflection import camelize
 from rest_framework import generics
 
+from drf_yasg import openapi
 from drf_yasg.inspectors import SwaggerAutoSchema
+from drf_yasg.utils import swagger_auto_schema
 from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer
 
@@ -53,6 +55,14 @@ class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
         """patch method docstring"""
         return super(SnippetDetail, self).patch(request, *args, **kwargs)
 
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter(
+            name='id', in_=openapi.IN_PATH,
+            type=openapi.TYPE_INTEGER,
+            description="path parameter override",
+            required=True
+        )
+    ])
     def delete(self, request, *args, **kwargs):
         """delete method docstring"""
         return super(SnippetDetail, self).patch(request, *args, **kwargs)
