@@ -13,23 +13,14 @@ env:
 jobs:
   include:
     - stage: test
+      python: '3.6'
+      env: DRF=master
+    -
       python: '3.5'
-      script: tox
-      after_script: skip
-      after_success: skip
       env: TOXENV=docs
     -
       python: '2.7'
-      script: tox
-      after_script: skip
-      after_success: skip
       env: TOXENV=lint
-    -
-      python: '3.6'
-      script: tox
-      after_script: skip
-      after_success: skip
-      env: DRF=master
 
     - stage: publish
       python: '3.6'
@@ -54,16 +45,17 @@ install:
  - pip install -r requirements/ci.txt
 
 before_script:
- - coverage erase
+ - 'coverage erase'
+ - '[[ -z "$TOXENV" ]] && REPORT_COVERAGE=1'
+ - '[[ -z "$TOXENV" && ! -z "$DRF" && "$DRF" != "master" ]] && USE_DETOX=1'
 
 script:
- - detox
-
-after_script:
- - coverage combine && coverage report
+ - 'if [[ $USE_DETOX == 1 ]]; then detox; else tox; fi'
 
 after_success:
- - codecov
+ - 'coverage combine'
+ - 'if [[ $REPORT_COVERAGE == 1 ]]; then coverage report; fi'
+ - 'if [[ $REPORT_COVERAGE == 1 ]]; then codecov; fi'
 
 branches:
   only:
