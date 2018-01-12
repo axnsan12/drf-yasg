@@ -45,17 +45,27 @@ install:
  - pip install -r requirements/ci.txt
 
 before_script:
- - 'coverage erase'
- - '[[ -z "$TOXENV" ]] && REPORT_COVERAGE=1'
- - '[[ -z "$TOXENV" && ! -z "$DRF" && "$DRF" != "master" ]] && USE_DETOX=1'
+ - coverage erase
+ - |
+  if [[ -z "$TOXENV" ]]
+  then
+    REPORT_COVERAGE="yes"
+    echo "Reporting coverage: ${REPORT_COVERAGE}
+  fi
+ - |
+  if [[ -z "$TOXENV" && ! -z "$DRF" && "$DRF" != "master" ]]
+  then
+    USE_DETOX="yes"
+    echo "Using detox: ${USE_DETOX}'
+  fi
 
 script:
- - 'if [[ $USE_DETOX == 1 ]]; then detox; else tox; fi'
+ - 'if [[ "$USE_DETOX" == "yes" ]]; then detox; else tox; fi'
 
 after_success:
- - 'coverage combine'
- - 'if [[ $REPORT_COVERAGE == 1 ]]; then coverage report; fi'
- - 'if [[ $REPORT_COVERAGE == 1 ]]; then codecov; fi'
+ - coverage combine
+ - 'if [[ "$REPORT_COVERAGE" == "yes" ]]; then coverage report; fi'
+ - 'if [[ "$REPORT_COVERAGE" == "yes" ]]; then codecov; fi'
 
 branches:
   only:
