@@ -95,3 +95,24 @@ You want to contribute some code? Great! Here are a few steps to get you started
 #. **Your code must pass all the required travis jobs before it is merged**
 
    As of now, this consists of running on Python 2.7, 3.4, 3.5 and 3.6, and building the docs succesfully.
+
+******************
+Maintainer's notes
+******************
+
+Release checklist
+=================
+
+* update ``docs/changelog.rst`` with changes since the latest tag
+* commit & tag the release
+* push using ``git push --follow-tags``
+* verify that `Travis`_ has built the tag and succesfully published the release to PyPI
+* publish release notes `on GitHub`_
+* start the `ReadTheDocs build`_ if it has not already started
+* deploy the live demo `on Heroku`_
+
+
+.. _Travis: https://travis-ci.org/axnsan12/drf-yasg/builds
+.. _on GitHub: https://github.com/axnsan12/drf-yasg/releases
+.. _ReadTheDocs build: https://readthedocs.org/projects/drf-yasg/builds/
+.. _on Heroku: https://dashboard.heroku.com/pipelines/412d1cae-6a95-4f5e-810b-94869133f36a
