@@ -14,12 +14,18 @@ jobs:
   include:
     - stage: test
       python: '3.5'
+      script: tox
+      after_success: skip
       env: TOXENV=docs
     -
       python: '2.7'
+      script: tox
+      after_success: skip
       env: TOXENV=lint
     -
       python: '3.6'
+      script: tox
+      after_success: skip
       env: DRF=master
 
     - stage: publish
