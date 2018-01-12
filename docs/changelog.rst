@@ -3,6 +3,13 @@ Changelog
 #########
 
 *********
+**1.2.2**
+*********
+
+- **FIXED:** djangorestframework>=3.7.7 is now required because of breaking changes
+  (:issue:`44`, :pr:`45`, thanks to :ghuser:`h-hirokawa`)
+
+*********
 **1.2.1**
 *********
 
