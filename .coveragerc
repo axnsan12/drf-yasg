@@ -20,7 +20,10 @@ exclude_lines =
     raise TypeError
     raise NotImplementedError
     warnings.warn
+    logger.debug
+    logger.info
     logger.warning
+    logger.error
     return NotHandled
 
     # Don't complain if non-runnable code isn't run:

@@ -97,6 +97,8 @@ class EndpointEnumerator(_EndpointEnumerator):
                     namespace="%s:%s" % (namespace, pattern.namespace) if namespace else pattern.namespace
                 )
                 api_endpoints.extend(nested_endpoints)
+            else:
+                logger.warning("unknown pattern type {}".format(type(pattern)))
 
         api_endpoints = sorted(api_endpoints, key=endpoint_ordering)
 
