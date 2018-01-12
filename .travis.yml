@@ -47,17 +47,9 @@ install:
 before_script:
  - coverage erase
  - |
-  if [[ -z "$TOXENV" ]]
-  then
-    REPORT_COVERAGE="yes"
-    echo "Reporting coverage: ${REPORT_COVERAGE}
-  fi
+  [[ -z "$TOXENV" ]] && REPORT_COVERAGE="yes" && echo "Reporting coverage: ${REPORT_COVERAGE}" || true
  - |
-  if [[ -z "$TOXENV" && ! -z "$DRF" && "$DRF" != "master" ]]
-  then
-    USE_DETOX="yes"
-    echo "Using detox: ${USE_DETOX}'
-  fi
+  [[ -z "$TOXENV" && ! -z "$DRF" && "$DRF" != "master" ]] && USE_DETOX="yes" &&echo "Using detox: ${USE_DETOX}" || true
 
 script:
  - 'if [[ "$USE_DETOX" == "yes" ]]; then detox; else tox; fi'
