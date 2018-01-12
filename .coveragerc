@@ -2,6 +2,7 @@
 source = drf_yasg
 branch = True
 parallel = true
+disable_warnings = module-not-measured
 
 [report]
 # Regexes for lines to exclude from consideration
