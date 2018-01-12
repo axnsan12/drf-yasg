@@ -24,7 +24,9 @@ jobs:
 
     - stage: publish
       python: '3.6'
+      before_script: skip
       script: skip
+      after_success: skip
       env:
       deploy: &pypi
         provider: pypi
@@ -47,9 +49,11 @@ install:
 before_script:
  - coverage erase
  - |
-  [[ -z "$TOXENV" ]] && REPORT_COVERAGE="yes" && echo "Reporting coverage: ${REPORT_COVERAGE}" || true
+  [[ -z "$TOXENV" ]] && REPORT_COVERAGE="yes" || REPORT_COVERAGE="no";
+  echo "Reporting coverage: ${REPORT_COVERAGE}"
  - |
-  [[ -z "$TOXENV" && ! -z "$DRF" && "$DRF" != "master" ]] && USE_DETOX="yes" &&echo "Using detox: ${USE_DETOX}" || true
+  [[ -z "$TOXENV" && ! -z "$DRF" && "$DRF" != "master" ]] && USE_DETOX="yes" || USE_DETOX="no";
+  echo "Using detox: ${USE_DETOX}"
 
 script:
  - 'if [[ "$USE_DETOX" == "yes" ]]; then detox; else tox; fi'
