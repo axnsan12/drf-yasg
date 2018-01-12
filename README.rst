@@ -42,10 +42,8 @@ Features
 - generated Swagger schema can be automatically validated by
   `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`_ or
   `flex <https://github.com/pipermerriam/flex>`_
-- supports Django REST Framework API versioning
-
-   + ``URLPathVersioning`` and ``NamespaceVersioning`` are supported
-   + ``HostnameVersioning``, ``AcceptHeaderVersioning`` and ``QueryParameterVersioning`` are not currently supported
+- supports Django REST Framework API versioning with ``URLPathVersioning`` and ``NamespaceVersioning``; other DRF
+  or custom versioning schemes are not currently supported
 
 .. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.2/screenshots/redoc-nested-response.png
    :width: 100%
