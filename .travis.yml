@@ -2,31 +2,31 @@ language: python
 cache: pip
 
 python:
+ - '2.7'
  - '3.4'
  - '3.5'
  - '3.6'
 
 env:
- - DRF=3.7 DJANGO=2.0
+ - DRF=3.7
 
 jobs:
   include:
     - stage: test
-      python: '2.7'
-      env: DRF=3.7 DJANGO=1.11
+      python: '3.6'
+      env: DRF=master
     -
       python: '3.5'
       env: TOXENV=docs
     -
       python: '2.7'
       env: TOXENV=lint
-    -
-      python: '3.6'
-      env: DRF=master
 
     - stage: publish
       python: '3.6'
+      before_script: skip
       script: skip
+      after_success: skip
       env:
       deploy: &pypi
         provider: pypi
@@ -48,12 +48,20 @@ install:
 
 before_script:
  - coverage erase
+ - |
+  [[ -z "$TOXENV" ]] && REPORT_COVERAGE="yes" || REPORT_COVERAGE="no";
+  echo "Reporting coverage: ${REPORT_COVERAGE}"
+ - |
+  [[ -z "$TOXENV" && ! -z "$DRF" && "$DRF" != "master" ]] && USE_DETOX="yes" || USE_DETOX="no";
+  echo "Using detox: ${USE_DETOX}"
 
 script:
- - tox
+ - 'if [[ "$USE_DETOX" == "yes" ]]; then detox; else tox; fi'
 
 after_success:
- - codecov
+ - coverage combine
+ - 'if [[ "$REPORT_COVERAGE" == "yes" ]]; then coverage report; fi'
+ - 'if [[ "$REPORT_COVERAGE" == "yes" ]]; then codecov; fi'
 
 branches:
   only:

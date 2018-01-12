@@ -1,6 +1,8 @@
 [run]
 source = drf_yasg
 branch = True
+parallel = true
+disable_warnings = module-not-measured
 
 [report]
 # Regexes for lines to exclude from consideration
@@ -29,7 +31,8 @@ exclude_lines =
     raise SwaggerGenerationError
 
 ignore_errors = True
-precision = 0
+precision = 2
+show_missing = True
 
 [paths]
 source =

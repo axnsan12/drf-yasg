@@ -2,6 +2,7 @@
 pytest>=2.9
 pytest-pythonpath>=0.7.1
 pytest-cov>=2.5.1
+pytest-xdist>=1.22.0
 # latest pip version of pytest-django is more than a year old and does not support Django 2.0
 git+https://github.com/pytest-dev/pytest-django.git@94cccb956435dd7a719606744ee7608397e1eafb
 datadiff==2.0.0
