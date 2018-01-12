@@ -15,16 +15,19 @@ jobs:
     - stage: test
       python: '3.5'
       script: tox
+      after_script: skip
       after_success: skip
       env: TOXENV=docs
     -
       python: '2.7'
       script: tox
+      after_script: skip
       after_success: skip
       env: TOXENV=lint
     -
       python: '3.6'
       script: tox
+      after_script: skip
       after_success: skip
       env: DRF=master
 
@@ -55,6 +58,9 @@ before_script:
 
 script:
  - detox
+
+after_script:
+ - coverage combine && coverage report
 
 after_success:
  - codecov
