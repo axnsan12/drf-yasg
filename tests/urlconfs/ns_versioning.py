@@ -19,7 +19,7 @@ schema_patterns = [
 
 urlpatterns = [
     url(VERSION_PREFIX_NS + r"v1.0/snippets/", include(ns_version1, namespace='1.0')),
-    url(VERSION_PREFIX_NS + r"v2.0/snippets/", include(ns_version2, namespace='2.0')),
+    url(VERSION_PREFIX_NS + r"v2.0/snippets/", include(ns_version2)),
     url(VERSION_PREFIX_NS + r'v1.0/', include((schema_patterns, '1.0'))),
     url(VERSION_PREFIX_NS + r'v2.0/', include((schema_patterns, '2.0'))),
 ]

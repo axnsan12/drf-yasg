@@ -5,6 +5,7 @@ import pytest
 
 from drf_yasg import codecs, openapi
 from drf_yasg.codecs import yaml_sane_load
+from drf_yasg.errors import SwaggerGenerationError
 from drf_yasg.generators import OpenAPISchemaGenerator
 
 
@@ -46,14 +47,23 @@ def test_yaml_and_json_match(codec_yaml, codec_json, swagger):
 
 
 def test_basepath_only(mock_schema_request):
+    with pytest.raises(SwaggerGenerationError):
+        generator = OpenAPISchemaGenerator(
+            info=openapi.Info(title="Test generator", default_version="v1"),
+            version="v2",
+            url='/basepath/',
+        )
+
+        generator.get_schema(mock_schema_request, public=True)
+
+
+def test_no_netloc(mock_schema_request):
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),
         version="v2",
-        url='/basepath/',
+        url='',
     )
 
     swagger = generator.get_schema(mock_schema_request, public=True)
-    assert 'host' not in swagger
-    assert 'schemes' not in swagger
-    assert swagger['basePath'] == '/'  # base path is not implemented for now
+    assert 'host' not in swagger and 'schemes' not in swagger
     assert swagger['info']['version'] == 'v2'

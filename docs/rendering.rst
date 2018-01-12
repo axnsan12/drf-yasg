@@ -66,7 +66,7 @@ See the command help for more advanced options:
 
    In ``settings.py``:
 
-   .. code:: python
+   .. code-block:: python
 
       SWAGGER_SETTINGS = {
          'DEFAULT_INFO': 'import.path.to.urls.api_info',
@@ -74,7 +74,7 @@ See the command help for more advanced options:
 
    In ``urls.py``:
 
-   .. code:: python
+   .. code-block:: python
 
       api_info = openapi.Info(
          title="Snippets API",

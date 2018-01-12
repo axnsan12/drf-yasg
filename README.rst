@@ -30,18 +30,22 @@ Resources:
 Features
 ********
 
--  full support for nested Serializers and Schemas
--  response schemas and descriptions
--  model definitions compatible with codegen tools
--  customization hooks at all points in the spec generation process
--  JSON and YAML format for spec
--  bundles latest version of
-   `swagger-ui <https://github.com/swagger-api/swagger-ui>`_ and
-   `redoc <https://github.com/Rebilly/ReDoc>`_ for viewing the generated documentation
--  schema view is cacheable out of the box
--  generated Swagger schema can be automatically validated by
-   `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`_ or
-   `flex <https://github.com/pipermerriam/flex>`_
+- full support for nested Serializers and Schemas
+- response schemas and descriptions
+- model definitions compatible with codegen tools
+- customization hooks at all points in the spec generation process
+- JSON and YAML format for spec
+- bundles latest version of
+  `swagger-ui <https://github.com/swagger-api/swagger-ui>`_ and
+  `redoc <https://github.com/Rebilly/ReDoc>`_ for viewing the generated documentation
+- schema view is cacheable out of the box
+- generated Swagger schema can be automatically validated by
+  `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`_ or
+  `flex <https://github.com/pipermerriam/flex>`_
+- supports Django REST Framework API versioning
+
+   + ``URLPathVersioning``, ``NamespaceVersioning`` and ``HostnameVersioning`` are supported
+   + ``AcceptHeaderVersioning`` and ``QueryParameterVersioning`` are not currently supported
 
 .. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.2/screenshots/redoc-nested-response.png
    :width: 100%
@@ -211,7 +215,7 @@ The possible settings and their default values are as follows:
       # default api Info if none is otherwise given; should be an import string to an openapi.Info object
       'DEFAULT_INFO': None,
       # default API url if none is otherwise given
-      'DEFAULT_API_URL': '',
+      'DEFAULT_API_URL': None,
 
       'USE_SESSION_AUTH': True,  # add Django Login and Django Logout buttons, CSRF token to swagger UI page
       'LOGIN_URL': getattr(django.conf.settings, 'LOGIN_URL', None),  # URL for the login button

@@ -42,7 +42,7 @@ class Command(BaseCommand):
             '-u', '--url', dest='api_url',
             default='',
             type=str,
-            help='Base API URL - sets the host, scheme and basePath attributes of the generated document.'
+            help='Base API URL - sets the host and scheme attributes of the generated document.'
         )
         parser.add_argument(
             '-m', '--mock-request', dest='mock',

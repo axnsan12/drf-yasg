@@ -2,6 +2,7 @@ import re
 from collections import OrderedDict
 
 from coreapi.compat import urlparse
+from django.urls import get_script_prefix
 from inflection import camelize
 
 from .utils import filter_none
@@ -210,11 +211,13 @@ class Info(SwaggerDict):
 
 
 class Swagger(SwaggerDict):
-    def __init__(self, info=None, _url=None, _version=None, paths=None, definitions=None, **extra):
+    def __init__(self, info=None, _url=None, _prefix=None, _version=None, paths=None, definitions=None, **extra):
         """Root Swagger object.
 
         :param .Info info: info object
-        :param str _url: URL used for guessing the API host, scheme and basepath
+        :param str _url: URL used for setting the API host and scheme
+        :param str _prefix: api path prefix to use in setting basePath; this will be appended to the wsgi
+            SCRIPT_NAME prefix or Django's FORCE_SCRIPT_NAME if applicable
         :param str _version: version string to override Info
         :param .Paths paths: paths object
         :param dict[str,.Schema] definitions: named models
@@ -226,15 +229,38 @@ class Swagger(SwaggerDict):
 
         if _url:
             url = urlparse.urlparse(_url)
-            if url.netloc:
-                self.host = url.netloc
-            if url.scheme:
-                self.schemes = [url.scheme]
-        self.base_path = '/'
+            assert url.netloc and url.scheme, "if given, url must have both schema and netloc"
+            self.host = url.netloc
+            self.schemes = [url.scheme]
 
+        self.base_path = self.get_base_path(get_script_prefix(), _prefix)
         self.paths = paths
         self.definitions = filter_none(definitions)
         self._insert_extras__()
+
+    @classmethod
+    def get_base_path(cls, script_prefix, api_prefix):
+        """Determine an appropriate value for ``basePath`` based on the SCRIPT_NAME and the api common prefix.
+
+        :param str script_prefix: script prefix as defined by django ``get_script_prefix``
+        :param str api_prefix: api common prefix
+        :return: joined base path
+        """
+        # avoid double slash when joining script_name with api_prefix
+        if script_prefix and script_prefix.endswith('/'):
+            script_prefix = script_prefix[:-1]
+        if not api_prefix.startswith('/'):
+            api_prefix = '/' + api_prefix
+
+        base_path = script_prefix + api_prefix
+
+        # ensure that the base path has a leading slash and no trailing slash
+        if base_path and base_path.endswith('/'):
+            base_path = base_path[:-1]
+        if not base_path.startswith('/'):
+            base_path = '/' + base_path
+
+        return base_path
 
 
 class Paths(SwaggerDict):

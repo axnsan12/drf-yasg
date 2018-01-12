@@ -127,6 +127,29 @@ This section describes where information is sourced from when using the default 
 * *descriptions* for :class:`.Operation`\ s, :class:`.Parameter`\ s and :class:`.Schema`\ s are picked up from
   docstrings and ``help_text`` attributes in the same manner as the `default DRF SchemaGenerator
   <http://www.django-rest-framework.org/api-guide/schemas/#schemas-as-documentation>`_
+* .. _custom-spec-base-url:
+
+  the base URL for the API consists of three values - the ``host``, ``schemes`` and ``basePath`` attributes
+* the host name and scheme are determined, in descending order of priority:
+
+   + from the ``url`` argument passed to :func:`.get_schema_view` (more specifically, to the underlying
+     :class:`.OpenAPISchemaGenerator`)
+   + from the :ref:`DEFAULT_API_URL setting <default-swagger-settings>`
+   + inferred from the request made to the schema endpoint
+
+   For example, an url of ``https://www.example.com:8080/some/path`` will populate the ``host`` and ``schemes``
+   attributes with ``www.example.com:8080`` and ``['https']``, respectively. The path component will be ignored.
+* the base path is determined as the concatenation of two variables:
+
+   #. the `SCRIPT_NAME`_ wsgi environment variable; this is set, for example, when serving the site from a
+      sub-path using web server url rewriting
+
+      .. Tip::
+
+         The Django `FORCE_SCRIPT_NAME`_ setting can be used to override the `SCRIPT_NAME`_ or set it when it's
+         missing from the environment.
+
+   #. the longest common path prefix of all the urls in your API - see :meth:`.determine_path_prefix`
 
 
 .. _custom-spec-swagger-auto-schema:
@@ -398,3 +421,6 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
    This means that you should generally avoid view or method-specific ``FieldInspector``\ s if you are dealing with
    references (a.k.a named models), because you can never know which view will be the first to generate the schema
    for a given serializer.
+
+.. _SCRIPT_NAME: https://www.python.org/dev/peps/pep-0333/#environ-variables
+.. _FORCE_SCRIPT_NAME: https://docs.djangoproject.com/en/2.0/ref/settings/#force-script-name

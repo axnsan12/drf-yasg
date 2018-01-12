@@ -1,24 +1,106 @@
+import logging
 import re
 from collections import OrderedDict, defaultdict
 
 import uritemplate
+from coreapi.compat import urlparse
 from django.utils.encoding import force_text
 from rest_framework import versioning
+from rest_framework.compat import URLPattern, URLResolver, get_original_route
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
-from rest_framework.schemas.generators import SchemaGenerator
+from rest_framework.schemas.generators import SchemaGenerator, endpoint_ordering
 from rest_framework.schemas.inspectors import get_pk_description
+
+from drf_yasg.errors import SwaggerGenerationError
 
 from . import openapi
 from .app_settings import swagger_settings
 from .inspectors.field import get_basic_type_info, get_queryset_field
 from .openapi import ReferenceResolver
 
+logger = logging.getLogger(__name__)
+
 PATH_PARAMETER_RE = re.compile(r'{(?P<parameter>\w+)}')
 
 
 class EndpointEnumerator(_EndpointEnumerator):
+    def __init__(self, patterns=None, urlconf=None, request=None):
+        super(EndpointEnumerator, self).__init__(patterns, urlconf)
+        self.request = request
+
     def get_path_from_regex(self, path_regex):
+        if path_regex.endswith(')'):
+            logger.warning("url pattern does not end in $ ('%s') - unexpected things might happen")
         return self.unescape_path(super(EndpointEnumerator, self).get_path_from_regex(path_regex))
+
+    def should_include_endpoint(self, path, callback, app_name='', namespace='', url_name=None):
+        if not super(EndpointEnumerator, self).should_include_endpoint(path, callback):
+            return False
+
+        version = getattr(self.request, 'version', None)
+        versioning_class = getattr(callback.cls, 'versioning_class', None)
+        if versioning_class is not None and issubclass(versioning_class, versioning.NamespaceVersioning):
+            if version and version not in namespace.split(':'):
+                return False
+
+        return True
+
+    def replace_version(self, path, callback):
+        """If ``request.version`` is not ``None`` and `callback` uses ``URLPathVersioning``, this function replaces
+        the ``version`` parameter in `path` with the actual version.
+
+        :param str path: the templated path
+        :param callback: the view callback
+        :rtype: str
+        """
+        versioning_class = getattr(callback.cls, 'versioning_class', None)
+        if versioning_class is not None and issubclass(versioning_class, versioning.URLPathVersioning):
+            version = getattr(self.request, 'version', None)
+            if version:
+                version_param = getattr(versioning_class, 'version_param', 'version')
+                version_param = '{%s}' % version_param
+                if version_param not in path:
+                    logger.info("view %s uses URLPathVersioning but URL %s has no param %s"
+                                % (callback.cls, path, version_param))
+                path = path.replace(version_param, version)
+
+        return path
+
+    def get_api_endpoints(self, patterns=None, prefix='', app_name=None, namespace=None):
+        """
+        Return a list of all available API endpoints by inspecting the URL conf.
+
+        Copied entirely from super.
+        """
+        if patterns is None:
+            patterns = self.patterns
+
+        api_endpoints = []
+
+        for pattern in patterns:
+            path_regex = prefix + get_original_route(pattern)
+            if isinstance(pattern, URLPattern):
+                path = self.get_path_from_regex(path_regex)
+                callback = pattern.callback
+                url_name = pattern.name
+                if self.should_include_endpoint(path, callback, app_name or '', namespace or '', url_name):
+                    path = self.replace_version(path, callback)
+                    for method in self.get_allowed_methods(callback):
+                        endpoint = (path, method, callback)
+                        api_endpoints.append(endpoint)
+
+            elif isinstance(pattern, URLResolver):
+                nested_endpoints = self.get_api_endpoints(
+                    patterns=pattern.url_patterns,
+                    prefix=path_regex,
+                    app_name="%s:%s" % (app_name, pattern.app_name) if app_name else pattern.app_name,
+                    namespace="%s:%s" % (namespace, pattern.namespace) if namespace else pattern.namespace
+                )
+                api_endpoints.extend(nested_endpoints)
+
+        api_endpoints = sorted(api_endpoints, key=endpoint_ordering)
+
+        return api_endpoints
 
     def unescape(self, s):
         """Unescape all backslash escapes from `s`.
@@ -30,8 +112,8 @@ class EndpointEnumerator(_EndpointEnumerator):
         return re.sub(r'\\(.)', r'\1', s)
 
     def unescape_path(self, path):
-        """Remove backslashes from all path components outside {parameters}. This is needed because
-        Django>=2.0 ``path()``/``RoutePattern`` aggresively escapes all non-parameter path components.
+        """Remove backslashe escapes from all path components outside {parameters}. This is needed because
+        ``simplify_regex`` does not handle this correctly - note however that this implementation is
 
         **NOTE:** this might destructively affect some url regex patterns that contain metacharacters (e.g. \w, \d)
         outside path parameter groups; if you are in this category, God help you
@@ -60,12 +142,19 @@ class OpenAPISchemaGenerator(object):
     """
     endpoint_enumerator_class = EndpointEnumerator
 
-    def __init__(self, info, version='', url=swagger_settings.DEFAULT_API_URL, patterns=None, urlconf=None):
+    def __init__(self, info, version='', url=None, patterns=None, urlconf=None):
         """
 
         :param .Info info: information about the API
-        :param str version: API version string; can be omitted to use `info.default_version`
-        :param str url: API url; can be empty to remove URL info from the result
+        :param str version: API version string; if omitted, `info.default_version` will be used
+        :param str url: API scheme, host and port; if ``None`` is passed and ``DEFAULT_API_URL`` is not set, the url
+            will be inferred from the request made against the schema view, so you should generally not need to set
+            this parameter explicitly; if the empty string is passed, no host and scheme will be emitted
+
+            If `url` is not ``None`` or the empty string, it must be a scheme-absolute uri (i.e. starting with http://
+            or https://), and any path component is ignored;
+
+            See also: :ref:`documentation on base URL construction <custom-spec-base-url>`
         :param patterns: if given, only these patterns will be enumerated for inclusion in the API spec
         :param urlconf: if patterns is not given, use this urlconf to enumerate patterns;
             if not given, the default urlconf is used
@@ -73,6 +162,15 @@ class OpenAPISchemaGenerator(object):
         self._gen = SchemaGenerator(info.title, url, info.get('description', ''), patterns, urlconf)
         self.info = info
         self.version = version
+        if url is None and swagger_settings.DEFAULT_API_URL is not None:
+            url = swagger_settings.DEFAULT_API_URL
+
+        if url:
+            parsed_url = urlparse.urlparse(url)
+            if parsed_url.scheme not in ('http', 'https') or not parsed_url.netloc:
+                raise SwaggerGenerationError("`url` must be an absolute HTTP(S) url")
+            if parsed_url.path:
+                logger.warning("path component of api base URL %s is ignored; use FORCE_SCRIPT_NAME instead" % url)
 
     @property
     def url(self):
@@ -89,17 +187,16 @@ class OpenAPISchemaGenerator(object):
         :rtype: openapi.Swagger
         """
         endpoints = self.get_endpoints(request)
-        endpoints = self.replace_version(endpoints, request)
         components = ReferenceResolver(openapi.SCHEMA_DEFINITIONS)
-        paths = self.get_paths(endpoints, components, request, public)
+        paths, prefix = self.get_paths(endpoints, components, request, public)
 
         url = self.url
-        if not url and request is not None:
+        if url is None and request is not None:
             url = request.build_absolute_uri()
 
         return openapi.Swagger(
             info=self.info, paths=paths,
-            _url=url, _version=self.version, **dict(components)
+            _url=url, _prefix=prefix, _version=self.version, **dict(components)
         )
 
     def create_view(self, callback, method, request=None):
@@ -120,30 +217,6 @@ class OpenAPISchemaGenerator(object):
                     setattr(view_method.__func__, '_swagger_auto_schema', overrides)
         return view
 
-    def replace_version(self, endpoints, request):
-        """If ``request.version`` is not ``None``, replace the version parameter in the path of any endpoints using
-        ``URLPathVersioning`` as a versioning class.
-
-        :param dict endpoints: endpoints as returned by :meth:`.get_endpoints`
-        :param Request request: the request made against the schema view
-        :return: endpoints with modified paths
-        """
-        version = getattr(request, 'version', None)
-        if version is None:
-            return endpoints
-
-        new_endpoints = {}
-        for path, endpoint in endpoints.items():
-            view_cls = endpoint[0]
-            versioning_class = getattr(view_cls, 'versioning_class', None)
-            version_param = getattr(versioning_class, 'version_param', 'version')
-            if versioning_class is not None and issubclass(versioning_class, versioning.URLPathVersioning):
-                path = path.replace('{%s}' % version_param, version)
-
-            new_endpoints[path] = endpoint
-
-        return new_endpoints
-
     def get_endpoints(self, request):
         """Iterate over all the registered endpoints in the API and return a fake view with the right parameters.
 
@@ -151,7 +224,7 @@ class OpenAPISchemaGenerator(object):
         :return: {path: (view_class, list[(http_method, view_instance)])
         :rtype: dict
         """
-        enumerator = self.endpoint_enumerator_class(self._gen.patterns, self._gen.urlconf)
+        enumerator = self.endpoint_enumerator_class(self._gen.patterns, self._gen.urlconf, request=request)
         endpoints = enumerator.get_api_endpoints()
 
         view_paths = defaultdict(list)
@@ -207,14 +280,16 @@ class OpenAPISchemaGenerator(object):
         :param ReferenceResolver components: resolver/container for Swagger References
         :param Request request: the request made against the schema view; can be None
         :param bool public: if True, all endpoints are included regardless of access through `request`
-        :rtype: openapi.Paths
+        :returns: the :class:`.Paths` object and the longest common path prefix, as a 2-tuple
+        :rtype: tuple[openapi.Paths,str]
         """
         if not endpoints:
-            return openapi.Paths(paths={})
+            return openapi.Paths(paths={}), ''
 
-        prefix = self.determine_path_prefix(list(endpoints.keys()))
+        prefix = self.determine_path_prefix(list(endpoints.keys())) or ''
+        assert '{' not in prefix, "base path cannot be templated in swagger 2.0"
+
         paths = OrderedDict()
-
         for path, (view_cls, methods) in sorted(endpoints.items()):
             operations = {}
             for method, view in methods:
@@ -224,9 +299,14 @@ class OpenAPISchemaGenerator(object):
                 operations[method.lower()] = self.get_operation(view, path, prefix, method, components, request)
 
             if operations:
-                paths[path] = self.get_path_item(path, view_cls, operations)
+                # since the common prefix is used as the API basePath, it must be stripped
+                # from individual paths when writing them into the swagger document
+                path_suffix = path[len(prefix):]
+                if not path_suffix.startswith('/'):
+                    path_suffix = '/' + path_suffix
+                paths[path_suffix] = self.get_path_item(path, view_cls, operations)
 
-        return openapi.Paths(paths=paths)
+        return openapi.Paths(paths=paths), prefix
 
     def get_operation(self, view, path, prefix, method, components, request):
         """Get an :class:`.Operation` for the given API endpoint (path, method). This method delegates to

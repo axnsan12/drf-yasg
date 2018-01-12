@@ -107,10 +107,13 @@ management command, or if no ``info`` argument is passed to ``get_schema_view``.
 DEFAULT_API_URL
 ---------------
 
-A string representing the default API URL. This will be used to populate the ``host``, ``schemes`` and ``basePath``
-attributes of the Swagger document if no API URL is otherwise provided.
+A string representing the default API URL. This will be used to populate the ``host`` and ``schemes`` attributes
+of the Swagger document if no API URL is otherwise provided. The Django `FORCE_SCRIPT_NAME`_ setting can be used for
+providing an API mount point prefix.
 
-**Default**: :python:`''`
+See also: :ref:`documentation on base URL construction <custom-spec-base-url>`
+
+**Default**: :python:`None`
 
 Authorization
 =============
@@ -274,3 +277,6 @@ PATH_IN_MIDDLE
 
 **Default**: :python:`False` |br|
 *Maps to attribute*: ``path-in-middle-panel``
+
+
+.. _FORCE_SCRIPT_NAME: https://docs.djangoproject.com/en/2.0/ref/settings/#force-script-name
