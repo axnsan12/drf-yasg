@@ -24,10 +24,8 @@ jobs:
 
     - stage: publish
       python: '3.6'
-      before_script: skip
       script: skip
-      after_success: skip
-      env:
+      env: PYPI_DEPLOY=true
       deploy: &pypi
         provider: pypi
         user: cvijdea
@@ -49,7 +47,7 @@ install:
 before_script:
  - coverage erase
  - |
-  [[ -z "$TOXENV" ]] && REPORT_COVERAGE="yes" || REPORT_COVERAGE="no";
+  [[ -z "$TOXENV" && -z "$PYPI_DEPLOY" ]] && REPORT_COVERAGE="yes" || REPORT_COVERAGE="no";
   echo "Reporting coverage: ${REPORT_COVERAGE}"
  - |
   [[ -z "$TOXENV" && ! -z "$DRF" && "$DRF" != "master" ]] && USE_DETOX="yes" || USE_DETOX="no";
