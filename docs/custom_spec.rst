@@ -129,8 +129,8 @@ This section describes where information is sourced from when using the default 
   <http://www.django-rest-framework.org/api-guide/schemas/#schemas-as-documentation>`_
 * .. _custom-spec-base-url:
 
-  the base URL for the API consists of three values - the ``host``, ``schemes`` and ``basePath`` attributes
-* the host name and scheme are determined, in descending order of priority:
+  The base URL for the API consists of three values - the ``host``, ``schemes`` and ``basePath`` attributes
+* The host name and scheme are determined, in descending order of priority:
 
    + from the ``url`` argument passed to :func:`.get_schema_view` (more specifically, to the underlying
      :class:`.OpenAPISchemaGenerator`)
@@ -139,7 +139,7 @@ This section describes where information is sourced from when using the default 
 
    For example, an url of ``https://www.example.com:8080/some/path`` will populate the ``host`` and ``schemes``
    attributes with ``www.example.com:8080`` and ``['https']``, respectively. The path component will be ignored.
-* the base path is determined as the concatenation of two variables:
+* The base path is determined as the concatenation of two variables:
 
    #. the `SCRIPT_NAME`_ wsgi environment variable; this is set, for example, when serving the site from a
       sub-path using web server url rewriting
@@ -151,6 +151,15 @@ This section describes where information is sourced from when using the default 
 
    #. the longest common path prefix of all the urls in your API - see :meth:`.determine_path_prefix`
 
+* When using API versioning with ``NamespaceVersioning`` or ``URLPathVersioning``, versioned endpoints that do not
+  match the version used to access the ``SchemaView`` will be excluded from the endpoint list - for example,
+  ``/api/v1.0/endpoint`` will be shown when viewing ``/api/v1.0/swagger/``, while ``/api/v2.0/endpoint`` will not
+
+  Other versioning schemes are not presently supported.
+
+
+.. versionadded:: 1.2
+   Base path and versioning support.
 
 .. _custom-spec-swagger-auto-schema:
 

@@ -44,8 +44,8 @@ Features
   `flex <https://github.com/pipermerriam/flex>`_
 - supports Django REST Framework API versioning
 
-   + ``URLPathVersioning``, ``NamespaceVersioning`` and ``HostnameVersioning`` are supported
-   + ``AcceptHeaderVersioning`` and ``QueryParameterVersioning`` are not currently supported
+   + ``URLPathVersioning`` and ``NamespaceVersioning`` are supported
+   + ``HostnameVersioning``, ``AcceptHeaderVersioning`` and ``QueryParameterVersioning`` are not currently supported
 
 .. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.2/screenshots/redoc-nested-response.png
    :width: 100%
