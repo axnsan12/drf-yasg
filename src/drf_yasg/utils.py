@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 from rest_framework import serializers, status
 from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.request import is_form_media_type
 from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
@@ -248,3 +249,30 @@ def force_serializer_instance(serializer):
     assert isinstance(serializer, serializers.BaseSerializer), \
         "Serializer class or instance required, not %s" % type(serializer).__name__
     return serializer
+
+
+def get_consumes(parser_classes):
+    """Extract ``consumes`` MIME types from a list of parser classes.
+
+    :param list parser_classes: parser classes
+    :return: MIME types for ``consumes``
+    :rtype: list[str]
+    """
+    media_types = [parser.media_type for parser in parser_classes or []]
+    if all(is_form_media_type(encoding) for encoding in media_types):
+        return media_types
+    else:
+        media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
+        return media_types
+
+
+def get_produces(renderer_classes):
+    """Extract ``produces`` MIME types from a list of renderer classes.
+
+    :param list renderer_classes: renderer classes
+    :return: MIME types for ``produces``
+    :rtype: list[str]
+    """
+    media_types = [renderer.media_type for renderer in renderer_classes or []]
+    media_types = [encoding for encoding in media_types if 'html' not in encoding]
+    return media_types

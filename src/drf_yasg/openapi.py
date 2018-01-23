@@ -211,7 +211,8 @@ class Info(SwaggerDict):
 
 
 class Swagger(SwaggerDict):
-    def __init__(self, info=None, _url=None, _prefix=None, _version=None, paths=None, definitions=None, **extra):
+    def __init__(self, info=None, _url=None, _prefix=None, _version=None, consumes=None, produces=None,
+                 security_definitions=None, security=None, paths=None, definitions=None, **extra):
         """Root Swagger object.
 
         :param .Info info: info object
@@ -219,6 +220,10 @@ class Swagger(SwaggerDict):
         :param str _prefix: api path prefix to use in setting basePath; this will be appended to the wsgi
             SCRIPT_NAME prefix or Django's FORCE_SCRIPT_NAME if applicable
         :param str _version: version string to override Info
+        :param list[dict] security_definitions: list of supported authentication mechanisms
+        :param list[dict] security: authentication mechanisms accepted by default; can be overriden in Operation
+        :param list[str] consumes: consumed MIME types; can be overriden in Operation
+        :param list[str] produces: produced MIME types; can be overriden in Operation
         :param .Paths paths: paths object
         :param dict[str,.Schema] definitions: named models
         """
@@ -234,6 +239,10 @@ class Swagger(SwaggerDict):
             self.schemes = [url.scheme]
 
         self.base_path = self.get_base_path(get_script_prefix(), _prefix)
+        self.consumes = consumes
+        self.produces = produces
+        self.security_definitions = filter_none(security_definitions)
+        self.security = filter_none(security)
         self.paths = paths
         self.definitions = filter_none(definitions)
         self._insert_extras__()

@@ -16,6 +16,15 @@ host: test.local:8002
 schemes:
   - http
 basePath: /
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  basic:
+    type: basic
+security:
+  - basic: []
 paths:
   /articles/:
     get:
@@ -63,10 +72,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/Article'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - articles
     post:
@@ -83,10 +88,6 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/Article'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - articles
     parameters: []
@@ -112,10 +113,6 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Article'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - articles
     parameters: []
@@ -129,10 +126,6 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/Article'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - articles
     put:
@@ -149,10 +142,6 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/Article'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - articles
     patch:
@@ -171,10 +160,6 @@ paths:
             $ref: '#/definitions/Article'
         '404':
           description: slug not found
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - articles
     delete:
@@ -184,10 +169,6 @@ paths:
       responses:
         '204':
           description: ''
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - articles
     parameters:
@@ -208,8 +189,6 @@ paths:
           description: ''
       consumes:
         - multipart/form-data
-      produces:
-        - application/json
       tags:
         - articles
     post:
@@ -244,8 +223,6 @@ paths:
           description: ''
       consumes:
         - multipart/form-data
-      produces:
-        - application/json
       tags:
         - articles
     parameters:
@@ -264,10 +241,6 @@ paths:
       responses:
         '200':
           description: ''
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - plain
     parameters: []
@@ -283,10 +256,6 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Snippet'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - snippets
     post:
@@ -303,10 +272,6 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/Snippet'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - snippets
     parameters: []
@@ -320,10 +285,6 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/Snippet'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - snippets
     put:
@@ -340,10 +301,6 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/Snippet'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - snippets
     patch:
@@ -360,10 +317,6 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/Snippet'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - snippets
     delete:
@@ -378,10 +331,6 @@ paths:
       responses:
         '204':
           description: ''
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - snippets
     parameters:
@@ -412,10 +361,6 @@ paths:
             type: array
             items:
               $ref: '#/definitions/UserSerializerrr'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - users
     post:
@@ -442,10 +387,6 @@ paths:
             properties:
               username:
                 type: string
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - users
       security: []
@@ -456,10 +397,6 @@ paths:
       responses:
         '200':
           description: ''
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - users
     parameters: []
@@ -477,10 +414,6 @@ paths:
           description: response description
           schema:
             $ref: '#/definitions/UserSerializerrr'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - users
     put:
@@ -497,10 +430,6 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/UserSerializerrr'
-      consumes:
-        - application/json
-      produces:
-        - application/json
       tags:
         - users
     parameters:
@@ -1163,8 +1092,3 @@ definitions:
           pattern: ^[-a-zA-Z0-9_]+$
         readOnly: true
         uniqueItems: true
-securityDefinitions:
-  basic:
-    type: basic
-security:
-  - basic: []

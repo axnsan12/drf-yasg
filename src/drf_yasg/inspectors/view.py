@@ -6,7 +6,10 @@ from rest_framework.status import is_success
 
 from .. import openapi
 from ..errors import SwaggerGenerationError
-from ..utils import force_serializer_instance, guess_response_status, is_list_view, no_body, param_list_to_odict
+from ..utils import (
+    force_serializer_instance, get_consumes, get_produces, guess_response_status, is_list_view, no_body,
+    param_list_to_odict
+)
 from .base import ViewInspector
 
 
@@ -316,18 +319,11 @@ class SwaggerAutoSchema(ViewInspector):
 
         :rtype: list[str]
         """
-        media_types = [parser.media_type for parser in getattr(self.view, 'parser_classes', [])]
-        if all(is_form_media_type(encoding) for encoding in media_types):
-            return media_types
-        else:
-            media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
-            return media_types
+        return get_consumes(getattr(self.view, 'parser_classes', []))
 
     def get_produces(self):
         """Return the MIME types this endpoint can produce.
 
         :rtype: list[str]
         """
-        media_types = [renderer.media_type for renderer in getattr(self.view, 'renderer_classes', [])]
-        media_types = [encoding for encoding in media_types if 'html' not in encoding]
-        return media_types
+        return get_produces(getattr(self.view, 'renderer_classes', []))
