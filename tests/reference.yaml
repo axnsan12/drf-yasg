@@ -412,6 +412,7 @@ paths:
         - application/json
       tags:
         - users
+      security: []
     patch:
       operationId: users_dummy
       description: dummy operation
@@ -1123,3 +1124,5 @@ definitions:
 securityDefinitions:
   basic:
     type: basic
+security:
+  - basic: []

@@ -13,8 +13,8 @@ no_body = object()
 
 
 def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_body=None, query_serializer=None,
-                        manual_parameters=None, operation_id=None, operation_description=None, responses=None,
-                        field_inspectors=None, filter_inspectors=None, paginator_inspectors=None,
+                        manual_parameters=None, operation_id=None, operation_description=None, security=None,
+                        responses=None, field_inspectors=None, filter_inspectors=None, paginator_inspectors=None,
                         **extra_overrides):
     """Decorate a view method to customize the :class:`.Operation` object generated from it.
 
@@ -62,6 +62,9 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
 
     :param str operation_id: operation ID override; the operation ID must be unique accross the whole API
     :param str operation_description: operation description override
+    :param str security: security requirements override; used to specify which authetication mechanism
+        is requried to call this API; an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
+        authentication schemes), and ``None`` will inherit the top-level secuirty requirements
     :param dict[str,(.Schema,.SchemaRef,.Response,str,Serializer)] responses: a dict of documented manual responses
         keyed on response status code. If no success (``2xx``) response is given, one will automatically be
         generated from the request body and http method. If any ``2xx`` response is given the automatic response is
@@ -94,6 +97,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
             'manual_parameters': manual_parameters,
             'operation_id': operation_id,
             'operation_description': operation_description,
+            'security': security,
             'responses': responses,
             'filter_inspectors': list(filter_inspectors) if filter_inspectors else None,
             'paginator_inspectors': list(paginator_inspectors) if paginator_inspectors else None,

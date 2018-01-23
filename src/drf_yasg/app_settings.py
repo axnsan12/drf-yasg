@@ -31,6 +31,7 @@ SWAGGER_DEFAULTS = {
             'type': 'basic'
         }
     },
+    'SECURITY_REQUIREMENTS': None,
     'LOGIN_URL': getattr(settings, 'LOGIN_URL', None),
     'LOGOUT_URL': getattr(settings, 'LOGOUT_URL', None),
     'VALIDATOR_URL': '',

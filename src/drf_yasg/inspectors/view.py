@@ -27,6 +27,8 @@ class SwaggerAutoSchema(ViewInspector):
 
         operation_id = self.get_operation_id(operation_keys)
         description = self.get_description()
+        security = self.get_security()
+        assert security is None or isinstance(security, list), "security must be a list of securiy requirement objects"
         tags = self.get_tags(operation_keys)
 
         responses = self.get_responses()
@@ -38,6 +40,7 @@ class SwaggerAutoSchema(ViewInspector):
             parameters=parameters,
             consumes=consumes,
             tags=tags,
+            security=security
         )
 
     def get_request_body_parameters(self, consumes):
@@ -285,6 +288,16 @@ class SwaggerAutoSchema(ViewInspector):
         if description is None:
             description = self._sch.get_description(self.path, self.method)
         return description
+
+    def get_security(self):
+        """Return a list of security requirements for this operation.
+
+        Returning an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
+        authentication schemes). Returning ``None`` will inherit the top-level secuirty requirements.
+
+        :return: security requirements
+        :rtype: list"""
+        return self.overrides.get('security', None)
 
     def get_tags(self, operation_keys):
         """Get a list of tags for this operation. Tags determine how operations relate with each other, and in the UI
