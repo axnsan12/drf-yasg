@@ -8,7 +8,6 @@ from coreapi.compat import force_bytes
 from ruamel import yaml
 
 from . import openapi
-from .app_settings import swagger_settings
 from .errors import SwaggerValidationError
 
 
