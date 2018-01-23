@@ -2,6 +2,7 @@ from djangorestframework_camel_case.parser import CamelCaseJSONParser
 from djangorestframework_camel_case.render import CamelCaseJSONRenderer
 from inflection import camelize
 from rest_framework import generics
+from rest_framework.parsers import FormParser
 
 from drf_yasg import openapi
 from drf_yasg.inspectors import SwaggerAutoSchema
@@ -21,7 +22,7 @@ class SnippetList(generics.ListCreateAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
 
-    parser_classes = (CamelCaseJSONParser,)
+    parser_classes = (FormParser, CamelCaseJSONParser,)
     renderer_classes = (CamelCaseJSONRenderer,)
     swagger_schema = CamelCaseOperationIDAutoSchema
 

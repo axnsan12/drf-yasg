@@ -317,4 +317,6 @@ class SwaggerAutoSchema(ViewInspector):
         media_types = [parser.media_type for parser in getattr(self.view, 'parser_classes', [])]
         if all(is_form_media_type(encoding) for encoding in media_types):
             return media_types
-        return media_types[:1]
+        else:
+            media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
+            return media_types
