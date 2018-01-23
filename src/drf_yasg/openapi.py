@@ -304,8 +304,8 @@ class PathItem(SwaggerDict):
 
 
 class Operation(SwaggerDict):
-    def __init__(self, operation_id, responses, parameters=None, consumes=None,
-                 produces=None, summary=None, description=None, tags=None, **extra):
+    def __init__(self, operation_id, responses, parameters=None, consumes=None, produces=None, summary=None,
+                 description=None, tags=None, security=None, **extra):
         """Information about an API operation (path + http method combination)
 
         :param str operation_id: operation ID, should be unique across all operations
@@ -316,6 +316,7 @@ class Operation(SwaggerDict):
         :param str summary: operation summary; should be < 120 characters
         :param str description: operation description; can be of any length and supports markdown
         :param list[str] tags: operation tags
+        :param list[dict[str,list[str]]] security: list of security requirements
         """
         super(Operation, self).__init__(**extra)
         self.operation_id = operation_id
@@ -326,6 +327,7 @@ class Operation(SwaggerDict):
         self.consumes = filter_none(consumes)
         self.produces = filter_none(produces)
         self.tags = filter_none(tags)
+        self.security = filter_none(security)
         self._insert_extras__()
 
 

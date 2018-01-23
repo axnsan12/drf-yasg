@@ -18,6 +18,7 @@ class SwaggerAutoSchema(ViewInspector):
 
     def get_operation(self, operation_keys):
         consumes = self.get_consumes()
+        produces = self.get_produces()
 
         body = self.get_request_body_parameters(consumes)
         query = self.get_query_parameters()
@@ -39,6 +40,7 @@ class SwaggerAutoSchema(ViewInspector):
             responses=responses,
             parameters=parameters,
             consumes=consumes,
+            produces=produces,
             tags=tags,
             security=security
         )
@@ -296,7 +298,7 @@ class SwaggerAutoSchema(ViewInspector):
         authentication schemes). Returning ``None`` will inherit the top-level secuirty requirements.
 
         :return: security requirements
-        :rtype: list"""
+        :rtype: list[dict[str,list[str]]]"""
         return self.overrides.get('security', None)
 
     def get_tags(self, operation_keys):
@@ -320,3 +322,12 @@ class SwaggerAutoSchema(ViewInspector):
         else:
             media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
             return media_types
+
+    def get_produces(self):
+        """Return the MIME types this endpoint can produce.
+
+        :rtype: list[str]
+        """
+        media_types = [renderer.media_type for renderer in getattr(self.view, 'renderer_classes', [])]
+        media_types = [encoding for encoding in media_types if 'html' not in encoding]
+        return media_types

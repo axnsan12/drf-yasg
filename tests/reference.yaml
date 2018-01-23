@@ -65,6 +65,8 @@ paths:
                   $ref: '#/definitions/Article'
       consumes:
         - application/json
+      produces:
+        - application/json
       tags:
         - articles
     post:
@@ -82,6 +84,8 @@ paths:
           schema:
             $ref: '#/definitions/Article'
       consumes:
+        - application/json
+      produces:
         - application/json
       tags:
         - articles
@@ -110,6 +114,8 @@ paths:
               $ref: '#/definitions/Article'
       consumes:
         - application/json
+      produces:
+        - application/json
       tags:
         - articles
     parameters: []
@@ -124,6 +130,8 @@ paths:
           schema:
             $ref: '#/definitions/Article'
       consumes:
+        - application/json
+      produces:
         - application/json
       tags:
         - articles
@@ -142,6 +150,8 @@ paths:
           schema:
             $ref: '#/definitions/Article'
       consumes:
+        - application/json
+      produces:
         - application/json
       tags:
         - articles
@@ -163,6 +173,8 @@ paths:
           description: slug not found
       consumes:
         - application/json
+      produces:
+        - application/json
       tags:
         - articles
     delete:
@@ -173,6 +185,8 @@ paths:
         '204':
           description: ''
       consumes:
+        - application/json
+      produces:
         - application/json
       tags:
         - articles
@@ -194,6 +208,8 @@ paths:
           description: ''
       consumes:
         - multipart/form-data
+      produces:
+        - application/json
       tags:
         - articles
     post:
@@ -228,6 +244,8 @@ paths:
           description: ''
       consumes:
         - multipart/form-data
+      produces:
+        - application/json
       tags:
         - articles
     parameters:
@@ -248,6 +266,8 @@ paths:
           description: ''
       consumes:
         - application/json
+      produces:
+        - application/json
       tags:
         - plain
     parameters: []
@@ -264,6 +284,8 @@ paths:
             items:
               $ref: '#/definitions/Snippet'
       consumes:
+        - application/json
+      produces:
         - application/json
       tags:
         - snippets
@@ -283,6 +305,8 @@ paths:
             $ref: '#/definitions/Snippet'
       consumes:
         - application/json
+      produces:
+        - application/json
       tags:
         - snippets
     parameters: []
@@ -297,6 +321,8 @@ paths:
           schema:
             $ref: '#/definitions/Snippet'
       consumes:
+        - application/json
+      produces:
         - application/json
       tags:
         - snippets
@@ -316,6 +342,8 @@ paths:
             $ref: '#/definitions/Snippet'
       consumes:
         - application/json
+      produces:
+        - application/json
       tags:
         - snippets
     patch:
@@ -334,6 +362,8 @@ paths:
             $ref: '#/definitions/Snippet'
       consumes:
         - application/json
+      produces:
+        - application/json
       tags:
         - snippets
     delete:
@@ -349,6 +379,8 @@ paths:
         '204':
           description: ''
       consumes:
+        - application/json
+      produces:
         - application/json
       tags:
         - snippets
@@ -382,6 +414,8 @@ paths:
               $ref: '#/definitions/UserSerializerrr'
       consumes:
         - application/json
+      produces:
+        - application/json
       tags:
         - users
     post:
@@ -410,6 +444,8 @@ paths:
                 type: string
       consumes:
         - application/json
+      produces:
+        - application/json
       tags:
         - users
       security: []
@@ -421,6 +457,8 @@ paths:
         '200':
           description: ''
       consumes:
+        - application/json
+      produces:
         - application/json
       tags:
         - users
@@ -441,6 +479,8 @@ paths:
             $ref: '#/definitions/UserSerializerrr'
       consumes:
         - application/json
+      produces:
+        - application/json
       tags:
         - users
     put:
@@ -458,6 +498,8 @@ paths:
           schema:
             $ref: '#/definitions/UserSerializerrr'
       consumes:
+        - application/json
+      produces:
         - application/json
       tags:
         - users
