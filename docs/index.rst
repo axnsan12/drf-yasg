@@ -12,6 +12,8 @@ drf-yasg
 
    readme.rst
    rendering.rst
+   openapi.rst
+   security.rst
    custom_spec.rst
    custom_ui.rst
    settings.rst

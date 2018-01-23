@@ -140,6 +140,9 @@ URL for the Django Logout action when using `USE_SESSION_AUTH`_.
 
 **Default**: :python:`django.conf.settings.LOGOUT_URL`
 
+.. _security-definitions-settings:
+
+
 SECURITY_DEFINITIONS
 --------------------
 
@@ -153,6 +156,14 @@ See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#sec
    'basic': {
       'type': 'basic'
    }
+
+SECURITY_REQUIREMENTS
+---------------------
+
+Global security requirements. If :python:`None`, all schemes in ``SECURITY_DEFINITIONS`` are accepted. |br|
+See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#securityRequirementObject.
+
+**Default**: :python:`None`
 
 .. _swagger-ui-settings:
 

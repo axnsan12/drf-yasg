@@ -94,7 +94,6 @@ class _OpenAPICodec(object):
         :return: swagger spec as dict
         :rtype: OrderedDict
         """
-        swagger.security_definitions = swagger_settings.SECURITY_DEFINITIONS
         return swagger.as_odict()
 
 

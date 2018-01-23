@@ -19,13 +19,17 @@ class UserList(APIView):
         serializer = UserSerializerrr(queryset, many=True)
         return Response(serializer.data)
 
-    @swagger_auto_schema(operation_description="apiview post description override", request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        required=['username'],
-        properties={
-            'username': openapi.Schema(type=openapi.TYPE_STRING)
-        },
-    ))
+    @swagger_auto_schema(
+        operation_description="apiview post description override",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['username'],
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING)
+            },
+        ),
+        security=[]
+    )
     def post(self, request):
         serializer = UserSerializerrr(request.data)
         serializer.is_valid(raise_exception=True)

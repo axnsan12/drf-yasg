@@ -197,10 +197,16 @@ class OpenAPISchemaGenerator(object):
         if url is None and request is not None:
             url = request.build_absolute_uri()
 
-        return openapi.Swagger(
+        swagger = openapi.Swagger(
             info=self.info, paths=paths,
             _url=url, _prefix=prefix, _version=self.version, **dict(components)
         )
+        swagger.security_definitions = swagger_settings.SECURITY_DEFINITIONS
+        security_requirements = swagger_settings.SECURITY_REQUIREMENTS
+        if security_requirements is None:
+            security_requirements = [{security_scheme: [] for security_scheme in swagger_settings.SECURITY_DEFINITIONS}]
+        swagger.security = security_requirements
+        return swagger
 
     def create_view(self, callback, method, request=None):
         """Create a view instance from a view callback as registered in urlpatterns.
