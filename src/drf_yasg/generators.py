@@ -45,6 +45,9 @@ class EndpointEnumerator(_EndpointEnumerator):
             if version and version not in namespace.split(':'):
                 return False
 
+        if getattr(callback.cls, 'swagger_schema', object()) is None:
+            return False
+
         return True
 
     def replace_version(self, path, callback):

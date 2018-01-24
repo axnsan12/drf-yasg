@@ -96,8 +96,8 @@ class SwaggerAutoSchema(ViewInspector):
             if body_override is no_body:
                 return None
             if self.method not in self.body_methods:
-                raise SwaggerGenerationError("request_body can only be applied to PUT, PATCH or POST views; "
-                                             "are you looking for query_serializer or manual_parameters?")
+                raise SwaggerGenerationError("request_body can only be applied to (" + ','.join(self.body_methods) +
+                                             "); are you looking for query_serializer or manual_parameters?")
             if isinstance(body_override, openapi.Schema.OR_REF):
                 return body_override
             return force_serializer_instance(body_override)

@@ -6,7 +6,6 @@
 Functional overview
 **********************
 
-
 ------------------------------
 OpenAPI specification overview
 ------------------------------
@@ -155,9 +154,26 @@ This section describes where information is sourced from when using the default 
 
   Other versioning schemes are not presently supported.
 
+---------------------
+A note on limitations
+---------------------
 
-.. versionadded:: 1.2
-   Base path and versioning support.
+When schema generation is requested, available endpoints are inspected by enumeration all the routes registered in
+Django's urlconf. Each registered view is then artificially instantiated for introspection, and it is this step that
+brings some limitations to what can be done:
+
+* the ``request`` the view sees will always be the request made against the schema view endpoint
+  - e.g. ``GET /swagger.yaml``
+* path parameters will not be filled
+
+This means that you could get surprizing results if your ``get_serializer`` or ``get_serializer_class`` methods
+depend on the incoming request, call ``get_object`` or in general depend on any stateful logic. You can prevent this
+in a few ways:
+
+* provide a fixed serializer for request and response body introspection using
+  :ref:`@swagger_auto_schema <custom-spec-swagger-auto-schema>`, to prevent ``get_serializer`` from being called on
+  the view
+* :ref:`exclude your endpoint from introspection <custom-spec-excluding-endpoints>`
 
 .. _SCRIPT_NAME: https://www.python.org/dev/peps/pep-0333/#environ-variables
 .. _FORCE_SCRIPT_NAME: https://docs.djangoproject.com/en/2.0/ref/settings/#force-script-name

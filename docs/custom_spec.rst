@@ -9,6 +9,31 @@ Custom schema generation
 If the default spec generation does not quite match what you were hoping to achieve, ``drf-yasg`` provides some
 custom behavior hooks by default.
 
+.. _custom-spec-excluding-endpoints:
+
+*******************
+Excluding endpoints
+*******************
+
+You can prevent a view from being included in the Swagger view by setting its class-level ``swagger_schema``
+attribute to ``None``, or you can prevent an operation from being included by setting its ``auto_schema`` override
+to none in :ref:`@swagger_auto_schema <custom-spec-swagger-auto-schema>`:
+
+.. code-block:: python
+
+   class UserList(APIView):
+      swagger_schema = None
+
+      # all methods of the UserList class will be excluded
+      ...
+
+   # only the GET method will be shown in Swagger
+   @swagger_auto_schema(method='put', auto_schema=None)
+   @swagger_auto_schema(methods=['get'], ...)
+   @api_view(['GET', 'PUT'])
+   def user_detail(request, pk):
+      pass
+
 .. _custom-spec-swagger-auto-schema:
 
 **************************************
@@ -199,8 +224,6 @@ This custom generator can be put to use by setting it as the :attr:`.generator_c
 ---------------------
 ``Inspector`` classes
 ---------------------
-
-.. versionadded:: 1.1
 
 For customizing behavior related to specific field, serializer, filter or paginator classes you can implement the
 :class:`~.inspectors.FieldInspector`, :class:`~.inspectors.SerializerInspector`, :class:`~.inspectors.FilterInspector`,

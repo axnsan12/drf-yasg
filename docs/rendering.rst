@@ -41,8 +41,6 @@ You can use your custom renderer classes as kwargs to :meth:`.SchemaView.as_cach
 Management command
 ******************
 
-.. versionadded:: 1.1.1
-
 If you only need a swagger spec file in YAML or JSON format, you can use the ``generate_swagger`` management command
 to get it without having to start the web server:
 

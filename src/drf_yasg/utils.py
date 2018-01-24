@@ -12,8 +12,10 @@ logger = logging.getLogger(__name__)
 #: used to forcibly remove the body of a request via :func:`.swagger_auto_schema`
 no_body = object()
 
+unset = object()
 
-def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_body=None, query_serializer=None,
+
+def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_body=None, query_serializer=None,
                         manual_parameters=None, operation_id=None, operation_description=None, security=None,
                         responses=None, field_inspectors=None, filter_inspectors=None, paginator_inspectors=None,
                         **extra_overrides):
@@ -24,17 +26,11 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
 
     The `auto_schema` and `operation_description` arguments take precendence over view- or method-level values.
 
-    .. versionchanged:: 1.1
-       Added the ``extra_overrides`` and ``operatiod_id`` parameters.
-
-    .. versionchanged:: 1.1
-       Added the ``field_inspectors``, ``filter_inspectors`` and ``paginator_inspectors`` parameters.
-
     :param str method: for multi-method views, the http method the options should apply to
     :param list[str] methods: for multi-method views, the http methods the options should apply to
     :param .inspectors.SwaggerAutoSchema auto_schema: custom class to use for generating the Operation object;
         this overrides both the class-level ``swagger_schema`` attribute and the ``DEFAULT_AUTO_SCHEMA_CLASS``
-        setting
+        setting, and can be set to ``None`` to prevent this operation from being generated
     :param .Schema,.SchemaRef,.Serializer request_body: custom request body, or :data:`.no_body`. The value given here
         will be used as the ``schema`` property of a :class:`.Parameter` with ``in: 'body'``.
 
@@ -92,7 +88,6 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
     def decorator(view_method):
         assert not any(hm in extra_overrides for hm in APIView.http_method_names), "HTTP method names not allowed here"
         data = {
-            'auto_schema': auto_schema,
             'request_body': request_body,
             'query_serializer': query_serializer,
             'manual_parameters': manual_parameters,
@@ -105,6 +100,8 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=None, request_bod
             'field_inspectors': list(field_inspectors) if field_inspectors else None,
         }
         data = filter_none(data)
+        if auto_schema is not unset:
+            data['auto_schema'] = auto_schema
         data.update(extra_overrides)
         if not data:  # pragma: no cover
             # no overrides to set, no use in doing more work
