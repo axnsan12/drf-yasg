@@ -3,11 +3,20 @@ Changelog
 #########
 
 *********
+**1.3.1**
+*********
+
+- **FIXED:** fixed a bug that would sometimes cause endpoints to wrongly be output as form operations (:issue:`50`)
+- **IMPROVED:** added generation of ``produces`` based on renderer classes
+- **IMPROVED:** added generation of top-level ``consumes`` and ``produces`` based on
+  ``DEFAULT_PARSER_CLASSES`` and ``DEFAULT_RENDERER_CLASSES`` (:issue:`48`)
+
+*********
 **1.3.0**
 *********
 
-- **ADDED:** security requirements are now correctly set and can be customized; this should fix
-   problems related to authentication in ``swagger-ui`` Try it out!  (:issue:`50`, :pr:`54`)
+- **ADDED:** security requirements are now correctly set and can be customized; this should fix problems related
+  to authentication in ``swagger-ui`` Try it out!  (:issue:`50`, :pr:`54`)
 - **IMPROVED:** updated ``swagger-ui`` to version 3.9.2
 - **IMPROVED:** updated ``ReDoc`` to version 1.20.0
 - **FIXED:** fixed an exception caused by a warning in get_path_from_regex (:pr:`49`, thanks to :ghuser:`blueyed`)
