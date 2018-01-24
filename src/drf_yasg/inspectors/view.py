@@ -6,7 +6,10 @@ from rest_framework.status import is_success
 
 from .. import openapi
 from ..errors import SwaggerGenerationError
-from ..utils import force_serializer_instance, guess_response_status, is_list_view, no_body, param_list_to_odict
+from ..utils import (
+    force_serializer_instance, get_consumes, get_produces, guess_response_status, is_list_view, no_body,
+    param_list_to_odict
+)
 from .base import ViewInspector
 
 
@@ -18,6 +21,7 @@ class SwaggerAutoSchema(ViewInspector):
 
     def get_operation(self, operation_keys):
         consumes = self.get_consumes()
+        produces = self.get_produces()
 
         body = self.get_request_body_parameters(consumes)
         query = self.get_query_parameters()
@@ -39,6 +43,7 @@ class SwaggerAutoSchema(ViewInspector):
             responses=responses,
             parameters=parameters,
             consumes=consumes,
+            produces=produces,
             tags=tags,
             security=security
         )
@@ -296,7 +301,7 @@ class SwaggerAutoSchema(ViewInspector):
         authentication schemes). Returning ``None`` will inherit the top-level secuirty requirements.
 
         :return: security requirements
-        :rtype: list"""
+        :rtype: list[dict[str,list[str]]]"""
         return self.overrides.get('security', None)
 
     def get_tags(self, operation_keys):
@@ -314,7 +319,11 @@ class SwaggerAutoSchema(ViewInspector):
 
         :rtype: list[str]
         """
-        media_types = [parser.media_type for parser in getattr(self.view, 'parser_classes', [])]
-        if all(is_form_media_type(encoding) for encoding in media_types):
-            return media_types
-        return media_types[:1]
+        return get_consumes(getattr(self.view, 'parser_classes', []))
+
+    def get_produces(self):
+        """Return the MIME types this endpoint can produce.
+
+        :rtype: list[str]
+        """
+        return get_produces(getattr(self.view, 'renderer_classes', []))

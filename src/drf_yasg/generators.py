@@ -10,13 +10,14 @@ from rest_framework.compat import URLPattern, URLResolver, get_original_route
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
 from rest_framework.schemas.generators import SchemaGenerator, endpoint_ordering
 from rest_framework.schemas.inspectors import get_pk_description
-
-from drf_yasg.errors import SwaggerGenerationError
+from rest_framework.settings import api_settings as rest_framework_settings
 
 from . import openapi
 from .app_settings import swagger_settings
+from .errors import SwaggerGenerationError
 from .inspectors.field import get_basic_type_info, get_queryset_field
 from .openapi import ReferenceResolver
+from .utils import get_consumes, get_produces
 
 logger = logging.getLogger(__name__)
 
@@ -165,6 +166,9 @@ class OpenAPISchemaGenerator(object):
         self._gen = SchemaGenerator(info.title, url, info.get('description', ''), patterns, urlconf)
         self.info = info
         self.version = version
+        self.consumes = []
+        self.produces = []
+
         if url is None and swagger_settings.DEFAULT_API_URL is not None:
             url = swagger_settings.DEFAULT_API_URL
 
@@ -191,22 +195,24 @@ class OpenAPISchemaGenerator(object):
         """
         endpoints = self.get_endpoints(request)
         components = ReferenceResolver(openapi.SCHEMA_DEFINITIONS)
+        self.consumes = get_consumes(rest_framework_settings.DEFAULT_PARSER_CLASSES)
+        self.produces = get_produces(rest_framework_settings.DEFAULT_RENDERER_CLASSES)
         paths, prefix = self.get_paths(endpoints, components, request, public)
+
+        security_definitions = swagger_settings.SECURITY_DEFINITIONS
+        security_requirements = swagger_settings.SECURITY_REQUIREMENTS
+        if security_requirements is None:
+            security_requirements = [{security_scheme: [] for security_scheme in swagger_settings.SECURITY_DEFINITIONS}]
 
         url = self.url
         if url is None and request is not None:
             url = request.build_absolute_uri()
 
-        swagger = openapi.Swagger(
-            info=self.info, paths=paths,
+        return openapi.Swagger(
+            info=self.info, paths=paths, consumes=self.consumes or None, produces=self.produces or None,
+            security_definitions=security_definitions, security=security_requirements,
             _url=url, _prefix=prefix, _version=self.version, **dict(components)
         )
-        swagger.security_definitions = swagger_settings.SECURITY_DEFINITIONS
-        security_requirements = swagger_settings.SECURITY_REQUIREMENTS
-        if security_requirements is None:
-            security_requirements = [{security_scheme: [] for security_scheme in swagger_settings.SECURITY_DEFINITIONS}]
-        swagger.security = security_requirements
-        return swagger
 
     def create_view(self, callback, method, request=None):
         """Create a view instance from a view callback as registered in urlpatterns.
@@ -330,7 +336,6 @@ class OpenAPISchemaGenerator(object):
         :param Request request: the request made against the schema view; can be None
         :rtype: openapi.Operation
         """
-
         operation_keys = self.get_operation_keys(path[len(prefix):], method, view)
         overrides = self.get_overrides(view, method)
 
@@ -342,8 +347,16 @@ class OpenAPISchemaGenerator(object):
         #   3. on the swagger_auto_schema decorator
         view_inspector_cls = overrides.get('auto_schema', view_inspector_cls)
 
+        if view_inspector_cls is None:
+            return None
+
         view_inspector = view_inspector_cls(view, path, method, components, request, overrides)
-        return view_inspector.get_operation(operation_keys)
+        operation = view_inspector.get_operation(operation_keys)
+        if set(operation.consumes) == set(self.consumes):
+            del operation.consumes
+        if set(operation.produces) == set(self.produces):
+            del operation.produces
+        return operation
 
     def get_path_item(self, path, view_cls, operations):
         """Get a :class:`.PathItem` object that describes the parameters and operations related to a single path in the
