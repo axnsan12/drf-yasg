@@ -39,7 +39,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'drf-yasg'
-copyright = '2017, Cristi V.'
+copyright = '2018, Cristi V.'
 author = 'Cristi V.'
 
 # The version info for the project you're documenting, acts as replacement for
