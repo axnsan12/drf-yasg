@@ -49,6 +49,7 @@ function initSwaggerUi() {
     };
 
     var swaggerSettings = JSON.parse(document.getElementById('swagger-settings').innerHTML);
+    console.log(swaggerSettings);
 
     for (var p in swaggerSettings) {
         if (swaggerSettings.hasOwnProperty(p)) {
@@ -56,6 +57,10 @@ function initSwaggerUi() {
         }
     }
     window.ui = SwaggerUIBundle(swaggerConfig);
+
+    var oauth2Config = JSON.parse(document.getElementById('oauth2-config').innerHTML);
+    console.log(oauth2Config);
+    window.ui.initOAuth(oauth2Config);
 }
 
 window.onload = function () {

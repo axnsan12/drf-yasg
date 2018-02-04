@@ -63,6 +63,7 @@ class _UIRenderer(BaseRenderer):
         renderer_context['version'] = swagger.info.version
         renderer_context['swagger_settings'] = json.dumps(self.get_swagger_ui_settings())
         renderer_context['redoc_settings'] = json.dumps(self.get_redoc_settings())
+        renderer_context['oauth2_config'] = json.dumps(self.get_oauth2_config())
         renderer_context['USE_SESSION_AUTH'] = swagger_settings.USE_SESSION_AUTH
         renderer_context.update(self.get_auth_urls())
 
@@ -85,6 +86,7 @@ class _UIRenderer(BaseRenderer):
             'defaultModelRendering': swagger_settings.DEFAULT_MODEL_RENDERING,
             'defaultModelExpandDepth': swagger_settings.DEFAULT_MODEL_DEPTH,
             'defaultModelsExpandDepth': swagger_settings.DEFAULT_MODEL_DEPTH,
+            'oauth2RedirectUrl': swagger_settings.OAUTH2_REDIRECT_URL,
         }
         data = {k: v for k, v in data.items() if v is not None}
         if swagger_settings.VALIDATOR_URL != '':
@@ -100,6 +102,11 @@ class _UIRenderer(BaseRenderer):
             'pathInMiddle': redoc_settings.PATH_IN_MIDDLE,
         }
 
+        return data
+
+    def get_oauth2_config(self):
+        data = swagger_settings.OAUTH2_CONFIG
+        assert isinstance(data, dict), "OAUTH2_CONFIG must be a dict"
         return data
 
 

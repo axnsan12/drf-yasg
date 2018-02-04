@@ -47,3 +47,19 @@ Operation-level overrides can be added using the ``security`` parameter of
 :ref:`@swagger_auto_schema <custom-spec-swagger-auto-schema>`.
 
 
+-------------------------------
+``swagger-ui`` as OAuth2 client
+-------------------------------
+
+It is possible to configure ``swagger-ui`` to authenticate against your (or a third party) OAuth2 service when sending
+"Try it out" requests. This client-side configuration does not remove the requirement of a spec-side
+:ref:`security definiiton <security-definitions-settings>`, but merely allows you to test OAuth2 APIs using
+``swagger-ui`` as a client.
+
+**DISCLAIMER**: this setup is very poorly tested as I do not currently implement OAuth in any of my projects. All
+contributions relating to documentation, bugs, mistakes or anything else are welcome as an issue or pull request. The
+settings described below were added as a result of discussion in issue :issue:`53`.
+
+The settings of interest can be found on the :ref:`settings page <oauth2-settings>`. Configuration options are similar
+to most OAuth client setups like web or mobile applications. Reading the relevant ``swagger-ui`` docmentation linked
+will also probably help.

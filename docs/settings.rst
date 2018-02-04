@@ -253,6 +253,25 @@ Controls how many levels are expaned by default when showing nested models.
 **Default**: :python:`3` |br|
 *Maps to parameter*: ``defaultModelExpandDepth``
 
+.. _oauth2-settings:
+
+OAUTH2_REDIRECT_URL
+-------------------
+
+Used when OAuth2 authenitcation of API requests via swagger-ui is desired.
+
+**Default**: :python:`None` |br|
+*Maps to parameter*: ``oauth2RedirectUrl``
+
+OAUTH2_CONFIG
+-------------
+
+Used when OAuth2 authenitcation of API requests via swagger-ui is desired. Provides OAuth2 configuration parameters
+to the ``SwaggerUIBundle#initOAuth`` method, and must be a dictionary. See
+`OAuth2 configuration <https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/oauth2.md>`_.
+
+**Default**: :python:`{}`
+
 ******************
 ``REDOC_SETTINGS``
 ******************

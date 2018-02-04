@@ -6,6 +6,7 @@ Changelog
 **1.4.0**
 *********
 
+- **ADDED:** added settings for OAuth2 client configuration in ``swagger-ui`` (:issue:`53`)
 - **IMPROVED:** updated ``swagger-ui`` to version 3.9.3
 
 *********
