@@ -8,6 +8,8 @@ Changelog
 
 - **FIXED:** the ``coerce_to_string`` is now respected when setting the type, default value and min/max values of
   ``DecimalField`` in the OpenAPI schema (:issue:`62`)
+- **IMPROVED:** updated ``swagger-ui`` to version 3.10.0
+- **IMPROVED:** updated ``ReDoc`` to version 1.21.0
 
 *********
 **1.4.0**
