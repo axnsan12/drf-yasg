@@ -1,11 +1,13 @@
+from decimal import Decimal
+
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.compat import MinValueValidator
 
 from snippets.models import LANGUAGE_CHOICES, STYLE_CHOICES, Snippet
 
 
 class LanguageSerializer(serializers.Serializer):
-
     name = serializers.ChoiceField(
         choices=LANGUAGE_CHOICES, default='python', help_text='The name of the programming language')
 
@@ -14,7 +16,6 @@ class LanguageSerializer(serializers.Serializer):
 
 
 class ExampleProjectSerializer(serializers.Serializer):
-
     project_name = serializers.CharField(help_text='Name of the project')
     github_repo = serializers.CharField(required=True, help_text='Github repository of the project')
 
@@ -49,6 +50,10 @@ class SnippetSerializer(serializers.Serializer):
     example_projects = serializers.ListSerializer(child=ExampleProjectSerializer(), read_only=True)
     difficulty_factor = serializers.FloatField(help_text="this is here just to test FloatField",
                                                read_only=True, default=lambda: 6.9)
+    rate_as_string = serializers.DecimalField(max_digits=6, decimal_places=3, default=Decimal('0.0'),
+                                              validators=[MinValueValidator(Decimal('0.0'))])
+    rate = serializers.DecimalField(max_digits=6, decimal_places=3, default=Decimal('0.0'), coerce_to_string=False,
+                                    validators=[MinValueValidator(Decimal('0.0'))])
 
     def create(self, validated_data):
         """

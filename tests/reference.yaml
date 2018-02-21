@@ -1036,6 +1036,17 @@ definitions:
         type: number
         readOnly: true
         default: 6.9
+      rateAsString:
+        title: Rate as string
+        type: string
+        format: decimal
+        default: '0.000'
+      rate:
+        title: Rate
+        type: number
+        format: decimal
+        default: 0.0
+        minimum: 0.0
   UserSerializerrr:
     required:
       - username

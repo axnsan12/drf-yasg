@@ -3,6 +3,13 @@ Changelog
 #########
 
 *********
+**1.5.0**
+*********
+
+- **FIXED:** the ``coerce_to_string`` is now respected when setting the type, default value and min/max values of
+  ``DecimalField`` in the OpenAPI schema (:issue:`62`)
+
+*********
 **1.4.0**
 *********
 
