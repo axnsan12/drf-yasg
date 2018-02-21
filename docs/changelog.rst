@@ -3,11 +3,13 @@ Changelog
 #########
 
 *********
-**1.5.0**
+**1.4.1**
 *********
 
 - **FIXED:** the ``coerce_to_string`` is now respected when setting the type, default value and min/max values of
   ``DecimalField`` in the OpenAPI schema (:issue:`62`)
+- **FIXED:** error responses from web UI views are now rendered with ``TemplateHTMLRenderer`` instead of throwing
+  confusing errors (:issue:`58`)
 - **IMPROVED:** updated ``swagger-ui`` to version 3.10.0
 - **IMPROVED:** updated ``ReDoc`` to version 1.21.0
 
