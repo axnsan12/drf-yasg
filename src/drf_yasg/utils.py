@@ -120,6 +120,8 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
         _methods = methods
         if methods or method:
+            assert available_methods or http_method_names, "`method` or `methods` can only be specified " \
+                                                           "on @detail_route or @api_view views"
             assert bool(methods) != bool(method), "specify either method or methods"
             assert not isinstance(methods, str), "`methods` expects to receive a list of methods;" \
                                                  " use `method` for a single argument"
