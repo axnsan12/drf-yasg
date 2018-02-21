@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'snippets',
     'users',
     'articles',
+    'todo',
 ]
 
 MIDDLEWARE = [

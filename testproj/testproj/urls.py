@@ -62,5 +62,6 @@ urlpatterns = [
     url(r'^snippets/', include('snippets.urls')),
     url(r'^articles/', include('articles.urls')),
     url(r'^users/', include('users.urls')),
+    url(r'^todo/', include('todo.urls')),
     url(r'^plain/', plain_view),
 ]
