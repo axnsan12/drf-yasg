@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework.utils import encoders, json
 
 from .. import openapi
-from ..utils import is_list_view
+from ..utils import decimal_as_float, is_list_view
 
 #: Sentinel value that inspectors must return to signal that they do not know how to handle an object
 NotHandled = object()
@@ -224,6 +224,8 @@ class FieldInspector(BaseInspector):
                             # JSON roundtrip ensures that the value is valid JSON;
                             # for example, sets and tuples get transformed into lists
                             default = json.loads(json.dumps(default, cls=encoders.JSONEncoder))
+                            if decimal_as_float(field):
+                                default = float(default)
                         except Exception:  # pragma: no cover
                             logger.warning("'default' on schema for %s will not be set because "
                                            "to_representation raised an exception", field, exc_info=True)

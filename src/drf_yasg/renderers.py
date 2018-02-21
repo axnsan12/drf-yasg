@@ -1,6 +1,8 @@
 from django.shortcuts import render, resolve_url
-from rest_framework.renderers import BaseRenderer
+from rest_framework.renderers import BaseRenderer, TemplateHTMLRenderer
 from rest_framework.utils import json
+
+from drf_yasg.openapi import Swagger
 
 from .app_settings import redoc_settings, swagger_settings
 from .codecs import VALIDATORS, OpenAPICodecJson, OpenAPICodecYaml
@@ -51,6 +53,11 @@ class _UIRenderer(BaseRenderer):
     template = ''
 
     def render(self, swagger, accepted_media_type=None, renderer_context=None):
+        if not isinstance(swagger, Swagger):
+            # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
+            # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
+            # see https://github.com/axnsan12/drf-yasg/issues/58
+            return TemplateHTMLRenderer().render(swagger, accepted_media_type, renderer_context)
         self.set_context(renderer_context, swagger)
         return render(
             renderer_context['request'],

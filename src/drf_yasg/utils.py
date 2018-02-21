@@ -2,9 +2,11 @@ import inspect
 import logging
 from collections import OrderedDict
 
+from django.db import models
 from rest_framework import serializers, status
 from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.request import is_form_media_type
+from rest_framework.settings import api_settings as rest_framework_settings
 from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
@@ -118,6 +120,8 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
         _methods = methods
         if methods or method:
+            assert available_methods or http_method_names, "`method` or `methods` can only be specified " \
+                                                           "on @detail_route or @api_view views"
             assert bool(methods) != bool(method), "specify either method or methods"
             assert not isinstance(methods, str), "`methods` expects to receive a list of methods;" \
                                                  " use `method` for a single argument"
@@ -273,3 +277,15 @@ def get_produces(renderer_classes):
     media_types = [renderer.media_type for renderer in renderer_classes or []]
     media_types = [encoding for encoding in media_types if 'html' not in encoding]
     return media_types
+
+
+def decimal_as_float(field):
+    """
+    Returns true if ``field`` is a django-rest-framework DecimalField and its ``coerce_to_string`` attribute or the
+    ``COERCE_DECIMAL_TO_STRING`` setting is set to ``False``.
+
+    :rtype: bool
+    """
+    if isinstance(field, serializers.DecimalField) or isinstance(field, models.DecimalField):
+        return not getattr(field, 'coerce_to_string', rest_framework_settings.COERCE_DECIMAL_TO_STRING)
+    return False

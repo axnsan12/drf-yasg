@@ -1,5 +1,6 @@
 import operator
 from collections import OrderedDict
+from decimal import Decimal
 
 from django.core import validators
 from django.db import models
@@ -8,7 +9,7 @@ from rest_framework.settings import api_settings as rest_framework_settings
 
 from .. import openapi
 from ..errors import SwaggerGenerationError
-from ..utils import filter_none
+from ..utils import decimal_as_float, filter_none
 from .base import FieldInspector, NotHandled, SerializerInspector
 
 
@@ -258,16 +259,27 @@ def find_limits(field):
         if isinstance(field, field_class)
     ]
 
+    if isinstance(field, serializers.DecimalField) and not decimal_as_float(field):
+        return limits
+
     for validator in field.validators:
         if not hasattr(validator, 'limit_value'):
             continue
 
+        limit_value = validator.limit_value
+        if isinstance(limit_value, Decimal) and decimal_as_float(field):
+            limit_value = float(limit_value)
+
         for validator_class, attr, improves in applicable_limits:
             if isinstance(validator, validator_class):
-                if attr not in limits or improves(validator.limit_value, limits[attr]):
-                    limits[attr] = validator.limit_value
+                if attr not in limits or improves(limit_value, limits[attr]):
+                    limits[attr] = limit_value
 
     return OrderedDict(sorted(limits.items()))
+
+
+def decimal_field_type(field):
+    return openapi.TYPE_NUMBER if decimal_as_float(field) else openapi.TYPE_STRING
 
 
 model_field_to_basic_type = [
@@ -277,7 +289,7 @@ model_field_to_basic_type = [
     (models.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (models.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
-    (models.DecimalField, (openapi.TYPE_NUMBER, None)),
+    (models.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
     (models.DurationField, (openapi.TYPE_INTEGER, None)),
     (models.FloatField, (openapi.TYPE_NUMBER, None)),
     (models.IntegerField, (openapi.TYPE_INTEGER, None)),
@@ -300,9 +312,11 @@ serializer_field_to_basic_type = [
     (serializers.UUIDField, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
     (serializers.RegexField, (openapi.TYPE_STRING, None)),
     (serializers.CharField, (openapi.TYPE_STRING, None)),
-    ((serializers.BooleanField, serializers.NullBooleanField), (openapi.TYPE_BOOLEAN, None)),
+    (serializers.BooleanField, (openapi.TYPE_BOOLEAN, None)),
+    (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (serializers.IntegerField, (openapi.TYPE_INTEGER, None)),
-    ((serializers.FloatField, serializers.DecimalField), (openapi.TYPE_NUMBER, None)),
+    (serializers.FloatField, (openapi.TYPE_NUMBER, None)),
+    (serializers.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
     (serializers.DurationField, (openapi.TYPE_NUMBER, None)),  # ?
     (serializers.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (serializers.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
@@ -326,6 +340,8 @@ def get_basic_type_info(field):
     for field_class, type_format in basic_type_info:
         if isinstance(field, field_class):
             swagger_type, format = type_format
+            if callable(swagger_type):
+                swagger_type = swagger_type(field)
             if callable(format):
                 format = format(field)
             break
