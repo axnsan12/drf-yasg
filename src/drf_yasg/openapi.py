@@ -396,6 +396,7 @@ class Parameter(SwaggerDict):
         self.enum = enum
         self.pattern = pattern
         self.items = items
+        self.default = default
         self._insert_extras__()
         if self['in'] == IN_PATH:
             # path parameters must always be required

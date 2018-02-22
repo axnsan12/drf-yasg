@@ -2,6 +2,14 @@
 Changelog
 #########
 
+
+*********
+**1.4.3**
+*********
+
+- **FIXED:** added a missing assignment that would cause the ``default`` argument to ``openapi.Parameter.__init__`` to
+  be ignored
+
 *********
 **1.4.2**
 *********

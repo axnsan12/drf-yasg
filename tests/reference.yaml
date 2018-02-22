@@ -198,9 +198,10 @@ paths:
         - name: what_am_i_doing
           in: formData
           description: test
-          required: true
+          required: false
           type: string
           pattern: ^69$
+          default: '69'
         - name: image_styles
           in: formData
           description: Parameter with Items
