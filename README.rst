@@ -362,7 +362,7 @@ provided out of the box - if you have ``djangorestframework-camel-case`` install
    :alt: Codecov
 
 .. |pypi-version| image:: https://img.shields.io/pypi/v/drf-yasg.svg
-   :target: https://pypi.python.org/pypi/drf-yasg/
+   :target: https://pypi.org/project/drf-yasg/
    :alt: PyPI
 
 .. |rtd-badge| image:: https://img.shields.io/readthedocs/drf-yasg.svg
