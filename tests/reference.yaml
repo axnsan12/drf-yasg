@@ -330,7 +330,7 @@ paths:
           type: integer
       responses:
         '204':
-          description: ''
+          description: This should not crash
       tags:
         - snippets
     parameters:

@@ -1,7 +1,7 @@
 from djangorestframework_camel_case.parser import CamelCaseJSONParser
 from djangorestframework_camel_case.render import CamelCaseJSONRenderer
 from inflection import camelize
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.parsers import FormParser
 
 from drf_yasg import openapi
@@ -62,8 +62,12 @@ class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
             type=openapi.TYPE_INTEGER,
             description="path parameter override",
             required=True
+        ),
+    ], responses={
+        status.HTTP_204_NO_CONTENT: openapi.Response(
+            description="This should not crash"
         )
-    ])
+    })
     def delete(self, request, *args, **kwargs):
         """delete method docstring"""
         return super(SnippetDetail, self).patch(request, *args, **kwargs)
