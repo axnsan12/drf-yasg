@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
 from .models import Todo, TodoAnother, TodoYetAnother
-from .serializer import TodoSerializer, TodoAnotherSerializer, TodoYetAnotherSerializer
+from .serializer import TodoAnotherSerializer, TodoSerializer, TodoYetAnotherSerializer
 
 
 class TodoViewSet(viewsets.ReadOnlyModelViewSet):

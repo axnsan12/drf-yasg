@@ -10,14 +10,15 @@ class TodoSerializer(serializers.ModelSerializer):
 
 
 class TodoAnotherSerializer(serializers.ModelSerializer):
+    todo = TodoSerializer()
+
     class Meta:
         model = TodoAnother
-        fields = ('title','todo')
-        depth = 2
+        fields = ('title', 'todo')
 
 
 class TodoYetAnotherSerializer(serializers.ModelSerializer):
     class Meta:
         model = TodoYetAnother
-        fields = ('title','todo')
+        fields = ('title', 'todo')
         depth = 2
