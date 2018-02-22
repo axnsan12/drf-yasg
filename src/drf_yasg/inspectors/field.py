@@ -1,3 +1,4 @@
+import logging
 import operator
 from collections import OrderedDict
 from decimal import Decimal
@@ -11,6 +12,8 @@ from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import decimal_as_float, filter_none
 from .base import FieldInspector, NotHandled, SerializerInspector
+
+logger = logging.getLogger(__name__)
 
 
 class InlineSerializerInspector(SerializerInspector):
@@ -54,10 +57,14 @@ class InlineSerializerInspector(SerializerInspector):
 
             serializer = field
             serializer_meta = getattr(serializer, 'Meta', None)
+            serializer_name = type(serializer).__name__
             if hasattr(serializer_meta, 'ref_name'):
                 ref_name = serializer_meta.ref_name
+            elif serializer_name == 'NestedSerializer' and isinstance(serializer, serializers.ModelSerializer):
+                logger.debug("Forcing inline output for ModelSerializer named 'NestedSerializer': " + str(serializer))
+                ref_name = None
             else:
-                ref_name = type(serializer).__name__
+                ref_name = serializer_name
                 if ref_name.endswith('Serializer'):
                     ref_name = ref_name[:-len('Serializer')]
 
@@ -77,11 +84,17 @@ class InlineSerializerInspector(SerializerInspector):
                     if child.required:
                         required.append(property_name)
 
-                return SwaggerType(
+                result = SwaggerType(
                     type=openapi.TYPE_OBJECT,
                     properties=properties,
                     required=required or None,
                 )
+                if not ref_name:
+                    # on an inline model, the title is derived from the field name
+                    # but is visually displayed like the model named, which is confusing
+                    # it is better to just remove title from inline models
+                    del result.title
+                return result
 
             if not ref_name or not use_references:
                 return make_schema_definition()

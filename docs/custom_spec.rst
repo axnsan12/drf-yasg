@@ -172,7 +172,11 @@ You can define some per-serializer options by adding a ``Meta`` class to your se
 Currently, the only option you can add here is
 
    * ``ref_name`` - a string which will be used as the model definition name for this serializer class; setting it to
-     ``None`` will force the serializer to be generated as an inline model everywhere it is used
+     ``None`` will force the serializer to be generated as an inline model everywhere it is used. If two serializers
+     have the same ``ref_name``, both their usages will be replaced with a reference to the same definition.
+     If this option is not specified, all serializers have an implicit name derived from their class name, minus any
+     ``Serializer`` suffix (e.g. ``UserSerializer`` -> ``User``, ``SerializerWithSuffix`` -> ``SerializerWithSuffix``)
+
 
 *************************
 Subclassing and extending
@@ -301,3 +305,25 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
    This means that you should generally avoid view or method-specific ``FieldInspector``\ s if you are dealing with
    references (a.k.a named models), because you can never know which view will be the first to generate the schema
    for a given serializer.
+
+   **IMPORTANT:** nested fields on ``ModelSerializer``\ s that are generated from model ``ForeignKeys`` will always be
+   output by value. If you want the by-reference behaviour you have to explictly set the serializer class of nested
+   fields instead of letting ``ModelSerializer`` generate one automatically; for example:
+
+   .. code-block:: python
+
+      class OneSerializer(serializers.ModelSerializer):
+         class Meta:
+            model = SomeModel
+            fields = ('id',)
+
+
+      class AnotherSerializer(serializers.ModelSerializer):
+         chilf = OneSerializer()
+
+         class Meta:
+            model = SomeParentModel
+            fields = ('id', 'child')
+
+   Another caveat that stems from this is that any serializer named "``NestedSerializer``" will be forced inline
+   unless it has a ``ref_name`` set explicitly.

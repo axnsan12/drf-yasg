@@ -3,6 +3,15 @@ Changelog
 #########
 
 *********
+**1.4.2**
+*********
+
+- **FIXED:** fixed a bug that causes a ``ModelViewSet`` generated from models with nested ``ForeignKey`` to output
+  models named ``Nested`` into the ``definitions`` section (:issue:`59`, :pr:`65`)
+- **FIXED:** ``Response`` objects without a ``schema`` are now properly handled when passed through
+  ``swagger_auto_schema`` (:issue:`66`)
+
+*********
 **1.4.1**
 *********
 

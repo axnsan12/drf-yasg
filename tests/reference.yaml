@@ -339,6 +339,105 @@ paths:
         description: A unique integer value identifying this snippet.
         required: true
         type: integer
+  /todo/:
+    get:
+      operationId: todo_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Todo'
+      tags:
+        - todo
+    parameters: []
+  /todo/another/:
+    get:
+      operationId: todo_another_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TodoAnother'
+      tags:
+        - todo
+    parameters: []
+  /todo/another/{id}/:
+    get:
+      operationId: todo_another_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TodoAnother'
+      tags:
+        - todo
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this todo another.
+        required: true
+        type: integer
+  /todo/yetanother/:
+    get:
+      operationId: todo_yetanother_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TodoYetAnother'
+      tags:
+        - todo
+    parameters: []
+  /todo/yetanother/{id}/:
+    get:
+      operationId: todo_yetanother_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TodoYetAnother'
+      tags:
+        - todo
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this todo yet another.
+        required: true
+        type: integer
+  /todo/{id}/:
+    get:
+      operationId: todo_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Todo'
+      tags:
+        - todo
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this todo.
+        required: true
+        type: integer
   /users/:
     get:
       operationId: users_list
@@ -538,7 +637,6 @@ definitions:
         title: Linenos
         type: boolean
       language:
-        title: Language
         description: Sample help text for language
         type: object
         properties:
@@ -983,7 +1081,6 @@ definitions:
               - zephir
             default: python
       styles:
-        title: Styles
         type: array
         items:
           type: string
@@ -1020,12 +1117,10 @@ definitions:
         default:
           - friendly
       lines:
-        title: Lines
         type: array
         items:
           type: integer
       exampleProjects:
-        title: Example projects
         type: array
         items:
           $ref: '#/definitions/Project'
@@ -1047,6 +1142,64 @@ definitions:
         format: decimal
         default: 0.0
         minimum: 0.0
+  Todo:
+    required:
+      - title
+    type: object
+    properties:
+      title:
+        title: Title
+        type: string
+        maxLength: 50
+  TodoAnother:
+    required:
+      - title
+      - todo
+    type: object
+    properties:
+      title:
+        title: Title
+        type: string
+        maxLength: 50
+      todo:
+        $ref: '#/definitions/Todo'
+  TodoYetAnother:
+    required:
+      - title
+    type: object
+    properties:
+      title:
+        title: Title
+        type: string
+        maxLength: 50
+      todo:
+        required:
+          - title
+        type: object
+        properties:
+          id:
+            title: ID
+            type: integer
+            readOnly: true
+          title:
+            title: Title
+            type: string
+            maxLength: 50
+          todo:
+            required:
+              - title
+            type: object
+            properties:
+              id:
+                title: ID
+                type: integer
+                readOnly: true
+              title:
+                title: Title
+                type: string
+                maxLength: 50
+            readOnly: true
+        readOnly: true
   UserSerializerrr:
     required:
       - username
@@ -1071,13 +1224,11 @@ definitions:
         format: email
         maxLength: 254
       articles:
-        title: Articles
         type: array
         items:
           type: integer
         uniqueItems: true
       snippets:
-        title: Snippets
         type: array
         items:
           type: integer
@@ -1095,7 +1246,6 @@ definitions:
         format: date
         readOnly: true
       article_slugs:
-        title: Article slugs
         type: array
         items:
           type: string
