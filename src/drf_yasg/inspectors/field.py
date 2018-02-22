@@ -57,13 +57,14 @@ class InlineSerializerInspector(SerializerInspector):
 
             serializer = field
             serializer_meta = getattr(serializer, 'Meta', None)
-            if type(serializer).__name__ == 'NestedSerializer' and isinstance(serializer, serializers.ModelSerializer):
+            serializer_name = type(serializer).__name__
+            if hasattr(serializer_meta, 'ref_name'):
+                ref_name = serializer_meta.ref_name
+            elif serializer_name == 'NestedSerializer' and isinstance(serializer, serializers.ModelSerializer):
                 logger.debug("Forcing inline output for ModelSerializer named 'NestedSerializer': " + str(serializer))
                 ref_name = None
-            elif hasattr(serializer_meta, 'ref_name'):
-                ref_name = serializer_meta.ref_name
             else:
-                ref_name = type(serializer).__name__
+                ref_name = serializer_name
                 if ref_name.endswith('Serializer'):
                     ref_name = ref_name[:-len('Serializer')]
 
