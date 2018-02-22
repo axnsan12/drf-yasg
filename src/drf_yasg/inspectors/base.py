@@ -234,7 +234,8 @@ class FieldInspector(BaseInspector):
                     if default is not None:
                         instance_kwargs['default'] = default
 
-            instance_kwargs.setdefault('title', title)
+            if instance_kwargs.get('type', None) != openapi.TYPE_ARRAY:
+                instance_kwargs.setdefault('title', title)
             instance_kwargs.setdefault('description', description)
             instance_kwargs.update(kwargs)
 
