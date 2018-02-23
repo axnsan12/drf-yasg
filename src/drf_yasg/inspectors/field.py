@@ -361,7 +361,10 @@ def get_basic_type_info(field):
     else:  # pragma: no cover
         return None
 
-    pattern = find_regex(field) if format in (None, openapi.FORMAT_SLUG) else None
+    pattern = None
+    if swagger_type == openapi.TYPE_STRING and format in (None, openapi.FORMAT_SLUG):
+        pattern = find_regex(field)
+
     limits = find_limits(field)
 
     result = OrderedDict([

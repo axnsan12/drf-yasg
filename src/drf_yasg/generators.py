@@ -405,8 +405,8 @@ class OpenAPISchemaGenerator(object):
         for variable in uritemplate.variables(path):
             model, model_field = get_queryset_field(queryset, variable)
             attrs = get_basic_type_info(model_field) or {'type': openapi.TYPE_STRING}
-            if hasattr(view_cls, 'lookup_value_regex') and getattr(view_cls, 'lookup_field', None) == variable:
-                attrs['pattern'] = view_cls.lookup_value_regex
+            if getattr(view_cls, 'lookup_field', None) == variable and attrs['type'] == openapi.TYPE_STRING:
+                attrs['pattern'] = getattr(view_cls, 'lookup_value_regex', attrs.get('pattern', None))
 
             if model_field and model_field.help_text:
                 description = force_text(model_field.help_text)

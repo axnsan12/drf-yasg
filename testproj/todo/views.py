@@ -8,6 +8,9 @@ class TodoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
 
+    lookup_field = 'id'
+    lookup_value_regex = '[0-9]+'
+
 
 class TodoAnotherViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = TodoAnother.objects.all()
