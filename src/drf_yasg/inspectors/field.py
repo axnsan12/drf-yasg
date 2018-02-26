@@ -397,16 +397,27 @@ class ChoiceFieldInspector(FieldInspector):
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
 
-        if isinstance(field, serializers.MultipleChoiceField):
-            return SwaggerType(
-                type=openapi.TYPE_ARRAY,
-                items=ChildSwaggerType(
-                    type=openapi.TYPE_STRING,
-                    enum=list(field.choices.keys())
+        if isinstance(field, serializers.ChoiceField):
+            enum_type = openapi.TYPE_STRING
+
+            # for ModelSerializer, try to infer the type from the associated model field
+            serializer = get_parent_serializer(field)
+            if isinstance(serializer, serializers.ModelSerializer):
+                model = getattr(getattr(serializer, 'Meta'), 'model')
+                model_field = get_model_field(model, field.source)
+                if model_field:
+                    enum_type = get_basic_type_info(model_field).get('type', enum_type)
+
+            if isinstance(field, serializers.MultipleChoiceField):
+                return SwaggerType(
+                    type=openapi.TYPE_ARRAY,
+                    items=ChildSwaggerType(
+                        type=enum_type,
+                        enum=list(field.choices.keys())
+                    )
                 )
-            )
-        elif isinstance(field, serializers.ChoiceField):
-            return SwaggerType(type=openapi.TYPE_STRING, enum=list(field.choices.keys()))
+
+            return SwaggerType(type=enum_type, enum=list(field.choices.keys()))
 
         return NotHandled
 

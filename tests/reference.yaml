@@ -591,6 +591,16 @@ definitions:
       cover_name:
         type: string
         readOnly: true
+      article_type:
+        description: IntegerField declared on model with choices=(...) and exposed
+          via ModelSerializer
+        type: integer
+        enum:
+          - 1
+          - 2
+          - 3
+          - 7
+          - 8
   Project:
     required:
       - projectName

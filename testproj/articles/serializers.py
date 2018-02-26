@@ -16,7 +16,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ('title', 'author', 'body', 'slug', 'date_created', 'date_modified',
-                  'references', 'uuid', 'cover', 'cover_name')
+                  'references', 'uuid', 'cover', 'cover_name', 'article_type')
         read_only_fields = ('date_created', 'date_modified',
                             'references', 'uuid', 'cover_name')
         lookup_field = 'slug'
