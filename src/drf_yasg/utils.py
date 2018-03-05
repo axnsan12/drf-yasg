@@ -11,10 +11,15 @@ from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 
-#: used to forcibly remove the body of a request via :func:`.swagger_auto_schema`
-no_body = object()
 
-unset = object()
+class no_body(object):
+    """Used as a sentinel value to forcibly remove the body of a request via :func:`.swagger_auto_schema`."""
+    pass
+
+
+class unset(object):
+    """Used as a sentinel value for function parameters not set by the caller where ``None`` would be a valid value."""
+    pass
 
 
 def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_body=None, query_serializer=None,
@@ -33,7 +38,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
     :param .inspectors.SwaggerAutoSchema auto_schema: custom class to use for generating the Operation object;
         this overrides both the class-level ``swagger_schema`` attribute and the ``DEFAULT_AUTO_SCHEMA_CLASS``
         setting, and can be set to ``None`` to prevent this operation from being generated
-    :param .Schema,.SchemaRef,.Serializer request_body: custom request body, or :data:`.no_body`. The value given here
+    :param .Schema,.SchemaRef,.Serializer request_body: custom request body, or :class:`.no_body`. The value given here
         will be used as the ``schema`` property of a :class:`.Parameter` with ``in: 'body'``.
 
         A Schema or SchemaRef is not valid if this request consumes form-data, because ``form`` and ``body`` parameters

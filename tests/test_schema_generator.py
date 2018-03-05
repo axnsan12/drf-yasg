@@ -2,11 +2,14 @@ import json
 from collections import OrderedDict
 
 import pytest
+from rest_framework import routers, serializers, viewsets
+from rest_framework.response import Response
 
 from drf_yasg import codecs, openapi
 from drf_yasg.codecs import yaml_sane_load
 from drf_yasg.errors import SwaggerGenerationError
 from drf_yasg.generators import OpenAPISchemaGenerator
+from drf_yasg.utils import swagger_auto_schema
 
 
 def test_schema_is_valid(swagger, codec_yaml):
@@ -79,3 +82,34 @@ def test_securiy_requirements(swagger_settings, mock_schema_request):
 
     swagger = generator.get_schema(mock_schema_request, public=True)
     assert swagger['security'] == []
+
+
+def test_replaced_serializer():
+    class DetailSerializer(serializers.Serializer):
+        detail = serializers.CharField()
+
+    class DetailViewSet(viewsets.ViewSet):
+        serializer_class = DetailSerializer
+
+        @swagger_auto_schema(responses={404: openapi.Response("Not found or Not accessible", DetailSerializer)})
+        def retrieve(self, request, pk=None):
+            serializer = DetailSerializer({'detail': None})
+            return Response(serializer.data)
+
+    router = routers.DefaultRouter()
+    router.register(r'details', DetailViewSet, base_name='details')
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        version="v2",
+        url='',
+        patterns=router.urls
+    )
+
+    for _ in range(3):
+        swagger = generator.get_schema(None, True)
+        assert 'Detail' in swagger['definitions']
+        assert 'detail' in swagger['definitions']['Detail']['properties']
+        responses = swagger['paths']['/details/{id}/']['get']['responses']
+        assert '404' in responses
+        assert responses['404']['schema']['$ref'] == "#/definitions/Detail"
