@@ -89,9 +89,9 @@ class InlineSerializerInspector(SerializerInspector):
                     properties=properties,
                     required=required or None,
                 )
-                if not ref_name:
+                if not ref_name and 'title' in result:
                     # on an inline model, the title is derived from the field name
-                    # but is visually displayed like the model named, which is confusing
+                    # but is visually displayed like the model name, which is confusing
                     # it is better to just remove title from inline models
                     del result.title
                 return result

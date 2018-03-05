@@ -4,6 +4,15 @@ Changelog
 
 
 *********
+**1.4.7**
+*********
+
+*Release date: Mar 05, 2018*
+
+- **FIXED:** prevent crashes caused by attempting to delete object attributes which do not exist in the first place
+  (:issue:`76`)
+
+*********
 **1.4.6**
 *********
 
