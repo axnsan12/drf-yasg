@@ -4,6 +4,15 @@ Changelog
 
 
 *********
+**1.4.6**
+*********
+
+*Release date: Mar 05, 2018*
+
+- **IMPROVED:** updated ``swagger-ui`` to version 3.12.0
+- **IMPROVED:** updated ``ReDoc`` to version 1.21.2
+
+*********
 **1.4.5**
 *********
 
