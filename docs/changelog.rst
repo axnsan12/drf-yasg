@@ -4,6 +4,15 @@ Changelog
 
 
 *********
+**1.4.5**
+*********
+
+*Release date: Mar 05, 2018*
+
+- **FIXED:** fixed an issue with modification of ``swagger_auto_schema`` arguments in-place during introspection, which
+  would sometimes cause an incomplete Swagger document to be generated after the first pass (:issue:`74`, :pr:`75`)
+
+*********
 **1.4.4**
 *********
 

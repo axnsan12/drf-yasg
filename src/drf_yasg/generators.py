@@ -1,3 +1,4 @@
+import copy
 import logging
 import re
 from collections import OrderedDict, defaultdict
@@ -388,7 +389,7 @@ class OpenAPISchemaGenerator(object):
         if method in overrides:
             overrides = overrides[method]
 
-        return overrides
+        return copy.deepcopy(overrides)
 
     def get_path_parameters(self, path, view_cls):
         """Return a list of Parameter instances corresponding to any templated path variables.
