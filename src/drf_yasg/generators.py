@@ -409,9 +409,9 @@ class OpenAPISchemaGenerator(object):
             if getattr(view_cls, 'lookup_field', None) == variable and attrs['type'] == openapi.TYPE_STRING:
                 attrs['pattern'] = getattr(view_cls, 'lookup_value_regex', attrs.get('pattern', None))
 
-            if model_field and model_field.help_text:
+            if model_field and hasattr(model_field, 'help_text') and model_field.help_text:
                 description = force_text(model_field.help_text)
-            elif model_field and model_field.primary_key:
+            elif model_field and hasattr(model_field, 'primary_key') and model_field.primary_key:
                 description = get_pk_description(model, model_field)
             else:
                 description = None
