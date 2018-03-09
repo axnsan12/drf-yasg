@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import serializers
 
 from .models import Todo, TodoAnother, TodoYetAnother
@@ -6,7 +7,9 @@ from .models import Todo, TodoAnother, TodoYetAnother
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
-        fields = ('title',)
+        fields = ('title', 'a_hidden_field',)
+
+    a_hidden_field = serializers.HiddenField(default=timezone.now)
 
 
 class TodoAnotherSerializer(serializers.ModelSerializer):
