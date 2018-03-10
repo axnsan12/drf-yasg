@@ -607,6 +607,7 @@ definitions:
         format: uuid
       original_group:
         type: string
+        format: uuid
         readOnly: true
   Project:
     required:
