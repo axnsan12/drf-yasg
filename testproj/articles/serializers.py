@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 
-from articles.models import Article
+from articles.models import Article, ArticleGroup
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -12,11 +12,13 @@ class ArticleSerializer(serializers.ModelSerializer):
     )
     uuid = serializers.UUIDField(help_text="should articles have UUIDs?", read_only=True)
     cover_name = serializers.FileField(use_url=False, source='cover', read_only=True)
+    group = serializers.SlugRelatedField(slug_field='uuid', queryset=ArticleGroup.objects.all())
+    original_group = serializers.SlugRelatedField(slug_field='uuid', read_only=True)
 
     class Meta:
         model = Article
         fields = ('title', 'author', 'body', 'slug', 'date_created', 'date_modified',
-                  'references', 'uuid', 'cover', 'cover_name', 'article_type')
+                  'references', 'uuid', 'cover', 'cover_name', 'article_type', 'group', 'original_group', )
         read_only_fields = ('date_created', 'date_modified',
                             'references', 'uuid', 'cover_name')
         lookup_field = 'slug'
