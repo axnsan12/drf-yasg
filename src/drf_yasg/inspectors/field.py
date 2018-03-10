@@ -161,7 +161,11 @@ def get_related_model(model, source):
     :return: related model or ``None``
     """
     try:
-        return getattr(model, source).rel.related_model
+        descriptor = getattr(model, source)
+        try:
+            return descriptor.rel.related_model
+        except Exception:
+            return descriptor.field.remote_field.model
     except Exception:  # pragma: no cover
         return None
 

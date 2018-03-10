@@ -542,6 +542,7 @@ definitions:
     required:
       - title
       - body
+      - group
     type: object
     properties:
       title:
@@ -601,6 +602,13 @@ definitions:
           - 3
           - 7
           - 8
+      group:
+        type: string
+        format: uuid
+      original_group:
+        type: string
+        format: uuid
+        readOnly: true
   Project:
     required:
       - projectName

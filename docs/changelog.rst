@@ -9,6 +9,7 @@ Changelog
 *Release date: TODO*
 
 - **IMPROVED:** ``serializers.HiddenField`` are now hidden (:issue:`78`)
+- **IMPROVED:** format is now detected for ``SlugRelatedField`` with ``read_only=True``  (:issue:`82`)
 
 *********
 **1.4.7**
