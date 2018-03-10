@@ -2,6 +2,13 @@
 Changelog
 #########
 
+*********
+**1.x.x**
+*********
+
+*Release date: TODO*
+
+- **IMPROVED:** ``serializers.HiddenField`` are now hidden (:issue:`78`)
 
 *********
 **1.4.7**
