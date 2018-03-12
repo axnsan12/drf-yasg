@@ -2,14 +2,20 @@
 Changelog
 #########
 
+
 *********
-**1.x.x**
+**1.5.0**
 *********
 
-*Release date: TODO*
+*Release date: Mar 12, 2018*
 
-- **IMPROVED:** ``serializers.HiddenField`` are now hidden (:issue:`78`)
-- **IMPROVED:** format is now detected for ``SlugRelatedField`` with ``read_only=True``  (:issue:`82`)
+- **IMPROVED:** ``serializers.HiddenField`` are now hidden (:issue:`78`, :pr:`79`, thanks to :ghuser:`therefromhere`)
+
+  *NOTE:* in order for this to work, you will have to add the new ``drf_yasg.inspectors.HiddenFieldInspector`` to your
+  ``DEFAULT_FIELD_INSPECTORS`` array if you changed it from the default value
+
+- **IMPROVED:** type of model field is now detected for ``serializers.SlugRelatedField`` with ``read_only=True``
+  (:issue:`82`, :pr:`83`, thanks to :ghuser:`therefromhere`)
 
 *********
 **1.4.7**
