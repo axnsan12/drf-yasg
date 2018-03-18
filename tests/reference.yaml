@@ -234,6 +234,113 @@ paths:
         type: string
         format: slug
         pattern: '[a-z0-9]+(?:-[a-z0-9]+)'
+  /people/:
+    get:
+      operationId: people_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Person'
+      tags:
+        - people
+    post:
+      operationId: people_create
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Person'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/Person'
+      tags:
+        - people
+    parameters: []
+  /people/{id}:
+    get:
+      operationId: people_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Person'
+      tags:
+        - people
+    patch:
+      operationId: people_partial_update
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Person'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Person'
+      tags:
+        - people
+    delete:
+      operationId: people_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - people
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this person.
+        required: true
+        type: integer
+  /people/{person}/identity:
+    get:
+      operationId: people_identity_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Identity'
+      tags:
+        - people
+    patch:
+      operationId: people_identity_partial_update
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Identity'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Identity'
+      tags:
+        - people
+    parameters:
+      - name: person
+        in: path
+        required: true
+        type: string
   /plain/:
     get:
       operationId: plain_list
@@ -609,6 +716,37 @@ definitions:
         type: string
         format: uuid
         readOnly: true
+  Identity:
+    title: Identity
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      firstName:
+        title: FirstName
+        type: string
+        maxLength: 30
+      lastName:
+        title: LastName
+        type: string
+        maxLength: 30
+    readOnly: true
+  Person:
+    required:
+      - Identity
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      identity:
+        $ref: '#/definitions/Identity'
+      Identity:
+        title: Identity
+        type: integer
   Project:
     required:
       - projectName
