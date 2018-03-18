@@ -4,6 +4,15 @@ Changelog
 
 
 *********
+**1.5.1**
+*********
+
+*Release date: Mar 18, 2018*
+
+- **IMPROVED:** updated ``swagger-ui`` to version 3.13.0
+- **FIXED:** fixed a crash caused by ``serializers.OneToOneRel`` (:pr:`81`, thanks to :ghuser:`ko-pp`)
+
+*********
 **1.5.0**
 *********
 
