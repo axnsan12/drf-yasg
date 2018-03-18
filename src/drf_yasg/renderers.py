@@ -131,11 +131,3 @@ class ReDocRenderer(_UIRenderer):
     """
     template = 'drf-yasg/redoc.html'
     format = 'redoc'
-
-
-class ReDocAlphaRenderer(_UIRenderer):
-    """Renders a ReDoc web interface for schema browisng.
-    Also requires :class:`.OpenAPIRenderer` as an available renderer on the same view.
-    """
-    template = 'drf-yasg/redoc-alpha.html'
-    format = 'redoc'

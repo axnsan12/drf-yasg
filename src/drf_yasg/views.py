@@ -13,14 +13,13 @@ from rest_framework.views import APIView
 from .app_settings import swagger_settings
 from .generators import OpenAPISchemaGenerator
 from .renderers import (
-    OpenAPIRenderer, ReDocAlphaRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer
+    OpenAPIRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer
 )
 
 SPEC_RENDERERS = (SwaggerYAMLRenderer, SwaggerJSONRenderer, OpenAPIRenderer)
 UI_RENDERERS = {
     'swagger': (SwaggerUIRenderer, ReDocRenderer),
     'redoc': (ReDocRenderer, SwaggerUIRenderer),
-    'redoc-alpha': (ReDocAlphaRenderer, ReDocRenderer, SwaggerUIRenderer)
 }
 
 
