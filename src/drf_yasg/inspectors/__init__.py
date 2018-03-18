@@ -3,9 +3,9 @@ from .base import (
     BaseInspector, FieldInspector, FilterInspector, NotHandled, PaginatorInspector, SerializerInspector, ViewInspector
 )
 from .field import (
-    CamelCaseJSONFilter, ChoiceFieldInspector, DictFieldInspector, FileFieldInspector, InlineSerializerInspector,
-    ReferencingSerializerInspector, RelatedFieldInspector, SimpleFieldInspector, StringDefaultFieldInspector,
-    HiddenFieldInspector,
+    CamelCaseJSONFilter, ChoiceFieldInspector, DictFieldInspector, FileFieldInspector, HiddenFieldInspector,
+    InlineSerializerInspector, ReferencingSerializerInspector, RelatedFieldInspector, SimpleFieldInspector,
+    StringDefaultFieldInspector
 )
 from .query import CoreAPICompatInspector, DjangoRestResponsePagination
 from .view import SwaggerAutoSchema
