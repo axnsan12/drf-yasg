@@ -10,7 +10,7 @@ class IdentitySerializer(serializers.ModelSerializer):
 
 
 class PersonSerializer(serializers.ModelSerializer):
-    identity = IdentitySerializer(read_only=True)
+    identity = IdentitySerializer()
 
     class Meta:
         model = Person

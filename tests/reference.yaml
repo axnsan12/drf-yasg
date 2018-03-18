@@ -732,10 +732,9 @@ definitions:
         title: LastName
         type: string
         maxLength: 30
-    readOnly: true
   Person:
     required:
-      - Identity
+      - identity
     type: object
     properties:
       id:
@@ -744,9 +743,6 @@ definitions:
         readOnly: true
       identity:
         $ref: '#/definitions/Identity'
-      Identity:
-        title: Identity
-        type: integer
   Project:
     required:
       - projectName

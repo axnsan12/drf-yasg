@@ -7,5 +7,4 @@ class Identity(models.Model):
 
 
 class Person(models.Model):
-    Identity = models.OneToOneField(Identity, related_name='person',
-                                    on_delete=models.PROTECT)
+    identity = models.OneToOneField(Identity, related_name='person', on_delete=models.PROTECT)
