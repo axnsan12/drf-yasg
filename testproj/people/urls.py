@@ -1,6 +1,6 @@
 from django.conf.urls import url
-from .views import IdentityViewSet, PersonViewSet
 
+from .views import IdentityViewSet, PersonViewSet
 
 person_list = PersonViewSet.as_view({
     'get': 'list',
