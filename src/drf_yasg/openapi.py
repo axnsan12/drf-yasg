@@ -425,7 +425,7 @@ class Schema(SwaggerDict):
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
-        :param list[.Schema,.SchemaRef] properties: object properties; required if `type` is ``object``
+        :param dict[str,(.Schema,.SchemaRef)] properties: object properties; required if `type` is ``object``
         :param bool,.Schema,.SchemaRef additional_properties: allow wildcard properties not listed in `properties`
         :param list[str] required: list of requried property names
         :param .Schema,.SchemaRef items: type of array items, only valid if `type` is ``array``
