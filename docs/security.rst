@@ -83,7 +83,7 @@ A very simple working configuration was provided by :ghuser:`Vigrond`, originall
             'tokenUrl': '/yourapp/o/token/',
             'flow": "accessCode',
             'scopes': {
-             'read groups': 'read groups',
+             'read:groups': 'read groups',
             }
          }
       },
