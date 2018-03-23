@@ -67,6 +67,8 @@
 <script src="{% static 'drf-yasg/insQ.min.js' %}"></script>
 <script src="{% static 'drf-yasg/swagger-ui-init.js' %}"></script>
 
+<a id="oauth2-redirect-url" href="{% static 'drf-yasg/swagger-ui-dist/oauth2-redirect.html' %}" class="hidden"></a>
+
 <div id="django-session-auth" class="hidden">
     {% if USE_SESSION_AUTH %}
         {% csrf_token %}
