@@ -93,3 +93,7 @@ A very simple working configuration was provided by :ghuser:`Vigrond`, originall
          'appName': 'your application name'
       },
    }
+
+If the OAuth2 provider requires you to provide the full absolute redirect URL, the default value for most
+``staticfiles`` configurations will be ``<origin>/static/drf-yasg/swagger-ui-dist/oauth2-redirect.html``. If this is
+not suitable for some reason, you can override the ``OAUTH2_REDIRECT_URL`` setting as appropriate.
