@@ -4,6 +4,14 @@ Changelog
 
 
 *********
+**1.6.0**
+*********
+
+*Release date: Mar 24, 2018*
+
+- **IMPROVED:** ``OAUTH2_REDIRECT_URL`` will now default to the built in ``oauth2-redirect.html`` file
+
+*********
 **1.5.1**
 *********
 

@@ -259,7 +259,10 @@ Controls how many levels are expaned by default when showing nested models.
 OAUTH2_REDIRECT_URL
 -------------------
 
-Used when OAuth2 authenitcation of API requests via swagger-ui is desired.
+Used when OAuth2 authenitcation of API requests via swagger-ui is desired. If ``None`` is passed, the
+``oauth2RedirectUrl`` parameter will be set to ``{% static 'drf-yasg/swagger-ui-dist/oauth2-redirect.html' %}``. This
+is the default `https://github.com/swagger-api/swagger-ui/blob/master/dist/oauth2-redirect.html <oauth2-redirect>`_
+file provided by ``swagger-ui``.
 
 **Default**: :python:`None` |br|
 *Maps to parameter*: ``oauth2RedirectUrl``

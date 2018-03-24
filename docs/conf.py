@@ -273,7 +273,7 @@ def role_github_user(name, rawtext, text, lineno, inliner, options=None, content
     options = options or {}
     content = content or []
 
-    if not re.match(r"^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$", text):
+    if not re.match(r"^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$", text, re.IGNORECASE):
         return sphinx_err(inliner, lineno, rawtext, '"%s" is not a valid GitHub username.' % text)
 
     ref = gh_user_uri.format(text)

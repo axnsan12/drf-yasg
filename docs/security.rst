@@ -63,3 +63,37 @@ settings described below were added as a result of discussion in issue :issue:`5
 The settings of interest can be found on the :ref:`settings page <oauth2-settings>`. Configuration options are similar
 to most OAuth client setups like web or mobile applications. Reading the relevant ``swagger-ui`` docmentation linked
 will also probably help.
+
+
+Example
+^^^^^^^
+
+A very simple working configuration was provided by :ghuser:`Vigrond`, originally at
+`https://github.com/Vigrond/django_oauth2_example <https://github.com/Vigrond/django_oauth2_example>`_.
+
+
+.. code-block:: python
+
+   SWAGGER_SETTINGS = {
+      'USE_SESSION_AUTH': False,
+      'SECURITY_DEFINITIONS': {
+         'Your App API - Swagger': {
+            'type': 'oauth2',
+            'authorizationUrl': '/yourapp/o/authorize',
+            'tokenUrl': '/yourapp/o/token/',
+            'flow": "accessCode',
+            'scopes': {
+             'read:groups': 'read groups',
+            }
+         }
+      },
+      'OAUTH2_CONFIG': {
+         'clientId': 'yourAppClientId',
+         'clientSecret': 'yourAppClientSecret',
+         'appName': 'your application name'
+      },
+   }
+
+If the OAuth2 provider requires you to provide the full absolute redirect URL, the default value for most
+``staticfiles`` configurations will be ``<origin>/static/drf-yasg/swagger-ui-dist/oauth2-redirect.html``. If this is
+not suitable for some reason, you can override the ``OAUTH2_REDIRECT_URL`` setting as appropriate.
