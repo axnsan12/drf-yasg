@@ -46,6 +46,16 @@ SWAGGER_DEFAULTS = {
     'DEFAULT_MODEL_DEPTH': 3,
     'OAUTH2_REDIRECT_URL': None,
     'OAUTH2_CONFIG': {},
+    'SUPPORTED_SUBMIT_METHODS': [
+        'get',
+        'put',
+        'post',
+        'delete',
+        'options',
+        'head',
+        'patch',
+        'trace'
+    ],
 }
 
 REDOC_DEFAULTS = {
