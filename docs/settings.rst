@@ -276,6 +276,15 @@ to the ``SwaggerUIBundle#initOAuth`` method, and must be a dictionary. See
 
 **Default**: :python:`{}`
 
+SUPPORTED_SUBMIT_METHODS
+------------------------
+
+List of HTTP methods that have the Try it out feature enabled. An empty array disables Try it out for all operations.
+This does not filter the operations from the display.
+
+**Default**: :python:`['get','put','post','delete','options','head','patch','trace']` |br|
+*Maps to parameter*: ``supportedSubmitMethods``
+
 ******************
 ``REDOC_SETTINGS``
 ******************

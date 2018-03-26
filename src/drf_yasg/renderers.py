@@ -94,6 +94,7 @@ class _UIRenderer(BaseRenderer):
             'defaultModelExpandDepth': swagger_settings.DEFAULT_MODEL_DEPTH,
             'defaultModelsExpandDepth': swagger_settings.DEFAULT_MODEL_DEPTH,
             'oauth2RedirectUrl': swagger_settings.OAUTH2_REDIRECT_URL,
+            'supportedSubmitMethods': swagger_settings.SUPPORTED_SUBMIT_METHODS,
         }
         data = {k: v for k, v in data.items() if v is not None}
         if swagger_settings.VALIDATOR_URL != '':
