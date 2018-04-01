@@ -4,6 +4,14 @@ Changelog
 
 
 *********
+**1.6.1**
+*********
+
+*Release date: Apr 01, 2018*
+
+- **ADDED:** added ``SUPPORTED_SUBMIT_METHODS`` ``swagger-ui`` setting
+
+*********
 **1.6.0**
 *********
 
