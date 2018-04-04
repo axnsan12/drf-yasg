@@ -3,6 +3,7 @@ import datetime
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
+# noinspection PyDeprecation
 from rest_framework.decorators import detail_route, list_route
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination
@@ -89,6 +90,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     swagger_schema = NoTitleAutoSchema
 
+    # noinspection PyDeprecation
     @swagger_auto_schema(auto_schema=NoPagingAutoSchema, filter_inspectors=[DjangoFilterDescriptionInspector])
     @list_route(methods=['get'])
     def today(self, request):
@@ -98,6 +100,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(articles, many=True)
         return Response(serializer.data)
 
+    # noinspection PyDeprecation
     @swagger_auto_schema(method='get', operation_description="image GET description override")
     @swagger_auto_schema(method='post', request_body=serializers.ImageUploadSerializer)
     @detail_route(methods=['get', 'post'], parser_classes=(MultiPartParser,))
@@ -106,6 +109,29 @@ class ArticleViewSet(viewsets.ModelViewSet):
         image method docstring
         """
         pass
+
+    try:
+        from rest_framework.decorators import action
+
+        @swagger_auto_schema(auto_schema=NoPagingAutoSchema, filter_inspectors=[DjangoFilterDescriptionInspector])
+        @action(detail=False, methods=['get'])
+        def today_with_action(self, request):
+            today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+            today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+            articles = self.get_queryset().filter(date_created__range=(today_min, today_max)).all()
+            serializer = self.serializer_class(articles, many=True)
+            return Response(serializer.data)
+
+        @swagger_auto_schema(method='get', operation_description="image GET description override")
+        @swagger_auto_schema(method='post', request_body=serializers.ImageUploadSerializer)
+        @action(detail=True, methods=['get', 'post'], parser_classes=(MultiPartParser,))
+        def image_with_action(self, request, slug=None):
+            """
+            image method docstring
+            """
+            pass
+    except ImportError:
+        action = None
 
     def update(self, request, *args, **kwargs):
         """update method docstring"""

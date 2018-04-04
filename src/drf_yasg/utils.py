@@ -114,7 +114,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
             # no overrides to set, no use in doing more work
             return
 
-        # if the method is a detail_route or list_route, it will have a bind_to_methods attribute
+        # if the method is an @action, it will have a bind_to_methods attribute
         bind_to_methods = getattr(view_method, 'bind_to_methods', [])
         # if the method is actually a function based view (@api_view), it will have a 'cls' attribute
         view_cls = getattr(view_method, 'cls', None)
@@ -126,7 +126,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
         _methods = methods
         if methods or method:
             assert available_methods or http_method_names, "`method` or `methods` can only be specified " \
-                                                           "on @detail_route or @api_view views"
+                                                           "on @action or @api_view views"
             assert bool(methods) != bool(method), "specify either method or methods"
             assert not isinstance(methods, str), "`methods` expects to receive a list of methods;" \
                                                  " use `method` for a single argument"
@@ -138,13 +138,13 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
             assert not any(mth in existing_data for mth in _methods), "http method defined multiple times"
 
         if available_methods:
-            # detail_route, list_route or api_view
+            # action or api_view
             assert bool(http_method_names) != bool(bind_to_methods), "this should never happen"
 
             if len(available_methods) > 1:
                 assert _methods, \
-                    "on multi-method api_view, detail_route or list_route, you must specify swagger_auto_schema on " \
-                    "a per-method basis using one of the `method` or `methods` arguments"
+                    "on multi-method api_view, action, detail_route or list_route, you must specify " \
+                    "swagger_auto_schema on a per-method basis using one of the `method` or `methods` arguments"
             else:
                 # for a single-method view we assume that single method as the decorator target
                 _methods = _methods or available_methods
@@ -156,8 +156,9 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
             view_method._swagger_auto_schema = existing_data
         else:
             assert not _methods, \
-                "the methods argument should only be specified when decorating a detail_route or list_route; you " \
-                "should also ensure that you put the swagger_auto_schema decorator AFTER (above) the _route decorator"
+                "the methods argument should only be specified when decorating an action, detail_route or " \
+                "list_route; you should also ensure that you put the swagger_auto_schema decorator " \
+                "AFTER (above) the _route decorator"
             assert not existing_data, "swagger_auto_schema applied twice to method"
             view_method._swagger_auto_schema = data
 
@@ -183,7 +184,7 @@ def is_list_view(path, method, view):
         return True
 
     if action in ('retrieve', 'update', 'partial_update', 'destroy') or detail is True or suffix == 'Instance':
-        # a detail_route is surely not a list route
+        # a detail action is surely not a list route
         return False
 
     # for GenericAPIView, if it's a detail view it can't also be a list view

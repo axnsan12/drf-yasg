@@ -87,8 +87,8 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
 
 * for ``ViewSet``, ``GenericViewSet``, ``ModelViewSet``, because each viewset corresponds to multiple **paths**, you have
   to decorate the *action methods*, i.e. ``list``, ``create``, ``retrieve``, etc. |br|
-  Additionally, ``@list_route``\ s or ``@detail_route``\ s defined on the viewset, like function based api views, can
-  respond to multiple HTTP methods and thus have multiple operations that must be decorated separately:
+  Additionally, ``@action``\ s, `@list_route``\ s or ``@detail_route``\ s defined on the viewset, like function based
+  api views, can respond to multiple HTTP methods and thus have multiple operations that must be decorated separately:
 
 
    .. code-block:: python
@@ -96,13 +96,13 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
       class ArticleViewSet(viewsets.ModelViewSet):
          # method or 'methods' can be skipped because the list_route only handles a single method (GET)
          @swagger_auto_schema(operation_description='GET /articles/today/')
-         @list_route(methods=['get'])
+         @action(detail=False, methods=['get'])
          def today(self, request):
             ...
 
          @swagger_auto_schema(method='get', operation_description="GET /articles/{id}/image/")
          @swagger_auto_schema(method='post', operation_description="POST /articles/{id}/image/")
-         @detail_route(methods=['get', 'post'], parser_classes=(MultiPartParser,))
+         @action(detail=True, methods=['get', 'post'], parser_classes=(MultiPartParser,))
          def image(self, request, id=None):
             ...
 
