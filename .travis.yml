@@ -9,6 +9,7 @@ python:
 
 env:
  - DRF=3.7
+ - DRF=3.8
 
 jobs:
   include:
