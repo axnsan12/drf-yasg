@@ -4,6 +4,14 @@ Changelog
 
 
 *********
+**1.6.2**
+*********
+
+*Release date: TODO, 2018*
+
+- **FIXED:** made documentation ordering of parameters stable for urls with multiple parameters (:issue:`105`, :pr:`106`)
+
+*********
 **1.6.1**
 *********
 

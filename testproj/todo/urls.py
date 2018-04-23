@@ -1,3 +1,4 @@
+from django.conf.urls import url
 from rest_framework import routers
 
 from todo import views
@@ -8,3 +9,8 @@ router.register(r'another', views.TodoAnotherViewSet)
 router.register(r'yetanother', views.TodoYetAnotherViewSet)
 
 urlpatterns = router.urls
+
+urlpatterns += [
+    url(r'^(?P<todo_id>\d+)/yetanother/(?P<yetanother_id>\d+)/$',
+        views.NestedTodoView.as_view(),),
+]

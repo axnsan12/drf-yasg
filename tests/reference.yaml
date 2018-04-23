@@ -546,6 +546,27 @@ paths:
         description: A unique integer value identifying this todo.
         required: true
         type: integer
+  /todo/{todo_id}/yetanother/{yetanother_id}/:
+    get:
+      operationId: todo_yetanother_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TodoYetAnother'
+      tags:
+        - todo
+    parameters:
+      - name: todo_id
+        in: path
+        required: true
+        type: string
+      - name: yetanother_id
+        in: path
+        required: true
+        type: string
   /users/:
     get:
       operationId: users_list
