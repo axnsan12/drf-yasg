@@ -7,9 +7,12 @@ Changelog
 **1.6.2**
 *********
 
-*Release date: TODO, 2018*
+*Release date: Apr 25, 2018
 
+- **IMPROVED:** updated ``swagger-ui`` to version 3.13.6
+- **IMPROVED:** switched ``ReDoc`` to version 2.0.0-alpha.17 (was 1.21.2); fixes :issue:`107`
 - **FIXED:** made documentation ordering of parameters stable for urls with multiple parameters (:issue:`105`, :pr:`106`)
+- **FIXED:** fixed crash when using a model ``ChoiceField`` of unknown child type
 
 *********
 **1.6.1**
