@@ -190,8 +190,8 @@ OPERATIONS_SORTER
 Sorting order for the operation list of each tag.
 
 * :python:`None`: show in the order returned by the server
-* :python:`alpha`: sort alphabetically by path
-* :python:`method`: sort by HTTP method
+* :python:`'alpha'`: sort alphabetically by path
+* :python:`'method'`: sort by HTTP method
 
 **Default**: :python:`None` |br|
 *Maps to parameter*: ``operationsSorter``
@@ -202,7 +202,7 @@ TAGS_SORTER
 Sorting order for tagged operation groups.
 
 * :python:`None`: Swagger UI default ordering
-* :python:`alpha`: sort alphabetically
+* :python:`'alpha'`: sort alphabetically
 
 **Default**: :python:`None` |br|
 *Maps to parameter*: ``tagsSorter``
@@ -212,9 +212,9 @@ DOC_EXPANSION
 
 Controls the default expansion setting for the operations and tags.
 
-* :python:`None`: everything is collapsed
-* :python:`list`: only tags are expanded
-* :python:`full`: all operations are expanded
+* :python:`'none'`: everything is collapsed
+* :python:`'list'`: only tags are expanded
+* :python:`'full'`: all operations are expanded
 
 **Default**: :python:`'list'` |br|
 *Maps to parameter*: ``docExpansion``
@@ -240,8 +240,8 @@ DEFAULT_MODEL_RENDERING
 
 Controls whether operations show the model structure or the example value by default.
 
-* :python:`model`: show the model fields by default
-* :python:`example`: show the example value by default
+* :python:`'model'`: show the model fields by default
+* :python:`'example'`: show the example value by default
 
 **Default**: :python:`'model'` |br|
 *Maps to parameter*: ``defaultModelRendering``
