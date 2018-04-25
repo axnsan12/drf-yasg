@@ -7,7 +7,7 @@ Changelog
 **1.6.2**
 *********
 
-*Release date: Apr 25, 2018
+*Release date: Apr 25, 2018*
 
 - **IMPROVED:** updated ``swagger-ui`` to version 3.13.6
 - **IMPROVED:** switched ``ReDoc`` to version 2.0.0-alpha.17 (was 1.21.2); fixes :issue:`107`
