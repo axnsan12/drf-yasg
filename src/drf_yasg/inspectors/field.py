@@ -410,7 +410,9 @@ class ChoiceFieldInspector(FieldInspector):
                 model = getattr(getattr(serializer, 'Meta'), 'model')
                 model_field = get_model_field(model, field.source)
                 if model_field:
-                    enum_type = get_basic_type_info(model_field).get('type', enum_type)
+                    model_type = get_basic_type_info(model_field)
+                    if model_type:
+                        enum_type = model_type.get('type', enum_type)
 
             if isinstance(field, serializers.MultipleChoiceField):
                 return SwaggerType(
