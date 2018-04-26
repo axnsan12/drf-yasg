@@ -1,3 +1,4 @@
+import logging
 import re
 from collections import OrderedDict
 
@@ -6,6 +7,8 @@ from django.urls import get_script_prefix
 from inflection import camelize
 
 from .utils import filter_none
+
+logger = logging.getLogger(__name__)
 
 TYPE_OBJECT = "object"  #:
 TYPE_STRING = "string"  #:
@@ -466,7 +469,7 @@ class Schema(SwaggerDict):
 class _Ref(SwaggerDict):
     ref_name_re = re.compile(r"#/(?P<scope>.+)/(?P<name>[^/]+)$")
 
-    def __init__(self, resolver, name, scope, expected_type):
+    def __init__(self, resolver, name, scope, expected_type, ignore_unresolved=False):
         """Base class for all reference types. A reference object has only one property, ``$ref``, which must be a JSON
         reference to a valid object in the specification, e.g. ``#/definitions/Article`` to refer to an article model.
 
@@ -474,13 +477,19 @@ class _Ref(SwaggerDict):
         :param str name: referenced object name, e.g. "Article"
         :param str scope: reference scope, e.g. "definitions"
         :param type[.SwaggerDict] expected_type: the expected type that will be asserted on the object found in resolver
+        :param bool ignore_unresolved: allow the reference to be not defined in resolver
         """
         super(_Ref, self).__init__()
         assert not type(self) == _Ref, "do not instantiate _Ref directly"
         ref_name = "#/{scope}/{name}".format(scope=scope, name=name)
-        obj = resolver.get(name, scope)
-        assert isinstance(obj, expected_type), ref_name + " is a {actual}, not a {expected}" \
-            .format(actual=type(obj).__name__, expected=expected_type.__name__)
+        if not ignore_unresolved:
+            obj = resolver.get(name, scope)
+            assert isinstance(obj, expected_type), ref_name + " is a {actual}, not a {expected}".format(
+                actual=type(obj).__name__,
+                expected=expected_type.__name__
+            )
+        else:
+            logger.debug('Allowing the reference without checking if it resolves')
         self.ref = ref_name
 
     def resolve(self, resolver):
@@ -502,14 +511,15 @@ class _Ref(SwaggerDict):
 
 
 class SchemaRef(_Ref):
-    def __init__(self, resolver, schema_name):
+    def __init__(self, resolver, schema_name, ignore_unresolved=False):
         """Adds a reference to a named Schema defined in the ``#/definitions/`` object.
 
         :param .ReferenceResolver resolver: component resolver which must contain the definition
         :param str schema_name: schema name
+        :param bool ignore_unresolved: allow the reference to be not defined in resolver
         """
         assert SCHEMA_DEFINITIONS in resolver.scopes
-        super(SchemaRef, self).__init__(resolver, schema_name, SCHEMA_DEFINITIONS, Schema)
+        super(SchemaRef, self).__init__(resolver, schema_name, SCHEMA_DEFINITIONS, Schema, ignore_unresolved)
 
 
 Schema.OR_REF = (Schema, SchemaRef)
