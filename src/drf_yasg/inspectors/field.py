@@ -520,3 +520,25 @@ else:
                 return camelize_schema(result, self.components)
 
             return result
+
+try:
+    from rest_framework_recursive.fields import RecursiveField
+except ImportError:
+    class RecursiveFieldInspector(FieldInspector):
+        """Provides conversion for RecursiveField (https://github.com/heywbj/django-rest-framework-recursive)"""
+        pass
+else:
+    class RecursiveFieldInspector(FieldInspector):
+        """Provides conversion for RecursiveField (https://github.com/heywbj/django-rest-framework-recursive)"""
+        def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+            if isinstance(field, RecursiveField) and swagger_object_type == openapi.Schema:
+                assert use_references is True, "Can not create schema for RecursiveField when use_references is False"
+                ref_name = get_serializer_ref_name(field.proxied)
+                assert ref_name is not None, "Can not create RecursiveField schema for inline ModelSerializer"
+
+                resolver = openapi.ReferenceResolver(openapi.SCHEMA_DEFINITIONS)
+                definitions = resolver.with_scope(openapi.SCHEMA_DEFINITIONS)
+                definitions.set(ref_name, openapi.Schema(type=openapi.TYPE_OBJECT))
+
+                return openapi.SchemaRef(definitions, ref_name)
+            return NotHandled
