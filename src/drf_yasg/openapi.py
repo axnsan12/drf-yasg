@@ -1,4 +1,3 @@
-import logging
 import re
 from collections import OrderedDict
 
@@ -7,8 +6,6 @@ from django.urls import get_script_prefix
 from inflection import camelize
 
 from .utils import filter_none
-
-logger = logging.getLogger(__name__)
 
 TYPE_OBJECT = "object"  #:
 TYPE_STRING = "string"  #:
@@ -484,12 +481,8 @@ class _Ref(SwaggerDict):
         ref_name = "#/{scope}/{name}".format(scope=scope, name=name)
         if not ignore_unresolved:
             obj = resolver.get(name, scope)
-            assert isinstance(obj, expected_type), ref_name + " is a {actual}, not a {expected}".format(
-                actual=type(obj).__name__,
-                expected=expected_type.__name__
-            )
-        else:
-            logger.debug('Allowing the reference without checking if it resolves')
+            assert isinstance(obj, expected_type), ref_name + " is a {actual}, not a {expected}" \
+                .format(actual=type(obj).__name__, expected=expected_type.__name__)
         self.ref = ref_name
 
     def resolve(self, resolver):
