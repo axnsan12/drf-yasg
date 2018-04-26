@@ -437,7 +437,7 @@ class Schema(SwaggerDict):
         super(Schema, self).__init__(**extra)
         if required is True or required is False:
             # common error
-            raise AssertionError("the `requires` attribute of schema must be an "
+            raise AssertionError("the `required` attribute of schema must be an "
                                  "array of required property names, not a boolean!")
         assert type, "type is required!"
         self.title = title
