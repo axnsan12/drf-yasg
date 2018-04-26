@@ -4,6 +4,20 @@ Changelog
 
 
 *********
+**1.7.0**
+*********
+
+*Release date: Apr 27, 2018*
+
+- **ADDED:** added integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_
+  (:issue:`109`, :pr:`110`, thanks to :ghuser:`rsichny`)
+
+  *NOTE:* in order for this to work, you will have to add the new ``drf_yasg.inspectors.RecursiveFieldInspector`` to
+  your ``DEFAULT_FIELD_INSPECTORS`` array if you changed it from the default value
+
+- **FIXED:** ``SchemaRef`` now supports cyclical references via the ``ignore_unresolved`` argument
+
+*********
 **1.6.2**
 *********
 
