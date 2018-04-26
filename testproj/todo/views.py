@@ -2,8 +2,9 @@ from rest_framework import viewsets
 from rest_framework.generics import RetrieveAPIView
 
 from .models import Todo, TodoAnother, TodoTree, TodoYetAnother
-from .serializer import TodoAnotherSerializer, TodoRecursiveSerializer, TodoSerializer, TodoTreeSerializer, \
-    TodoYetAnotherSerializer
+from .serializer import (
+    TodoAnotherSerializer, TodoRecursiveSerializer, TodoSerializer, TodoTreeSerializer, TodoYetAnotherSerializer
+)
 
 
 class TodoViewSet(viewsets.ReadOnlyModelViewSet):
