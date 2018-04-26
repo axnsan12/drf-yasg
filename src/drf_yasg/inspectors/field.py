@@ -10,7 +10,7 @@ from rest_framework.settings import api_settings as rest_framework_settings
 
 from .. import openapi
 from ..errors import SwaggerGenerationError
-from ..utils import decimal_as_float, filter_none
+from ..utils import decimal_as_float, filter_none, get_serializer_ref_name
 from .base import FieldInspector, NotHandled, SerializerInspector
 
 logger = logging.getLogger(__name__)
@@ -55,23 +55,12 @@ class InlineSerializerInspector(SerializerInspector):
             if swagger_object_type != openapi.Schema:
                 raise SwaggerGenerationError("cannot instantiate nested serializer as " + swagger_object_type.__name__)
 
-            serializer = field
-            serializer_meta = getattr(serializer, 'Meta', None)
-            serializer_name = type(serializer).__name__
-            if hasattr(serializer_meta, 'ref_name'):
-                ref_name = serializer_meta.ref_name
-            elif serializer_name == 'NestedSerializer' and isinstance(serializer, serializers.ModelSerializer):
-                logger.debug("Forcing inline output for ModelSerializer named 'NestedSerializer': " + str(serializer))
-                ref_name = None
-            else:
-                ref_name = serializer_name
-                if ref_name.endswith('Serializer'):
-                    ref_name = ref_name[:-len('Serializer')]
+            ref_name = get_serializer_ref_name(field)
 
             def make_schema_definition():
                 properties = OrderedDict()
                 required = []
-                for property_name, child in serializer.fields.items():
+                for property_name, child in field.fields.items():
                     property_name = self.get_property_name(property_name)
                     prop_kwargs = {
                         'read_only': child.read_only or None
