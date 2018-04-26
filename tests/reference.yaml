@@ -495,6 +495,129 @@ paths:
         description: A unique integer value identifying this todo another.
         required: true
         type: integer
+  /todo/recursive/:
+    get:
+      operationId: todo_recursive_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TodoRecursive'
+      tags:
+        - todo
+    post:
+      operationId: todo_recursive_create
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/TodoRecursive'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/TodoRecursive'
+      tags:
+        - todo
+    parameters: []
+  /todo/recursive/{id}/:
+    get:
+      operationId: todo_recursive_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TodoRecursive'
+      tags:
+        - todo
+    put:
+      operationId: todo_recursive_update
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/TodoRecursive'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TodoRecursive'
+      tags:
+        - todo
+    patch:
+      operationId: todo_recursive_partial_update
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/TodoRecursive'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TodoRecursive'
+      tags:
+        - todo
+    delete:
+      operationId: todo_recursive_delete
+      description: ''
+      parameters: []
+      responses:
+        '204':
+          description: ''
+      tags:
+        - todo
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this todo tree.
+        required: true
+        type: integer
+  /todo/tree/:
+    get:
+      operationId: todo_tree_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TodoTree'
+      tags:
+        - todo
+    parameters: []
+  /todo/tree/{id}/:
+    get:
+      operationId: todo_tree_read
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/TodoTree'
+      tags:
+        - todo
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this todo tree.
+        required: true
+        type: integer
   /todo/yetanother/:
     get:
       operationId: todo_yetanother_list
@@ -1337,6 +1460,42 @@ definitions:
         maxLength: 50
       todo:
         $ref: '#/definitions/Todo'
+  TodoRecursive:
+    required:
+      - title
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      title:
+        title: Title
+        type: string
+        maxLength: 50
+      parent:
+        $ref: '#/definitions/TodoRecursive'
+      parent_id:
+        type: integer
+        title: Parent id
+  TodoTree:
+    required:
+      - title
+      - children
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      title:
+        title: Title
+        type: string
+        maxLength: 50
+      children:
+        type: array
+        items:
+          $ref: '#/definitions/TodoTree'
   TodoYetAnother:
     required:
       - title

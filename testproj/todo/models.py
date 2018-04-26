@@ -13,3 +13,8 @@ class TodoAnother(models.Model):
 class TodoYetAnother(models.Model):
     todo = models.ForeignKey(TodoAnother, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
+
+
+class TodoTree(models.Model):
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children', null=True)
+    title = models.CharField(max_length=50)
