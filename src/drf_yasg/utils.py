@@ -295,3 +295,25 @@ def decimal_as_float(field):
     if isinstance(field, serializers.DecimalField) or isinstance(field, models.DecimalField):
         return not getattr(field, 'coerce_to_string', rest_framework_settings.COERCE_DECIMAL_TO_STRING)
     return False
+
+
+def get_serializer_ref_name(serializer):
+    """
+    Get serializer's ref_name (or None for ModelSerializer if it is named 'NestedSerializer')
+
+    :param serializer: Serializer instance
+    :return: Serializer's ref_name or None for inline serializer
+    :rtype: str or None
+    """
+    serializer_meta = getattr(serializer, 'Meta', None)
+    serializer_name = type(serializer).__name__
+    if hasattr(serializer_meta, 'ref_name'):
+        ref_name = serializer_meta.ref_name
+    elif serializer_name == 'NestedSerializer' and isinstance(serializer, serializers.ModelSerializer):
+        logger.debug("Forcing inline output for ModelSerializer named 'NestedSerializer': " + str(serializer))
+        ref_name = None
+    else:
+        ref_name = serializer_name
+        if ref_name.endswith('Serializer'):
+            ref_name = ref_name[:-len('Serializer')]
+    return ref_name

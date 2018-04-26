@@ -353,6 +353,12 @@ Integration with `djangorestframework-camel-case <https://github.com/vbabiy/djan
 provided out of the box - if you have ``djangorestframework-camel-case`` installed and your ``APIView`` uses
 ``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer``, all property names will be converted to *camelCase* by default.
 
+djangorestframework-recursive
+===============================
+
+Integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_ is
+provided out of the box - if you have ``djangorestframework-recursive`` installed.
+
 .. |travis| image:: https://img.shields.io/travis/axnsan12/drf-yasg/master.svg
    :target: https://travis-ci.org/axnsan12/drf-yasg
    :alt: Travis CI
