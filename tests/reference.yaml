@@ -202,6 +202,7 @@ paths:
           type: string
           pattern: ^69$
           default: '69'
+          minLength: 1
         - name: image_styles
           in: formData
           description: Parameter with Items
@@ -700,6 +701,7 @@ paths:
           description: this field is generated from a query_serializer
           required: false
           type: string
+          minLength: 1
         - name: is_staff
           in: query
           description: this one too!
@@ -800,6 +802,7 @@ definitions:
         description: title model help_text
         type: string
         maxLength: 255
+        minLength: 1
       author:
         description: The ID of the user that created this article; if none is provided,
           defaults to the currently logged in user.
@@ -809,6 +812,7 @@ definitions:
         description: body serializer help_text
         type: string
         maxLength: 5000
+        minLength: 1
       slug:
         description: slug model help_text
         type: string
@@ -830,6 +834,7 @@ definitions:
           description: but i needed to test these 2 fields somehow
           type: string
           format: uri
+          minLength: 1
         readOnly: true
       uuid:
         description: should articles have UUIDs?
@@ -872,10 +877,12 @@ definitions:
         title: FirstName
         type: string
         maxLength: 30
+        minLength: 1
       lastName:
         title: LastName
         type: string
         maxLength: 30
+        minLength: 1
   Person:
     required:
       - identity
@@ -897,10 +904,12 @@ definitions:
         title: Project name
         description: Name of the project
         type: string
+        minLength: 1
       githubRepo:
         title: Github repo
         description: Github repository of the project
         type: string
+        minLength: 1
   Snippet:
     required:
       - code
@@ -922,6 +931,7 @@ definitions:
         description: The ID of the user that created this snippet.
         type: string
         readOnly: true
+        minLength: 1
         title: Owner as string
       title:
         title: Title
@@ -930,6 +940,7 @@ definitions:
       code:
         title: Code
         type: string
+        minLength: 1
       linenos:
         title: Linenos
         type: boolean
@@ -1448,6 +1459,7 @@ definitions:
         title: Title
         type: string
         maxLength: 50
+        minLength: 1
   TodoAnother:
     required:
       - title
@@ -1458,6 +1470,7 @@ definitions:
         title: Title
         type: string
         maxLength: 50
+        minLength: 1
       todo:
         $ref: '#/definitions/Todo'
   TodoRecursive:
@@ -1473,6 +1486,7 @@ definitions:
         title: Title
         type: string
         maxLength: 50
+        minLength: 1
       parent:
         $ref: '#/definitions/TodoRecursive'
       parent_id:
@@ -1492,6 +1506,7 @@ definitions:
         title: Title
         type: string
         maxLength: 50
+        minLength: 1
       children:
         type: array
         items:
@@ -1505,6 +1520,7 @@ definitions:
         title: Title
         type: string
         maxLength: 50
+        minLength: 1
       todo:
         required:
           - title
@@ -1518,6 +1534,7 @@ definitions:
             title: Title
             type: string
             maxLength: 50
+            minLength: 1
           todo:
             required:
               - title
@@ -1531,6 +1548,7 @@ definitions:
                 title: Title
                 type: string
                 maxLength: 50
+                minLength: 1
             readOnly: true
         readOnly: true
   UserSerializerrr:
@@ -1551,6 +1569,7 @@ definitions:
         type: string
         pattern: ^[\w.@+-]+$
         maxLength: 150
+        minLength: 1
       email:
         title: Email address
         type: string
@@ -1572,6 +1591,7 @@ definitions:
         type: string
         format: ipv4
         readOnly: true
+        minLength: 1
       last_connected_at:
         title: Last connected at
         description: really?

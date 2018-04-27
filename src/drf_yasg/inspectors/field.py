@@ -281,6 +281,10 @@ def find_limits(field):
                 if attr not in limits or improves(limit_value, limits[attr]):
                     limits[attr] = limit_value
 
+    if hasattr(field, "allow_blank") and not field.allow_blank:
+        if limits.get('min_length', 0) < 1:
+            limits['min_length'] = 1
+
     return OrderedDict(sorted(limits.items()))
 
 
