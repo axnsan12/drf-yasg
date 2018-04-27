@@ -1,3 +1,6 @@
+from collections import OrderedDict
+from random import shuffle
+
 from drf_yasg import openapi
 
 
@@ -51,3 +54,15 @@ def test_trailing_underscore_stripped():
     del sd.in_
     assert 'in' not in sd
     assert not hasattr(sd, 'in__')
+
+
+def test_extra_ordering():
+    """Insertion order should also be consistent when setting undeclared parameters (kwargs) in SwaggerDict"""
+    extras = [('beta', 1), ('alpha', 2), ('omega', 3), ('gamma', 4)]
+    shuffled_extras = list(extras)
+    shuffle(shuffled_extras)
+
+    s1 = openapi.SwaggerDict(**OrderedDict(extras))
+    s2 = openapi.SwaggerDict(**OrderedDict(shuffled_extras))
+
+    assert list(s1.items()) == list(s2.items())

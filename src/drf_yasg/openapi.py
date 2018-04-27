@@ -116,7 +116,7 @@ class SwaggerDict(OrderedDict):
         which would result in the extra attributes being added first. For this reason, we defer the insertion of the
         attributes and require that subclasses call ._insert_extras__ at the end of their __init__ method.
         """
-        for attr, val in self._extras__.items():
+        for attr, val in sorted(self._extras__.items()):
             setattr(self, attr, val)
 
     @staticmethod
