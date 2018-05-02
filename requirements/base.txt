@@ -8,5 +8,4 @@ six>=1.10.0
 uritemplate>=3.0.0
 
 djangorestframework>=3.7.7
-Django>=1.11.7,<2.0; python_version <= "2.7"
-Django>=1.11.7; python_version >= "3.4"
+Django>=1.11.7
