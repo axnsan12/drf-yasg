@@ -401,7 +401,6 @@ class OpenAPISchemaGenerator(object):
         """
         parameters = []
         queryset = getattr(view_cls, 'queryset', None)
-        model = getattr(getattr(view_cls, 'queryset', None), 'model', None)
 
         for variable in sorted(uritemplate.variables(path)):
             model, model_field = get_queryset_field(queryset, variable)

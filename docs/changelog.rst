@@ -4,6 +4,16 @@ Changelog
 
 
 *********
+**1.7.1**
+*********
+
+*Release date: May 05, 2018*
+
+- **IMPROVED:** updated ``swagger-ui`` to version 3.14.1
+- **IMPROVED:** set ``swagger-ui`` ``showCommonExtensions`` to ``True`` by default and add
+  ``SHOW_COMMON_EXTENSIONS`` setting key
+
+*********
 **1.7.0**
 *********
 

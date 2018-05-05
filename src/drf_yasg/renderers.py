@@ -93,6 +93,7 @@ class _UIRenderer(BaseRenderer):
             'defaultModelRendering': swagger_settings.DEFAULT_MODEL_RENDERING,
             'defaultModelExpandDepth': swagger_settings.DEFAULT_MODEL_DEPTH,
             'defaultModelsExpandDepth': swagger_settings.DEFAULT_MODEL_DEPTH,
+            'showCommonExtensions': swagger_settings.SHOW_COMMON_EXTENSIONS,
             'oauth2RedirectUrl': swagger_settings.OAUTH2_REDIRECT_URL,
             'supportedSubmitMethods': swagger_settings.SUPPORTED_SUBMIT_METHODS,
         }
