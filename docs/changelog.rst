@@ -12,6 +12,8 @@ Changelog
 - **IMPROVED:** updated ``swagger-ui`` to version 3.14.1
 - **IMPROVED:** set ``swagger-ui`` ``showCommonExtensions`` to ``True`` by default and add
   ``SHOW_COMMON_EXTENSIONS`` setting key
+- **IMPROVED:** set ``min_length=1`` when ``allow_blank=False`` (:pr:`112`, thanks to :ghuser:`elnappo`)
+- **FIXED:** made documentation ordering of ``SwaggerDict`` extra attributes stable
 
 *********
 **1.7.0**
