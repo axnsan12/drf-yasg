@@ -276,7 +276,7 @@ class SerializerInspector(FieldInspector):
 
 
 class ViewInspector(BaseInspector):
-    body_methods = ('PUT', 'PATCH', 'POST')  #: methods that are allowed to have a request body
+    body_methods = ('PUT', 'PATCH', 'POST', 'DELETE')  #: methods that are allowed to have a request body
 
     # real values set in __init__ to prevent import errors
     field_inspectors = []  #:
