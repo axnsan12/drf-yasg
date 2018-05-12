@@ -4,12 +4,13 @@ Changelog
 
 
 *********
-**1.7.2**
+**1.7.2b**
 *********
 
 *Release date: May 12, 2018*
 
 - **FIXED:** fixed generation of default ``SECURITY_REQUIREMENTS`` to match documented behaviour
+- **FIXED:** ordering of ``SECURITY_REQUIREMENTS`` and ``SECURITY_DEFINITIONS`` is now stable
 
 
 *********

@@ -204,9 +204,14 @@ class OpenAPISchemaGenerator(object):
         paths, prefix = self.get_paths(endpoints, components, request, public)
 
         security_definitions = swagger_settings.SECURITY_DEFINITIONS
+        if security_definitions is not None:
+            security_definitions = OrderedDict(sorted([(key, OrderedDict(sorted(sd.items())))
+                                                       for key, sd in swagger_settings.SECURITY_DEFINITIONS.items()]))
         security_requirements = swagger_settings.SECURITY_REQUIREMENTS
         if security_requirements is None:
             security_requirements = [{security_scheme: []} for security_scheme in swagger_settings.SECURITY_DEFINITIONS]
+        else:
+            security_requirements = [OrderedDict(sorted(sr.items())) for sr in security_requirements]
 
         url = self.url
         if url is None and request is not None:

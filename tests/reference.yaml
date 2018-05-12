@@ -24,9 +24,9 @@ securityDefinitions:
   Basic:
     type: basic
   Bearer:
-    type: apiKey
-    name: Authorization
     in: header
+    name: Authorization
+    type: apiKey
 security:
   - Basic: []
   - Bearer: []

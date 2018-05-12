@@ -221,7 +221,7 @@ class Swagger(SwaggerDict):
         :param str _prefix: api path prefix to use in setting basePath; this will be appended to the wsgi
             SCRIPT_NAME prefix or Django's FORCE_SCRIPT_NAME if applicable
         :param str _version: version string to override Info
-        :param list[dict] security_definitions: list of supported authentication mechanisms
+        :param dict[str,dict[str,str]] security_definitions: list of supported authentication mechanisms
         :param list[dict] security: authentication mechanisms accepted by default; can be overriden in Operation
         :param list[str] consumes: consumed MIME types; can be overriden in Operation
         :param list[str] produces: produced MIME types; can be overriden in Operation
