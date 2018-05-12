@@ -39,7 +39,7 @@ Security requirements
 The second step is specifying, for each endpoint, which authentication mechanism can be used for interacting with it.
 See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#security-requirement-object for details.
 
-By default, a top-level `security` that accepts all the declared security definitions is generated.
+By default, a top-level `security` that accepts any one of the declared security definitions is generated.
 For the example above, that would be :code:`[{'Basic': []}, {'Bearer': []}]`. This can be overriden using the
 :ref:`SECURITY_REQUIREMENTS <security-definitions-settings>` setting.
 

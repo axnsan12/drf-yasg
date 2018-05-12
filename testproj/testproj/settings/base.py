@@ -94,7 +94,18 @@ SWAGGER_SETTINGS = {
     'LOGIN_URL': '/admin/login',
     'LOGOUT_URL': '/admin/logout',
 
-    'DEFAULT_INFO': 'testproj.urls.swagger_info'
+    'DEFAULT_INFO': 'testproj.urls.swagger_info',
+
+    'SECURITY_DEFINITIONS': {
+        'Basic': {
+            'type': 'basic'
+        },
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
 }
 
 # Internationalization

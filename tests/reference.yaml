@@ -21,10 +21,15 @@ consumes:
 produces:
   - application/json
 securityDefinitions:
-  basic:
+  Basic:
     type: basic
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
 security:
-  - basic: []
+  - Basic: []
+  - Bearer: []
 paths:
   /articles/:
     get:

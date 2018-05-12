@@ -4,6 +4,15 @@ Changelog
 
 
 *********
+**1.7.2**
+*********
+
+*Release date: May 12, 2018*
+
+- **FIXED:** fixed generation of default ``SECURITY_REQUIREMENTS`` to match documented behaviour
+
+
+*********
 **1.7.1**
 *********
 

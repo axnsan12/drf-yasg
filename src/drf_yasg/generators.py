@@ -206,7 +206,7 @@ class OpenAPISchemaGenerator(object):
         security_definitions = swagger_settings.SECURITY_DEFINITIONS
         security_requirements = swagger_settings.SECURITY_REQUIREMENTS
         if security_requirements is None:
-            security_requirements = [{security_scheme: [] for security_scheme in swagger_settings.SECURITY_DEFINITIONS}]
+            security_requirements = [{security_scheme: []} for security_scheme in swagger_settings.SECURITY_DEFINITIONS]
 
         url = self.url
         if url is None and request is not None:
