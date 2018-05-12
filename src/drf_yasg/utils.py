@@ -66,7 +66,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
     :param str operation_id: operation ID override; the operation ID must be unique accross the whole API
     :param str operation_description: operation description override
-    :param str security: security requirements override; used to specify which authetication mechanism
+    :param list[dict] security: security requirements override; used to specify which authetication mechanism
         is requried to call this API; an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
         authentication schemes), and ``None`` will inherit the top-level secuirty requirements
     :param dict[str,(.Schema,.SchemaRef,.Response,str,Serializer)] responses: a dict of documented manual responses
