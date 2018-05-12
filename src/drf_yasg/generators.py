@@ -86,14 +86,17 @@ class EndpointEnumerator(_EndpointEnumerator):
         for pattern in patterns:
             path_regex = prefix + get_original_route(pattern)
             if isinstance(pattern, URLPattern):
-                path = self.get_path_from_regex(path_regex)
-                callback = pattern.callback
-                url_name = pattern.name
-                if self.should_include_endpoint(path, callback, app_name or '', namespace or '', url_name):
-                    path = self.replace_version(path, callback)
-                    for method in self.get_allowed_methods(callback):
-                        endpoint = (path, method, callback)
-                        api_endpoints.append(endpoint)
+                try:
+                    path = self.get_path_from_regex(path_regex)
+                    callback = pattern.callback
+                    url_name = pattern.name
+                    if self.should_include_endpoint(path, callback, app_name or '', namespace or '', url_name):
+                        path = self.replace_version(path, callback)
+                        for method in self.get_allowed_methods(callback):
+                            endpoint = (path, method, callback)
+                            api_endpoints.append(endpoint)
+                except Exception:
+                    logger.warning('failed to enumerate view', exc_info=True)
 
             elif isinstance(pattern, URLResolver):
                 nested_endpoints = self.get_api_endpoints(

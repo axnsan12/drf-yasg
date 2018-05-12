@@ -4,6 +4,15 @@ Changelog
 
 
 *********
+**1.7.3**
+*********
+
+*Release date: May 12, 2018*
+
+- **FIXED:** views whose ``__init__`` methods throw exceptions will now be ignored during endpoint enumeration
+
+
+*********
 **1.7.2**
 *********
 
