@@ -9,6 +9,8 @@ Changelog
 
 *Release date: May 14, 2018*
 
+- **IMPROVED:** updated ``swagger-ui`` to version 3.14.2
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-alpha.20
 - **FIXED:** ignore ``None`` return from ``get_operation`` to avoid empty ``Path`` objects in output
 - **FIXED:** request body is now allowed on ``DELETE`` endpoints (:issue:`118`)
 
