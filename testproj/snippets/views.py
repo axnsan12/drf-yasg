@@ -33,6 +33,21 @@ class SnippetList(generics.ListCreateAPIView):
         """post method docstring"""
         return super(SnippetList, self).post(request, *args, **kwargs)
 
+    @swagger_auto_schema(
+        operation_id='snippets_delete_bulk',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'body': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='this should not crash (request body on DELETE method)'
+                )
+            }
+        ),
+    )
+    def delete(self, *args, **kwargs):
+        pass
+
 
 class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -56,18 +71,26 @@ class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
         """patch method docstring"""
         return super(SnippetDetail, self).patch(request, *args, **kwargs)
 
-    @swagger_auto_schema(manual_parameters=[
-        openapi.Parameter(
-            name='id', in_=openapi.IN_PATH,
-            type=openapi.TYPE_INTEGER,
-            description="path parameter override",
-            required=True
-        ),
-    ], responses={
-        status.HTTP_204_NO_CONTENT: openapi.Response(
-            description="This should not crash"
-        )
-    })
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                name='id', in_=openapi.IN_PATH,
+                type=openapi.TYPE_INTEGER,
+                description="path parameter override",
+                required=True
+            ),
+            openapi.Parameter(
+                name='delete_form_param', in_=openapi.IN_FORM,
+                type=openapi.TYPE_INTEGER,
+                description="this should not crash (form parameter on DELETE method)"
+            ),
+        ],
+        responses={
+            status.HTTP_204_NO_CONTENT: openapi.Response(
+                description="this should not crash (response object with no schema)"
+            )
+        }
+    )
     def delete(self, request, *args, **kwargs):
         """delete method docstring"""
         return super(SnippetDetail, self).patch(request, *args, **kwargs)
