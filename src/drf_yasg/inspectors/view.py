@@ -101,7 +101,7 @@ class SwaggerAutoSchema(ViewInspector):
             if isinstance(body_override, openapi.Schema.OR_REF):
                 return body_override
             return force_serializer_instance(body_override)
-        elif self.method in self.body_methods:
+        elif self.method in self.implicit_body_methods:
             return self.get_view_serializer()
 
         return None
