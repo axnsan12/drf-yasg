@@ -324,7 +324,9 @@ class OpenAPISchemaGenerator(object):
                 if not public and not self._gen.has_view_permissions(path, method, view):
                     continue
 
-                operations[method.lower()] = self.get_operation(view, path, prefix, method, components, request)
+                operation = self.get_operation(view, path, prefix, method, components, request)
+                if operation is not None:
+                    operations[method.lower()] = operation
 
             if operations:
                 # since the common prefix is used as the API basePath, it must be stripped

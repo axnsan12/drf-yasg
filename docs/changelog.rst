@@ -4,13 +4,20 @@ Changelog
 
 
 *********
+**1.7.4**
+*********
+
+*Release date: May 14, 2018*
+
+- **FIXED:** ignore ``None`` return from ``get_operation`` to avoid empty ``Path`` objects in output
+
+*********
 **1.7.3**
 *********
 
 *Release date: May 12, 2018*
 
 - **FIXED:** views whose ``__init__`` methods throw exceptions will now be ignored during endpoint enumeration
-
 
 *********
 **1.7.2**
@@ -20,7 +27,6 @@ Changelog
 
 - **FIXED:** fixed generation of default ``SECURITY_REQUIREMENTS`` to match documented behaviour
 - **FIXED:** ordering of ``SECURITY_REQUIREMENTS`` and ``SECURITY_DEFINITIONS`` is now stable
-
 
 *********
 **1.7.1**
