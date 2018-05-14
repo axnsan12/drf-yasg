@@ -367,6 +367,9 @@ class OpenAPISchemaGenerator(object):
 
         view_inspector = view_inspector_cls(view, path, method, components, request, overrides)
         operation = view_inspector.get_operation(operation_keys)
+        if operation is None:
+            return None
+
         if 'consumes' in operation and set(operation.consumes) == set(self.consumes):
             del operation.consumes
         if 'produces' in operation and set(operation.produces) == set(self.produces):
