@@ -101,7 +101,7 @@ class SwaggerAutoSchema(ViewInspector):
             if isinstance(body_override, openapi.Schema.OR_REF):
                 return body_override
             return force_serializer_instance(body_override)
-        elif self.method in self.body_methods:
+        elif self.method in self.implicit_body_methods:
             return self.get_view_serializer()
 
         return None
@@ -144,8 +144,11 @@ class SwaggerAutoSchema(ViewInspector):
             raise SwaggerGenerationError("specify the body parameter as a Schema or Serializer in request_body")
         if any(param.in_ == openapi.IN_FORM for param in manual_parameters):  # pragma: no cover
             if any(param.in_ == openapi.IN_BODY for param in parameters.values()):
-                raise SwaggerGenerationError("cannot add form parameters when the request has a request schema; "
+                raise SwaggerGenerationError("cannot add form parameters when the request has a request body; "
                                              "did you forget to set an appropriate parser class on the view?")
+            if self.method not in self.body_methods:
+                raise SwaggerGenerationError("form parameters can only be applied to (" + ','.join(self.body_methods) +
+                                             ") HTTP methods")
 
         parameters.update(param_list_to_odict(manual_parameters))
         return list(parameters.values())

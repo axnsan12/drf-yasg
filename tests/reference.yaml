@@ -388,6 +388,24 @@ paths:
             $ref: '#/definitions/Snippet'
       tags:
         - snippets
+    delete:
+      operationId: snippetsDeleteBulk
+      description: SnippetList classdoc
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              body:
+                description: this should not crash (request body on DELETE method)
+                type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+        - snippets
     parameters: []
   /snippets/{id}/:
     get:
@@ -442,9 +460,13 @@ paths:
           description: path parameter override
           required: true
           type: integer
+        - name: delete_form_param
+          in: formData
+          description: this should not crash (form parameter on DELETE method)
+          type: integer
       responses:
         '204':
-          description: This should not crash
+          description: this should not crash (response object with no schema)
       tags:
         - snippets
     parameters:
