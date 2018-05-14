@@ -10,6 +10,7 @@ Changelog
 *Release date: May 14, 2018*
 
 - **FIXED:** ignore ``None`` return from ``get_operation`` to avoid empty ``Path`` objects in output
+- **FIXED:** request body is now allowed on ``DELETE`` endpoints (:issue:`118`)
 
 *********
 **1.7.3**
