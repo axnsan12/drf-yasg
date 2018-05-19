@@ -95,7 +95,7 @@ class InlineSerializerInspector(SerializerInspector):
                 for property_name, child in field.fields.items():
                     property_name = self.get_property_name(property_name)
                     prop_kwargs = {
-                        'read_only': child.read_only or None
+                        'read_only': bool(child.read_only) or None
                     }
                     prop_kwargs = filter_none(prop_kwargs)
 
