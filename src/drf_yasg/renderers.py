@@ -10,7 +10,7 @@ from .codecs import VALIDATORS, OpenAPICodecJson, OpenAPICodecYaml
 
 class _SpecRenderer(BaseRenderer):
     """Base class for text renderers. Handles encoding and validation."""
-    charset = None
+    charset = 'utf-8'
     validators = []
     codec_class = None
 
@@ -22,6 +22,12 @@ class _SpecRenderer(BaseRenderer):
     def render(self, data, media_type=None, renderer_context=None):
         assert self.codec_class, "must override codec_class"
         codec = self.codec_class(self.validators)
+
+        if not isinstance(data, Swagger):
+            # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
+            # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
+            # see https://github.com/axnsan12/drf-yasg/issues/58
+            return TemplateHTMLRenderer().render(data, media_type, renderer_context)
         return codec.encode(data)
 
 
