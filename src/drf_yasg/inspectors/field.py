@@ -433,7 +433,8 @@ class FileFieldInspector(FieldInspector):
             err = SwaggerGenerationError("FileField is supported only in a formData Parameter or response Schema")
             if swagger_object_type == openapi.Schema:
                 # FileField.to_representation returns URL or file name
-                result = SwaggerType(type=openapi.TYPE_STRING, read_only=True)
+                result = SwaggerType(type=openapi.TYPE_STRING,
+                                     read_only=field.read_only)
                 if getattr(field, 'use_url', rest_framework_settings.UPLOADED_FILES_USE_URL):
                     result.format = openapi.FORMAT_URI
                 return result
