@@ -26,6 +26,15 @@ class TodoYetAnotherSerializer(serializers.ModelSerializer):
         model = TodoYetAnother
         fields = ('title', 'todo')
         depth = 2
+        swagger_schema_fields = {
+            'example': {
+                'title': 'parent',
+                'todo': {
+                    'title': 'child',
+                    'todo': None,
+                }
+            }
+        }
 
 
 class TodoTreeSerializer(serializers.ModelSerializer):
