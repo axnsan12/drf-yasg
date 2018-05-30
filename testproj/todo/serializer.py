@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_recursive.fields import RecursiveField
@@ -27,13 +29,13 @@ class TodoYetAnotherSerializer(serializers.ModelSerializer):
         fields = ('title', 'todo')
         depth = 2
         swagger_schema_fields = {
-            'example': {
-                'title': 'parent',
-                'todo': {
-                    'title': 'child',
-                    'todo': None,
-                }
-            }
+            'example': OrderedDict([
+                ('title', 'parent'),
+                ('todo', OrderedDict([
+                    ('title', 'child'),
+                    ('todo', None),
+                ])),
+            ])
         }
 
 
