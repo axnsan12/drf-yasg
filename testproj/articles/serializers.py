@@ -11,7 +11,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     uuid = serializers.UUIDField(help_text="should articles have UUIDs?", read_only=True)
-    cover_name = serializers.FileField(use_url=False, source='cover', read_only=True)
+    cover_name = serializers.FileField(use_url=False, source='cover', required=True)
     group = serializers.SlugRelatedField(slug_field='uuid', queryset=ArticleGroup.objects.all())
     original_group = serializers.SlugRelatedField(slug_field='uuid', read_only=True)
 
