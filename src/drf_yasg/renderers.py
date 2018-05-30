@@ -23,7 +23,7 @@ class _SpecRenderer(BaseRenderer):
         assert self.codec_class, "must override codec_class"
         codec = self.codec_class(self.validators)
 
-        if not isinstance(data, Swagger):
+        if not isinstance(data, Swagger):  # pragma: no cover
             # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
             # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
             # see https://github.com/axnsan12/drf-yasg/issues/58
@@ -59,7 +59,7 @@ class _UIRenderer(BaseRenderer):
     template = ''
 
     def render(self, swagger, accepted_media_type=None, renderer_context=None):
-        if not isinstance(swagger, Swagger):
+        if not isinstance(swagger, Swagger):  # pragma: no cover
             # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
             # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
             # see https://github.com/axnsan12/drf-yasg/issues/58

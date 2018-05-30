@@ -95,7 +95,7 @@ class EndpointEnumerator(_EndpointEnumerator):
                         for method in self.get_allowed_methods(callback):
                             endpoint = (path, method, callback)
                             api_endpoints.append(endpoint)
-                except Exception:
+                except Exception:  # pragma: no cover
                     logger.warning('failed to enumerate view', exc_info=True)
 
             elif isinstance(pattern, URLResolver):

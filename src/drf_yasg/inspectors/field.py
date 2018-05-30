@@ -529,7 +529,7 @@ else:
 
 try:
     from rest_framework_recursive.fields import RecursiveField
-except ImportError:
+except ImportError:  # pragma: no cover
     class RecursiveFieldInspector(FieldInspector):
         """Provides conversion for RecursiveField (https://github.com/heywbj/django-rest-framework-recursive)"""
         pass
