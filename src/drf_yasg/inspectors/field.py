@@ -67,10 +67,12 @@ class InlineSerializerInspector(SerializerInspector):
                     }
                     prop_kwargs = filter_none(prop_kwargs)
 
-                    properties[property_name] = self.probe_field_inspectors(
+                    child_schema = self.probe_field_inspectors(
                         child, ChildSwaggerType, use_references, **prop_kwargs
                     )
-                    if child.required:
+                    properties[property_name] = child_schema
+
+                    if child.required and not getattr(child_schema, 'read_only', False):
                         required.append(property_name)
 
                 result = SwaggerType(
