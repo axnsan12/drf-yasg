@@ -169,13 +169,19 @@ You can define some per-serializer options by adding a ``Meta`` class to your se
       class Meta:
          ... options here ...
 
-Currently, the only option you can add here is
+.. _swagger_schema_fields:
+
+The available options are:
 
    * ``ref_name`` - a string which will be used as the model definition name for this serializer class; setting it to
      ``None`` will force the serializer to be generated as an inline model everywhere it is used. If two serializers
      have the same ``ref_name``, both their usages will be replaced with a reference to the same definition.
      If this option is not specified, all serializers have an implicit name derived from their class name, minus any
      ``Serializer`` suffix (e.g. ``UserSerializer`` -> ``User``, ``SerializerWithSuffix`` -> ``SerializerWithSuffix``)
+   * ``swagger_schema_fields`` - a dictionary mapping :class:`.Schema` field names to values. These attributes
+     will be set on the :class:`.Schema` object generated from the ``Serializer``. Field names must be python values,
+     which are converted to Swagger ``Schema`` attribute names according to :func:`.make_swagger_name`.
+     Attribute names and values must conform to the `OpenAPI 2.0 specification <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#schemaObject>`_.
 
 
 *************************

@@ -4,6 +4,18 @@ Changelog
 
 
 *********
+**1.8.0**
+*********
+
+*Release date: Jun 01, 2018*
+
+- **ADDED:** added a :ref:`swagger_schema_fields <swagger_schema_fields>` field on serializer ``Meta`` classes for
+  customizing schema generation
+- **FIXED:** error responses from schema views are now rendered with ``JSONRenderer`` instead of throwing
+  confusing errors (:pr:`130`, :issue:`58`)
+- **FIXED:** ``readOnly`` schema fields will now no longer be marked as ``required`` (:pr:`133`)
+
+*********
 **1.7.4**
 *********
 
