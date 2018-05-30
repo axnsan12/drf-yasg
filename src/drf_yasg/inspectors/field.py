@@ -22,12 +22,39 @@ class InlineSerializerInspector(SerializerInspector):
     #: whether to output :class:`.Schema` definitions inline or into the ``definitions`` section
     use_definitions = False
 
+    def add_manual_fields(self, serializer, schema):
+        """Set fields from the ``swagger_schem_fields`` attribute on the serializer's Meta class. This method is called
+        only for serializers that are converted into ``openapi.Schema`` objects.
+
+        :param serializer: serializer instance
+        :param openapi.Schema schema: the schema object to be modified in-place
+        """
+        serializer_meta = getattr(serializer, 'Meta', None)
+        swagger_schema_fields = getattr(serializer_meta, 'swagger_schema_fields', {})
+        if swagger_schema_fields:
+            for attr, val in swagger_schema_fields.items():
+                setattr(schema, attr, val)
+
     def get_schema(self, serializer):
-        return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
+        result = self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
+        schema = openapi.resolve_ref(result, self.components)
+        self.add_manual_fields(serializer, schema)
+        return result
+
+    def add_manual_parameters(self, serializer, parameters):
+        """Add/replace parameters from the given list of automatically generated request parameters. This method
+        is called only when the serializer is converted into a list of parameters for use in a form data request.
+
+        :param serializer: serializer instance
+        :param list[openapi.Parameter] parameters: genereated parameters
+        :return: modified parameters
+        :rtype: list[openapi.Parameter]
+        """
+        return parameters
 
     def get_request_parameters(self, serializer, in_):
         fields = getattr(serializer, 'fields', {})
-        return [
+        parameters = [
             self.probe_field_inspectors(
                 value, openapi.Parameter, self.use_definitions,
                 name=self.get_parameter_name(key), in_=in_
@@ -36,11 +63,16 @@ class InlineSerializerInspector(SerializerInspector):
             in fields.items()
         ]
 
+        return self.add_manual_parameters(serializer, parameters)
+
     def get_property_name(self, field_name):
         return field_name
 
     def get_parameter_name(self, field_name):
         return field_name
+
+    def get_serializer_ref_name(self, serializer):
+        return get_serializer_ref_name(serializer)
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
@@ -55,7 +87,7 @@ class InlineSerializerInspector(SerializerInspector):
             if swagger_object_type != openapi.Schema:
                 raise SwaggerGenerationError("cannot instantiate nested serializer as " + swagger_object_type.__name__)
 
-            ref_name = get_serializer_ref_name(field)
+            ref_name = self.get_serializer_ref_name(field)
 
             def make_schema_definition():
                 properties = OrderedDict()

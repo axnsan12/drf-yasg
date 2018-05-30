@@ -1578,6 +1578,11 @@ definitions:
                 minLength: 1
             readOnly: true
         readOnly: true
+    example:
+      title: parent
+      todo:
+        title: child
+        todo: null
   UserSerializerrr:
     required:
       - username
