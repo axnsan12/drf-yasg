@@ -870,7 +870,7 @@ definitions:
         readOnly: true
       cover:
         type: string
-        readOnly: false
+        readOnly: true
         format: uri
       cover_name:
         type: string
