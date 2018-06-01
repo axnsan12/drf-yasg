@@ -1,3 +1,4 @@
+import logging
 from collections import OrderedDict
 
 from rest_framework.request import is_form_media_type
@@ -11,6 +12,8 @@ from ..utils import (
     param_list_to_odict
 )
 from .base import ViewInspector
+
+log = logging.getLogger(__name__)
 
 
 class SwaggerAutoSchema(ViewInspector):
@@ -83,7 +86,11 @@ class SwaggerAutoSchema(ViewInspector):
         """
         if not hasattr(self.view, 'get_serializer'):
             return None
-        return self.view.get_serializer()
+        try:
+            return self.view.get_serializer()
+        except Exception:
+            log.warning("view's get_serializer raised exception (%s)", type(self.view).__name__, exc_info=True)
+            return None
 
     def get_request_serializer(self):
         """Return the request serializer (used for parsing the request payload) for this endpoint.
