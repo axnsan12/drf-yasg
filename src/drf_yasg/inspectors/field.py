@@ -117,6 +117,10 @@ class InlineSerializerInspector(SerializerInspector):
                     # but is visually displayed like the model name, which is confusing
                     # it is better to just remove title from inline models
                     del result.title
+
+                # Provide an option to add manual paremeters to a schema
+                # for example, to add examples
+                self.add_manual_fields(field, result)
                 return result
 
             if not ref_name or not use_references:
