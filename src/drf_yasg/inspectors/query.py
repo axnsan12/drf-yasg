@@ -48,7 +48,7 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
             in_=location_to_in[field.location],
             type=coreapi_types.get(type(field.schema), openapi.TYPE_STRING),
             required=field.required,
-            description=field.schema.description,
+            description=field.schema.description if field.schema else None,
         )
 
 
