@@ -36,10 +36,7 @@ class InlineSerializerInspector(SerializerInspector):
                 setattr(schema, attr, val)
 
     def get_schema(self, serializer):
-        result = self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
-        schema = openapi.resolve_ref(result, self.components)
-        self.add_manual_fields(serializer, schema)
-        return result
+        return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
 
     def add_manual_parameters(self, serializer, parameters):
         """Add/replace parameters from the given list of automatically generated request parameters. This method
