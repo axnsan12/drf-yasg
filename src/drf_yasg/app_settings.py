@@ -2,6 +2,7 @@ from django.conf import settings
 from rest_framework.settings import perform_import
 
 SWAGGER_DEFAULTS = {
+    'DEFAULT_GENERATOR_CLASS': 'drf_yasg.generators.OpenAPISchemaGenerator',
     'DEFAULT_AUTO_SCHEMA_CLASS': 'drf_yasg.inspectors.SwaggerAutoSchema',
 
     'DEFAULT_FIELD_INSPECTORS': [
@@ -68,6 +69,7 @@ REDOC_DEFAULTS = {
 }
 
 IMPORT_STRINGS = [
+    'DEFAULT_GENERATOR_CLASS',
     'DEFAULT_AUTO_SCHEMA_CLASS',
     'DEFAULT_FIELD_INSPECTORS',
     'DEFAULT_FILTER_INSPECTORS',

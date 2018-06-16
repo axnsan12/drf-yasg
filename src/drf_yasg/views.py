@@ -11,7 +11,6 @@ from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
 from .app_settings import swagger_settings
-from .generators import OpenAPISchemaGenerator
 from .renderers import OpenAPIRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer
 
 SPEC_RENDERERS = (SwaggerYAMLRenderer, SwaggerJSONRenderer, OpenAPIRenderer)
@@ -46,7 +45,7 @@ def deferred_never_cache(view_func):
 
 
 def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=False, validators=None,
-                    generator_class=OpenAPISchemaGenerator,
+                    generator_class=swagger_settings.DEFAULT_GENERATOR_CLASS,
                     authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
                     permission_classes=api_settings.DEFAULT_PERMISSION_CLASSES):
     """Create a SchemaView class with default renderers and generators.

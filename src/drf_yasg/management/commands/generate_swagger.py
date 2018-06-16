@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from collections import OrderedDict
+from importlib import import_module
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
@@ -12,7 +13,15 @@ from rest_framework.views import APIView
 from ... import openapi
 from ...app_settings import swagger_settings
 from ...codecs import OpenAPICodecJson, OpenAPICodecYaml
-from ...generators import OpenAPISchemaGenerator
+
+
+def import_class(import_string):
+    if not import_string:
+        return None
+
+    module_path, class_name = import_string.rsplit('.', 1)
+    module = import_module(module_path)
+    return getattr(module, class_name)
 
 
 class Command(BaseCommand):
@@ -64,6 +73,11 @@ class Command(BaseCommand):
                  'OpenAPISchemaGenerator.get_schema().\n'
                  'This option implies --mock-request.'
         )
+        parser.add_argument(
+            '-g', '--generator-class', dest='generator_class_name',
+            default='',
+            help='Import string pointing to an OpenAPISchemaGenerator subclass to use for schema generation.'
+        )
 
     def write_schema(self, schema, stream, format):
         if format == 'json':
@@ -89,7 +103,8 @@ class Command(BaseCommand):
         request = APIView().initialize_request(request)
         return request
 
-    def handle(self, output_file, overwrite, format, api_url, mock, user, private, *args, **options):
+    def handle(self, output_file, overwrite, format, api_url, mock, user, private, generator_class_name,
+               *args, **kwargs):
         # disable logs of WARNING and below
         logging.disable(logging.WARNING)
 
@@ -117,7 +132,8 @@ class Command(BaseCommand):
 
         request = self.get_mock_request(api_url, format, user) if mock else None
 
-        generator = OpenAPISchemaGenerator(
+        generator_class = import_class(generator_class_name) or swagger_settings.DEFAULT_GENERATOR_CLASS
+        generator = generator_class(
             info=info,
             url=api_url
         )

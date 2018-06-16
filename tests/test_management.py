@@ -11,17 +11,18 @@ import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
 
+from drf_yasg import openapi
 from drf_yasg.codecs import yaml_sane_load
+from drf_yasg.generators import OpenAPISchemaGenerator
 
 
 def call_generate_swagger(output_file='-', overwrite=False, format='', api_url='',
-                          mock=False, user='', private=False, **kwargs):
+                          mock=False, user='', private=False, generator_class_name='', **kwargs):
     out = StringIO()
     call_command(
         'generate_swagger', stdout=out,
-        output_file=output_file, overwrite=overwrite, format=format,
-        api_url=api_url, mock=mock, user=user, private=private,
-        **kwargs
+        output_file=output_file, overwrite=overwrite, format=format, api_url=api_url, mock=mock, user=user,
+        private=private, generator_class_name=generator_class_name, **kwargs
     )
     return out.getvalue()
 
@@ -44,6 +45,17 @@ def test_no_mock(db):
     output = call_generate_swagger()
     output_schema = json.loads(output, object_pairs_hook=OrderedDict)
     assert len(output_schema['paths']) > 0
+
+
+class EmptySchemaGenerator(OpenAPISchemaGenerator):
+    def get_paths(self, endpoints, components, request, public):
+        return openapi.Paths(paths={}), ''
+
+
+def test_generator_class(db):
+    output = call_generate_swagger(generator_class_name='test_management.EmptySchemaGenerator')
+    output_schema = json.loads(output, object_pairs_hook=OrderedDict)
+    assert len(output_schema['paths']) == 0
 
 
 def silentremove(filename):

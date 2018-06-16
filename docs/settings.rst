@@ -43,6 +43,14 @@ The possible settings and their default values are as follows:
 Default classes
 ===============
 
+DEFAULT_GENERATOR_CLASS
+-------------------------
+
+:class:`~.generators.OpenAPISchemaGenerator` subclass that will be used by default for generating the final
+:class:`.Schema` object. Can be overriden by the ``generator_class`` argument to :func:`.get_schema_view`.
+
+**Default**: :class:`drf_yasg.generators.OpenAPISchemaGenerator`
+
 DEFAULT_AUTO_SCHEMA_CLASS
 -------------------------
 
@@ -102,7 +110,7 @@ DEFAULT_INFO
 ------------
 
 An import string to an :class:`.openapi.Info` object. This will be used when running the ``generate_swagger``
-management command, or if no ``info`` argument is passed to ``get_schema_view``.
+management command, or if no ``info`` argument is passed to :func:`.get_schema_view`.
 
 **Default**: :python:`None`
 
