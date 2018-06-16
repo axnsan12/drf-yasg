@@ -36,10 +36,7 @@ class InlineSerializerInspector(SerializerInspector):
                 setattr(schema, attr, val)
 
     def get_schema(self, serializer):
-        result = self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
-        schema = openapi.resolve_ref(result, self.components)
-        self.add_manual_fields(serializer, schema)
-        return result
+        return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
 
     def add_manual_parameters(self, serializer, parameters):
         """Add/replace parameters from the given list of automatically generated request parameters. This method
@@ -117,6 +114,10 @@ class InlineSerializerInspector(SerializerInspector):
                     # but is visually displayed like the model name, which is confusing
                     # it is better to just remove title from inline models
                     del result.title
+
+                # Provide an option to add manual paremeters to a schema
+                # for example, to add examples
+                self.add_manual_fields(field, result)
                 return result
 
             if not ref_name or not use_references:
