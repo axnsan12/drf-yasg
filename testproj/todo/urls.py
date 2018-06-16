@@ -13,6 +13,6 @@ router.register(r'recursive', views.TodoRecursiveView)
 urlpatterns = router.urls
 
 urlpatterns += [
-    url(r'^(?P<todo_id>\d+)/yetanother/(?P<yetanother_id>\d+)/$',
+    url(r'^(?P<todo_id>\d+)/yetanothers/(?P<yetanother_id>\d+)/$',
         views.NestedTodoView.as_view(), ),
 ]

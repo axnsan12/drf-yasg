@@ -697,9 +697,9 @@ paths:
         description: A unique integer value identifying this todo.
         required: true
         type: integer
-  /todo/{todo_id}/yetanother/{yetanother_id}/:
+  /todo/{todo_id}/yetanothers/{yetanother_id}/:
     get:
-      operationId: todo_yetanother_read
+      operationId: todo_yetanothers_read
       description: ''
       parameters: []
       responses:
