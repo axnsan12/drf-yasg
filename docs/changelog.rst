@@ -4,6 +4,18 @@ Changelog
 
 
 *********
+**1.9.0**
+*********
+
+*Release date: Jun 16, 2018*
+
+- **ADDED:** added ``DEFAULT_GENERATOR_CLASS`` setting and ``--generator-clas`` argument to the ``generate_swagger``
+  management command (:issue:`140`)
+- **FIXED:** fixed wrongly required ``'count'`` response field on ``CursorPagination`` (:issue:`141`)
+- **FIXED:** fixed crash when encountering ``coreapi.Fields``\ s without a ``schema`` (:issue:`143`)
+
+
+*********
 **1.8.0**
 *********
 
