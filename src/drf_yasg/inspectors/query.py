@@ -70,7 +70,10 @@ class DjangoRestResponsePagination(PaginatorInspector):
                     ('previous', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)),
                     ('results', response_schema),
                 )),
-                required=['count', 'results']
+                required=['results']
             )
+
+            if has_count:
+                paged_schema.required.insert(0, 'count')
 
         return paged_schema
