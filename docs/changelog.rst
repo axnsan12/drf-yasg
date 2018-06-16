@@ -12,6 +12,7 @@ Changelog
 - **ADDED:** added ``DEFAULT_GENERATOR_CLASS`` setting and ``--generator-clas`` argument to the ``generate_swagger``
   management command (:issue:`140`)
 - **FIXED:** fixed wrongly required ``'count'`` response field on ``CursorPagination`` (:issue:`141`)
+- **FIXED:** fixed some cases where ``swagger_extra_fields`` would not be handlded (:pr:`142`)
 - **FIXED:** fixed crash when encountering ``coreapi.Fields``\ s without a ``schema`` (:issue:`143`)
 
 
