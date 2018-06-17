@@ -9,7 +9,7 @@ Changelog
 
 *Release date: Jun 16, 2018*
 
-- **ADDED:** added ``DEFAULT_GENERATOR_CLASS`` setting and ``--generator-clas`` argument to the ``generate_swagger``
+- **ADDED:** added ``DEFAULT_GENERATOR_CLASS`` setting and ``--generator-class`` argument to the ``generate_swagger``
   management command (:issue:`140`)
 - **FIXED:** fixed wrongly required ``'count'`` response field on ``CursorPagination`` (:issue:`141`)
 - **FIXED:** fixed some cases where ``swagger_extra_fields`` would not be handlded (:pr:`142`)
