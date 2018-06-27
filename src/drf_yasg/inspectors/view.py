@@ -172,6 +172,9 @@ class SwaggerAutoSchema(ViewInspector):
             responses=self.get_response_schemas(response_serializers)
         )
 
+    def get_response_serializer(self):
+        return self.get_request_serializer() or self.get_view_serializer()
+
     def get_default_responses(self):
         """Get the default responses determined for this view from the request serializer and request method.
 
@@ -182,7 +185,7 @@ class SwaggerAutoSchema(ViewInspector):
         default_status = guess_response_status(method)
         default_schema = ''
         if method in ('get', 'post', 'put', 'patch'):
-            default_schema = self.get_request_serializer() or self.get_view_serializer()
+            default_schema = self.get_response_serializer()
 
         default_schema = default_schema or ''
         if any(is_form_media_type(encoding) for encoding in self.get_consumes()):
