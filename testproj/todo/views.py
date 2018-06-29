@@ -33,7 +33,12 @@ class NestedTodoView(RetrieveAPIView):
 
 class TodoTreeView(viewsets.ReadOnlyModelViewSet):
     queryset = TodoTree.objects.all()
-    serializer_class = TodoTreeSerializer
+
+    def get_serializer_class(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return TodoTreeSerializer
+
+        raise NotImplementedError("must not call this")
 
 
 class TodoRecursiveView(viewsets.ModelViewSet):

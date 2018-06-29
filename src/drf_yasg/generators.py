@@ -243,6 +243,8 @@ class OpenAPISchemaGenerator(object):
                 view_method = getattr(view, method, None)
                 if view_method is not None:  # pragma: no cover
                     setattr(view_method.__func__, '_swagger_auto_schema', overrides)
+
+        setattr(view, 'swagger_fake_view', True)
         return view
 
     def get_endpoints(self, request):
