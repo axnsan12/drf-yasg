@@ -2,7 +2,9 @@ import json
 from collections import OrderedDict
 
 import pytest
+from django.conf.urls import url
 from rest_framework import routers, serializers, viewsets
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from drf_yasg import codecs, openapi
@@ -113,3 +115,35 @@ def test_replaced_serializer():
         responses = swagger['paths']['/details/{id}/']['get']['responses']
         assert '404' in responses
         assert responses['404']['schema']['$ref'] == "#/definitions/Detail"
+
+
+def test_url_order():
+    # this view with description override should show up in the schema ...
+    @swagger_auto_schema(method='get', operation_description="description override")
+    @api_view()
+    def test_override(request, pk=None):
+        return Response({"message": "Hello, world!"})
+
+    # ... instead of this view which appears later in the url patterns
+    @api_view()
+    def test_view(request, pk=None):
+        return Response({"message": "Hello, world!"})
+
+    patterns = [
+        url(r'^/test/$', test_override),
+        url(r'^/test/$', test_view),
+    ]
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        version="v2",
+        url='',
+        patterns=patterns
+    )
+
+    # description override is successful
+    swagger = generator.get_schema(None, True)
+    assert swagger['paths']['/test/']['get']['description'] == 'description override'
+
+    # get_endpoints only includes one endpoint
+    assert len(generator.get_endpoints(None)['/test/'][1]) == 1
