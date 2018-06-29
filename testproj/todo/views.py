@@ -57,7 +57,7 @@ class TodoRecursiveView(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         return super(TodoRecursiveView, self).create(request, *args, **kwargs)
 
-    @swagger_auto_schema(responses={200: TodoRecursiveSerializer})
+    @swagger_auto_schema(responses={200: None, 302: 'Redirect somewhere'})
     def retrieve(self, request, *args, **kwargs):
         return super(TodoRecursiveView, self).retrieve(request, *args, **kwargs)
 

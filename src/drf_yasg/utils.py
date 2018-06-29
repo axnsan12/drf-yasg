@@ -76,6 +76,8 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
         * if a plain string is given as value, a :class:`.Response` with no body and that string as its description
           will be generated
+        * if ``None`` is given as a value, the response is ignored; this is mainly useful for disabling default
+          2xx responses, i.e. ``responses={200: None, 302: 'something'}``
         * if a :class:`.Schema`, :class:`.SchemaRef` is given, a :class:`.Response` with the schema as its body and
           an empty description will be generated
         * a ``Serializer`` class or instance will be converted into a :class:`.Schema` and treated as above

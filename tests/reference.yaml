@@ -560,10 +560,8 @@ paths:
       description: ''
       parameters: []
       responses:
-        '200':
-          description: ''
-          schema:
-            $ref: '#/definitions/TodoRecursive'
+        '302':
+          description: Redirect somewhere
       tags:
         - todo
     put:

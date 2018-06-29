@@ -230,6 +230,8 @@ class SwaggerAutoSchema(ViewInspector):
                 response = openapi.Response(
                     description=serializer
                 )
+            elif not serializer:
+                continue
             elif isinstance(serializer, openapi.Response):
                 response = serializer
                 if hasattr(response, 'schema') and not isinstance(response.schema, openapi.Schema.OR_REF):
