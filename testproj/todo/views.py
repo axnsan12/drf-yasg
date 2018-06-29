@@ -1,6 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.generics import RetrieveAPIView
 
+from drf_yasg.utils import swagger_auto_schema
+
 from .models import Todo, TodoAnother, TodoTree, TodoYetAnother
 from .serializer import (
     TodoAnotherSerializer, TodoRecursiveSerializer, TodoSerializer, TodoTreeSerializer, TodoYetAnotherSerializer
@@ -36,4 +38,35 @@ class TodoTreeView(viewsets.ReadOnlyModelViewSet):
 
 class TodoRecursiveView(viewsets.ModelViewSet):
     queryset = TodoTree.objects.all()
-    serializer_class = TodoRecursiveSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        raise NotImplementedError("must not call this")
+
+    def get_serializer_class(self):
+        raise NotImplementedError("must not call this")
+
+    def get_serializer_context(self):
+        raise NotImplementedError("must not call this")
+
+    @swagger_auto_schema(request_body=TodoRecursiveSerializer)
+    def create(self, request, *args, **kwargs):
+        return super(TodoRecursiveView, self).create(request, *args, **kwargs)
+
+    @swagger_auto_schema(responses={200: TodoRecursiveSerializer})
+    def retrieve(self, request, *args, **kwargs):
+        return super(TodoRecursiveView, self).retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(request_body=TodoRecursiveSerializer)
+    def update(self, request, *args, **kwargs):
+        return super(TodoRecursiveView, self).update(request, *args, **kwargs)
+
+    @swagger_auto_schema(request_body=TodoRecursiveSerializer)
+    def partial_update(self, request, *args, **kwargs):
+        return super(TodoRecursiveView, self).update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        return super(TodoRecursiveView, self).destroy(request, *args, **kwargs)
+
+    @swagger_auto_schema(responses={200: TodoRecursiveSerializer(many=True)})
+    def list(self, request, *args, **kwargs):
+        return super(TodoRecursiveView, self).list(request, *args, **kwargs)

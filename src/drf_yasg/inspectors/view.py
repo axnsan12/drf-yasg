@@ -89,7 +89,8 @@ class SwaggerAutoSchema(ViewInspector):
         try:
             return self.view.get_serializer()
         except Exception:
-            log.warning("view's get_serializer raised exception (%s)", type(self.view).__name__, exc_info=True)
+            log.warning("view's get_serializer raised exception (%s %s %s)",
+                        self.method, self.path, type(self.view).__name__, exc_info=True)
             return None
 
     def get_request_serializer(self):
