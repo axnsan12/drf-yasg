@@ -72,7 +72,7 @@ class EndpointEnumerator(_EndpointEnumerator):
 
         return path
 
-    def get_api_endpoints(self, patterns=None, prefix='', app_name=None, namespace=None, previously_seen_endpoints=None):
+    def get_api_endpoints(self, patterns=None, prefix='', app_name=None, namespace=None, ignored_endpoints=None):
         """
         Return a list of all available API endpoints by inspecting the URL conf.
 
@@ -82,8 +82,8 @@ class EndpointEnumerator(_EndpointEnumerator):
             patterns = self.patterns
 
         api_endpoints = []
-        if previously_seen_endpoints is None:
-            previously_seen_endpoints = set()
+        if ignored_endpoints is None:
+            ignored_endpoints = set()
 
         for pattern in patterns:
             path_regex = prefix + get_original_route(pattern)
@@ -97,9 +97,9 @@ class EndpointEnumerator(_EndpointEnumerator):
 
                         # avoid adding endpoints that have already been seen,
                         # as Django resolves urls in top-down order
-                        if path in previously_seen_endpoints:
+                        if path in ignored_endpoints:
                             continue
-                        previously_seen_endpoints.add(path)
+                        ignored_endpoints.add(path)
 
                         for method in self.get_allowed_methods(callback):
                             endpoint = (path, method, callback)
@@ -113,7 +113,7 @@ class EndpointEnumerator(_EndpointEnumerator):
                     prefix=path_regex,
                     app_name="%s:%s" % (app_name, pattern.app_name) if app_name else pattern.app_name,
                     namespace="%s:%s" % (namespace, pattern.namespace) if namespace else pattern.namespace,
-                    previously_seen_endpoints=previously_seen_endpoints
+                    ignored_endpoints=ignored_endpoints
                 )
                 api_endpoints.extend(nested_endpoints)
             else:
