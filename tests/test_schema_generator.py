@@ -2,10 +2,10 @@ import json
 from collections import OrderedDict
 
 import pytest
-from django.urls import path
+from django.conf.urls import url
 from rest_framework import routers, serializers, viewsets
-from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from drf_yasg import codecs, openapi
 from drf_yasg.codecs import yaml_sane_load
@@ -130,8 +130,8 @@ def test_url_order():
         return Response({"message": "Hello, world!"})
 
     patterns = [
-        path('/test/', test_override),
-        path('/test/', test_view),
+        url(r'^/test/$', test_override),
+        url(r'^/test/$', test_view),
     ]
 
     generator = OpenAPISchemaGenerator(
