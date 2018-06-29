@@ -4,6 +4,20 @@ Changelog
 
 
 *********
+**1.9.1**
+*********
+
+*Release date: Jun 30, 2018*
+
+- **IMPROVED:** added a ``swagger_fake_view`` marker to more easily detect mock views in view methods;
+  ``getattr(self, 'swagger_fake_view', False)`` inside a view method like ``get_serializer_class`` will tell you if the
+  view instnace is being used for swagger schema introspection (:issue:`154`)
+- **IMPROVED:** updated ``swagger-ui`` to version 3.17.1
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-alpha.25
+- **FIXED:** fixed wrong handling of duplicate urls in urlconf (:pr:`155`)
+- **FIXED:** fixed crash when passing ``None`` as a response override (:issue:`148`)
+
+*********
 **1.9.0**
 *********
 
@@ -14,7 +28,6 @@ Changelog
 - **FIXED:** fixed wrongly required ``'count'`` response field on ``CursorPagination`` (:issue:`141`)
 - **FIXED:** fixed some cases where ``swagger_extra_fields`` would not be handlded (:pr:`142`)
 - **FIXED:** fixed crash when encountering ``coreapi.Fields``\ s without a ``schema`` (:issue:`143`)
-
 
 *********
 **1.8.0**
