@@ -4,6 +4,14 @@ Changelog
 
 
 *********
+**1.9.1b**
+*********
+
+*Release date: Jun 30, 2018*
+
+- Maintenance release (fixed a git tag/branching issue)
+
+*********
 **1.9.1**
 *********
 
