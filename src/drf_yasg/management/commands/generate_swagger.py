@@ -4,6 +4,7 @@ import os
 from collections import OrderedDict
 from importlib import import_module
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -12,11 +13,6 @@ from rest_framework.views import APIView
 from ... import openapi
 from ...app_settings import swagger_settings
 from ...codecs import OpenAPICodecJson, OpenAPICodecYaml
-
-try:
-    from django.contrib.auth.models import User
-except RuntimeError:
-    User = None
 
 
 def import_class(import_string):
@@ -126,11 +122,9 @@ class Command(BaseCommand):
         api_url = api_url or swagger_settings.DEFAULT_API_URL
 
         if user:
-            if User is None:
-                raise ImproperlyConfigured(
-                    '--user requires authentication to be properly configured in settings'
-                )
-            user = User.objects.get(username=user)
+            # Only call get_user_model if --user was passed in order to
+            # avoid crashing if auth is not configured in the project
+            user = get_user_model().objects.get(username=user)
 
         mock = mock or private or (user is not None)
         if mock and not api_url:
