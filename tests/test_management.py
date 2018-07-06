@@ -17,7 +17,7 @@ from drf_yasg.generators import OpenAPISchemaGenerator
 
 
 def call_generate_swagger(output_file='-', overwrite=False, format='', api_url='',
-                          mock=False, user='', private=False, generator_class_name='', **kwargs):
+                          mock=False, user=None, private=False, generator_class_name='', **kwargs):
     out = StringIO()
     call_command(
         'generate_swagger', stdout=out,
