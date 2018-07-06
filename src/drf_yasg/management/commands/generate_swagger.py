@@ -4,7 +4,7 @@ import os
 from collections import OrderedDict
 from importlib import import_module
 
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -61,7 +61,6 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--user', dest='user',
-            default='',
             help='Username of an existing user to use for mocked authentication. This option implies --mock-request.'
         )
         parser.add_argument(
@@ -122,7 +121,11 @@ class Command(BaseCommand):
 
         api_url = api_url or swagger_settings.DEFAULT_API_URL
 
-        user = User.objects.get(username=user) if user else None
+        if user:
+            # Only call get_user_model if --user was passed in order to
+            # avoid crashing if auth is not configured in the project
+            user = get_user_model().objects.get(username=user)
+
         mock = mock or private or (user is not None)
         if mock and not api_url:
             raise ImproperlyConfigured(
