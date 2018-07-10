@@ -35,8 +35,9 @@ class InlineSerializerInspector(SerializerInspector):
             for attr, val in swagger_schema_fields.items():
                 setattr(schema, attr, val)
 
-    def get_schema(self, serializer):
-        return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
+    def get_schema(self, serializer, is_request=False, is_response=False):
+        return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions, is_request=is_request,
+                                           is_response=is_response)
 
     def add_manual_parameters(self, serializer, parameters):
         """Add/replace parameters from the given list of automatically generated request parameters. This method
@@ -54,7 +55,7 @@ class InlineSerializerInspector(SerializerInspector):
         parameters = [
             self.probe_field_inspectors(
                 value, openapi.Parameter, self.use_definitions,
-                name=self.get_parameter_name(key), in_=in_
+                name=self.get_parameter_name(key), in_=in_, is_request=True
             )
             for key, value
             in fields.items()
@@ -71,33 +72,39 @@ class InlineSerializerInspector(SerializerInspector):
     def get_serializer_ref_name(self, serializer):
         return get_serializer_ref_name(serializer)
 
-    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, is_request=False, is_response=False,
+                                **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
 
         if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
-            child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)
+            child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references,
+                                                       is_request=is_request, is_response=is_response)
             return SwaggerType(
                 type=openapi.TYPE_ARRAY,
-                items=child_schema,
+                items=child_schema
             )
         elif isinstance(field, serializers.Serializer):
             if swagger_object_type != openapi.Schema:
                 raise SwaggerGenerationError("cannot instantiate nested serializer as " + swagger_object_type.__name__)
 
             ref_name = self.get_serializer_ref_name(field)
+            if ref_name and is_request:
+                ref_name += 'Request'
+            if ref_name and is_response:
+                ref_name += 'Response'
 
             def make_schema_definition():
                 properties = OrderedDict()
                 required = []
                 for property_name, child in field.fields.items():
+                    if is_request and child.write_only:
+                        continue
+                    elif is_response and child.read_only:
+                        continue
                     property_name = self.get_property_name(property_name)
-                    prop_kwargs = {
-                        'read_only': bool(child.read_only) or None
-                    }
-                    prop_kwargs = filter_none(prop_kwargs)
 
                     child_schema = self.probe_field_inspectors(
-                        child, ChildSwaggerType, use_references, **prop_kwargs
+                        child, ChildSwaggerType, use_references, is_request=is_request, is_response=is_response
                     )
                     properties[property_name] = child_schema
 
@@ -197,11 +204,13 @@ def get_related_model(model, source):
 class RelatedFieldInspector(FieldInspector):
     """Provides conversions for ``RelatedField``\ s."""
 
-    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, is_request=False, is_response=False,
+                                **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
 
         if isinstance(field, serializers.ManyRelatedField):
-            child_schema = self.probe_field_inspectors(field.child_relation, ChildSwaggerType, use_references)
+            child_schema = self.probe_field_inspectors(field.child_relation, ChildSwaggerType, use_references,
+                                                       is_request=is_request, is_response=is_response)
             return SwaggerType(
                 type=openapi.TYPE_ARRAY,
                 items=child_schema,
@@ -217,7 +226,8 @@ class RelatedFieldInspector(FieldInspector):
             if getattr(field, 'pk_field', ''):
                 # a PrimaryKeyRelatedField can have a `pk_field` attribute which is a
                 # serializer field that will convert the PK value
-                result = self.probe_field_inspectors(field.pk_field, swagger_object_type, use_references, **kwargs)
+                result = self.probe_field_inspectors(field.pk_field, swagger_object_type, use_references,
+                                                     is_request=is_request, is_response=is_response, **kwargs)
                 # take the type, format, etc from `pk_field`, and the field-level information
                 # like title, description, default from the PrimaryKeyRelatedField
                 return SwaggerType(existing_object=result)
@@ -414,7 +424,8 @@ class SimpleFieldInspector(FieldInspector):
     and min/max validators.
     """
 
-    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, is_request=False, is_response=False,
+                                **kwargs):
         type_info = get_basic_type_info(field)
         if type_info is None:
             return NotHandled
@@ -426,7 +437,8 @@ class SimpleFieldInspector(FieldInspector):
 class ChoiceFieldInspector(FieldInspector):
     """Provides conversions for ``ChoiceField`` and ``MultipleChoiceField``."""
 
-    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, is_request=False, is_response=False,
+                                **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
 
         if isinstance(field, serializers.ChoiceField):
@@ -459,7 +471,8 @@ class ChoiceFieldInspector(FieldInspector):
 class FileFieldInspector(FieldInspector):
     """Provides conversions for ``FileField``\ s."""
 
-    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, is_request=False, is_response=False,
+                                **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
 
         if isinstance(field, serializers.FileField):
@@ -486,11 +499,13 @@ class FileFieldInspector(FieldInspector):
 class DictFieldInspector(FieldInspector):
     """Provides conversion for ``DictField``."""
 
-    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, is_request=False, is_response=False,
+                                **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
 
         if isinstance(field, serializers.DictField) and swagger_object_type == openapi.Schema:
-            child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)
+            child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references,
+                                                       is_request=is_request, is_response=is_response)
             return SwaggerType(
                 type=openapi.TYPE_OBJECT,
                 additional_properties=child_schema
@@ -502,7 +517,8 @@ class DictFieldInspector(FieldInspector):
 class HiddenFieldInspector(FieldInspector):
     """Hide ``HiddenField``."""
 
-    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, is_request=False, is_response=False,
+                                **kwargs):
         if isinstance(field, serializers.HiddenField):
             return None
 
@@ -512,7 +528,8 @@ class HiddenFieldInspector(FieldInspector):
 class StringDefaultFieldInspector(FieldInspector):
     """For otherwise unhandled fields, return them as plain :data:`.TYPE_STRING` objects."""
 
-    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):  # pragma: no cover
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, is_request=False, is_response=False,
+                                **kwargs):  # pragma: no cover
         # TODO unhandled fields: TimeField JSONField
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
         return SwaggerType(type=openapi.TYPE_STRING)
@@ -569,7 +586,8 @@ except ImportError:  # pragma: no cover
 else:
     class RecursiveFieldInspector(FieldInspector):
         """Provides conversion for RecursiveField (https://github.com/heywbj/django-rest-framework-recursive)"""
-        def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+        def field_to_swagger_object(self, field, swagger_object_type, use_references, is_request=False,
+                                    is_response=False, **kwargs):
             if isinstance(field, RecursiveField) and swagger_object_type == openapi.Schema:
                 assert use_references is True, "Can not create schema for RecursiveField when use_references is False"
 

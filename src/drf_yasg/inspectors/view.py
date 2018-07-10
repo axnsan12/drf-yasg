@@ -138,7 +138,7 @@ class SwaggerAutoSchema(ViewInspector):
         :param serializer: the view's request serializer as returned by :meth:`.get_request_serializer`
         :rtype: openapi.Schema
         """
-        return self.serializer_to_schema(serializer)
+        return self.serializer_to_schema(serializer, is_request=True)
 
     def make_body_parameter(self, schema):
         """Given a :class:`.Schema` object, create an ``in: body`` :class:`.Parameter`.
@@ -206,7 +206,7 @@ class SwaggerAutoSchema(ViewInspector):
         if any(is_form_media_type(encoding) for encoding in self.get_consumes()):
             default_schema = ''
         if default_schema and not isinstance(default_schema, openapi.Schema):
-            default_schema = self.serializer_to_schema(default_schema) or ''
+            default_schema = self.serializer_to_schema(default_schema, is_response=True) or ''
 
         if default_schema:
             if is_list_view(self.path, self.method, self.view) and self.method.lower() == 'get':
@@ -254,7 +254,7 @@ class SwaggerAutoSchema(ViewInspector):
                 response = serializer
                 if hasattr(response, 'schema') and not isinstance(response.schema, openapi.Schema.OR_REF):
                     serializer = force_serializer_instance(response.schema)
-                    response.schema = self.serializer_to_schema(serializer)
+                    response.schema = self.serializer_to_schema(serializer, is_response=True)
             elif isinstance(serializer, openapi.Schema.OR_REF):
                 response = openapi.Response(
                     description='',
@@ -264,7 +264,7 @@ class SwaggerAutoSchema(ViewInspector):
                 serializer = force_serializer_instance(serializer)
                 response = openapi.Response(
                     description='',
-                    schema=self.serializer_to_schema(serializer),
+                    schema=self.serializer_to_schema(serializer, is_response=True),
                 )
 
             responses[str(sc)] = response

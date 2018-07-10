@@ -136,7 +136,8 @@ class FieldInspector(BaseInspector):
         super(FieldInspector, self).__init__(view, path, method, components, request)
         self.field_inspectors = field_inspectors
 
-    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, is_request=False, is_response=False,
+                                **kwargs):
         """Convert a drf Serializer or Field instance into a Swagger object.
 
         Should return :data:`.NotHandled` if this inspector does not know how to handle the given `field`.
@@ -152,7 +153,8 @@ class FieldInspector(BaseInspector):
         """
         return NotHandled
 
-    def probe_field_inspectors(self, field, swagger_object_type, use_references, **kwargs):
+    def probe_field_inspectors(self, field, swagger_object_type, use_references, is_request=False, is_response=False,
+                               **kwargs):
         """Helper method for recursively probing `field_inspectors` to handle a given field.
 
         All arguments are the same as :meth:`.field_to_swagger_object`.
@@ -161,7 +163,8 @@ class FieldInspector(BaseInspector):
         """
         return self.probe_inspectors(
             self.field_inspectors, 'field_to_swagger_object', field, {'field_inspectors': self.field_inspectors},
-            swagger_object_type=swagger_object_type, use_references=use_references, **kwargs
+            swagger_object_type=swagger_object_type, use_references=use_references, is_request=is_request,
+            is_response=is_response, **kwargs
         )
 
     def _get_partial_types(self, field, swagger_object_type, use_references, **kwargs):
@@ -253,7 +256,8 @@ class FieldInspector(BaseInspector):
 
 
 class SerializerInspector(FieldInspector):
-    def get_schema(self, serializer):
+
+    def get_schema(self, serializer, is_request=False, is_response=False):
         """Convert a DRF Serializer instance to an :class:`.openapi.Schema`.
 
         Should return :data:`.NotHandled` if this inspector does not know how to handle the given `serializer`.
@@ -366,15 +370,17 @@ class ViewInspector(BaseInspector):
 
         return self.probe_inspectors(self.paginator_inspectors, 'get_paginator_parameters', self.view.paginator) or []
 
-    def serializer_to_schema(self, serializer):
+    def serializer_to_schema(self, serializer, is_request=False, is_response=False):
         """Convert a serializer to an OpenAPI :class:`.Schema`.
 
         :param serializers.BaseSerializer serializer: the ``Serializer`` instance
         :returns: the converted :class:`.Schema`, or ``None`` in case of an unknown serializer
         :rtype: openapi.Schema,openapi.SchemaRef,None
         """
+
         return self.probe_inspectors(
-            self.field_inspectors, 'get_schema', serializer, {'field_inspectors': self.field_inspectors}
+            self.field_inspectors, 'get_schema', serializer,  {'field_inspectors': self.field_inspectors},
+            is_request=is_request, is_response=is_response
         )
 
     def serializer_to_parameters(self, serializer, in_):
