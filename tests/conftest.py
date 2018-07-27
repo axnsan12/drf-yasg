@@ -6,8 +6,10 @@ from collections import OrderedDict
 import pytest
 from datadiff.tools import assert_equal
 from django.contrib.auth.models import User
+from django.core.management import call_command
 from rest_framework.test import APIRequestFactory
 from rest_framework.views import APIView
+from six import StringIO
 
 from drf_yasg import codecs, openapi
 from drf_yasg.codecs import yaml_sane_dump, yaml_sane_load
@@ -62,6 +64,21 @@ def validate_schema(db):
         validate_ssv(copy.deepcopy(swagger))
 
     return validate_schema
+
+
+@pytest.fixture
+def call_generate_swagger():
+    def call_generate_swagger(output_file='-', overwrite=False, format='', api_url='',
+                              mock=False, user=None, private=False, generator_class_name='', **kwargs):
+        out = StringIO()
+        call_command(
+            'generate_swagger', stdout=out,
+            output_file=output_file, overwrite=overwrite, format=format, api_url=api_url, mock=mock, user=user,
+            private=private, generator_class_name=generator_class_name, **kwargs
+        )
+        return out.getvalue()
+
+    return call_generate_swagger
 
 
 @pytest.fixture
