@@ -313,7 +313,7 @@ ReDoc UI settings
 =================
 
 ReDoc UI configuration settings. |br|
-See https://github.com/Rebilly/ReDoc#redoc-tag-attributes.
+See https://github.com/Rebilly/ReDoc/tree/v1.x#redoc-tag-attributes.
 
 LAZY_RENDERING
 --------------
