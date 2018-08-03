@@ -263,10 +263,10 @@ Controls how many levels are expaned by default when showing nested models.
 **Default**: :python:`3` |br|
 *Maps to parameter*: ``defaultModelExpandDepth``
 
-DEFAULT_MODEL_DEPTH
--------------------
+SHOW_COMMON_EXTENSIONS
+----------------------
 
-Controls the display of extensions (``pattern``, ``maxLength``, ``minLength``, ``maximum``, ```minimum``) fields and
+Controls the display of extensions (``pattern``, ``maxLength``, ``minLength``, ``maximum``, ``minimum``) fields and
 values for Parameters.
 
 **Default**: :python:`True` |br|
@@ -313,7 +313,7 @@ ReDoc UI settings
 =================
 
 ReDoc UI configuration settings. |br|
-See https://github.com/Rebilly/ReDoc#redoc-tag-attributes.
+See https://github.com/Rebilly/ReDoc#configuration.
 
 LAZY_RENDERING
 --------------
