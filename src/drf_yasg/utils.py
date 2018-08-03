@@ -305,8 +305,8 @@ def get_serializer_ref_name(serializer):
     Get serializer's ref_name (or None for ModelSerializer if it is named 'NestedSerializer')
 
     :param serializer: Serializer instance
-    :return: Serializer's ref_name or None for inline serializer
-    :rtype: str or None
+    :return: Serializer's ``ref_name`` or ``None`` for inline serializer
+    :rtype: str
     """
     serializer_meta = getattr(serializer, 'Meta', None)
     serializer_name = type(serializer).__name__

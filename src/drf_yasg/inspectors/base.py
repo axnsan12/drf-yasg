@@ -370,7 +370,7 @@ class ViewInspector(BaseInspector):
 
         :param serializers.BaseSerializer serializer: the ``Serializer`` instance
         :returns: the converted :class:`.Schema`, or ``None`` in case of an unknown serializer
-        :rtype: openapi.Schema,openapi.SchemaRef,None
+        :rtype: openapi.Schema,openapi.SchemaRef
         """
         return self.probe_inspectors(
             self.field_inspectors, 'get_schema', serializer, {'field_inspectors': self.field_inspectors}

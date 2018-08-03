@@ -4,12 +4,17 @@ Changelog
 
 
 **********
-**1.9.1b**
+**1.9.2**
 **********
 
-*Release date: Jun 30, 2018*
+*Release date: Aug 03, 2018*
 
-- Maintenance release (fixed a git tag/branching issue)
+- **IMPROVED:** updated ``swagger-ui`` to version 3.17.6
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-alpha.32
+- **IMPROVED:** added ``--api-version`` argument to the ``generate_swagger`` management command (:pr:`170`)
+- **FIXED:** corrected various documentation typos (:pr:`160`, :pr:`162`, :issue:`171`, :pr:`172`)
+- **FIXED:** made ``generate_swagger`` work for projects without authentication (:pr:`161`)
+- **FIXED:** fixed ``SafeText`` interaction with YAML codec (:issue:`159`)
 
 *********
 **1.9.1**
