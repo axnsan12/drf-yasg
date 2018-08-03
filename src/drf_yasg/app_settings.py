@@ -14,6 +14,7 @@ SWAGGER_DEFAULTS = {
         'drf_yasg.inspectors.DictFieldInspector',
         'drf_yasg.inspectors.HiddenFieldInspector',
         'drf_yasg.inspectors.RelatedFieldInspector',
+        'drf_yasg.inspectors.SerializerMethodFieldInspector',
         'drf_yasg.inspectors.SimpleFieldInspector',
         'drf_yasg.inspectors.StringDefaultFieldInspector',
     ],

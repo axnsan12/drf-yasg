@@ -1581,6 +1581,15 @@ definitions:
       todo:
         title: child
         todo: null
+  OtherStuff:
+    required:
+      - foo
+    type: object
+    properties:
+      foo:
+        title: Foo
+        type: string
+        minLength: 1
   UserSerializerrr:
     required:
       - username
@@ -1636,3 +1645,5 @@ definitions:
           pattern: ^[-a-zA-Z0-9_]+$
         readOnly: true
         uniqueItems: true
+      other_stuff:
+        $ref: '#/definitions/OtherStuff'

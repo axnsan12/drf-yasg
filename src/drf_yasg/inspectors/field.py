@@ -409,6 +409,20 @@ def get_basic_type_info(field):
     return result
 
 
+class SerializerMethodFieldInspector(FieldInspector):
+
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+
+        if isinstance(field, serializers.SerializerMethodField):
+            method = getattr(field.parent, field.method_name)
+
+            if hasattr(method, "serializer_class"):
+                serializer = method.serializer_class()
+                return self.probe_field_inspectors(serializer, openapi.Schema, use_references)
+
+        return NotHandled
+
+
 class SimpleFieldInspector(FieldInspector):
     """Provides conversions for fields which can be described using just ``type``, ``format``, ``pattern``
     and min/max validators.
