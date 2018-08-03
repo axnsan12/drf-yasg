@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import distutils.core
 import io
 import os
 import random
@@ -22,48 +21,21 @@ requirements_setup = read_req('setup.txt')
 requirements_validation = read_req('validation.txt')
 
 
-def _install_setup_requires(attrs):
-    # copied from setuptools
-    dist = distutils.core.Distribution(dict(
-        (k, v) for k, v in attrs.items()
-        if k in ('dependency_links', 'setup_requires')
-    ))
-    # Honor setup.cfg's options.
-    dist.parse_config_files(ignore_option_errors=True)
-    if dist.setup_requires:
-        dist.fetch_build_eggs(dist.setup_requires)
-
-
-try:
-    # try to install setuptools_scm before setuptools does it, otherwise our monkey patch below will come too early
-    # (setuptools_scm adds find_files hooks into setuptools on install)
-    _install_setup_requires({'setup_requires': requirements_setup})
-except Exception:
-    pass
-
-if 'sdist' in sys.argv:
-    try:
-        # see https://github.com/pypa/setuptools_scm/issues/190, setuptools_scm includes ALL versioned files from
-        # the git repo into the sdist by default, and there is no easy way to provide an opt-out;
-        # this hack is ugly but does the job; because this is not really a documented interface of the module,
-        # the setuptools_scm version should remain pinned to ensure it keeps working
-        import setuptools_scm.integration
-
-        setuptools_scm.integration.find_files = lambda _: []
-    except ImportError:
-        pass
-
 try:
     # this is a workaround for being able to install the package from source without working from a git checkout
     # it is needed for building succesfully on Heroku
     from setuptools_scm import get_version
+except ImportError:
+    get_version = None
 
+try:
     version = get_version()
     version_kwargs = {'use_scm_version': True}
-except LookupError:
+except Exception:
     if 'sdist' in sys.argv or 'bdist_wheel' in sys.argv:
         raise
 
+    time
     rnd = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(16))
     version_kwargs = {'version': '0.0.0.dummy+' + rnd}
 
@@ -99,9 +71,11 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Framework :: Django',
         'Framework :: Django :: 1.11',
         'Framework :: Django :: 2.0',
+        'Framework :: Django :: 2.1',
         'Topic :: Documentation',
         'Topic :: Software Development :: Code Generators',
     ],
