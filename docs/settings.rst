@@ -264,7 +264,7 @@ Controls how many levels are expaned by default when showing nested models.
 *Maps to parameter*: ``defaultModelExpandDepth``
 
 SHOW_COMMON_EXTENSIONS
--------------------
+----------------------
 
 Controls the display of extensions (``pattern``, ``maxLength``, ``minLength``, ``maximum``, ``minimum``) fields and
 values for Parameters.
