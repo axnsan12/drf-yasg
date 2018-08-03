@@ -15,16 +15,30 @@ class UserSerializerrr(serializers.ModelSerializer):
     last_connected_ip = serializers.IPAddressField(help_text="i'm out of ideas", protocol='ipv4', read_only=True)
     last_connected_at = serializers.DateField(help_text="really?", read_only=True)
 
-    other_stuff = serializers.SerializerMethodField()
+    other_stuff = serializers.SerializerMethodField(
+        help_text="the decorator should determine the serializer class for this")
+
+    hinted_number = serializers.SerializerMethodField(
+        help_text="the type hint on the method should determine the serializer for this")
+
+    non_hinted_number = serializers.SerializerMethodField(
+        help_text="No hint on the method, so this is expected to fallback to string")
 
     @swagger_serializer_method(serializer_class=OtherStuffSerializer)
     def get_other_stuff(self, obj):
         return OtherStuffSerializer().data
 
+    def get_hinted_number(self, obj) -> float:
+        return 1.0
+
+    def get_non_hinted_number(self, obj):
+        return 1.0
+
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'articles', 'snippets',
-                  'last_connected_ip', 'last_connected_at', 'article_slugs', 'other_stuff')
+                  'last_connected_ip', 'last_connected_at', 'article_slugs',
+                  'non_hinted_number', 'other_stuff', 'hinted_number')
 
 
 class UserListQuerySerializer(serializers.Serializer):

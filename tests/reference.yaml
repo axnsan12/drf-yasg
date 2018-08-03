@@ -1645,5 +1645,16 @@ definitions:
           pattern: ^[-a-zA-Z0-9_]+$
         readOnly: true
         uniqueItems: true
+      non_hinted_number:
+        title: Non hinted number
+        description: No hint on the method, so this is expected to fallback to string
+        type: string
+        readOnly: true
       other_stuff:
         $ref: '#/definitions/OtherStuff'
+      hinted_number:
+        title: Hinted number
+        description: the type hint on the method should determine the serializer for
+          this
+        type: string
+        readOnly: true

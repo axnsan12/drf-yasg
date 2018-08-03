@@ -1,3 +1,4 @@
+import inspect
 import logging
 import operator
 from collections import OrderedDict
@@ -417,8 +418,16 @@ class SerializerMethodFieldInspector(FieldInspector):
             method = getattr(field.parent, field.method_name)
 
             if hasattr(method, "serializer_class"):
+                # attribute added by the swagger_serializer_method decorator
                 serializer = method.serializer_class()
                 return self.probe_field_inspectors(serializer, openapi.Schema, use_references)
+
+            # look for Python 3.5+ style type hinting of the return value
+            return_class = inspect.signature(method).return_annotation
+
+            if not issubclass(return_class, inspect._empty):
+                # TODO - get swagger for return class
+                pass
 
         return NotHandled
 
