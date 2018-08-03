@@ -464,9 +464,9 @@ class SerializerMethodFieldInspector(FieldInspector):
         if isinstance(field, serializers.SerializerMethodField):
             method = getattr(field.parent, field.method_name)
 
-            if hasattr(method, "serializer_class"):
+            if hasattr(method, "swagger_serializer_class"):
                 # attribute added by the swagger_serializer_method decorator
-                serializer = method.serializer_class()
+                serializer = method.swagger_serializer_class()
                 return self.probe_field_inspectors(serializer, swagger_object_type, use_references)
 
             # look for Python 3.5+ style type hinting of the return value
