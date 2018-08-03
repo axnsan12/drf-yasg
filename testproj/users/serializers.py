@@ -19,7 +19,7 @@ class UserSerializerrr(serializers.ModelSerializer):
         help_text="the decorator should determine the serializer class for this")
 
     hinted_number = serializers.SerializerMethodField(
-        help_text="the type hint on the method should determine the serializer for this")
+        help_text="the type hint on the method should determine this to be a number")
 
     non_hinted_number = serializers.SerializerMethodField(
         help_text="No hint on the method, so this is expected to fallback to string")

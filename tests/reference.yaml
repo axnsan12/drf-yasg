@@ -1655,7 +1655,6 @@ definitions:
         $ref: '#/definitions/OtherStuff'
       hinted_number:
         title: Hinted number
-        description: the type hint on the method should determine the serializer for
-          this
+        description: the type hint on the method should determine this to be a number
         type: number
         readOnly: true
