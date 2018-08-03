@@ -1,12 +1,11 @@
 import inspect
 import logging
 
-from django.utils.encoding import force_text
 from rest_framework import serializers
 from rest_framework.utils import encoders, json
 
 from .. import openapi
-from ..utils import decimal_as_float, is_list_view
+from ..utils import decimal_as_float, force_real_str, is_list_view
 
 #: Sentinel value that inspectors must return to signal that they do not know how to handle an object
 NotHandled = object()
@@ -196,9 +195,9 @@ class FieldInspector(BaseInspector):
         """
         assert swagger_object_type in (openapi.Schema, openapi.Parameter, openapi.Items)
         assert not isinstance(field, openapi.SwaggerDict), "passed field is already a SwaggerDict object"
-        title = force_text(field.label) if field.label else None
+        title = force_real_str(field.label) if field.label else None
         title = title if swagger_object_type == openapi.Schema else None  # only Schema has title
-        description = force_text(field.help_text) if field.help_text else None
+        description = force_real_str(field.help_text) if field.help_text else None
         description = description if swagger_object_type != openapi.Items else None  # Items has no description either
 
         def SwaggerType(existing_object=None, **instance_kwargs):

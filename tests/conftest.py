@@ -1,3 +1,5 @@
+from six import StringIO
+
 import copy
 import json
 import os
@@ -9,7 +11,6 @@ from django.contrib.auth.models import User
 from django.core.management import call_command
 from rest_framework.test import APIRequestFactory
 from rest_framework.views import APIView
-from six import StringIO
 
 from drf_yasg import codecs, openapi
 from drf_yasg.codecs import yaml_sane_dump, yaml_sane_load
