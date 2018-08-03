@@ -9,25 +9,13 @@ from collections import OrderedDict
 
 import pytest
 from django.contrib.auth.models import User
-from django.core.management import call_command
 
 from drf_yasg import openapi
 from drf_yasg.codecs import yaml_sane_load
 from drf_yasg.generators import OpenAPISchemaGenerator
 
 
-def call_generate_swagger(output_file='-', overwrite=False, format='', api_url='',
-                          mock=False, user=None, private=False, generator_class_name='', **kwargs):
-    out = StringIO()
-    call_command(
-        'generate_swagger', stdout=out,
-        output_file=output_file, overwrite=overwrite, format=format, api_url=api_url, mock=mock, user=user,
-        private=private, generator_class_name=generator_class_name, **kwargs
-    )
-    return out.getvalue()
-
-
-def test_reference_schema(db, reference_schema):
+def test_reference_schema(call_generate_swagger, db, reference_schema):
     User.objects.create_superuser('admin', 'admin@admin.admin', 'blabla')
 
     output = call_generate_swagger(format='yaml', api_url='http://test.local:8002/', user='admin')
@@ -35,13 +23,13 @@ def test_reference_schema(db, reference_schema):
     assert output_schema == reference_schema
 
 
-def test_non_public(db):
+def test_non_public(call_generate_swagger, db):
     output = call_generate_swagger(format='yaml', api_url='http://test.local:8002/', private=True)
     output_schema = yaml_sane_load(output)
     assert len(output_schema['paths']) == 0
 
 
-def test_no_mock(db):
+def test_no_mock(call_generate_swagger, db):
     output = call_generate_swagger()
     output_schema = json.loads(output, object_pairs_hook=OrderedDict)
     assert len(output_schema['paths']) > 0
@@ -52,7 +40,7 @@ class EmptySchemaGenerator(OpenAPISchemaGenerator):
         return openapi.Paths(paths={}), ''
 
 
-def test_generator_class(db):
+def test_generator_class(call_generate_swagger, db):
     output = call_generate_swagger(generator_class_name='test_management.EmptySchemaGenerator')
     output_schema = json.loads(output, object_pairs_hook=OrderedDict)
     assert len(output_schema['paths']) == 0
@@ -65,7 +53,7 @@ def silentremove(filename):
         pass
 
 
-def test_file_output(db):
+def test_file_output(call_generate_swagger, db):
     prefix = os.path.join(tempfile.gettempdir(), tempfile.gettempprefix())
     name = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
     yaml_file = prefix + name + '.yaml'

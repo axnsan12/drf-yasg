@@ -8,7 +8,7 @@ from rest_framework.status import is_success
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
-    force_serializer_instance, get_consumes, get_produces, guess_response_status, is_list_view, no_body,
+    force_real_str, force_serializer_instance, get_consumes, get_produces, guess_response_status, is_list_view, no_body,
     param_list_to_odict
 )
 from .base import ViewInspector
@@ -42,7 +42,7 @@ class SwaggerAutoSchema(ViewInspector):
 
         return openapi.Operation(
             operation_id=operation_id,
-            description=description,
+            description=force_real_str(description),
             responses=responses,
             parameters=parameters,
             consumes=consumes,
@@ -246,7 +246,7 @@ class SwaggerAutoSchema(ViewInspector):
         for sc, serializer in response_serializers.items():
             if isinstance(serializer, str):
                 response = openapi.Response(
-                    description=serializer
+                    description=force_real_str(serializer)
                 )
             elif not serializer:
                 continue

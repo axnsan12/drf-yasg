@@ -3,6 +3,7 @@ import logging
 from collections import OrderedDict
 
 from django.db import models
+from django.utils.encoding import force_text
 from rest_framework import serializers, status
 from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.request import is_form_media_type
@@ -304,8 +305,8 @@ def get_serializer_ref_name(serializer):
     Get serializer's ref_name (or None for ModelSerializer if it is named 'NestedSerializer')
 
     :param serializer: Serializer instance
-    :return: Serializer's ref_name or None for inline serializer
-    :rtype: str or None
+    :return: Serializer's ``ref_name`` or ``None`` for inline serializer
+    :rtype: str
     """
     serializer_meta = getattr(serializer, 'Meta', None)
     serializer_name = type(serializer).__name__
@@ -319,3 +320,17 @@ def get_serializer_ref_name(serializer):
         if ref_name.endswith('Serializer'):
             ref_name = ref_name[:-len('Serializer')]
     return ref_name
+
+
+def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
+    """
+    Force `s` into a ``str`` instance.
+
+    Fix for https://github.com/axnsan12/drf-yasg/issues/159
+    """
+    if s is not None:
+        s = force_text(s, encoding, strings_only, errors)
+        if type(s) != str:
+            s = '' + s
+
+    return s

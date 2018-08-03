@@ -3,6 +3,8 @@ from collections import OrderedDict
 import coreschema
 from rest_framework.pagination import CursorPagination, LimitOffsetPagination, PageNumberPagination
 
+from drf_yasg.utils import force_real_str
+
 from .. import openapi
 from .base import FilterInspector, PaginatorInspector
 
@@ -48,7 +50,7 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
             in_=location_to_in[field.location],
             type=coreapi_types.get(type(field.schema), openapi.TYPE_STRING),
             required=field.required,
-            description=field.schema.description if field.schema else None,
+            description=force_real_str(field.schema.description) if field.schema else None,
         )
 
 
