@@ -410,6 +410,53 @@ def get_basic_type_info(field):
     return result
 
 
+def decimal_return_type():
+    return openapi.TYPE_NUMBER if rest_framework_settings.COERCE_DECIMAL_TO_STRING else openapi.TYPE_STRING
+
+
+raw_type_info = [
+    (bool, (openapi.TYPE_BOOLEAN, None)),
+    (int, (openapi.TYPE_INTEGER, None)),
+    (float, (openapi.TYPE_NUMBER, None)),
+    (Decimal, (decimal_return_type, openapi.FORMAT_DECIMAL)),
+    # TODO date, datetime etc
+]
+
+
+def get_basic_type_info_from_type(klass):
+    """Given a class (eg from a SerializerMethodField's return type hint,
+    return its basic type information - ``type``, ``format``, ``pattern``,
+    and any applicable min/max limit values.
+
+    :param klass: the class
+    :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
+    :rtype: OrderedDict
+    """
+
+    # based on get_basic_type_info, but without the model or field we have less to go on
+
+    for check_class, type_format in raw_type_info:
+        if issubclass(klass, check_class):
+            swagger_type, format = type_format
+            if callable(swagger_type):
+                swagger_type = swagger_type()
+            # if callable(format):
+            #     format = format(klass)
+            break
+    else:  # pragma: no cover
+        return None
+
+    pattern = None
+
+    result = OrderedDict([
+        ('type', swagger_type),
+        ('format', format),
+        ('pattern', pattern)
+    ])
+
+    return result
+
+
 class SerializerMethodFieldInspector(FieldInspector):
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
@@ -420,14 +467,17 @@ class SerializerMethodFieldInspector(FieldInspector):
             if hasattr(method, "serializer_class"):
                 # attribute added by the swagger_serializer_method decorator
                 serializer = method.serializer_class()
-                return self.probe_field_inspectors(serializer, openapi.Schema, use_references)
+                return self.probe_field_inspectors(serializer, swagger_object_type, use_references)
 
             # look for Python 3.5+ style type hinting of the return value
             return_class = inspect.signature(method).return_annotation
 
             if not issubclass(return_class, inspect._empty):
-                # TODO - get swagger for return class
-                pass
+                type_info = get_basic_type_info_from_type(return_class)
+
+                SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references,
+                                                                        **kwargs)
+                return SwaggerType(**type_info)
 
         return NotHandled
 

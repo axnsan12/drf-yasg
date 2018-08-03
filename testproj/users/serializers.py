@@ -26,6 +26,13 @@ class UserSerializerrr(serializers.ModelSerializer):
 
     @swagger_serializer_method(serializer_class=OtherStuffSerializer)
     def get_other_stuff(self, obj):
+        """
+        method_field that uses a serializer internally.
+
+        By using the decorator, we can tell drf-yasg how to represent this in Swagger
+        :param obj:
+        :return:
+        """
         return OtherStuffSerializer().data
 
     def get_hinted_number(self, obj) -> float:

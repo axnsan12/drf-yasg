@@ -1656,5 +1656,5 @@ definitions:
         title: Hinted number
         description: the type hint on the method should determine the serializer for
           this
-        type: string
+        type: number
         readOnly: true
