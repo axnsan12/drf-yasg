@@ -10,7 +10,7 @@ from .field import (
 from .query import CoreAPICompatInspector, DjangoRestResponsePagination
 from .view import SwaggerAutoSchema
 
-# these settings must be accesed only after definig/importing all the classes in this module to avoid ImportErrors
+# these settings must be accessed only after defining/importing all the classes in this module to avoid ImportErrors
 ViewInspector.field_inspectors = swagger_settings.DEFAULT_FIELD_INSPECTORS
 ViewInspector.filter_inspectors = swagger_settings.DEFAULT_FILTER_INSPECTORS
 ViewInspector.paginator_inspectors = swagger_settings.DEFAULT_PAGINATOR_INSPECTORS
