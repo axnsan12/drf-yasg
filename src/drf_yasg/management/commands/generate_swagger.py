@@ -60,6 +60,11 @@ class Command(BaseCommand):
                  'depend on context from a request in order to function.'
         )
         parser.add_argument(
+            '--api-version', dest='api_version',
+            type=str,
+            help='Version to use to generate schema. This option implies --mock-request.'
+        )
+        parser.add_argument(
             '--user', dest='user',
             help='Username of an existing user to use for mocked authentication. This option implies --mock-request.'
         )
@@ -102,7 +107,7 @@ class Command(BaseCommand):
         request = APIView().initialize_request(request)
         return request
 
-    def handle(self, output_file, overwrite, format, api_url, mock, user, private, generator_class_name,
+    def handle(self, output_file, overwrite, format, api_url, mock, api_version, user, private, generator_class_name,
                *args, **kwargs):
         # disable logs of WARNING and below
         logging.disable(logging.WARNING)
@@ -126,19 +131,25 @@ class Command(BaseCommand):
             # avoid crashing if auth is not configured in the project
             user = get_user_model().objects.get(username=user)
 
-        mock = mock or private or (user is not None)
+        mock = mock or private or (user is not None) or (api_version is not None)
         if mock and not api_url:
             raise ImproperlyConfigured(
                 '--mock-request requires an API url; either provide '
                 'the --url argument or set the DEFAULT_API_URL setting'
             )
 
-        request = self.get_mock_request(api_url, format, user) if mock else None
+        request = None
+        if mock:
+            request = self.get_mock_request(api_url, format, user)
+
+        if request and api_version:
+            request.version = api_version
 
         generator_class = import_class(generator_class_name) or swagger_settings.DEFAULT_GENERATOR_CLASS
         generator = generator_class(
             info=info,
-            url=api_url
+            version=api_version,
+            url=api_url,
         )
         schema = generator.get_schema(request=request, public=not private)
 

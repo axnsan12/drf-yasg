@@ -5,7 +5,6 @@ from collections import OrderedDict, defaultdict
 
 import uritemplate
 from coreapi.compat import urlparse
-from django.utils.encoding import force_text
 from rest_framework import versioning
 from rest_framework.compat import URLPattern, URLResolver, get_original_route
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
@@ -18,7 +17,7 @@ from .app_settings import swagger_settings
 from .errors import SwaggerGenerationError
 from .inspectors.field import get_basic_type_info, get_queryset_field
 from .openapi import ReferenceResolver
-from .utils import get_consumes, get_produces
+from .utils import force_real_str, get_consumes, get_produces
 
 logger = logging.getLogger(__name__)
 
@@ -435,7 +434,7 @@ class OpenAPISchemaGenerator(object):
                 attrs['pattern'] = getattr(view_cls, 'lookup_value_regex', attrs.get('pattern', None))
 
             if model_field and getattr(model_field, 'help_text', False):
-                description = force_text(model_field.help_text)
+                description = model_field.help_text
             elif model_field and getattr(model_field, 'primary_key', False):
                 description = get_pk_description(model, model_field)
             else:
@@ -443,7 +442,7 @@ class OpenAPISchemaGenerator(object):
 
             field = openapi.Parameter(
                 name=variable,
-                description=description,
+                description=force_real_str(description),
                 required=True,
                 in_=openapi.IN_PATH,
                 **attrs

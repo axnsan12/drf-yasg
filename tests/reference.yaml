@@ -905,6 +905,7 @@ definitions:
         minLength: 1
       lastName:
         title: LastName
+        description: <strong>Here's some HTML!</strong>
         type: string
         maxLength: 30
         minLength: 1
