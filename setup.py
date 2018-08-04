@@ -32,12 +32,13 @@ try:
     version = get_version()
     version_kwargs = {'use_scm_version': True}
 except Exception:
-    if 'sdist' in sys.argv or 'bdist_wheel' in sys.argv:
+    if any(any(dist in arg for dist in ['sdist', 'bdist']) for arg in sys.argv):
         raise
 
-    time
-    rnd = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(16))
-    version_kwargs = {'version': '0.0.0.dummy+' + rnd}
+    import time
+    timestamp_ms = int(time.time() * 1000)
+    timestamp_str = hex(timestamp_ms)[2:].zfill(16)
+    version_kwargs = {'version': '0.0.0.dummy+' + timestamp_str}
 
 setup(
     name='drf-yasg',
