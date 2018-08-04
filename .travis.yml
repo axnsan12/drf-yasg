@@ -8,11 +8,12 @@ python:
  - '3.7'
 
 env:
- - DRF=3.7
- - DRF=3.8
- - DJANGO=1.11
- - DJANGO=2.0
- - DJANGO=2.1
+ - DJANGO=1.11 DRF=3.7
+ - DJANGO=2.0 DRF=3.7
+ - DJANGO=2.1 DRF=3.7
+ - DJANGO=1.11 DRF=3.8
+ - DJANGO=2.0 DRF=3.8
+ - DJANGO=2.1 DRF=3.8
 
 jobs:
   include:
