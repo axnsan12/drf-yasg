@@ -1,8 +1,14 @@
+import sys
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from drf_yasg.utils import swagger_serializer_method
 from snippets.models import Snippet
+
+if sys.version_info < (3, 5,):
+    from .serializers_old_py import MethodFieldExampleSerializer
+else:
+    from .serializers_new_py import MethodFieldExampleSerializer
 
 
 class OtherStuffSerializer(serializers.Serializer):
@@ -18,11 +24,7 @@ class UserSerializerrr(serializers.ModelSerializer):
     other_stuff = serializers.SerializerMethodField(
         help_text="the decorator should determine the serializer class for this")
 
-    hinted_number = serializers.SerializerMethodField(
-        help_text="the type hint on the method should determine this to be a number")
-
-    non_hinted_number = serializers.SerializerMethodField(
-        help_text="No hint on the method, so this is expected to fallback to string")
+    hint_example = MethodFieldExampleSerializer()
 
     @swagger_serializer_method(serializer_class=OtherStuffSerializer)
     def get_other_stuff(self, obj):
@@ -35,17 +37,10 @@ class UserSerializerrr(serializers.ModelSerializer):
         """
         return OtherStuffSerializer().data
 
-    def get_hinted_number(self, obj) -> float:
-        return 1.0
-
-    def get_non_hinted_number(self, obj):
-        return 1.0
-
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'articles', 'snippets',
-                  'last_connected_ip', 'last_connected_at', 'article_slugs',
-                  'non_hinted_number', 'other_stuff', 'hinted_number')
+                  'last_connected_ip', 'last_connected_at', 'article_slugs', 'other_stuff', 'hint_example')
 
 
 class UserListQuerySerializer(serializers.Serializer):

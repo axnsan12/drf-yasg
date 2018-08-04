@@ -1591,11 +1591,26 @@ definitions:
         title: Foo
         type: string
         minLength: 1
+  MethodFieldExample:
+    title: Hint example
+    type: object
+    properties:
+      hinted_number:
+        title: Hinted number
+        description: the type hint on the method should determine this to be a number
+        type: number
+        readOnly: true
+      non_hinted_number:
+        title: Non hinted number
+        description: No hint on the method, so this is expected to fallback to string
+        type: string
+        readOnly: true
   UserSerializerrr:
     required:
       - username
       - articles
       - snippets
+      - hint_example
     type: object
     properties:
       id:
@@ -1646,15 +1661,7 @@ definitions:
           pattern: ^[-a-zA-Z0-9_]+$
         readOnly: true
         uniqueItems: true
-      non_hinted_number:
-        title: Non hinted number
-        description: No hint on the method, so this is expected to fallback to string
-        type: string
-        readOnly: true
       other_stuff:
         $ref: '#/definitions/OtherStuff'
-      hinted_number:
-        title: Hinted number
-        description: the type hint on the method should determine this to be a number
-        type: number
-        readOnly: true
+      hint_example:
+        $ref: '#/definitions/MethodFieldExample'

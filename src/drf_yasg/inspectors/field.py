@@ -1,6 +1,7 @@
 import inspect
 import logging
 import operator
+import sys
 from collections import OrderedDict
 from decimal import Decimal
 
@@ -469,15 +470,16 @@ class SerializerMethodFieldInspector(FieldInspector):
                 serializer = method.swagger_serializer_class()
                 return self.probe_field_inspectors(serializer, swagger_object_type, use_references)
 
-            # look for Python 3.5+ style type hinting of the return value
-            return_class = inspect.signature(method).return_annotation
+            if sys.version_info >= (3, 5):
+                # look for Python 3.5+ style type hinting of the return value
+                return_class = inspect.signature(method).return_annotation
 
-            if not issubclass(return_class, inspect._empty):
-                type_info = get_basic_type_info_from_type(return_class)
+                if not issubclass(return_class, inspect._empty):
+                    type_info = get_basic_type_info_from_type(return_class)
 
-                SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references,
-                                                                        **kwargs)
-                return SwaggerType(**type_info)
+                    SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references,
+                                                                            **kwargs)
+                    return SwaggerType(**type_info)
 
         return NotHandled
 
