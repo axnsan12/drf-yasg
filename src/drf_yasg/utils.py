@@ -117,7 +117,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
             # no overrides to set, no use in doing more work
             return
 
-        # if the method is an @action, it will have a bind_to_methods attribute
+        # if the method is an @action, it will have a bind_to_methods attribute, or a mapper attribute for drf>3.8
         bind_to_methods = getattr(view_method, 'bind_to_methods', [])
         # if the method is actually a function based view (@api_view), it will have a 'cls' attribute
         view_cls = getattr(view_method, 'cls', None)
