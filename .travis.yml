@@ -5,24 +5,18 @@ python:
  - '3.4'
  - '3.5'
  - '3.6'
- - '3.7'
-
-env:
- - DJANGO=1.11 DRF=3.7
- - DJANGO=2.0 DRF=3.7
- - DJANGO=2.1 DRF=3.7
- - DJANGO=1.11 DRF=3.8
- - DJANGO=2.0 DRF=3.8
- - DJANGO=2.1 DRF=3.8
 
 jobs:
   include:
     - stage: test
       python: '2.7'
-      env: DRF=3.7 DJANGO=1.11
+    -
+      python: '3.7'
+      dist: xenial
+      sudo: required
     -
       python: '3.6'
-      env: DRF=master
+      env: DRF=master DJANGO=master
     -
       python: '3.5'
       env: TOXENV=docs
@@ -42,10 +36,6 @@ jobs:
         on:
           tags: true
         distributions: "sdist bdist_wheel"
-
-  exclude:
-     - python: '3.4'
-       env: DJANGO=2.1
 
   allow_failures:
     - env: TOXENV=lint
