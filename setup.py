@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 import io
 import os
-import random
-import string
 import sys
 from setuptools import find_packages, setup
 

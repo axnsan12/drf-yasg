@@ -12,11 +12,12 @@ jobs:
       python: '2.7'
     -
       python: '3.7'
+      # https://github.com/travis-ci/travis-ci/issues/9815#issuecomment-401756442
       dist: xenial
       sudo: required
     -
       python: '3.6'
-      env: DRF=master DJANGO=master
+      env: TOXENV=djmaster
     -
       python: '3.5'
       env: TOXENV=docs
