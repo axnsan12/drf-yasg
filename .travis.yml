@@ -10,12 +10,15 @@ python:
 env:
  - DRF=3.7
  - DRF=3.8
+ - DJANGO=1.11
+ - DJANGO=2.0
+ - DJANGO=2.1
 
 jobs:
   include:
     - stage: test
       python: '2.7'
-      env: DRF=3.7
+      env: DRF=3.7 DJANGO=1.11
     -
       python: '3.6'
       env: DRF=master
@@ -39,6 +42,10 @@ jobs:
           tags: true
         distributions: "sdist bdist_wheel"
 
+  exclude:
+     - python: '3.4'
+       env: DJANGO=2.1
+
   allow_failures:
     - env: TOXENV=lint
     - env: DRF=master
@@ -53,12 +60,9 @@ before_script:
  - |
   [[ -z "$TOXENV" && -z "$PYPI_DEPLOY" ]] && REPORT_COVERAGE="yes" || REPORT_COVERAGE="no";
   echo "Reporting coverage: ${REPORT_COVERAGE}"
- - |
-  [[ -z "$TOXENV" && ! -z "$DRF" && "$DRF" != "master" ]] && USE_DETOX="yes" || USE_DETOX="no";
-  echo "Using detox: ${USE_DETOX}"
 
 script:
- - 'if [[ "$USE_DETOX" == "yes" ]]; then detox; else tox; fi'
+ - tox
 
 after_success:
  - coverage combine
