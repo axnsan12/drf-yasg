@@ -467,7 +467,14 @@ class SerializerMethodFieldInspector(FieldInspector):
 
             if hasattr(method, "swagger_serializer_class"):
                 # attribute added by the swagger_serializer_method decorator
-                serializer = method.swagger_serializer_class()
+
+                serializer_kwargs = {
+                    # a bit hacky? copy help_text from the SerializerMethodField
+                    "help_text": field.help_text,
+                    "label": field.label,
+                }
+                serializer = method.swagger_serializer_class(**serializer_kwargs)
+
                 return self.probe_field_inspectors(serializer, swagger_object_type, use_references)
 
             if sys.version_info >= (3, 5):

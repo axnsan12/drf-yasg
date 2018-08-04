@@ -1583,6 +1583,8 @@ definitions:
         title: child
         todo: null
   OtherStuff:
+    title: Other stuff
+    description: the decorator should determine the serializer class for this
     required:
       - foo
     type: object
