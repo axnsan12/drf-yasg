@@ -1593,6 +1593,7 @@ definitions:
         title: Foo
         type: string
         minLength: 1
+    readOnly: true
   MethodFieldExample:
     title: Hint example
     type: object

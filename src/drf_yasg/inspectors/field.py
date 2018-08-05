@@ -469,13 +469,15 @@ class SerializerMethodFieldInspector(FieldInspector):
                 # attribute added by the swagger_serializer_method decorator
 
                 serializer_kwargs = {
-                    # a bit hacky? copy help_text from the SerializerMethodField
+                    # copy attributes from the SerializerMethodField
                     "help_text": field.help_text,
                     "label": field.label,
+                    # SerializerMethodField is read_only by definition
+                    "read_only": True,
                 }
                 serializer = method.swagger_serializer_class(**serializer_kwargs)
 
-                return self.probe_field_inspectors(serializer, swagger_object_type, use_references)
+                return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
 
             if sys.version_info >= (3, 5):
                 # look for Python 3.5+ style type hinting of the return value
