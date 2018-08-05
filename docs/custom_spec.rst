@@ -155,6 +155,46 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
    replacing/decorating methods on the base class itself.
 
 
+*********************************
+Support for SerializerMethodField
+*********************************
+
+Schema generation of ``serializers.SerializerMethodField`` supported in two ways:
+
+1) The decorator ``swagger_serializer_method(serializer_class)`` for the use case where the serializer method
+   is using a serializer.  e.g.:
+
+
+.. code-block:: python
+
+   from drf_yasg.utils import swagger_serializer_method
+
+
+   class OtherStuffSerializer(serializers.Serializer):
+       foo = serializers.CharField()
+
+
+   class ParentSerializer(serializers.Serializer):
+
+       other_stuff = serializers.SerializerMethodField()
+
+       @swagger_serializer_method(serializer_class=OtherStuffSerializer)
+       def get_other_stuff(self, obj):
+           return OtherStuffSerializer().data
+
+
+2) For simple cases where the method is returning one of the supported types,
+   `Python 3 type hinting`_ of the serializer method return value can be used.  e.g.:
+
+ .. code-block:: python
+
+   class SomeSerializer(serializers.Serializer):
+
+       some_number = serializers.SerializerMethodField()
+
+       def get_some_number(self, obj) -> float:
+           return 1.0
+
 ********************************
 Serializer ``Meta`` nested class
 ********************************
@@ -333,3 +373,6 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
 
    Another caveat that stems from this is that any serializer named "``NestedSerializer``" will be forced inline
    unless it has a ``ref_name`` set explicitly.
+
+
+.. _Python 3 type hinting: https://docs.python.org/3/library/typing.html
