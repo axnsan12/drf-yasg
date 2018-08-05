@@ -1603,6 +1603,29 @@ definitions:
         description: the type hint on the method should determine this to be a number
         type: number
         readOnly: true
+      hinted_datetime:
+        title: Hinted datetime
+        description: the type hint on the method should determine this to be a datetime
+        type: string
+        format: date-time
+        readOnly: true
+      hinted_date:
+        title: Hinted date
+        description: the type hint on the method should determine this to be a date
+        type: string
+        format: date
+        readOnly: true
+      hinted_uuid:
+        title: Hinted uuid
+        description: the type hint on the method should determine this to be a uuid
+        type: string
+        format: uuid
+        readOnly: true
+      hinted_unknown:
+        title: Hinted unknown
+        description: type hint is unknown, so is expected to fallback to string
+        type: string
+        readOnly: true
       non_hinted_number:
         title: Non hinted number
         description: No hint on the method, so this is expected to fallback to string

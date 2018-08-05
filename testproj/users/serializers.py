@@ -1,15 +1,14 @@
-import sys
-
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from drf_yasg.utils import swagger_serializer_method
 from snippets.models import Snippet
 
-if sys.version_info < (3, 5,):
-    from .serializers_old_py import MethodFieldExampleSerializer
-else:
-    from .serializers_new_py import MethodFieldExampleSerializer
+try:
+    import typing
+    from .method_serializers_with_typing import MethodFieldExampleSerializer
+except ImportError:
+    from .method_serializers_without_typing import MethodFieldExampleSerializer
 
 
 class OtherStuffSerializer(serializers.Serializer):
