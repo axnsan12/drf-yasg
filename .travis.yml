@@ -5,7 +5,7 @@ cache:
   - .tox
 before_cache:
   - rm -f $HOME/.cache/pip/log/debug.log
-  - rm -fr .tox/log/ .tox/*/log/ .tox/*/tmp/
+  - rm -fr .tox/log/ .tox/*/log/ .tox/*/tmp/ .tox/dist .tox/*/lib/*/site-packages/drf_yasg*
 
 python:
   - '2.7'
@@ -15,15 +15,15 @@ python:
 
 jobs:
   include:
-    - stage: test
+    - # https://github.com/travis-ci/travis-ci/issues/9815#issuecomment-401756442
+      stage: test
       python: '3.7'
-      # https://github.com/travis-ci/travis-ci/issues/9815#issuecomment-401756442
       dist: xenial
       sudo: required
     -
       python: '3.6'
       env: TOXENV=djmaster
-    -
+    - # readthedocs uses python 3.5 for building
       python: '3.5'
       env: TOXENV=docs
     -
