@@ -25,9 +25,9 @@ class unset(object):
 
 
 def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_body=None, query_serializer=None,
-                        manual_parameters=None, operation_id=None, operation_description=None, security=None,
-                        responses=None, field_inspectors=None, filter_inspectors=None, paginator_inspectors=None,
-                        **extra_overrides):
+                        manual_parameters=None, operation_id=None, operation_description=None, operation_summary=None,
+                        security=None, deprecated=None, responses=None, field_inspectors=None, filter_inspectors=None,
+                        paginator_inspectors=None, **extra_overrides):
     """Decorate a view method to customize the :class:`.Operation` object generated from it.
 
     `method` and `methods` are mutually exclusive and must only be present when decorating a view method that accepts
@@ -68,9 +68,11 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
     :param str operation_id: operation ID override; the operation ID must be unique accross the whole API
     :param str operation_description: operation description override
+    :param str operation_summary: operation summary string
     :param list[dict] security: security requirements override; used to specify which authetication mechanism
         is requried to call this API; an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
         authentication schemes), and ``None`` will inherit the top-level secuirty requirements
+    :param bool deprecated: deprecation status for operation
     :param dict[str,(.Schema,.SchemaRef,.Response,str,Serializer)] responses: a dict of documented manual responses
         keyed on response status code. If no success (``2xx``) response is given, one will automatically be
         generated from the request body and http method. If any ``2xx`` response is given the automatic response is

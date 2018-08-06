@@ -34,8 +34,10 @@ class SwaggerAutoSchema(ViewInspector):
 
         operation_id = self.get_operation_id(operation_keys)
         description = self.get_description()
+        summary = self.get_summary()
         security = self.get_security()
         assert security is None or isinstance(security, list), "security must be a list of securiy requirement objects"
+        deprecated = self.is_deprecated()
         tags = self.get_tags(operation_keys)
 
         responses = self.get_responses()
@@ -43,12 +45,14 @@ class SwaggerAutoSchema(ViewInspector):
         return openapi.Operation(
             operation_id=operation_id,
             description=force_real_str(description),
+            summary=force_real_str(summary),
             responses=responses,
             parameters=parameters,
             consumes=consumes,
             produces=produces,
             tags=tags,
-            security=security
+            security=security,
+            deprecated=deprecated
         )
 
     def get_request_body_parameters(self, consumes):
@@ -325,6 +329,14 @@ class SwaggerAutoSchema(ViewInspector):
             description = self._sch.get_description(self.path, self.method)
         return description
 
+    def get_summary(self):
+        """Return a summary description for this operation.
+
+        :return: the summary
+        :rtype: str
+        """
+        return self.overrides.get('operation_summary', None)
+
     def get_security(self):
         """Return a list of security requirements for this operation.
 
@@ -334,6 +346,14 @@ class SwaggerAutoSchema(ViewInspector):
         :return: security requirements
         :rtype: list[dict[str,list[str]]]"""
         return self.overrides.get('security', None)
+
+    def is_deprecated(self):
+        """Return ``True`` if this operation is to be marked as deprecated.
+
+        :return: deprecation status
+        :rtype: bool
+        """
+        return self.overrides.get('deprecated', None)
 
     def get_tags(self, operation_keys):
         """Get a list of tags for this operation. Tags determine how operations relate with each other, and in the UI

@@ -9,12 +9,14 @@ Changelog
 
 *Release date: TBD, 2018*
 
-- **IMPROVED:** added support for ``SerializerMethodField``, via the ``swagger_serializer_method`` decorator for the
+- **ADDED:** added support for ``SerializerMethodField``, via the ``swagger_serializer_method`` decorator for the
   method field, and support for Python 3.5 style type hinting of the method field return type
   (:issue:`137`, :pr:`175`, :pr:`179`)
 
   *NOTE:* in order for this to work, you will have to add the new ``drf_yasg.inspectors.SerializerMethodFieldInspector``
   to your ``DEFAULT_FIELD_INSPECTORS`` array if you changed it from the default value
+- **IMPROVED:** added ``operation_summary`` and ``deprecated`` arguments to ``swagger_auto_schema``
+  (:issue:`149`, :issue:`173`)
 
 *********
 **1.9.2**
