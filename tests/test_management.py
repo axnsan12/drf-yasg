@@ -1,5 +1,3 @@
-from six import StringIO
-
 import json
 import os
 import random
