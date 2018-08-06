@@ -49,17 +49,15 @@ install:
 
 before_script:
  - coverage erase
- - |
-  [[ -z "$TOXENV" && -z "$PYPI_DEPLOY" ]] && REPORT_COVERAGE="yes" || REPORT_COVERAGE="no";
-  echo "Reporting coverage: ${REPORT_COVERAGE}"
 
 script:
  - tox
 
 after_success:
- - coverage combine
- - 'if [[ "$REPORT_COVERAGE" == "yes" ]]; then coverage report; fi'
- - 'if [[ "$REPORT_COVERAGE" == "yes" ]]; then codecov; fi'
+  - |
+    if [[ -z "$TOXENV" && -z "$PYPI_DEPLOY" ]]; then
+      ./coverage.sh
+    fi
 
 branches:
   only:
