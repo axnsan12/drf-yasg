@@ -45,7 +45,7 @@ jobs:
 
   allow_failures:
     - env: TOXENV=lint
-    - env: DRF=master
+    - env: TOXENV=djmaster
 
   fast_finish: true
 
