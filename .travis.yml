@@ -1,4 +1,11 @@
 language: python
+sudo: false
+python:
+  - '2.7'
+  - '3.4'
+  - '3.5'
+  - '3.6'
+
 cache:
   directories:
   - $HOME/.cache/pip
@@ -7,15 +14,9 @@ before_cache:
   - rm -f $HOME/.cache/pip/log/debug.log
   - rm -fr .tox/log/ .tox/*/log/ .tox/*/tmp/ .tox/dist .tox/*/lib/*/site-packages/drf_yasg*
 
-python:
-  - '2.7'
-  - '3.4'
-  - '3.5'
-  - '3.6'
-
 jobs:
   include:
-    - # https://github.com/travis-ci/travis-ci/issues/9815#issuecomment-401756442
+    - # workaround for python 3.7 on travis https://github.com/travis-ci/travis-ci/issues/9815#issuecomment-401756442
       stage: test
       python: '3.7'
       dist: xenial
