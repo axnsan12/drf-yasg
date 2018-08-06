@@ -2,5 +2,3 @@
 -r tox.txt
 -r test.txt
 -r lint.txt
-
-tox-battery>=0.5

@@ -1,5 +1,11 @@
 language: python
-cache: pip
+cache:
+  directories:
+  - $HOME/.cache/pip
+  - .tox
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
+  - rm -fr .tox/log/ .tox/*/log/ .tox/*/tmp/
 
 python:
  - '3.4'
