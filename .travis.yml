@@ -51,7 +51,7 @@ jobs:
   fast_finish: true
 
 install:
- - pip install -r requirements/ci.txt
+ - pip install -U -r requirements/ci.txt
 
 before_script:
  - coverage erase
