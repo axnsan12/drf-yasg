@@ -1,5 +1,5 @@
 # requirements for running the tests via pytest
-pytest>=2.9
+pytest>=2.9,<3.7  # <3.7 because of incompatible pluggy requirement
 pytest-pythonpath>=0.7.1
 pytest-cov>=2.5.1
 pytest-xdist>=1.22.0

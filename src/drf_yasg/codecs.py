@@ -5,7 +5,6 @@ import json
 from collections import OrderedDict
 
 from coreapi.compat import force_bytes
-from django.utils.safestring import SafeData, SafeText
 from ruamel import yaml
 
 from . import openapi
