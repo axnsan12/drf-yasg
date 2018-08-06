@@ -274,6 +274,7 @@ def force_serializer_instance(serializer):
 
     :param serializer: serializer class or instance
     :return: serializer instance
+    :rtype: serializers.BaseSerializer
     """
     if inspect.isclass(serializer):
         assert issubclass(serializer, serializers.BaseSerializer), "Serializer required, not %s" % serializer.__name__
@@ -282,6 +283,26 @@ def force_serializer_instance(serializer):
     assert isinstance(serializer, serializers.BaseSerializer), \
         "Serializer class or instance required, not %s" % type(serializer).__name__
     return serializer
+
+
+def get_serializer_class(serializer):
+    """Given a ``Serializer`` class or intance, return the ``Serializer`` class. If `serializer` is not a ``Serializer``
+    class or instance, raises an assertion error.
+
+    :param serializer: serializer class or instance, or ``None``
+    :return: serializer class
+    :rtype: type[serializers.BaseSerializer]
+    """
+    if serializer is None:
+        return None
+
+    if inspect.isclass(serializer):
+        assert issubclass(serializer, serializers.BaseSerializer), "Serializer required, not %s" % serializer.__name__
+        return serializer
+
+    assert isinstance(serializer, serializers.BaseSerializer), \
+        "Serializer class or instance required, not %s" % type(serializer).__name__
+    return type(serializer)
 
 
 def get_consumes(parser_classes):
@@ -336,7 +357,7 @@ def get_serializer_ref_name(serializer):
     if hasattr(serializer_meta, 'ref_name'):
         ref_name = serializer_meta.ref_name
     elif serializer_name == 'NestedSerializer' and isinstance(serializer, serializers.ModelSerializer):
-        logger.debug("Forcing inline output for ModelSerializer named 'NestedSerializer': " + str(serializer))
+        logger.debug("Forcing inline output for ModelSerializer named 'NestedSerializer':\n" + str(serializer))
         ref_name = None
     else:
         ref_name = serializer_name

@@ -1,3 +1,4 @@
+import logging
 import re
 from collections import OrderedDict
 
@@ -6,6 +7,8 @@ from django.urls import get_script_prefix
 from inflection import camelize
 
 from .utils import filter_none
+
+logger = logging.getLogger(__name__)
 
 TYPE_OBJECT = "object"  #:
 TYPE_STRING = "string"  #:
@@ -628,8 +631,13 @@ class ReferenceResolver(object):
         ret = self.getdefault(name, None, scope)
         if ret is None:
             ret = maker()
+            value = self.getdefault(name, None, scope)
             assert ret is not None, "maker returned None; referenced objects cannot be None/null"
-            self.set(name, ret, scope)
+            if value is None:
+                self.set(name, ret, scope)
+            elif value != ret:
+                logger.debug("during setdefault, maker for %s inserted a value and returned a different value", name)
+                ret = value
 
         return ret
 

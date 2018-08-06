@@ -13,7 +13,7 @@ from rest_framework.settings import api_settings as rest_framework_settings
 
 from .. import openapi
 from ..errors import SwaggerGenerationError
-from ..utils import decimal_as_float, filter_none, get_serializer_ref_name
+from ..utils import decimal_as_float, filter_none, get_serializer_ref_name, get_serializer_class
 from .base import FieldInspector, NotHandled, SerializerInspector
 
 try:
@@ -107,7 +107,7 @@ class InlineSerializerInspector(SerializerInspector):
                 )
                 if not ref_name and 'title' in result:
                     # on an inline model, the title is derived from the field name
-                    # but is visually displayed like the model name, which is confusing
+                    # but is visno coverually displayed like the model name, which is confusing
                     # it is better to just remove title from inline models
                     del result.title
 
@@ -117,7 +117,13 @@ class InlineSerializerInspector(SerializerInspector):
                 return make_schema_definition()
 
             definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
-            definitions.setdefault(ref_name, make_schema_definition)
+            actual_schema = definitions.setdefault(ref_name, make_schema_definition)
+            actual_serializer = get_serializer_class(getattr(actual_schema, '_serializer', None))
+            this_serializer = get_serializer_class(field)
+            if actual_serializer and actual_serializer != this_serializer:  # pragma: no cover
+                logger.warning("Schema for %s will override distinct serializer %s because they "
+                               "share the same ref_name", actual_serializer, this_serializer)
+
             return openapi.SchemaRef(definitions, ref_name)
 
         return NotHandled
