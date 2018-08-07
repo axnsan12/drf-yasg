@@ -652,7 +652,6 @@ else:
         """Hack to force ``djangorestframework_camel_case`` to camelize a plain string."""
         return next(iter(camelize({s: ''})))
 
-
     def camelize_schema(schema_or_ref, components):
         """Recursively camelize property names for the given schema using ``djangorestframework_camel_case``."""
         schema = openapi.resolve_ref(schema_or_ref, components)
@@ -666,7 +665,6 @@ else:
                 schema.required = [camelize_string(p) for p in schema.required]
 
         return schema_or_ref
-
 
     class CamelCaseJSONFilter(FieldInspector):
         """Converts property names to camelCase if ``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer`` are used."""
