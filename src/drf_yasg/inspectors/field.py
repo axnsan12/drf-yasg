@@ -420,7 +420,7 @@ def get_basic_type_info(field):
 
 
 def decimal_return_type():
-    return openapi.TYPE_NUMBER if rest_framework_settings.COERCE_DECIMAL_TO_STRING else openapi.TYPE_STRING
+    return openapi.TYPE_STRING if rest_framework_settings.COERCE_DECIMAL_TO_STRING else openapi.TYPE_NUMBER
 
 
 raw_type_info = [
