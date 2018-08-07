@@ -172,7 +172,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
 def swagger_serializer_method(serializer):
     """
-    Decorates the "get_" method of a serializers.SerializerMethodField
+    Decorates the method of a serializers.SerializerMethodField
     to hint as to how Swagger should be generated for this field.
 
     :param serializer: serializer class or instance
