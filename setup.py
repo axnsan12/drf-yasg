@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
+
 import io
 import os
 import sys
@@ -68,6 +70,7 @@ try:
     drf_yasg_setup(use_scm_version=True)
 except LookupError as e:
     if os.getenv('CI', 'false') == 'true' or os.getenv('TRAVIS', 'false') == 'true':
+        # don't silently fail on travis - we don't want to accidentally push a dummy version to PyPI
         raise
 
     if 'setuptools-scm' in str(e):
