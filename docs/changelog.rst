@@ -7,8 +7,9 @@ Changelog
 **1.10.0**
 **********
 
-*Release date: TBD, 2018*
+*Release date: Aug 08, 2018*
 
+- **ADDED:** added ``EXCLUDED_MEDIA_TYPES`` setting for controlling ``produces`` MIME type filtering (:issue:`158`)
 - **ADDED:** added support for ``SerializerMethodField``, via the ``swagger_serializer_method`` decorator for the
   method field, and support for Python 3.5 style type hinting of the method field return type
   (:issue:`137`, :pr:`175`, :pr:`179`)
@@ -16,10 +17,13 @@ Changelog
   *NOTE:* in order for this to work, you will have to add the new ``drf_yasg.inspectors.SerializerMethodFieldInspector``
   to your ``DEFAULT_FIELD_INSPECTORS`` array if you changed it from the default value
 
-- **ADDED:** added ``EXCLUDED_MEDIA_TYPES`` setting for controlling ``produces`` MIME type filtering (:issue:`158`)
 - **IMPROVED:** updated ``swagger-ui`` to version 3.18.0
+- **IMPROVED:** added support for Python 3.7 and Django 2.1 (:pr:`176`)
+- **IMPROVED:** ``swagger_schema_fields`` will now also work on serializer ``Field``\ s (:issue:`167`)
+- **IMPROVED:** ``ref_name`` collisions will now log a warning message (:issue:`156`)
 - **IMPROVED:** added ``operation_summary`` and ``deprecated`` arguments to ``swagger_auto_schema``
   (:issue:`149`, :issue:`173`)
+- **FIXED:** made ``swagger_auto_schema`` work with DRF 3.9 ``@action`` mappings (:issue:`177`)
 
 *********
 **1.9.2**
