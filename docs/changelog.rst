@@ -2,6 +2,16 @@
 Changelog
 #########
 
+*********
+**1.9.x**
+*********
+
+*Release date: TODO, 2018*
+
+- **IMPROVED:** added support for SerializerMethodField, with ``swagger_serializer_method`` decorator for the
+  method field; with which you can provide a serializer class; and support for Python 3.5 style type hinting of the
+  method field return type (:issue:`137`)
+
 
 **********
 **1.9.2**
@@ -24,7 +34,7 @@ Changelog
 
 - **IMPROVED:** added a ``swagger_fake_view`` marker to more easily detect mock views in view methods;
   ``getattr(self, 'swagger_fake_view', False)`` inside a view method like ``get_serializer_class`` will tell you if the
-  view instnace is being used for swagger schema introspection (:issue:`154`)
+  view instance is being used for swagger schema introspection (:issue:`154`)
 - **IMPROVED:** updated ``swagger-ui`` to version 3.17.1
 - **IMPROVED:** updated ``ReDoc`` to version 2.0.0-alpha.25
 - **FIXED:** fixed wrong handling of duplicate urls in urlconf (:pr:`155`)

@@ -5,12 +5,12 @@ from .base import (
 from .field import (
     CamelCaseJSONFilter, ChoiceFieldInspector, DictFieldInspector, FileFieldInspector, HiddenFieldInspector,
     InlineSerializerInspector, RecursiveFieldInspector, ReferencingSerializerInspector, RelatedFieldInspector,
-    SimpleFieldInspector, StringDefaultFieldInspector
+    SerializerMethodFieldInspector, SimpleFieldInspector, StringDefaultFieldInspector
 )
 from .query import CoreAPICompatInspector, DjangoRestResponsePagination
 from .view import SwaggerAutoSchema
 
-# these settings must be accesed only after definig/importing all the classes in this module to avoid ImportErrors
+# these settings must be accessed only after defining/importing all the classes in this module to avoid ImportErrors
 ViewInspector.field_inspectors = swagger_settings.DEFAULT_FIELD_INSPECTORS
 ViewInspector.filter_inspectors = swagger_settings.DEFAULT_FILTER_INSPECTORS
 ViewInspector.paginator_inspectors = swagger_settings.DEFAULT_PAGINATOR_INSPECTORS
@@ -25,7 +25,7 @@ __all__ = [
     # field inspectors
     'InlineSerializerInspector', 'RecursiveFieldInspector', 'ReferencingSerializerInspector', 'RelatedFieldInspector',
     'SimpleFieldInspector', 'FileFieldInspector', 'ChoiceFieldInspector', 'DictFieldInspector',
-    'StringDefaultFieldInspector', 'CamelCaseJSONFilter', 'HiddenFieldInspector',
+    'StringDefaultFieldInspector', 'CamelCaseJSONFilter', 'HiddenFieldInspector', 'SerializerMethodFieldInspector',
 
     # view inspectors
     'SwaggerAutoSchema',
