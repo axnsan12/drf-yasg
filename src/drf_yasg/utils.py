@@ -179,7 +179,7 @@ def swagger_serializer_method(serializer_class):
 
     def decorator(serializer_method):
         # stash the serializer class for SerializerMethodFieldInspector to find
-        serializer_method.swagger_serializer_class = serializer_class
+        serializer_method._swagger_serializer_class = serializer_class
         return serializer_method
 
     return decorator

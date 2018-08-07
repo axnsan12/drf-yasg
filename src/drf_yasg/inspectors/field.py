@@ -479,7 +479,7 @@ class SerializerMethodFieldInspector(FieldInspector):
         if isinstance(field, serializers.SerializerMethodField):
             method = getattr(field.parent, field.method_name)
 
-            if hasattr(method, "swagger_serializer_class"):
+            if hasattr(method, "_swagger_serializer_class"):
                 # attribute added by the swagger_serializer_method decorator
 
                 serializer_kwargs = {
@@ -489,7 +489,7 @@ class SerializerMethodFieldInspector(FieldInspector):
                     # SerializerMethodField is read_only by definition
                     "read_only": True,
                 }
-                serializer = method.swagger_serializer_class(**serializer_kwargs)
+                serializer = method._swagger_serializer_class(**serializer_kwargs)
 
                 return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
 
