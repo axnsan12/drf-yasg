@@ -147,3 +147,46 @@ def test_url_order():
 
     # get_endpoints only includes one endpoint
     assert len(generator.get_endpoints(None)['/test/'][1]) == 1
+
+
+try:
+    from rest_framework.decorators import action, MethodMapper
+except ImportError:
+    action = MethodMapper = None
+
+
+@pytest.mark.skipif(not MethodMapper or not action, reason="action.mapping test (djangorestframework>=3.9 required)")
+def test_action_mapping():
+    class ActionViewSet(viewsets.ViewSet):
+        @swagger_auto_schema(method='get', operation_id='mapping_get')
+        @swagger_auto_schema(method='delete', operation_id='mapping_delete')
+        @action(detail=False, methods=['get', 'delete'], url_path='test')
+        def action_main(self, request):
+            """mapping docstring get/delete"""
+            pass
+
+        @swagger_auto_schema(operation_id='mapping_post')
+        @action_main.mapping.post
+        def action_post(self, request):
+            """mapping docstring post"""
+            pass
+
+    router = routers.DefaultRouter()
+    router.register(r'action', ActionViewSet, base_name='action')
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        version="v2",
+        url='',
+        patterns=router.urls
+    )
+
+    for _ in range(3):
+        swagger = generator.get_schema(None, True)
+        action_ops = swagger['paths']['/test/']
+        methods = ['get', 'post', 'delete']
+        assert all(mth in action_ops for mth in methods)
+        assert all(action_ops[mth]['operationId'] == 'mapping_' + mth for mth in methods)
+        assert action_ops['post']['description'] == 'mapping docstring post'
+        assert action_ops['get']['description'] == 'mapping docstring get/delete'
+        assert action_ops['delete']['description'] == 'mapping docstring get/delete'

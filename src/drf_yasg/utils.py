@@ -117,19 +117,22 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
             # no overrides to set, no use in doing more work
             return
 
-        # if the method is an @action, it will have a bind_to_methods attribute, or a mapper attribute for drf>3.8
+        # if the method is an @action, it will have a bind_to_methods attribute, or a mapping attribute for drf>3.8
         bind_to_methods = getattr(view_method, 'bind_to_methods', [])
+        mapping = getattr(view_method, 'mapping', {})
+        mapping_methods = [mth for mth, name in mapping.items() if name == view_method.__name__]
+        action_http_methods = bind_to_methods + mapping_methods
+
         # if the method is actually a function based view (@api_view), it will have a 'cls' attribute
         view_cls = getattr(view_method, 'cls', None)
-        http_method_names = [m for m in getattr(view_cls, 'http_method_names', []) if hasattr(view_cls, m)]
+        api_view_http_methods = [m for m in getattr(view_cls, 'http_method_names', []) if hasattr(view_cls, m)]
 
-        available_methods = http_method_names + bind_to_methods
+        available_http_methods = api_view_http_methods + action_http_methods
         existing_data = getattr(view_method, '_swagger_auto_schema', {})
 
         _methods = methods
         if methods or method:
-            assert available_methods or http_method_names, "`method` or `methods` can only be specified " \
-                                                           "on @action or @api_view views"
+            assert available_http_methods, "`method` or `methods` can only be specified on @action or @api_view views"
             assert bool(methods) != bool(method), "specify either method or methods"
             assert not isinstance(methods, str), "`methods` expects to receive a list of methods;" \
                                                  " use `method` for a single argument"
@@ -137,20 +140,20 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
                 _methods = [method.lower()]
             else:
                 _methods = [mth.lower() for mth in methods]
-            assert all(mth in available_methods for mth in _methods), "http method not bound to view"
+            assert all(mth in available_http_methods for mth in _methods), "http method not bound to view"
             assert not any(mth in existing_data for mth in _methods), "http method defined multiple times"
 
-        if available_methods:
+        if available_http_methods:
             # action or api_view
-            assert bool(http_method_names) != bool(bind_to_methods), "this should never happen"
+            assert bool(api_view_http_methods) != bool(action_http_methods), "this should never happen"
 
-            if len(available_methods) > 1:
+            if len(available_http_methods) > 1:
                 assert _methods, \
                     "on multi-method api_view, action, detail_route or list_route, you must specify " \
                     "swagger_auto_schema on a per-method basis using one of the `method` or `methods` arguments"
             else:
                 # for a single-method view we assume that single method as the decorator target
-                _methods = _methods or available_methods
+                _methods = _methods or available_http_methods
 
             assert not any(hasattr(getattr(view_cls, mth, None), '_swagger_auto_schema') for mth in _methods), \
                 "swagger_auto_schema applied twice to method"
