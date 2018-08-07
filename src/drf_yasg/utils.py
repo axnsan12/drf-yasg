@@ -178,18 +178,18 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
     return decorator
 
 
-def swagger_serializer_method(serializer):
+def swagger_serializer_method(serializer_or_field):
     """
     Decorates the method of a serializers.SerializerMethodField
     to hint as to how Swagger should be generated for this field.
 
-    :param serializer: serializer class or instance
+    :param serializer_or_field: ``Serializer``/``Field`` class or instance
     :return:
     """
 
     def decorator(serializer_method):
         # stash the serializer for SerializerMethodFieldInspector to find
-        serializer_method._swagger_serializer = serializer
+        serializer_method._swagger_serializer = serializer_or_field
         return serializer_method
 
     return decorator

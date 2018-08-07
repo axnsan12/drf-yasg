@@ -26,7 +26,7 @@ class UserSerializerrr(serializers.ModelSerializer):
 
     hint_example = MethodFieldExampleSerializer()
 
-    @swagger_serializer_method(serializer=OtherStuffSerializer)
+    @swagger_serializer_method(serializer_or_field=OtherStuffSerializer)
     def get_other_stuff(self, obj):
         """
         method_field that uses a serializer internally.
@@ -41,7 +41,7 @@ class UserSerializerrr(serializers.ModelSerializer):
         help_text="help text on field is set, so this should appear in swagger"
     )
 
-    @swagger_serializer_method(serializer=serializers.IntegerField(
+    @swagger_serializer_method(serializer_or_field=serializers.IntegerField(
         help_text="decorated instance help_text shouldn't appear in swagger because field has priority"))
     def get_help_text_example_1(self):
         """
@@ -52,7 +52,7 @@ class UserSerializerrr(serializers.ModelSerializer):
 
     help_text_example_2 = serializers.SerializerMethodField()
 
-    @swagger_serializer_method(serializer=serializers.IntegerField(
+    @swagger_serializer_method(serializer_or_field=serializers.IntegerField(
         help_text="instance help_text is set, so should appear in swagger"))
     def get_help_text_example_2(self):
         """
@@ -63,7 +63,7 @@ class UserSerializerrr(serializers.ModelSerializer):
 
     help_text_example_3 = serializers.SerializerMethodField()
 
-    @swagger_serializer_method(serializer=serializers.IntegerField())
+    @swagger_serializer_method(serializer_or_field=serializers.IntegerField())
     def get_help_text_example_3(self):
         """
         docstring is set so should appear in swagger as fallback

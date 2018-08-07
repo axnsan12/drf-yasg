@@ -159,44 +159,52 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
 Support for SerializerMethodField
 *********************************
 
-Schema generation of ``serializers.SerializerMethodField`` supported in two ways:
+Schema generation of ``serializers.SerializerMethodField`` is supported in two ways:
 
-1) The decorator ``swagger_serializer_method(serializer)`` for the use case where the serializer method
-   is using a serializer.  e.g.:
+1) The :func:`swagger_serializer_method <.swagger_serializer_method>` decorator for the use case where the serializer
+   method is using a serializer. e.g.:
 
+   .. code-block:: python
 
-.. code-block:: python
+      from drf_yasg.utils import swagger_serializer_method
 
-   from drf_yasg.utils import swagger_serializer_method
+      class OtherStuffSerializer(serializers.Serializer):
+          foo = serializers.CharField()
 
+      class ParentSerializer(serializers.Serializer):
+          other_stuff = serializers.SerializerMethodField()
 
-   class OtherStuffSerializer(serializers.Serializer):
-       foo = serializers.CharField()
-
-
-   class ParentSerializer(serializers.Serializer):
-
-       other_stuff = serializers.SerializerMethodField()
-
-       @swagger_serializer_method(serializer=OtherStuffSerializer)
-       def get_other_stuff(self, obj):
-           return OtherStuffSerializer().data
+          @swagger_serializer_method(serializer_or_field=OtherStuffSerializer)
+          def get_other_stuff(self, obj):
+              return OtherStuffSerializer().data
 
 
-Note that the serializer parameter can be either be a serializer class or instance
+   Note that the ``serializer_or_field`` parameter can accept either a subclass or an instance of ``serializers.Field``.
 
 
-2) For simple cases where the method is returning one of the supported types,
-   `Python 3 type hinting`_ of the serializer method return value can be used.  e.g.:
+2) For simple cases where the method is returning one of the supported types, `Python 3 type hinting`_ of the
+   serializer method return value can be used. e.g.:
 
- .. code-block:: python
+   .. code-block:: python
 
-   class SomeSerializer(serializers.Serializer):
+      class SomeSerializer(serializers.Serializer):
+          some_number = serializers.SerializerMethodField()
 
-       some_number = serializers.SerializerMethodField()
+          def get_some_number(self, obj) -> float:
+              return 1.0
 
-       def get_some_number(self, obj) -> float:
-           return 1.0
+   When return type hinting is not supported, the equivalent ``serializers.Field`` subclass can be used with
+   :func:`swagger_serializer_method <.swagger_serializer_method>`:
+
+   .. code-block:: python
+
+      class SomeSerializer(serializers.Serializer):
+          some_number = serializers.SerializerMethodField()
+
+          @swagger_serializer_method(serializer_or_field=serializers.FloatField)
+          def get_some_number(self, obj):
+              return 1.0
+
 
 ********************************
 Serializer ``Meta`` nested class

@@ -459,8 +459,8 @@ def get_basic_type_info_from_hint(hint_class):
 
 
 class SerializerMethodFieldInspector(FieldInspector):
-    """Provides conversion for SerializerMethodField, optionally using information from the swagger_method_field
-    decorator
+    """Provides conversion for SerializerMethodField, optionally using information from the swagger_serializer_method
+    decorator.
     """
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
