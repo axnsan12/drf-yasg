@@ -1598,10 +1598,26 @@ definitions:
     title: Hint example
     type: object
     properties:
-      hinted_number:
-        title: Hinted number
+      hinted_bool:
+        title: Hinted bool
+        description: the type hint on the method should determine this to be a bool
+        type: boolean
+        readOnly: true
+      hinted_int:
+        title: Hinted int
+        description: the type hint on the method should determine this to be an integer
+        type: integer
+        readOnly: true
+      hinted_float:
+        title: Hinted float
         description: the type hint on the method should determine this to be a number
         type: number
+        readOnly: true
+      hinted_decimal:
+        title: Hinted decimal
+        description: the type hint on the method should determine this to be a decimal
+        type: string
+        format: decimal
         readOnly: true
       hinted_datetime:
         title: Hinted datetime

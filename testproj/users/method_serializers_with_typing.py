@@ -1,4 +1,5 @@
 import datetime
+import decimal
 import typing
 import uuid
 
@@ -14,11 +15,29 @@ class MethodFieldExampleSerializer(serializers.Serializer):
     Implementation of SerializerMethodField using type hinting for Python >= 3.5
     """
 
-    hinted_number = serializers.SerializerMethodField(
+    hinted_bool = serializers.SerializerMethodField(
+        help_text="the type hint on the method should determine this to be a bool")
+
+    def get_hinted_bool(self, obj) -> bool:
+        return True
+
+    hinted_int = serializers.SerializerMethodField(
+        help_text="the type hint on the method should determine this to be an integer")
+
+    def get_hinted_int(self, obj) -> int:
+        return 1
+
+    hinted_float = serializers.SerializerMethodField(
         help_text="the type hint on the method should determine this to be a number")
 
-    def get_hinted_number(self, obj) -> float:
+    def get_hinted_float(self, obj) -> float:
         return 1.0
+
+    hinted_decimal = serializers.SerializerMethodField(
+        help_text="the type hint on the method should determine this to be a decimal")
+
+    def get_hinted_decimal(self, obj) -> decimal.Decimal:
+        return decimal.Decimal(1)
 
     hinted_datetime = serializers.SerializerMethodField(
         help_text="the type hint on the method should determine this to be a datetime")

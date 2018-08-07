@@ -1,4 +1,5 @@
 import datetime
+import decimal
 import uuid
 
 from rest_framework import serializers
@@ -18,12 +19,33 @@ class MethodFieldExampleSerializer(serializers.Serializer):
     a bit of a hack, but it provides a cross-check between hinting and decorator functionality.
     """
 
-    hinted_number = serializers.SerializerMethodField(
+    hinted_bool = serializers.SerializerMethodField(
+        help_text="the type hint on the method should determine this to be a bool")
+
+    @swagger_serializer_method(serializer_class=serializers.BooleanField)
+    def get_hinted_bool(self, obj):
+        return True
+
+    hinted_int = serializers.SerializerMethodField(
+        help_text="the type hint on the method should determine this to be an integer")
+
+    @swagger_serializer_method(serializer_class=serializers.IntegerField)
+    def get_hinted_int(self, obj):
+        return 1
+
+    hinted_float = serializers.SerializerMethodField(
         help_text="the type hint on the method should determine this to be a number")
 
     @swagger_serializer_method(serializer_class=serializers.FloatField)
-    def get_hinted_number(self, obj):
+    def get_hinted_float(self, obj):
         return 1.0
+
+    hinted_decimal = serializers.SerializerMethodField(
+        help_text="the type hint on the method should determine this to be a decimal")
+
+    @swagger_serializer_method(serializer_class=serializers.DecimalField)
+    def get_hinted_decimal(self, obj):
+        return decimal.Decimal(1)
 
     hinted_datetime = serializers.SerializerMethodField(
         help_text="the type hint on the method should determine this to be a datetime")
