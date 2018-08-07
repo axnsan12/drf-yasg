@@ -330,7 +330,8 @@ def get_produces(renderer_classes):
     :rtype: list[str]
     """
     media_types = [renderer.media_type for renderer in renderer_classes or []]
-    media_types = [encoding for encoding in media_types if not any(excluded in encoding for excluded in swagger_settings.EXCLUDED_MEDIA_TYPES)]
+    media_types = [encoding for encoding in media_types
+                   if not any(excluded in encoding for excluded in swagger_settings.EXCLUDED_MEDIA_TYPES)]
     return media_types
 
 
