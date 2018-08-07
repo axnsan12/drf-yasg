@@ -1,10 +1,10 @@
+import datetime
 import inspect
 import logging
 import operator
+import uuid
 from collections import OrderedDict
 from decimal import Decimal
-import datetime
-import uuid
 
 from django.core import validators
 from django.db import models
@@ -19,9 +19,8 @@ from .base import FieldInspector, NotHandled, SerializerInspector
 try:
     # Python>=3.5
     import typing
-    HAS_TYPING = True
 except ImportError:
-    HAS_TYPING = False
+    typing = None
 
 logger = logging.getLogger(__name__)
 
@@ -434,7 +433,6 @@ raw_type_info = [
     # TODO - support typing.List etc
 ]
 
-
 hinting_type_info = raw_type_info
 
 
@@ -447,8 +445,6 @@ def get_basic_type_info_from_hint(hint_class):
     :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
     :rtype: OrderedDict
     """
-
-    # based on get_basic_type_info, but without the model or field we have less to go on
 
     for check_class, type_format in hinting_type_info:
         if issubclass(hint_class, check_class):
@@ -473,53 +469,63 @@ def get_basic_type_info_from_hint(hint_class):
 
 
 class SerializerMethodFieldInspector(FieldInspector):
+    """Provides conversion for SerializerMethodField, optionally using information from the swagger_method_field
+    decorator
+    """
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+        if not isinstance(field, serializers.SerializerMethodField):
+            return NotHandled
 
-        if isinstance(field, serializers.SerializerMethodField):
-            method = getattr(field.parent, field.method_name)
+        method = getattr(field.parent, field.method_name)
+        if method is None:
+            return NotHandled
 
-            if hasattr(method, "_swagger_serializer"):
-                # attribute added by the swagger_serializer_method decorator
+        serializer = getattr(method, "_swagger_serializer", None)
 
-                if inspect.isclass(method._swagger_serializer):
-                    serializer_kwargs = {
-                        # copy attributes from the SerializerMethodField
-                        "help_text": field.help_text,
-                        "label": field.label,
-                        # SerializerMethodField is read_only by definition
-                        "read_only": True,
-                    }
+        if serializer:
+            # attribute added by the swagger_serializer_method decorator
+            serializer = getattr(method, '_swagger_serializer', None)
 
-                    serializer = method._swagger_serializer(**serializer_kwargs)
-                else:
-                    serializer = method._swagger_serializer
+            # in order of preference for description, use:
+            # 1) field.help_text from SerializerMethodField(help_text)
+            # 2) serializer.help_text from swagger_serializer_method(serializer)
+            # 3) method's docstring
+            description = field.help_text
+            if description is None:
+                description = getattr(serializer, 'help_text', None)
+            if description is None:
+                description = method.__doc__
 
-                    # in order of preference for help_text, use:
-                    # 1) field.help_text from SerializerMethodField(help_text)
-                    # 2) serializer.help_text from swagger_serializer_method(serializer)
-                    # 3) method's docstring
-                    if field.help_text is not None:
-                        serializer.help_text = field.help_text
-                    elif serializer.help_text is None:
-                        serializer.help_text = method.__doc__
+            label = field.label
+            if label is None:
+                label = getattr(serializer, 'label', None)
 
-                    if field.label is not None:
-                        serializer.label = field.label
+            if inspect.isclass(serializer):
+                serializer_kwargs = {
+                    "help_text": description,
+                    "label": label,
+                    "read_only": True,
+                }
 
-                return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
+                serializer = method._swagger_serializer(**serializer_kwargs)
+            else:
+                serializer.help_text = description
+                serializer.label = label
+                serializer.read_only = True
 
-            elif HAS_TYPING:
-                # look for Python 3.5+ style type hinting of the return value
-                hint_class = inspect.signature(method).return_annotation
+            return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
+        elif typing:
+            # look for Python 3.5+ style type hinting of the return value
+            hint_class = inspect.signature(method).return_annotation
 
-                if not issubclass(hint_class, inspect._empty):
-                    type_info = get_basic_type_info_from_hint(hint_class)
+            if not issubclass(hint_class, inspect._empty):
+                type_info = get_basic_type_info_from_hint(hint_class)
 
-                    if type_info is not None:
-                        SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references,
-                                                                                **kwargs)
-                        return SwaggerType(**type_info)
+                if type_info is not None:
+                    SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type,
+                                                                            use_references, **kwargs)
+                    return SwaggerType(**type_info)
 
         return NotHandled
 
@@ -646,6 +652,7 @@ else:
         """Hack to force ``djangorestframework_camel_case`` to camelize a plain string."""
         return next(iter(camelize({s: ''})))
 
+
     def camelize_schema(schema_or_ref, components):
         """Recursively camelize property names for the given schema using ``djangorestframework_camel_case``."""
         schema = openapi.resolve_ref(schema_or_ref, components)
@@ -659,6 +666,7 @@ else:
                 schema.required = [camelize_string(p) for p in schema.required]
 
         return schema_or_ref
+
 
     class CamelCaseJSONFilter(FieldInspector):
         """Converts property names to camelCase if ``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer`` are used."""
@@ -684,6 +692,7 @@ except ImportError:  # pragma: no cover
 else:
     class RecursiveFieldInspector(FieldInspector):
         """Provides conversion for RecursiveField (https://github.com/heywbj/django-rest-framework-recursive)"""
+
         def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
             if isinstance(field, RecursiveField) and swagger_object_type == openapi.Schema:
                 assert use_references is True, "Can not create schema for RecursiveField when use_references is False"

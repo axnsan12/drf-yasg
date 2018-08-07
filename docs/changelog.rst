@@ -2,20 +2,23 @@
 Changelog
 #########
 
-*********
-**1.9.x**
-*********
-
-*Release date: TODO, 2018*
-
-- **IMPROVED:** added support for SerializerMethodField, with ``swagger_serializer_method`` decorator for the
-  method field; with which you can provide a serializer class; and support for Python 3.5 style type hinting of the
-  method field return type (:issue:`137`)
-
 
 **********
+**1.10.0**
+**********
+
+*Release date: TBD, 2018*
+
+- **IMPROVED:** added support for ``SerializerMethodField``, via the ``swagger_serializer_method`` decorator for the
+  method field, and support for Python 3.5 style type hinting of the method field return type
+  (:issue:`137`, :pr:`175`, :pr:`179`)
+
+  *NOTE:* in order for this to work, you will have to add the new ``drf_yasg.inspectors.SerializerMethodFieldInspector``
+  to your ``DEFAULT_FIELD_INSPECTORS`` array if you changed it from the default value
+
+*********
 **1.9.2**
-**********
+*********
 
 *Release date: Aug 03, 2018*
 

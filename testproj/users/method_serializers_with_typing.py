@@ -1,6 +1,5 @@
 import datetime
 import decimal
-import typing
 import uuid
 
 from rest_framework import serializers
