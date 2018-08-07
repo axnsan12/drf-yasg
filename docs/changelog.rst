@@ -2,6 +2,16 @@
 Changelog
 #########
 
+*********
+**1.9.x**
+*********
+
+*Release date: TODO, 2018*
+
+- **IMPROVED:** added support for SerializerMethodField, with ``swagger_serializer_method`` decorator for the
+  method field; with which you can provide a serializer class; and support for Python 3.5 style type hinting of the
+  method field return type (:issue:`137`)
+
 
 **********
 **1.9.2**

@@ -1582,11 +1582,77 @@ definitions:
       todo:
         title: child
         todo: null
+  OtherStuff:
+    title: Other stuff
+    description: the decorator should determine the serializer class for this
+    required:
+      - foo
+    type: object
+    properties:
+      foo:
+        title: Foo
+        type: string
+        minLength: 1
+    readOnly: true
+  MethodFieldExample:
+    title: Hint example
+    type: object
+    properties:
+      hinted_bool:
+        title: Hinted bool
+        description: the type hint on the method should determine this to be a bool
+        type: boolean
+        readOnly: true
+      hinted_int:
+        title: Hinted int
+        description: the type hint on the method should determine this to be an integer
+        type: integer
+        readOnly: true
+      hinted_float:
+        title: Hinted float
+        description: the type hint on the method should determine this to be a number
+        type: number
+        readOnly: true
+      hinted_decimal:
+        title: Hinted decimal
+        description: the type hint on the method should determine this to be a decimal
+        type: string
+        format: decimal
+        readOnly: true
+      hinted_datetime:
+        title: Hinted datetime
+        description: the type hint on the method should determine this to be a datetime
+        type: string
+        format: date-time
+        readOnly: true
+      hinted_date:
+        title: Hinted date
+        description: the type hint on the method should determine this to be a date
+        type: string
+        format: date
+        readOnly: true
+      hinted_uuid:
+        title: Hinted uuid
+        description: the type hint on the method should determine this to be a uuid
+        type: string
+        format: uuid
+        readOnly: true
+      hinted_unknown:
+        title: Hinted unknown
+        description: type hint is unknown, so is expected to fallback to string
+        type: string
+        readOnly: true
+      non_hinted_number:
+        title: Non hinted number
+        description: No hint on the method, so this is expected to fallback to string
+        type: string
+        readOnly: true
   UserSerializerrr:
     required:
       - username
       - articles
       - snippets
+      - hint_example
     type: object
     properties:
       id:
@@ -1637,3 +1703,23 @@ definitions:
           pattern: ^[-a-zA-Z0-9_]+$
         readOnly: true
         uniqueItems: true
+      other_stuff:
+        $ref: '#/definitions/OtherStuff'
+      hint_example:
+        $ref: '#/definitions/MethodFieldExample'
+      help_text_example_1:
+        title: Help text example 1
+        description: help text on field is set, so this should appear in swagger
+        type: integer
+        readOnly: true
+      help_text_example_2:
+        title: Help text example 2
+        description: instance help_text is set, so should appear in swagger
+        type: integer
+        readOnly: true
+      help_text_example_3:
+        title: Help text example 3
+        description: "\n        docstring is set so should appear in swagger as fallback\n\
+          \        :return:\n        "
+        type: integer
+        readOnly: true

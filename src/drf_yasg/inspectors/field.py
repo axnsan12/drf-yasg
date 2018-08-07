@@ -1,7 +1,10 @@
+import inspect
 import logging
 import operator
 from collections import OrderedDict
 from decimal import Decimal
+import datetime
+import uuid
 
 from django.core import validators
 from django.db import models
@@ -12,6 +15,13 @@ from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import decimal_as_float, filter_none, get_serializer_ref_name
 from .base import FieldInspector, NotHandled, SerializerInspector
+
+try:
+    # Python>=3.5
+    import typing
+    HAS_TYPING = True
+except ImportError:
+    HAS_TYPING = False
 
 logger = logging.getLogger(__name__)
 
@@ -407,6 +417,111 @@ def get_basic_type_info(field):
     result.update(limits)
     result = filter_none(result)
     return result
+
+
+def decimal_return_type():
+    return openapi.TYPE_STRING if rest_framework_settings.COERCE_DECIMAL_TO_STRING else openapi.TYPE_NUMBER
+
+
+raw_type_info = [
+    (bool, (openapi.TYPE_BOOLEAN, None)),
+    (int, (openapi.TYPE_INTEGER, None)),
+    (float, (openapi.TYPE_NUMBER, None)),
+    (Decimal, (decimal_return_type, openapi.FORMAT_DECIMAL)),
+    (uuid.UUID, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
+    (datetime.datetime, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
+    (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
+    # TODO - support typing.List etc
+]
+
+
+hinting_type_info = raw_type_info
+
+
+def get_basic_type_info_from_hint(hint_class):
+    """Given a class (eg from a SerializerMethodField's return type hint,
+    return its basic type information - ``type``, ``format``, ``pattern``,
+    and any applicable min/max limit values.
+
+    :param hint_class: the class
+    :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
+    :rtype: OrderedDict
+    """
+
+    # based on get_basic_type_info, but without the model or field we have less to go on
+
+    for check_class, type_format in hinting_type_info:
+        if issubclass(hint_class, check_class):
+            swagger_type, format = type_format
+            if callable(swagger_type):
+                swagger_type = swagger_type()
+            # if callable(format):
+            #     format = format(klass)
+            break
+    else:  # pragma: no cover
+        return None
+
+    pattern = None
+
+    result = OrderedDict([
+        ('type', swagger_type),
+        ('format', format),
+        ('pattern', pattern)
+    ])
+
+    return result
+
+
+class SerializerMethodFieldInspector(FieldInspector):
+
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+
+        if isinstance(field, serializers.SerializerMethodField):
+            method = getattr(field.parent, field.method_name)
+
+            if hasattr(method, "_swagger_serializer"):
+                # attribute added by the swagger_serializer_method decorator
+
+                if inspect.isclass(method._swagger_serializer):
+                    serializer_kwargs = {
+                        # copy attributes from the SerializerMethodField
+                        "help_text": field.help_text,
+                        "label": field.label,
+                        # SerializerMethodField is read_only by definition
+                        "read_only": True,
+                    }
+
+                    serializer = method._swagger_serializer(**serializer_kwargs)
+                else:
+                    serializer = method._swagger_serializer
+
+                    # in order of preference for help_text, use:
+                    # 1) field.help_text from SerializerMethodField(help_text)
+                    # 2) serializer.help_text from swagger_serializer_method(serializer)
+                    # 3) method's docstring
+                    if field.help_text is not None:
+                        serializer.help_text = field.help_text
+                    elif serializer.help_text is None:
+                        serializer.help_text = method.__doc__
+
+                    if field.label is not None:
+                        serializer.label = field.label
+
+                return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
+
+            elif HAS_TYPING:
+                # look for Python 3.5+ style type hinting of the return value
+                hint_class = inspect.signature(method).return_annotation
+
+                if not issubclass(hint_class, inspect._empty):
+                    type_info = get_basic_type_info_from_hint(hint_class)
+
+                    if type_info is not None:
+                        SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references,
+                                                                                **kwargs)
+                        return SwaggerType(**type_info)
+
+        return NotHandled
 
 
 class SimpleFieldInspector(FieldInspector):
