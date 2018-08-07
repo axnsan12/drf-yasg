@@ -36,7 +36,7 @@ except Exception:
     import time
     timestamp_ms = int(time.time() * 1000)
     timestamp_str = hex(timestamp_ms)[2:].zfill(16)
-    version_kwargs = {'version': '0.0.0.dummy+' + timestamp_str}
+    version_kwargs = {'version': '0.0.0rc0+dummy.' + timestamp_str}
 
 setup(
     name='drf-yasg',
