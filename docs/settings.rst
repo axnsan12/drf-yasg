@@ -105,6 +105,14 @@ Paginator inspectors given to :func:`@swagger_auto_schema <.swagger_auto_schema>
 Swagger document attributes
 ===========================
 
+EXCLUDED_MEDIA_TYPES
+--------------------
+
+A list of keywords for excluding MIME types from ``Operation.produces``. Any MIME type string which includes one of
+the substrings in this list will be prevented from appearing in a ``produces`` array in the Swagger document.
+
+**Default**: :python:`['html']`
+
 .. _default-swagger-settings:
 
 DEFAULT_INFO

@@ -26,6 +26,8 @@ SWAGGER_DEFAULTS = {
         'drf_yasg.inspectors.CoreAPICompatInspector',
     ],
 
+    'EXCLUDED_MEDIA_TYPES': ['html'],
+
     'DEFAULT_INFO': None,
     'DEFAULT_API_URL': None,
 
