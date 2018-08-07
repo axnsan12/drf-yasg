@@ -8,6 +8,7 @@ from rest_framework import serializers, status
 from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.request import is_form_media_type
 from rest_framework.settings import api_settings as rest_framework_settings
+from rest_framework.utils import encoders, json
 from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
@@ -354,3 +355,38 @@ def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
             s = '' + s
 
     return s
+
+
+def get_field_default(field):
+    """
+    Get the default value for a field, converted to a JSON-compatible value while properly handling callables.
+
+    :param field: field instance
+    :return: default value
+    """
+    default = getattr(field, 'default', serializers.empty)
+    if default is not serializers.empty:
+        if callable(default):
+            try:
+                if hasattr(default, 'set_context'):
+                    default.set_context(field)
+                default = default()
+            except Exception:  # pragma: no cover
+                logger.warning("default for %s is callable but it raised an exception when "
+                               "called; 'default' will not be set on schema", field, exc_info=True)
+                default = serializers.empty
+
+        if default is not serializers.empty:
+            try:
+                default = field.to_representation(default)
+                # JSON roundtrip ensures that the value is valid JSON;
+                # for example, sets and tuples get transformed into lists
+                default = json.loads(json.dumps(default, cls=encoders.JSONEncoder))
+                if decimal_as_float(field):
+                    default = float(default)
+            except Exception:  # pragma: no cover
+                logger.warning("'default' on schema for %s will not be set because "
+                               "to_representation raised an exception", field, exc_info=True)
+                default = serializers.empty
+
+    return default

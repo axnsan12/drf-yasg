@@ -5,7 +5,7 @@ from drf_yasg.utils import swagger_serializer_method
 from snippets.models import Snippet
 
 try:
-    import typing
+    import typing  # noqa: F401
     from .method_serializers_with_typing import MethodFieldExampleSerializer
 except ImportError:
     from .method_serializers_without_typing import MethodFieldExampleSerializer

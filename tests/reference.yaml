@@ -947,6 +947,12 @@ definitions:
         description: id serializer help text
         type: integer
         readOnly: true
+      created:
+        title: Client date time suu
+        type: string
+        format: integer
+        readOnly: true
+        description: Date time in unix timestamp format
       owner:
         title: Owner
         description: The ID of the user that created this snippet; if none is provided,

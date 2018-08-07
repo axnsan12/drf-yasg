@@ -31,19 +31,6 @@ class InlineSerializerInspector(SerializerInspector):
     #: whether to output :class:`.Schema` definitions inline or into the ``definitions`` section
     use_definitions = False
 
-    def add_manual_fields(self, serializer, schema):
-        """Set fields from the ``swagger_schem_fields`` attribute on the serializer's Meta class. This method is called
-        only for serializers that are converted into ``openapi.Schema`` objects.
-
-        :param serializer: serializer instance
-        :param openapi.Schema schema: the schema object to be modified in-place
-        """
-        serializer_meta = getattr(serializer, 'Meta', None)
-        swagger_schema_fields = getattr(serializer_meta, 'swagger_schema_fields', {})
-        if swagger_schema_fields:
-            for attr, val in swagger_schema_fields.items():
-                setattr(schema, attr, val)
-
     def get_schema(self, serializer):
         return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
 
@@ -124,9 +111,6 @@ class InlineSerializerInspector(SerializerInspector):
                     # it is better to just remove title from inline models
                     del result.title
 
-                # Provide an option to add manual paremeters to a schema
-                # for example, to add examples
-                self.add_manual_fields(field, result)
                 return result
 
             if not ref_name or not use_references:
@@ -696,9 +680,9 @@ else:
                 assert use_references is True, "Can not create schema for RecursiveField when use_references is False"
 
                 ref_name = get_serializer_ref_name(field.proxied)
-                assert ref_name is not None, "Can not create RecursiveField schema for inline ModelSerializer"
+                assert ref_name is not None, "Can't create RecursiveField schema for inline " + str(type(field.proxied))
 
-                return openapi.SchemaRef(self.components.with_scope(openapi.SCHEMA_DEFINITIONS), ref_name,
-                                         ignore_unresolved=True)
+                definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
+                return openapi.SchemaRef(definitions, ref_name, ignore_unresolved=True)
 
             return NotHandled

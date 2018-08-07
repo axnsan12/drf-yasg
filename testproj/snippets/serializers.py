@@ -23,12 +23,34 @@ class ExampleProjectSerializer(serializers.Serializer):
         ref_name = 'Project'
 
 
+class UnixTimestampField(serializers.DateTimeField):
+    def to_representation(self, value):
+        """ Return epoch time for a datetime object or ``None``"""
+        from django.utils.dateformat import format
+        try:
+            return int(format(value, 'U'))
+        except (AttributeError, TypeError):
+            return None
+
+    def to_internal_value(self, value):
+        import datetime
+        return datetime.datetime.fromtimestamp(int(value))
+
+    class Meta:
+        swagger_schema_fields = {
+            'format': 'integer',
+            'title': 'Client date time suu',
+            'description': 'Date time in unix timestamp format',
+        }
+
+
 class SnippetSerializer(serializers.Serializer):
     """SnippetSerializer classdoc
 
     create: docstring for create from serializer classdoc
     """
     id = serializers.IntegerField(read_only=True, help_text="id serializer help text")
+    created = UnixTimestampField(read_only=True)
     owner = serializers.PrimaryKeyRelatedField(
         queryset=get_user_model().objects.all(),
         default=serializers.CurrentUserDefault(),

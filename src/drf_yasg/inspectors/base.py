@@ -2,10 +2,9 @@ import inspect
 import logging
 
 from rest_framework import serializers
-from rest_framework.utils import encoders, json
 
 from .. import openapi
-from ..utils import decimal_as_float, force_real_str, is_list_view
+from ..utils import force_real_str, get_field_default, is_list_view
 
 #: Sentinel value that inspectors must return to signal that they do not know how to handle an object
 NotHandled = object()
@@ -135,6 +134,19 @@ class FieldInspector(BaseInspector):
         super(FieldInspector, self).__init__(view, path, method, components, request)
         self.field_inspectors = field_inspectors
 
+    def add_manual_fields(self, serializer_or_field, schema):
+        """Set fields from the ``swagger_schem_fields`` attribute on the Meta class. This method is called
+        only for serializers or fields that are converted into ``openapi.Schema`` objects.
+
+        :param serializer_or_field: serializer or field instance
+        :param openapi.Schema schema: the schema object to be modified in-place
+        """
+        meta = getattr(serializer_or_field, 'Meta', None)
+        swagger_schema_fields = getattr(meta, 'swagger_schema_fields', {})
+        if swagger_schema_fields:
+            for attr, val in swagger_schema_fields.items():
+                setattr(schema, attr, val)
+
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         """Convert a drf Serializer or Field instance into a Swagger object.
 
@@ -205,46 +217,29 @@ class FieldInspector(BaseInspector):
                 instance_kwargs['required'] = field.required
 
             if 'default' not in instance_kwargs and swagger_object_type != openapi.Items:
-                default = getattr(field, 'default', serializers.empty)
-                if default is not serializers.empty:
-                    if callable(default):
-                        try:
-                            if hasattr(default, 'set_context'):
-                                default.set_context(field)
-                            default = default()
-                        except Exception:  # pragma: no cover
-                            logger.warning("default for %s is callable but it raised an exception when "
-                                           "called; 'default' field will not be added to schema", field, exc_info=True)
-                            default = None
-
-                    if default is not None:
-                        try:
-                            default = field.to_representation(default)
-                            # JSON roundtrip ensures that the value is valid JSON;
-                            # for example, sets and tuples get transformed into lists
-                            default = json.loads(json.dumps(default, cls=encoders.JSONEncoder))
-                            if decimal_as_float(field):
-                                default = float(default)
-                        except Exception:  # pragma: no cover
-                            logger.warning("'default' on schema for %s will not be set because "
-                                           "to_representation raised an exception", field, exc_info=True)
-                            default = None
-
-                    if default is not None:
-                        instance_kwargs['default'] = default
+                default = get_field_default(field)
+                if default not in (None, serializers.empty):
+                    instance_kwargs['default'] = default
 
             if instance_kwargs.get('type', None) != openapi.TYPE_ARRAY:
                 instance_kwargs.setdefault('title', title)
-            instance_kwargs.setdefault('description', description)
+            if description is not None:
+                instance_kwargs.setdefault('description', description)
             instance_kwargs.update(kwargs)
 
             if existing_object is not None:
                 assert isinstance(existing_object, swagger_object_type)
-                for attr, val in sorted(instance_kwargs.items()):
-                    setattr(existing_object, attr, val)
-                return existing_object
+                for key, val in sorted(instance_kwargs.items()):
+                    setattr(existing_object, key, val)
+                result = existing_object
+            else:
+                result = swagger_object_type(**instance_kwargs)
 
-            return swagger_object_type(**instance_kwargs)
+            # Provide an option to add manual paremeters to a schema
+            # for example, to add examples
+            if swagger_object_type == openapi.Schema:
+                self.add_manual_fields(field, result)
+            return result
 
         # arrays in Schema have Schema elements, arrays in Parameter and Items have Items elements
         child_swagger_type = openapi.Schema if swagger_object_type == openapi.Schema else openapi.Items
