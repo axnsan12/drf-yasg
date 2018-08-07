@@ -28,7 +28,7 @@ jobs:
       python: '3.5'
       env: TOXENV=docs
     -
-      python: '2.7'
+      python: '3.6'
       env: TOXENV=lint
 
     - stage: publish
