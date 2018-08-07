@@ -37,10 +37,45 @@ class UserSerializerrr(serializers.ModelSerializer):
         """
         return OtherStuffSerializer().data
 
+    help_text_example_1 = serializers.SerializerMethodField(
+        help_text="help text on field is set, so this should appear in swagger"
+    )
+
+    @swagger_serializer_method(serializer=serializers.IntegerField(
+        help_text="decorated instance help_text shouldn't appear in swagger because field has priority"))
+    def get_help_text_example_1(self):
+        """
+        method docstring shouldn't appear in swagger because field has priority
+        :return:
+        """
+        return 1
+
+    help_text_example_2 = serializers.SerializerMethodField()
+
+    @swagger_serializer_method(serializer=serializers.IntegerField(
+        help_text="instance help_text is set, so should appear in swagger"))
+    def get_help_text_example_2(self):
+        """
+        method docstring shouldn't appear in swagger because decorator has priority
+        :return:
+        """
+        return 1
+
+    help_text_example_3 = serializers.SerializerMethodField()
+
+    @swagger_serializer_method(serializer=serializers.IntegerField())
+    def get_help_text_example_3(self):
+        """
+        docstring is set so should appear in swagger as fallback
+        :return:
+        """
+        return 1
+
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'articles', 'snippets',
-                  'last_connected_ip', 'last_connected_at', 'article_slugs', 'other_stuff', 'hint_example')
+                  'last_connected_ip', 'last_connected_at', 'article_slugs', 'other_stuff', 'hint_example',
+                  'help_text_example_1', 'help_text_example_2', 'help_text_example_3')
 
 
 class UserListQuerySerializer(serializers.Serializer):

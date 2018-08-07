@@ -495,10 +495,16 @@ class SerializerMethodFieldInspector(FieldInspector):
                 else:
                     serializer = method._swagger_serializer
 
-                    if serializer.help_text is None:
+                    # in order of preference for help_text, use:
+                    # 1) field.help_text from SerializerMethodField(help_text)
+                    # 2) serializer.help_text from swagger_serializer_method(serializer)
+                    # 3) method's docstring
+                    if field.help_text is not None:
                         serializer.help_text = field.help_text
+                    elif serializer.help_text is None:
+                        serializer.help_text = method.__doc__
 
-                    if serializer.label is None:
+                    if field.label is not None:
                         serializer.label = field.label
 
                 return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
