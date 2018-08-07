@@ -1,5 +1,8 @@
+import datetime
+import inspect
 import logging
 import operator
+import uuid
 from collections import OrderedDict
 from decimal import Decimal
 
@@ -12,6 +15,12 @@ from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import decimal_as_float, filter_none, get_serializer_ref_name
 from .base import FieldInspector, NotHandled, SerializerInspector
+
+try:
+    # Python>=3.5
+    import typing
+except ImportError:
+    typing = None
 
 logger = logging.getLogger(__name__)
 
@@ -409,6 +418,118 @@ def get_basic_type_info(field):
     return result
 
 
+def decimal_return_type():
+    return openapi.TYPE_STRING if rest_framework_settings.COERCE_DECIMAL_TO_STRING else openapi.TYPE_NUMBER
+
+
+raw_type_info = [
+    (bool, (openapi.TYPE_BOOLEAN, None)),
+    (int, (openapi.TYPE_INTEGER, None)),
+    (float, (openapi.TYPE_NUMBER, None)),
+    (Decimal, (decimal_return_type, openapi.FORMAT_DECIMAL)),
+    (uuid.UUID, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
+    (datetime.datetime, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
+    (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
+    # TODO - support typing.List etc
+]
+
+hinting_type_info = raw_type_info
+
+
+def get_basic_type_info_from_hint(hint_class):
+    """Given a class (eg from a SerializerMethodField's return type hint,
+    return its basic type information - ``type``, ``format``, ``pattern``,
+    and any applicable min/max limit values.
+
+    :param hint_class: the class
+    :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
+    :rtype: OrderedDict
+    """
+
+    for check_class, type_format in hinting_type_info:
+        if issubclass(hint_class, check_class):
+            swagger_type, format = type_format
+            if callable(swagger_type):
+                swagger_type = swagger_type()
+            # if callable(format):
+            #     format = format(klass)
+            break
+    else:  # pragma: no cover
+        return None
+
+    pattern = None
+
+    result = OrderedDict([
+        ('type', swagger_type),
+        ('format', format),
+        ('pattern', pattern)
+    ])
+
+    return result
+
+
+class SerializerMethodFieldInspector(FieldInspector):
+    """Provides conversion for SerializerMethodField, optionally using information from the swagger_method_field
+    decorator
+    """
+
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+        if not isinstance(field, serializers.SerializerMethodField):
+            return NotHandled
+
+        method = getattr(field.parent, field.method_name)
+        if method is None:
+            return NotHandled
+
+        serializer = getattr(method, "_swagger_serializer", None)
+
+        if serializer:
+            # attribute added by the swagger_serializer_method decorator
+            serializer = getattr(method, '_swagger_serializer', None)
+
+            # in order of preference for description, use:
+            # 1) field.help_text from SerializerMethodField(help_text)
+            # 2) serializer.help_text from swagger_serializer_method(serializer)
+            # 3) method's docstring
+            description = field.help_text
+            if description is None:
+                description = getattr(serializer, 'help_text', None)
+            if description is None:
+                description = method.__doc__
+
+            label = field.label
+            if label is None:
+                label = getattr(serializer, 'label', None)
+
+            if inspect.isclass(serializer):
+                serializer_kwargs = {
+                    "help_text": description,
+                    "label": label,
+                    "read_only": True,
+                }
+
+                serializer = method._swagger_serializer(**serializer_kwargs)
+            else:
+                serializer.help_text = description
+                serializer.label = label
+                serializer.read_only = True
+
+            return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
+        elif typing:
+            # look for Python 3.5+ style type hinting of the return value
+            hint_class = inspect.signature(method).return_annotation
+
+            if not issubclass(hint_class, inspect._empty):
+                type_info = get_basic_type_info_from_hint(hint_class)
+
+                if type_info is not None:
+                    SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type,
+                                                                            use_references, **kwargs)
+                    return SwaggerType(**type_info)
+
+        return NotHandled
+
+
 class SimpleFieldInspector(FieldInspector):
     """Provides conversions for fields which can be described using just ``type``, ``format``, ``pattern``
     and min/max validators.
@@ -531,6 +652,7 @@ else:
         """Hack to force ``djangorestframework_camel_case`` to camelize a plain string."""
         return next(iter(camelize({s: ''})))
 
+
     def camelize_schema(schema_or_ref, components):
         """Recursively camelize property names for the given schema using ``djangorestframework_camel_case``."""
         schema = openapi.resolve_ref(schema_or_ref, components)
@@ -544,6 +666,7 @@ else:
                 schema.required = [camelize_string(p) for p in schema.required]
 
         return schema_or_ref
+
 
     class CamelCaseJSONFilter(FieldInspector):
         """Converts property names to camelCase if ``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer`` are used."""
@@ -569,6 +692,7 @@ except ImportError:  # pragma: no cover
 else:
     class RecursiveFieldInspector(FieldInspector):
         """Provides conversion for RecursiveField (https://github.com/heywbj/django-rest-framework-recursive)"""
+
         def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
             if isinstance(field, RecursiveField) and swagger_object_type == openapi.Schema:
                 assert use_references is True, "Can not create schema for RecursiveField when use_references is False"

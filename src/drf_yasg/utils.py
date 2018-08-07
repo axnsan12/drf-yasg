@@ -170,6 +170,23 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
     return decorator
 
 
+def swagger_serializer_method(serializer):
+    """
+    Decorates the method of a serializers.SerializerMethodField
+    to hint as to how Swagger should be generated for this field.
+
+    :param serializer: serializer class or instance
+    :return:
+    """
+
+    def decorator(serializer_method):
+        # stash the serializer for SerializerMethodFieldInspector to find
+        serializer_method._swagger_serializer = serializer
+        return serializer_method
+
+    return decorator
+
+
 def is_list_view(path, method, view):
     """Check if the given path/method appears to represent a list view (as opposed to a detail/instance view).
 
