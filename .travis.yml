@@ -1,24 +1,30 @@
 language: python
-cache: pip
-
+sudo: false
 python:
- - '3.4'
- - '3.5'
- - '3.6'
+  - '2.7'
+  - '3.4'
+  - '3.5'
+  - '3.6'
 
-env:
- - DRF=3.7
- - DRF=3.8
+cache:
+  directories:
+  - $HOME/.cache/pip
+  - .tox
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
+  - rm -fr .tox/log/ .tox/*/log/ .tox/*/tmp/ .tox/dist .tox/*/lib/*/site-packages/drf_yasg*
 
 jobs:
   include:
-    - stage: test
-      python: '2.7'
-      env: DRF=3.7
+    - # workaround for python 3.7 on travis https://github.com/travis-ci/travis-ci/issues/9815#issuecomment-401756442
+      stage: test
+      python: '3.7'
+      dist: xenial
+      sudo: required
     -
       python: '3.6'
-      env: DRF=master
-    -
+      env: TOXENV=djmaster
+    - # readthedocs uses python 3.5 for building
       python: '3.5'
       env: TOXENV=docs
     -
@@ -40,29 +46,26 @@ jobs:
 
   allow_failures:
     - env: TOXENV=lint
-    - env: DRF=master
+    - env: TOXENV=djmaster
 
   fast_finish: true
 
 install:
- - pip install -r requirements/ci.txt
+ - python -m pip install -U pip
+ - pip install -U -r requirements/ci.txt
 
 before_script:
  - coverage erase
- - |
-  [[ -z "$TOXENV" && -z "$PYPI_DEPLOY" ]] && REPORT_COVERAGE="yes" || REPORT_COVERAGE="no";
-  echo "Reporting coverage: ${REPORT_COVERAGE}"
- - |
-  [[ -z "$TOXENV" && ! -z "$DRF" && "$DRF" != "master" ]] && USE_DETOX="yes" || USE_DETOX="no";
-  echo "Using detox: ${USE_DETOX}"
 
 script:
- - 'if [[ "$USE_DETOX" == "yes" ]]; then detox; else tox; fi'
+ - tox
 
 after_success:
- - coverage combine
- - 'if [[ "$REPORT_COVERAGE" == "yes" ]]; then coverage report; fi'
- - 'if [[ "$REPORT_COVERAGE" == "yes" ]]; then codecov; fi'
+  - |
+    if [[ -z "$TOXENV" && -z "$PYPI_DEPLOY" ]]; then
+      chmod +x coverage.sh
+      ./coverage.sh
+    fi
 
 branches:
   only:

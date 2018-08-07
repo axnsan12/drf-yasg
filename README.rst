@@ -11,9 +11,9 @@ Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framewor
 
 Compatible with
 
-- **Django Rest Framework**: 3.7.7, 3.8.x
-- **Django**: 1.11.x, 2.0.x
-- **Python**: 2.7, 3.4, 3.5, 3.6
+- **Django Rest Framework**: 3.7.7, 3.8
+- **Django**: 1.11, 2.0, 2.1
+- **Python**: 2.7, 3.4, 3.5, 3.6, 3.7
 
 Resources:
 
@@ -85,14 +85,14 @@ The preferred instalation method is directly from pypi:
 
 .. code:: console
 
-   pip install drf-yasg
+   pip install -U drf-yasg
 
 Additionally, if you want to use the built-in validation mechanisms (see `4. Validation`_), you need to install
 some extra requirements:
 
 .. code:: console
 
-   pip install drf-yasg[validation]
+   pip install -U drf-yasg[validation]
 
 .. _readme-quickstart:
 
@@ -294,7 +294,7 @@ For additional usage examples, you can take a look at the test project in the ``
    $ virtualenv venv
    $ source venv/bin/activate
    (venv) $ cd testproj
-   (venv) $ pip install -r requirements.txt
+   (venv) $ pip install -U -r requirements.txt
    (venv) $ python manage.py migrate
    (venv) $ python manage.py shell -c "import createsuperuser"
    (venv) $ python manage.py runserver
@@ -315,8 +315,8 @@ From here on, the terms “OpenAPI” and “Swagger” are used interchangeably
 Swagger in Django Rest Framework
 ================================
 
-Since Django Rest 3.7, there is now `built in support <http://www.django-rest-framework.org/api-guide/schemas/>`__ for
-automatic OpenAPI 2.0 schema generation. However, this generation is based on the `coreapi <http://www.coreapi.org/>`__
+Since Django Rest Framework 3.7, there is now `built in support <http://www.django-rest-framework.org/api-guide/schemas/>`__
+for automatic OpenAPI 2.0 schema generation. However, this generation is based on the `coreapi <http://www.coreapi.org/>`__
 standard, which for the moment is vastly inferior to OpenAPI in both features and tooling support. In particular,
 the OpenAPI codec/compatibility layer provided has a few major problems:
 
@@ -329,18 +329,15 @@ In short this makes the generated schema unusable for code generation, and medio
 Other libraries
 ===============
 
-There are currently two decent Swagger schema generators that I could
-find for django-rest-framework:
+There are currently two decent Swagger schema generators that I could find for django-rest-framework:
 
 * `django-rest-swagger <https://github.com/marcgibbons/django-rest-swagger>`__
 * `drf-openapi <https://github.com/limdauto/drf_openapi>`__
 
-Out of the two, ``django-rest-swagger`` is just a wrapper around DRF 3.7 schema generation with an added UI, and
-thus presents the same problems. ``drf-openapi`` is a bit more involved and implements some custom handling for response
-schemas, but ultimately still falls short in code generation because the responses are plain of lacking support for
-named schemas.
-
-Both projects are also currently unmantained.
+``django-rest-swagger`` is just a wrapper around DRF 3.7 schema generation with an added UI, and
+thus presents the same problems, while also being unmaintained. ``drf-openapi`` was
+`discontinued by the author <https://github.com/limdauto/drf_openapi/commit/1673c6e039eec7f089336a83bdc31613f32f7e21>`_
+on April 3rd, 2018.
 
 ************************
 Third-party integrations
