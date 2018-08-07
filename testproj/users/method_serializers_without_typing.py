@@ -22,49 +22,50 @@ class MethodFieldExampleSerializer(serializers.Serializer):
     hinted_bool = serializers.SerializerMethodField(
         help_text="the type hint on the method should determine this to be a bool")
 
-    @swagger_serializer_method(serializer_class=serializers.BooleanField)
+    @swagger_serializer_method(serializer=serializers.BooleanField)
     def get_hinted_bool(self, obj):
         return True
 
     hinted_int = serializers.SerializerMethodField(
         help_text="the type hint on the method should determine this to be an integer")
 
-    @swagger_serializer_method(serializer_class=serializers.IntegerField)
+    @swagger_serializer_method(serializer=serializers.IntegerField)
     def get_hinted_int(self, obj):
         return 1
 
     hinted_float = serializers.SerializerMethodField(
         help_text="the type hint on the method should determine this to be a number")
 
-    @swagger_serializer_method(serializer_class=serializers.FloatField)
+    @swagger_serializer_method(serializer=serializers.FloatField)
     def get_hinted_float(self, obj):
         return 1.0
 
     hinted_decimal = serializers.SerializerMethodField(
         help_text="the type hint on the method should determine this to be a decimal")
 
-    @swagger_serializer_method(serializer_class=serializers.DecimalField)
+    # note that in this case an instance is required since DecimalField has required arguments
+    @swagger_serializer_method(serializer=serializers.DecimalField(max_digits=6, decimal_places=4))
     def get_hinted_decimal(self, obj):
         return decimal.Decimal(1)
 
     hinted_datetime = serializers.SerializerMethodField(
         help_text="the type hint on the method should determine this to be a datetime")
 
-    @swagger_serializer_method(serializer_class=serializers.DateTimeField)
+    @swagger_serializer_method(serializer=serializers.DateTimeField)
     def get_hinted_datetime(self, obj):
         return datetime.datetime.now()
 
     hinted_date = serializers.SerializerMethodField(
         help_text="the type hint on the method should determine this to be a date")
 
-    @swagger_serializer_method(serializer_class=serializers.DateField)
+    @swagger_serializer_method(serializer=serializers.DateField)
     def get_hinted_date(self, obj):
         return datetime.date.today()
 
     hinted_uuid = serializers.SerializerMethodField(
         help_text="the type hint on the method should determine this to be a uuid")
 
-    @swagger_serializer_method(serializer_class=serializers.UUIDField)
+    @swagger_serializer_method(serializer=serializers.UUIDField)
     def get_hinted_uuid(self, obj):
         return uuid.uuid4()
 

@@ -161,7 +161,7 @@ Support for SerializerMethodField
 
 Schema generation of ``serializers.SerializerMethodField`` supported in two ways:
 
-1) The decorator ``swagger_serializer_method(serializer_class)`` for the use case where the serializer method
+1) The decorator ``swagger_serializer_method(serializer)`` for the use case where the serializer method
    is using a serializer.  e.g.:
 
 
@@ -178,9 +178,12 @@ Schema generation of ``serializers.SerializerMethodField`` supported in two ways
 
        other_stuff = serializers.SerializerMethodField()
 
-       @swagger_serializer_method(serializer_class=OtherStuffSerializer)
+       @swagger_serializer_method(serializer=OtherStuffSerializer)
        def get_other_stuff(self, obj):
            return OtherStuffSerializer().data
+
+
+Note that the serializer parameter can be either be a serializer class or instance
 
 
 2) For simple cases where the method is returning one of the supported types,

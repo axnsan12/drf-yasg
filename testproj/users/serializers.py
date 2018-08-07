@@ -26,7 +26,7 @@ class UserSerializerrr(serializers.ModelSerializer):
 
     hint_example = MethodFieldExampleSerializer()
 
-    @swagger_serializer_method(serializer_class=OtherStuffSerializer)
+    @swagger_serializer_method(serializer=OtherStuffSerializer)
     def get_other_stuff(self, obj):
         """
         method_field that uses a serializer internally.

@@ -479,21 +479,31 @@ class SerializerMethodFieldInspector(FieldInspector):
         if isinstance(field, serializers.SerializerMethodField):
             method = getattr(field.parent, field.method_name)
 
-            if hasattr(method, "_swagger_serializer_class"):
+            if hasattr(method, "_swagger_serializer"):
                 # attribute added by the swagger_serializer_method decorator
 
-                serializer_kwargs = {
-                    # copy attributes from the SerializerMethodField
-                    "help_text": field.help_text,
-                    "label": field.label,
-                    # SerializerMethodField is read_only by definition
-                    "read_only": True,
-                }
-                serializer = method._swagger_serializer_class(**serializer_kwargs)
+                if inspect.isclass(method._swagger_serializer):
+                    serializer_kwargs = {
+                        # copy attributes from the SerializerMethodField
+                        "help_text": field.help_text,
+                        "label": field.label,
+                        # SerializerMethodField is read_only by definition
+                        "read_only": True,
+                    }
+
+                    serializer = method._swagger_serializer(**serializer_kwargs)
+                else:
+                    serializer = method._swagger_serializer
+
+                    if serializer.help_text is None:
+                        serializer.help_text = field.help_text
+
+                    if serializer.label is None:
+                        serializer.label = field.label
 
                 return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
 
-            if HAS_TYPING:
+            elif HAS_TYPING:
                 # look for Python 3.5+ style type hinting of the return value
                 hint_class = inspect.signature(method).return_annotation
 
