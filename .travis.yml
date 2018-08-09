@@ -6,13 +6,7 @@ python:
   - '3.5'
   - '3.6'
 
-cache:
-  directories:
-  - $HOME/.cache/pip
-  - .tox
-before_cache:
-  - rm -f $HOME/.cache/pip/log/debug.log
-  - rm -fr .tox/log/ .tox/*/log/ .tox/*/tmp/ .tox/dist .tox/*/lib/*/site-packages/drf_yasg*
+cache: pip
 
 jobs:
   include:
