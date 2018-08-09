@@ -135,10 +135,11 @@ class SwaggerUIRenderer(_UIRenderer):
             'supportedSubmitMethods': swagger_settings.SUPPORTED_SUBMIT_METHODS,
         }
 
+        data = filter_none(data)
         if swagger_settings.VALIDATOR_URL != '':
             data['validatorUrl'] = self.resolve_url(swagger_settings.VALIDATOR_URL)
 
-        return filter_none(data)
+        return data
 
 
 class ReDocRenderer(_UIRenderer):
