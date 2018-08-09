@@ -1,5 +1,4 @@
 # requirements for building and running tox
 tox>=3.1.2
-tox-battery>=0.5
 
 -r setup.txt
