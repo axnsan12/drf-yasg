@@ -139,3 +139,6 @@ class ReDocRenderer(_UIRenderer):
     """
     template = 'drf-yasg/redoc.html'
     format = 'redoc'
+class ReDocOldRenderer(ReDocRenderer):
+    """Renders a ReDoc 1.x.x web interface for schema browisng."""
+    template = 'drf-yasg/redoc-old.html'
