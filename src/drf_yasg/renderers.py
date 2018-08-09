@@ -4,11 +4,10 @@ from django.shortcuts import render, resolve_url
 from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer
 from rest_framework.utils import json
 
-from drf_yasg.openapi import Swagger
-from drf_yasg.utils import filter_none
-
 from .app_settings import redoc_settings, swagger_settings
 from .codecs import VALIDATORS, OpenAPICodecJson, OpenAPICodecYaml
+from .openapi import Swagger
+from .utils import filter_none
 
 
 class _SpecRenderer(BaseRenderer):
@@ -135,11 +134,11 @@ class SwaggerUIRenderer(_UIRenderer):
             'oauth2RedirectUrl': swagger_settings.OAUTH2_REDIRECT_URL,
             'supportedSubmitMethods': swagger_settings.SUPPORTED_SUBMIT_METHODS,
         }
-        data = filter_none(data)
+
         if swagger_settings.VALIDATOR_URL != '':
             data['validatorUrl'] = self.resolve_url(swagger_settings.VALIDATOR_URL)
 
-        return data
+        return filter_none(data)
 
 
 class ReDocRenderer(_UIRenderer):
@@ -159,9 +158,8 @@ class ReDocRenderer(_UIRenderer):
             'expandResponses': redoc_settings.EXPAND_RESPONSES,
             'pathInMiddle': redoc_settings.PATH_IN_MIDDLE,
         }
-        data = filter_none(data)
 
-        return data
+        return filter_none(data)
 
 
 class ReDocOldRenderer(ReDocRenderer):

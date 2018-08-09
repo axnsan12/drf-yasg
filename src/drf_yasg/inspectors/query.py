@@ -3,9 +3,8 @@ from collections import OrderedDict
 import coreschema
 from rest_framework.pagination import CursorPagination, LimitOffsetPagination, PageNumberPagination
 
-from drf_yasg.utils import force_real_str
-
 from .. import openapi
+from ..utils import force_real_str
 from .base import FilterInspector, PaginatorInspector
 
 
