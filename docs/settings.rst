@@ -31,12 +31,23 @@ Example:
       ...
    }
 
+.. _url-settings:
+
+All settings which configure URLs (``LOGIN_URL``, ``SPEC_URL``, ``VALIDATOR_URL``, etc.) can accept several forms of
+input:
+
+* A view name: `urls.reverse()` will be used to reverse-resolve the name
+* A 2-tuple of ``(view_name, kwargs)```: `urls.reverse()` will be used to reverse-resolve the name using the given
+  `kwargs`; `kwargs` must be a dict
+* A 3-tuple of ``(view_name, args, kwargs)```: `urls.reverse()` will be used to reverse-resolve the name using the given
+  `args` and `kwargs`; `args`, `kwargs` must be a tuple/list and a dict respectively
+* A URL, which will be used as-is
+
 The possible settings and their default values are as follows:
 
-********************
-``SWAGGER_SETTINGS``
-********************
-
+****************
+SWAGGER_SETTINGS
+****************
 
 .. _default-class-settings:
 
@@ -192,6 +203,15 @@ Swagger UI settings
 Swagger UI configuration settings. |br|
 See https://github.com/swagger-api/swagger-ui/blob/112bca906553a937ac67adc2e500bdeed96d067b/docs/usage/configuration.md#parameters.
 
+SPEC_URL
+--------
+
+URL pointing to a swagger document for use by swagger-ui. The default behaviour is to append ``?format=openapi`` to the
+URL which serves the UI; see :ref:`note on URL settings <url-settings>` above.
+
+**Default**: :python:`None` |br|
+*Maps to parameter*: ``url``
+
 VALIDATOR_URL
 -------------
 
@@ -312,9 +332,9 @@ This does not filter the operations from the display.
 **Default**: :python:`['get','put','post','delete','options','head','patch','trace']` |br|
 *Maps to parameter*: ``supportedSubmitMethods``
 
-******************
-``REDOC_SETTINGS``
-******************
+**************
+REDOC_SETTINGS
+**************
 
 .. _redoc-ui-settings:
 
@@ -323,6 +343,15 @@ ReDoc UI settings
 
 ReDoc UI configuration settings. |br|
 See https://github.com/Rebilly/ReDoc#configuration.
+
+SPEC_URL
+--------
+
+URL pointing to a swagger document for use by ReDoc. The default behaviour is to append ``?format=openapi`` to the
+URL which serves the UI; see :ref:`note on URL settings <url-settings>` above.
+
+**Default**: :python:`None` |br|
+*Maps to attribute*: ``spec-url``
 
 LAZY_RENDERING
 --------------

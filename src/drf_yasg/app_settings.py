@@ -40,6 +40,7 @@ SWAGGER_DEFAULTS = {
     'SECURITY_REQUIREMENTS': None,
     'LOGIN_URL': getattr(settings, 'LOGIN_URL', None),
     'LOGOUT_URL': getattr(settings, 'LOGOUT_URL', None),
+    'SPEC_URL': None,
     'VALIDATOR_URL': '',
 
     'OPERATIONS_SORTER': None,
@@ -65,6 +66,7 @@ SWAGGER_DEFAULTS = {
 }
 
 REDOC_DEFAULTS = {
+    'SPEC_URL': None,
     'LAZY_RENDERING': True,
     'HIDE_HOSTNAME': False,
     'EXPAND_RESPONSES': 'all',

@@ -3,9 +3,13 @@
 var currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
 var specURL = currentPath + '?format=openapi';
 var redoc = document.createElement("redoc");
-redoc.setAttribute("spec-url", specURL);
 
 var redocSettings = JSON.parse(document.getElementById('redoc-settings').innerHTML);
+if (redocSettings.url) {
+    specURL = redocSettings.url;
+}
+redoc.setAttribute("spec-url", specURL);
+
 if (redocSettings.lazyRendering) {
     redoc.setAttribute("lazy-rendering", '');
 }

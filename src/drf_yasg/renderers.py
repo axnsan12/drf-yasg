@@ -1,8 +1,11 @@
+import six
+
 from django.shortcuts import render, resolve_url
 from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer
 from rest_framework.utils import json
 
 from drf_yasg.openapi import Swagger
+from drf_yasg.utils import filter_none
 
 from .app_settings import redoc_settings, swagger_settings
 from .codecs import VALIDATORS, OpenAPICodecJson, OpenAPICodecYaml
@@ -74,23 +77,52 @@ class _UIRenderer(BaseRenderer):
     def set_context(self, renderer_context, swagger):
         renderer_context['title'] = swagger.info.title
         renderer_context['version'] = swagger.info.version
-        renderer_context['swagger_settings'] = json.dumps(self.get_swagger_ui_settings())
-        renderer_context['redoc_settings'] = json.dumps(self.get_redoc_settings())
         renderer_context['oauth2_config'] = json.dumps(self.get_oauth2_config())
         renderer_context['USE_SESSION_AUTH'] = swagger_settings.USE_SESSION_AUTH
         renderer_context.update(self.get_auth_urls())
 
-    def get_auth_urls(self):
-        urls = {}
-        if swagger_settings.LOGIN_URL is not None:
-            urls['LOGIN_URL'] = resolve_url(swagger_settings.LOGIN_URL)
-        if swagger_settings.LOGOUT_URL is not None:
-            urls['LOGOUT_URL'] = resolve_url(swagger_settings.LOGOUT_URL)
+    def resolve_url(self, to):
+        if to is None:
+            return None
 
-        return urls
+        args, kwargs = None, None
+        if not isinstance(to, six.string_types):
+            if len(to) > 2:
+                to, args, kwargs = to
+            elif len(to) == 2:
+                to, kwargs = to
+
+        args = args or ()
+        kwargs = kwargs or {}
+
+        return resolve_url(to, *args, **kwargs)
+
+    def get_auth_urls(self):
+        urls = {
+            'LOGIN_URL': self.resolve_url(swagger_settings.LOGIN_URL),
+            'LOGOUT_URL': self.resolve_url(swagger_settings.LOGOUT_URL),
+        }
+
+        return filter_none(urls)
+
+    def get_oauth2_config(self):
+        data = swagger_settings.OAUTH2_CONFIG
+        assert isinstance(data, dict), "OAUTH2_CONFIG must be a dict"
+        return data
+
+
+class SwaggerUIRenderer(_UIRenderer):
+    """Renders a swagger-ui web interface for schema browisng."""
+    template = 'drf-yasg/swagger-ui.html'
+    format = 'swagger'
+
+    def set_context(self, renderer_context, swagger):
+        super(SwaggerUIRenderer, self).set_context(renderer_context, swagger)
+        renderer_context['swagger_settings'] = json.dumps(self.get_swagger_ui_settings())
 
     def get_swagger_ui_settings(self):
         data = {
+            'url': self.resolve_url(swagger_settings.SPEC_URL),
             'operationsSorter': swagger_settings.OPERATIONS_SORTER,
             'tagsSorter': swagger_settings.TAGS_SORTER,
             'docExpansion': swagger_settings.DOC_EXPANSION,
@@ -103,42 +135,35 @@ class _UIRenderer(BaseRenderer):
             'oauth2RedirectUrl': swagger_settings.OAUTH2_REDIRECT_URL,
             'supportedSubmitMethods': swagger_settings.SUPPORTED_SUBMIT_METHODS,
         }
-        data = {k: v for k, v in data.items() if v is not None}
+        data = filter_none(data)
         if swagger_settings.VALIDATOR_URL != '':
-            data['validatorUrl'] = swagger_settings.VALIDATOR_URL
+            data['validatorUrl'] = self.resolve_url(swagger_settings.VALIDATOR_URL)
 
         return data
 
+
+class ReDocRenderer(_UIRenderer):
+    """Renders a ReDoc web interface for schema browisng."""
+    template = 'drf-yasg/redoc.html'
+    format = 'redoc'
+
+    def set_context(self, renderer_context, swagger):
+        super(ReDocRenderer, self).set_context(renderer_context, swagger)
+        renderer_context['redoc_settings'] = json.dumps(self.get_redoc_settings())
+
     def get_redoc_settings(self):
         data = {
+            'url': self.resolve_url(redoc_settings.SPEC_URL),
             'lazyRendering': redoc_settings.LAZY_RENDERING,
             'hideHostname': redoc_settings.HIDE_HOSTNAME,
             'expandResponses': redoc_settings.EXPAND_RESPONSES,
             'pathInMiddle': redoc_settings.PATH_IN_MIDDLE,
         }
+        data = filter_none(data)
 
         return data
 
-    def get_oauth2_config(self):
-        data = swagger_settings.OAUTH2_CONFIG
-        assert isinstance(data, dict), "OAUTH2_CONFIG must be a dict"
-        return data
 
-
-class SwaggerUIRenderer(_UIRenderer):
-    """Renders a swagger-ui web interface for schema browisng.
-    Also requires :class:`.OpenAPIRenderer` as an available renderer on the same view.
-    """
-    template = 'drf-yasg/swagger-ui.html'
-    format = 'swagger'
-
-
-class ReDocRenderer(_UIRenderer):
-    """Renders a ReDoc web interface for schema browisng.
-    Also requires :class:`.OpenAPIRenderer` as an available renderer on the same view.
-    """
-    template = 'drf-yasg/redoc.html'
-    format = 'redoc'
 class ReDocOldRenderer(ReDocRenderer):
     """Renders a ReDoc 1.x.x web interface for schema browisng."""
     template = 'drf-yasg/redoc-old.html'

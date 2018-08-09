@@ -108,6 +108,10 @@ SWAGGER_SETTINGS = {
     }
 }
 
+REDOC_SETTINGS = {
+    'SPEC_URL': ('schema-json', {'format': '.json'}),
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
