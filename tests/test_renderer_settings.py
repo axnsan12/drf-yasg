@@ -25,8 +25,8 @@ def test_validator_url(swagger_settings, swagger):
     swagger_settings['VALIDATOR_URL'] = None
     _check_swagger_setting(swagger, 'validatorUrl', None)
 
-    swagger_settings['VALIDATOR_URL'] = 'not none'
-    _check_swagger_setting(swagger, 'validatorUrl', 'not none')
+    swagger_settings['VALIDATOR_URL'] = 'http://not.none/'
+    _check_swagger_setting(swagger, 'validatorUrl', 'http://not.none/')
 
     with pytest.raises(KeyError):
         swagger_settings['VALIDATOR_URL'] = ''
