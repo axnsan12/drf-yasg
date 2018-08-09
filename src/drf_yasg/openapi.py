@@ -387,8 +387,6 @@ class Parameter(SwaggerDict):
         :param default: default value if the parameter is not provided; must conform to parameter type
         """
         super(Parameter, self).__init__(**extra)
-        if (not schema and not type) or (schema and type):
-            raise AssertionError("either schema or type are required for Parameter object!")
         self.name = name
         self.in_ = in_
         self.description = description
@@ -401,6 +399,10 @@ class Parameter(SwaggerDict):
         self.items = items
         self.default = default
         self._insert_extras__()
+        if (not schema and not type) or (schema and type):
+            raise AssertionError("either schema or type are required for Parameter object (not both)!")
+        if schema and isinstance(schema, Schema):
+            schema._remove_read_only()
         if self['in'] == IN_PATH:
             # path parameters must always be required
             assert required is not False, "path parameter cannot be optional"
@@ -465,6 +467,11 @@ class Schema(SwaggerDict):
         if pattern and type != TYPE_STRING:
             raise AssertionError("pattern can only be used when type is string")
 
+    def _remove_read_only(self):
+        # readOnly is only valid for Schemas inside another Schema's properties;
+        # when placing Schema elsewhere we must take care to remove the readOnly flag
+        self.pop('readOnly', '')
+
 
 class _Ref(SwaggerDict):
     ref_name_re = re.compile(r"#/(?P<scope>.+)/(?P<name>[^/]+)$")
@@ -497,12 +504,12 @@ class _Ref(SwaggerDict):
         ref_match = self.ref_name_re.match(self.ref)
         return resolver.get(ref_match.group('name'), scope=ref_match.group('scope'))
 
-    def __setitem__(self, key, value, **kwargs):
+    def __setitem__(self, key, value):
         if key == "$ref":
-            return super(_Ref, self).__setitem__(key, value, **kwargs)
+            return super(_Ref, self).__setitem__(key, value)
         raise NotImplementedError("only $ref can be set on Reference objects (not %s)" % key)
 
-    def __delitem__(self, key, **kwargs):
+    def __delitem__(self, key):
         raise NotImplementedError("cannot delete property of Reference object")
 
 
@@ -560,6 +567,8 @@ class Response(SwaggerDict):
         self.schema = schema
         self.examples = examples
         self._insert_extras__()
+        if schema and isinstance(schema, Schema):
+            schema._remove_read_only()
 
 
 class ReferenceResolver(object):

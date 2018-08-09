@@ -118,6 +118,8 @@ class InlineSerializerInspector(SerializerInspector):
 
             definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
             actual_schema = definitions.setdefault(ref_name, make_schema_definition)
+            actual_schema._remove_read_only()
+
             actual_serializer = get_serializer_class(getattr(actual_schema, '_serializer', None))
             this_serializer = get_serializer_class(field)
             if actual_serializer and actual_serializer != this_serializer:  # pragma: no cover
