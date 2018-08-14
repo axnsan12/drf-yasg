@@ -4,6 +4,7 @@ import logging
 from rest_framework import serializers
 
 from .. import openapi
+from ..app_settings import swagger_settings as _swagger_settings
 from ..utils import force_real_str, get_field_default, get_object_classes, is_list_view
 
 #: Sentinel value that inspectors must return to signal that they do not know how to handle an object
@@ -52,19 +53,21 @@ def call_view_method(view, method_name, fallback_attr=None, default=None):
 
 
 class BaseInspector:
-    def __init__(self, view, path, method, components, request):
+    def __init__(self, view, path, method, components, request, swagger_settings=_swagger_settings):
         """
         :param rest_framework.views.APIView view: the view associated with this endpoint
         :param str path: the path component of the operation URL
         :param str method: the http method of the operation
         :param openapi.ReferenceResolver components: referenceable components
         :param rest_framework.request.Request request: the request made against the schema view; can be None
+        :param swagger_settings: if given global swagger_settings are overridden with local settings
         """
         self.view = view
         self.path = path
         self.method = method
         self.components = components
         self.request = request
+        self.swagger_settings = swagger_settings
 
     def process_result(self, result, method_name, obj, **kwargs):
         """After an inspector handles an object (i.e. returns a value other than :data:`.NotHandled`), all inspectors
@@ -185,8 +188,8 @@ class FilterInspector(BaseInspector):
 class FieldInspector(BaseInspector):
     """Base inspector for serializers and serializer fields. """
 
-    def __init__(self, view, path, method, components, request, field_inspectors):
-        super(FieldInspector, self).__init__(view, path, method, components, request)
+    def __init__(self, view, path, method, components, request, field_inspectors, swagger_settings=_swagger_settings):
+        super(FieldInspector, self).__init__(view, path, method, components, request, swagger_settings)
         self.field_inspectors = field_inspectors
 
     def add_manual_fields(self, serializer_or_field, schema):
@@ -338,18 +341,42 @@ class ViewInspector(BaseInspector):
     #: methods which are assumed to return a list of objects when present on non-detail endpoints
     implicit_list_response_methods = ('GET',)
 
-    # real values set in __init__ to prevent import errors
-    field_inspectors = []  #:
-    filter_inspectors = []  #:
-    paginator_inspectors = []  #:
+    _field_inspectors = None
+    _filter_inspectors = None
+    _paginator_inspectors = None
 
-    def __init__(self, view, path, method, components, request, overrides):
+    @property
+    def field_inspectors(self):
+        return self._field_inspectors or self.swagger_settings.DEFAULT_FIELD_INSPECTORS
+
+    @field_inspectors.setter
+    def field_inspectors(self, value):
+        self._field_inspectors = value
+
+    @property
+    def filter_inspectors(self):
+        return self._filter_inspectors or self.swagger_settings.DEFAULT_FILTER_INSPECTORS
+
+    @filter_inspectors.setter
+    def filter_inspectors(self, value):
+        self._filter_inspectors = value
+
+    @property
+    def paginator_inspectors(self):
+        return self._paginator_inspectors or self.swagger_settings.DEFAULT_PAGINATOR_INSPECTORS
+
+    @paginator_inspectors.setter
+    def paginator_inspectors(self, value):
+        self._paginator_inspectors = value
+
+    def __init__(self, view, path, method, components, request, overrides, swagger_settings=_swagger_settings):
         """
         Inspector class responsible for providing :class:`.Operation` definitions given a view, path and method.
 
         :param dict overrides: manual overrides as passed to :func:`@swagger_auto_schema <.swagger_auto_schema>`
+        :param swagger_settings: if given global swagger_settings are overridden with local settings
         """
-        super(ViewInspector, self).__init__(view, path, method, components, request)
+        super(ViewInspector, self).__init__(view, path, method, components, request, swagger_settings)
         self.overrides = overrides
         self._prepend_inspector_overrides('field_inspectors')
         self._prepend_inspector_overrides('filter_inspectors')
