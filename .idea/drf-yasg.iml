@@ -19,7 +19,7 @@
       <excludeFolder url="file://$MODULE_DIR$/docs/_build" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.6 (drf-yasg)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.7 (drf-yasg)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">
