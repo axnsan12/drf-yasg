@@ -5,6 +5,7 @@ import operator
 import uuid
 from collections import OrderedDict
 from decimal import Decimal
+from inspect import isclass
 
 from django.core import validators
 from django.db import models
@@ -511,6 +512,8 @@ class SerializerMethodFieldInspector(FieldInspector):
             # look for Python 3.5+ style type hinting of the return value
             hint_class = inspect.signature(method).return_annotation
 
+            if not isclass(hint_class) and hasattr(hint_class, '__args__'):
+                hint_class = hint_class.__args__[0]
             if not issubclass(hint_class, inspect._empty):
                 type_info = get_basic_type_info_from_hint(hint_class)
 
