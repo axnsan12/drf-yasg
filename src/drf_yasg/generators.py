@@ -436,7 +436,7 @@ class OpenAPISchemaGenerator(object):
                 description = model_field.help_text
             elif model_field and getattr(model_field, 'primary_key', False):
                 description = get_pk_description(model, model_field)
-            elif 'param:' in view_cls.__doc__:
+            elif view_cls.__doc__ is not None and 'param:' in view_cls.__doc__:
                 description = None
                 for line in view_cls.__doc__.splitlines():
                     param_variable = 'param: ' + variable + ': '
