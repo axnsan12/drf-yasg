@@ -50,7 +50,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
         the `manual_parameters` argument.
 
         If a ``Serializer`` class or instance is given, it will be automatically converted into a :class:`.Schema`
-        used as a ``body`` :class:`.Parameter`, or into a list of ``form`` :class:`.Parameter`\ s, as appropriate.
+        used as a ``body`` :class:`.Parameter`, or into a list of ``form`` :class:`.Parameter`\\ s, as appropriate.
 
     :param .Serializer query_serializer: if you use a ``Serializer`` to parse query parameters, you can pass it here
         and have :class:`.Parameter` objects be generated automatically from it.
@@ -63,7 +63,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
     :param list[.Parameter] manual_parameters: a list of manual parameters to override the automatically generated ones
 
-        :class:`.Parameter`\ s are identified by their (``name``, ``in``) combination, and any parameters given
+        :class:`.Parameter`\\ s are identified by their (``name``, ``in``) combination, and any parameters given
         here will fully override automatically generated parameters if they collide.
 
         It is an error to supply ``form`` parameters when the request does not consume form-data.

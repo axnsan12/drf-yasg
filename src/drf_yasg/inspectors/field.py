@@ -197,7 +197,7 @@ def get_related_model(model, source):
 
 
 class RelatedFieldInspector(FieldInspector):
-    """Provides conversions for ``RelatedField``\ s."""
+    """Provides conversions for ``RelatedField``\\ s."""
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
@@ -573,7 +573,7 @@ class ChoiceFieldInspector(FieldInspector):
 
 
 class FileFieldInspector(FieldInspector):
-    """Provides conversions for ``FileField``\ s."""
+    """Provides conversions for ``FileField``\\ s."""
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
