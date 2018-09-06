@@ -134,7 +134,7 @@ class EndpointEnumerator(_EndpointEnumerator):
         """Remove backslashe escapes from all path components outside {parameters}. This is needed because
         ``simplify_regex`` does not handle this correctly - note however that this implementation is
 
-        **NOTE:** this might destructively affect some url regex patterns that contain metacharacters (e.g. \w, \d)
+        **NOTE:** this might destructively affect some url regex patterns that contain metacharacters (e.g. \\w, \\d)
         outside path parameter groups; if you are in this category, God help you
 
         :param str path: path possibly containing

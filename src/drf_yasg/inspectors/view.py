@@ -63,7 +63,7 @@ class SwaggerAutoSchema(ViewInspector):
         -  a list of primitive Parameters parsed as form data
 
         :param list[str] consumes: a list of accepted MIME types as returned by :meth:`.get_consumes`
-        :return: a (potentially empty) list of :class:`.Parameter`\ s either ``in: body`` or ``in: formData``
+        :return: a (potentially empty) list of :class:`.Parameter`\\ s either ``in: body`` or ``in: formData``
         :rtype: list[openapi.Parameter]
         """
         serializer = self.get_request_serializer()
@@ -129,7 +129,7 @@ class SwaggerAutoSchema(ViewInspector):
         return body_override
 
     def get_request_form_parameters(self, serializer):
-        """Given a Serializer, return a list of ``in: formData`` :class:`.Parameter`\ s.
+        """Given a Serializer, return a list of ``in: formData`` :class:`.Parameter`\\ s.
 
         :param serializer: the view's request serializer as returned by :meth:`.get_request_serializer`
         :rtype: list[openapi.Parameter]
@@ -223,7 +223,7 @@ class SwaggerAutoSchema(ViewInspector):
     def get_response_serializers(self):
         """Return the response codes that this view is expected to return, and the serializer for each response body.
         The return value should be a dict where the keys are possible status codes, and values are either strings,
-        ``Serializer``\ s, :class:`.Schema`, :class:`.SchemaRef` or :class:`.Response` objects. See
+        ``Serializer``\\ s, :class:`.Schema`, :class:`.SchemaRef` or :class:`.Response` objects. See
         :func:`@swagger_auto_schema <.swagger_auto_schema>` for more details.
 
         :return: the response serializers
