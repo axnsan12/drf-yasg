@@ -4,6 +4,24 @@ Changelog
 
 
 **********
+**1.10.1**
+**********
+
+*Release date: Sep 10, 2018*
+
+- **ADDED:** added the ``SPEC_URL`` setting for controlling the download link in ``swagger-ui`` and ``ReDoc``
+- **IMPROVED:** updated ``swagger-ui`` to version 3.18.2
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-alpha.37
+- **FIXED:** stopped generating invalid OpenAPI by improper placement of ``readOnly`` Schemas
+- **FIXED:** fixed broken CSS when ``USE_SESSION_AUTH=False``
+- **FIXED:** fixed implementation of ``operation_summary`` and ``deprecated`` (:pr:`194`, :pr:`198`)
+- **FIXED:** fixed a bug related to nested ``typing`` hints (:pr:`195`)
+- **FIXED:** removed dependency on ``future`` (:issue:`196`)
+- **FIXED:** removed exceptions loged for fields with ``default=None`` (:issue:`203`)
+- **FIXED:** fixed ``request_body=no_body`` handling and related tests (:issue:`188`, :issue:`199`)
+
+
+**********
 **1.10.0**
 **********
 
