@@ -106,7 +106,7 @@ class SwaggerAutoSchema(ViewInspector):
 
         if body_override is not None:
             if body_override is no_body:
-                return None
+                return no_body
             if self.method not in self.body_methods:
                 raise SwaggerGenerationError("request_body can only be applied to (" + ','.join(self.body_methods) +
                                              "); are you looking for query_serializer or manual_parameters?")
@@ -125,6 +125,9 @@ class SwaggerAutoSchema(ViewInspector):
 
         if body_override is None and self.method in self.implicit_body_methods:
             return self.get_view_serializer()
+
+        if body_override is no_body:
+            return None
 
         return body_override
 
@@ -192,7 +195,11 @@ class SwaggerAutoSchema(ViewInspector):
 
         :return: response serializer, :class:`.Schema`, :class:`.SchemaRef`, ``None``
         """
-        return self._get_request_body_override() or self.get_view_serializer()
+        body_override = self._get_request_body_override()
+        if body_override and body_override is not no_body:
+            return body_override
+
+        return self.get_view_serializer()
 
     def get_default_responses(self):
         """Get the default responses determined for this view from the request serializer and request method.
