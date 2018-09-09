@@ -1,5 +1,3 @@
-import warnings
-
 import six
 
 from django.shortcuts import render, resolve_url
