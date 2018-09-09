@@ -134,14 +134,9 @@ paths:
       tags:
         - articles
     put:
-      operationId: articles_update
+      operationId: no_body_test
       description: update method docstring
-      parameters:
-        - name: data
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/Article'
+      parameters: []
       responses:
         '200':
           description: ''
