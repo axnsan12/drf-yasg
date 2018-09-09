@@ -11,6 +11,7 @@ Changelog
 
 - **ADDED:** added the ``SPEC_URL`` setting for controlling the download link in ``swagger-ui`` and ``ReDoc``
 - **ADDED:** updated ``ReDoc`` settings (added ``NATIVE_SCROLLBARS`` and ``REQUIRED_PROPS_FIRST``)
+- **ADDED:** added ``extra_styles`` and ``extra_scripts`` blocks to ui templates (:issue:`178`)
 - **IMPROVED:** updated ``swagger-ui`` to version 3.18.2
 - **IMPROVED:** updated ``ReDoc`` to version 2.0.0-alpha.37
 - **FIXED:** stopped generating invalid OpenAPI by improper placement of ``readOnly`` Schemas

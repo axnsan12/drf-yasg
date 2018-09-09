@@ -7,12 +7,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" type="text/css" href="{% static 'drf-yasg/style.css' %}"/>
+    {% block extra_styles %}
+        {# -- Add any additional CSS scripts here -- #}
+    {% endblock %}
 </head>
 <body>
-    <script id="redoc-settings" type="application/json">{{ redoc_settings | safe }}</script>
+<script id="redoc-settings" type="application/json">{{ redoc_settings | safe }}</script>
 
-    <script src="{% static 'drf-yasg/insQ.min.js' %}"></script>
-    <script src="{% static 'drf-yasg/redoc-init.js' %}"> </script>
-    <script src="{% static 'drf-yasg/redoc/redoc.min.js' %}"></script>
+<script src="{% static 'drf-yasg/insQ.min.js' %}"></script>
+<script src="{% static 'drf-yasg/redoc-init.js' %}"></script>
+<script src="{% static 'drf-yasg/redoc/redoc.min.js' %}"></script>
+{% block extra_scripts %}
+    {# -- Add any additional scripts here -- #}
+{% endblock %}
 </body>
 </html>
