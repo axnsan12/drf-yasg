@@ -137,7 +137,8 @@ class ArticleViewSet(viewsets.ModelViewSet):
         """update method docstring"""
         return super(ArticleViewSet, self).update(request, *args, **kwargs)
 
-    @swagger_auto_schema(operation_description="partial_update description override", responses={404: 'slug not found'})
+    @swagger_auto_schema(operation_description="partial_update description override", responses={404: 'slug not found'},
+                         operation_summary='partial_update summary', deprecated=True)
     def partial_update(self, request, *args, **kwargs):
         """partial_update method docstring"""
         return super(ArticleViewSet, self).partial_update(request, *args, **kwargs)

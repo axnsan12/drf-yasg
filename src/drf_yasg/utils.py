@@ -107,6 +107,8 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
             'query_serializer': query_serializer,
             'manual_parameters': manual_parameters,
             'operation_id': operation_id,
+            'operation_summary': operation_summary,
+            'deprecated': deprecated,
             'operation_description': operation_description,
             'security': security,
             'responses': responses,
