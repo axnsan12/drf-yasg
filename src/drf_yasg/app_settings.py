@@ -67,10 +67,12 @@ SWAGGER_DEFAULTS = {
 
 REDOC_DEFAULTS = {
     'SPEC_URL': None,
-    'LAZY_RENDERING': True,
+    'LAZY_RENDERING': False,
     'HIDE_HOSTNAME': False,
     'EXPAND_RESPONSES': 'all',
     'PATH_IN_MIDDLE': False,
+    'NATIVE_SCROLLBARS': False,
+    'REQUIRED_PROPS_FIRST': False,
 }
 
 IMPORT_STRINGS = [

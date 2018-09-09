@@ -7,19 +7,22 @@ var redoc = document.createElement("redoc");
 var redocSettings = JSON.parse(document.getElementById('redoc-settings').innerHTML);
 if (redocSettings.url) {
     specURL = redocSettings.url;
+    delete redocSettings.url;
 }
 redoc.setAttribute("spec-url", specURL);
 
-if (redocSettings.lazyRendering) {
-    redoc.setAttribute("lazy-rendering", '');
+function camelToKebab(str) {
+    return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
-if (redocSettings.pathInMiddle) {
-    redoc.setAttribute("path-in-middle-panel", '');
+
+for (var p in redocSettings) {
+    if (redocSettings.hasOwnProperty(p)) {
+        if (redocSettings[p] !== null && redocSettings[p] !== undefined && redocSettings[p] !== false) {
+            redoc.setAttribute(camelToKebab(p), redocSettings[p].toString());
+        }
+    }
 }
-if (redocSettings.hideHostname) {
-    redoc.setAttribute("hide-hostname", '');
-}
-redoc.setAttribute("expand-responses", redocSettings.expandResponses);
+
 document.body.appendChild(redoc);
 
 function hideEmptyVersion() {

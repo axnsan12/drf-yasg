@@ -1,3 +1,5 @@
+import warnings
+
 import six
 
 from django.shortcuts import render, resolve_url
@@ -157,7 +159,9 @@ class ReDocRenderer(_UIRenderer):
             'lazyRendering': redoc_settings.LAZY_RENDERING,
             'hideHostname': redoc_settings.HIDE_HOSTNAME,
             'expandResponses': redoc_settings.EXPAND_RESPONSES,
-            'pathInMiddle': redoc_settings.PATH_IN_MIDDLE,
+            'pathInMiddlePanel': redoc_settings.PATH_IN_MIDDLE,
+            'nativeScrollbars': redoc_settings.NATIVE_SCROLLBARS,
+            'requiredPropsFirst': redoc_settings.REQUIRED_PROPS_FIRST,
         }
 
         return filter_none(data)

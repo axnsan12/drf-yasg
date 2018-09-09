@@ -27,7 +27,7 @@ Example:
    }
 
    REDOC_SETTINGS = {
-      'LAZY_RENDERING': True,
+      'LAZY_RENDERING': False,
       ...
    }
 
@@ -356,26 +356,40 @@ URL which serves the UI; see :ref:`note on URL settings <url-settings>` above.
 LAZY_RENDERING
 --------------
 
-**Default**: :python:`True` |br|
-*Maps to attribute*: ``lazy-rendering``
+**NOTE:** this feature might be removed in future versions of ReDoc (see https://github.com/Rebilly/ReDoc/issues/475)
+
+**Default**: :python:`False` |br|
+*Maps to attribute*: ``lazyRendering``
 
 HIDE_HOSTNAME
 -------------
 
 **Default**: :python:`False` |br|
-*Maps to attribute*: ``hide-hostname``
+*Maps to attribute*: ``hideHostname``
 
 EXPAND_RESPONSES
 ----------------
 
 **Default**: :python:`'all'` |br|
-*Maps to attribute*: ``expand-responses``
+*Maps to attribute*: ``expandResponses``
 
 PATH_IN_MIDDLE
 --------------
 
 **Default**: :python:`False` |br|
-*Maps to attribute*: ``path-in-middle-panel``
+*Maps to attribute*: ``pathInMiddlePanel``
+
+NATIVE_SCROLLBARS
+-----------------
+
+**Default**: :python:`False` |br|
+*Maps to attribute*: ``nativeScrollbars``
+
+REQUIRED_PROPS_FIRST
+--------------------
+
+**Default**: :python:`False` |br|
+*Maps to attribute*: ``requiredPropsFirst``
 
 
 .. _FORCE_SCRIPT_NAME: https://docs.djangoproject.com/en/2.0/ref/settings/#force-script-name
