@@ -19,10 +19,6 @@ body.swagger-body {
     background: #fafafa;
 }
 
-#django-session-auth {
-    margin-right: 8px;
-}
-
 .hidden {
     display: none;
 }

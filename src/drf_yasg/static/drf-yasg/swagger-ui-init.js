@@ -6,6 +6,11 @@ function patchSwaggerUi() {
     var authWrapper = document.querySelector('.auth-wrapper');
     var authorizeButton = document.querySelector('.auth-wrapper .authorize');
     var djangoSessionAuth = document.querySelector('#django-session-auth');
+    if (!djangoSessionAuth) {
+        console.log("WARNING: session auth disabled");
+        return;
+    }
+
     if (document.querySelector('.auth-wrapper #django-session-auth')) {
         console.log("WARNING: session auth already patched; skipping patchSwaggerUi()");
         return;
@@ -57,7 +62,7 @@ function initSwaggerUi() {
         }
     }
 
-    console.log(swaggerSettings);
+    console.log('swaggerSettings', swaggerSettings);
     for (var p in swaggerSettings) {
         if (swaggerSettings.hasOwnProperty(p)) {
             swaggerConfig[p] = swaggerSettings[p];
@@ -66,7 +71,7 @@ function initSwaggerUi() {
     window.ui = SwaggerUIBundle(swaggerConfig);
 
     var oauth2Config = JSON.parse(document.getElementById('oauth2-config').innerHTML);
-    console.log(oauth2Config);
+    console.log('oauth2Config', oauth2Config);
     window.ui.initOAuth(oauth2Config);
 }
 

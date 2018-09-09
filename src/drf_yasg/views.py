@@ -48,9 +48,7 @@ def deferred_never_cache(view_func):
 
 
 def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=False, validators=None,
-                    generator_class=swagger_settings.DEFAULT_GENERATOR_CLASS,
-                    authentication_classes=api_settings.DEFAULT_AUTHENTICATION_CLASSES,
-                    permission_classes=api_settings.DEFAULT_PERMISSION_CLASSES):
+                    generator_class=None, authentication_classes=None, permission_classes=None):
     """Create a SchemaView class with default renderers and generators.
 
     :param .Info info: information about the API; if omitted, defaults to :ref:`DEFAULT_INFO <default-swagger-settings>`
@@ -66,9 +64,13 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
     :rtype: type[.SchemaView]
     """
     _public = public
-    _generator_class = generator_class
+    _generator_class = generator_class or swagger_settings.DEFAULT_GENERATOR_CLASS
     _auth_classes = authentication_classes
+    if _auth_classes is None:
+        _auth_classes = api_settings.DEFAULT_AUTHENTICATION_CLASSES
     _perm_classes = permission_classes
+    if _perm_classes is None:
+        _perm_classes = api_settings.DEFAULT_PERMISSION_CLASSES
     info = info or swagger_settings.DEFAULT_INFO
     validators = validators or []
     _spec_renderers = tuple(renderer.with_validators(validators) for renderer in SPEC_RENDERERS)
