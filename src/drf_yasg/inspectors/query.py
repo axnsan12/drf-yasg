@@ -9,7 +9,7 @@ from .base import FilterInspector, PaginatorInspector
 
 
 class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
-    """Converts ``coreapi.Field``\ s to :class:`.openapi.Parameter`\ s for filters and paginators that implement a
+    """Converts ``coreapi.Field``\\ s to :class:`.openapi.Parameter`\\ s for filters and paginators that implement a
     ``get_schema_fields`` method.
     """
 

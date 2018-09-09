@@ -258,7 +258,7 @@ class SerializerInspector(FieldInspector):
         return NotHandled
 
     def get_request_parameters(self, serializer, in_):
-        """Convert a DRF serializer into a list of :class:`.Parameter`\ s.
+        """Convert a DRF serializer into a list of :class:`.Parameter`\\ s.
 
         Should return :data:`.NotHandled` if this inspector does not know how to handle the given `serializer`.
 
@@ -372,7 +372,7 @@ class ViewInspector(BaseInspector):
         )
 
     def serializer_to_parameters(self, serializer, in_):
-        """Convert a serializer to a possibly empty list of :class:`.Parameter`\ s.
+        """Convert a serializer to a possibly empty list of :class:`.Parameter`\\ s.
 
         :param serializers.BaseSerializer serializer: the ``Serializer`` instance
         :param str in_: the location of the parameters, one of the `openapi.IN_*` constants
