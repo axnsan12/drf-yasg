@@ -63,7 +63,7 @@ class SwaggerAutoSchema(ViewInspector):
         -  a list of primitive Parameters parsed as form data
 
         :param list[str] consumes: a list of accepted MIME types as returned by :meth:`.get_consumes`
-        :return: a (potentially empty) list of :class:`.Parameter`\ s either ``in: body`` or ``in: formData``
+        :return: a (potentially empty) list of :class:`.Parameter`\\ s either ``in: body`` or ``in: formData``
         :rtype: list[openapi.Parameter]
         """
         serializer = self.get_request_serializer()
@@ -106,7 +106,7 @@ class SwaggerAutoSchema(ViewInspector):
 
         if body_override is not None:
             if body_override is no_body:
-                return None
+                return no_body
             if self.method not in self.body_methods:
                 raise SwaggerGenerationError("request_body can only be applied to (" + ','.join(self.body_methods) +
                                              "); are you looking for query_serializer or manual_parameters?")
@@ -126,10 +126,13 @@ class SwaggerAutoSchema(ViewInspector):
         if body_override is None and self.method in self.implicit_body_methods:
             return self.get_view_serializer()
 
+        if body_override is no_body:
+            return None
+
         return body_override
 
     def get_request_form_parameters(self, serializer):
-        """Given a Serializer, return a list of ``in: formData`` :class:`.Parameter`\ s.
+        """Given a Serializer, return a list of ``in: formData`` :class:`.Parameter`\\ s.
 
         :param serializer: the view's request serializer as returned by :meth:`.get_request_serializer`
         :rtype: list[openapi.Parameter]
@@ -192,7 +195,11 @@ class SwaggerAutoSchema(ViewInspector):
 
         :return: response serializer, :class:`.Schema`, :class:`.SchemaRef`, ``None``
         """
-        return self._get_request_body_override() or self.get_view_serializer()
+        body_override = self._get_request_body_override()
+        if body_override and body_override is not no_body:
+            return body_override
+
+        return self.get_view_serializer()
 
     def get_default_responses(self):
         """Get the default responses determined for this view from the request serializer and request method.
@@ -207,8 +214,6 @@ class SwaggerAutoSchema(ViewInspector):
             default_schema = self.get_default_response_serializer()
 
         default_schema = default_schema or ''
-        if any(is_form_media_type(encoding) for encoding in self.get_consumes()):
-            default_schema = ''
         if default_schema and not isinstance(default_schema, openapi.Schema):
             default_schema = self.serializer_to_schema(default_schema) or ''
 
@@ -223,7 +228,7 @@ class SwaggerAutoSchema(ViewInspector):
     def get_response_serializers(self):
         """Return the response codes that this view is expected to return, and the serializer for each response body.
         The return value should be a dict where the keys are possible status codes, and values are either strings,
-        ``Serializer``\ s, :class:`.Schema`, :class:`.SchemaRef` or :class:`.Response` objects. See
+        ``Serializer``\\ s, :class:`.Schema`, :class:`.SchemaRef` or :class:`.Response` objects. See
         :func:`@swagger_auto_schema <.swagger_auto_schema>` for more details.
 
         :return: the response serializers

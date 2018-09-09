@@ -134,14 +134,9 @@ paths:
       tags:
         - articles
     put:
-      operationId: articles_update
+      operationId: no_body_test
       description: update method docstring
-      parameters:
-        - name: data
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/Article'
+      parameters: []
       responses:
         '200':
           description: ''
@@ -151,6 +146,7 @@ paths:
         - articles
     patch:
       operationId: articles_partial_update
+      summary: partial_update summary
       description: partial_update description override
       parameters:
         - name: data
@@ -167,6 +163,7 @@ paths:
           description: slug not found
       tags:
         - articles
+      deprecated: true
     delete:
       operationId: articles_delete
       description: destroy method docstring
@@ -192,6 +189,8 @@ paths:
       responses:
         '200':
           description: ''
+          schema:
+            $ref: '#/definitions/Article'
       consumes:
         - multipart/form-data
       tags:
@@ -228,6 +227,8 @@ paths:
       responses:
         '201':
           description: ''
+          schema:
+            $ref: '#/definitions/ImageUpload'
       consumes:
         - multipart/form-data
       tags:
@@ -890,6 +891,32 @@ definitions:
         type: string
         format: uuid
         readOnly: true
+  ImageUpload:
+    required:
+      - image_styles
+    type: object
+    properties:
+      what_am_i_doing:
+        description: test
+        type: string
+        pattern: ^69$
+        default: '69'
+        minLength: 1
+      image_styles:
+        description: Parameter with Items
+        type: array
+        items:
+          type: string
+          enum:
+            - wide
+            - tall
+            - thumb
+            - social
+      upload:
+        description: image serializer help_text
+        type: string
+        readOnly: true
+        format: uri
   Identity:
     title: Identity
     type: object

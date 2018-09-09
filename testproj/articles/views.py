@@ -15,7 +15,7 @@ from articles.models import Article
 from drf_yasg import openapi
 from drf_yasg.app_settings import swagger_settings
 from drf_yasg.inspectors import CoreAPICompatInspector, FieldInspector, NotHandled, SwaggerAutoSchema
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import no_body, swagger_auto_schema
 
 
 class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
@@ -133,11 +133,13 @@ class ArticleViewSet(viewsets.ModelViewSet):
             """
             pass
 
+    @swagger_auto_schema(request_body=no_body, operation_id='no_body_test')
     def update(self, request, *args, **kwargs):
         """update method docstring"""
         return super(ArticleViewSet, self).update(request, *args, **kwargs)
 
-    @swagger_auto_schema(operation_description="partial_update description override", responses={404: 'slug not found'})
+    @swagger_auto_schema(operation_description="partial_update description override", responses={404: 'slug not found'},
+                         operation_summary='partial_update summary', deprecated=True)
     def partial_update(self, request, *args, **kwargs):
         """partial_update method docstring"""
         return super(ArticleViewSet, self).partial_update(request, *args, **kwargs)

@@ -50,7 +50,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
         the `manual_parameters` argument.
 
         If a ``Serializer`` class or instance is given, it will be automatically converted into a :class:`.Schema`
-        used as a ``body`` :class:`.Parameter`, or into a list of ``form`` :class:`.Parameter`\ s, as appropriate.
+        used as a ``body`` :class:`.Parameter`, or into a list of ``form`` :class:`.Parameter`\\ s, as appropriate.
 
     :param .Serializer query_serializer: if you use a ``Serializer`` to parse query parameters, you can pass it here
         and have :class:`.Parameter` objects be generated automatically from it.
@@ -63,7 +63,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
     :param list[.Parameter] manual_parameters: a list of manual parameters to override the automatically generated ones
 
-        :class:`.Parameter`\ s are identified by their (``name``, ``in``) combination, and any parameters given
+        :class:`.Parameter`\\ s are identified by their (``name``, ``in``) combination, and any parameters given
         here will fully override automatically generated parameters if they collide.
 
         It is an error to supply ``form`` parameters when the request does not consume form-data.
@@ -107,6 +107,8 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
             'query_serializer': query_serializer,
             'manual_parameters': manual_parameters,
             'operation_id': operation_id,
+            'operation_summary': operation_summary,
+            'deprecated': deprecated,
             'operation_description': operation_description,
             'security': security,
             'responses': responses,
@@ -120,7 +122,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
         data.update(extra_overrides)
         if not data:  # pragma: no cover
             # no overrides to set, no use in doing more work
-            return
+            return view_method
 
         # if the method is an @action, it will have a bind_to_methods attribute, or a mapping attribute for drf>3.8
         bind_to_methods = getattr(view_method, 'bind_to_methods', [])
@@ -402,7 +404,7 @@ def get_field_default(field):
                                "called; 'default' will not be set on schema", field, exc_info=True)
                 default = serializers.empty
 
-        if default is not serializers.empty:
+        if default is not serializers.empty and default is not None:
             try:
                 default = field.to_representation(default)
                 # JSON roundtrip ensures that the value is valid JSON;

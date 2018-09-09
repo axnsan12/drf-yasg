@@ -2,7 +2,6 @@ coreapi>=2.3.3
 coreschema>=0.0.4
 ruamel.yaml>=0.15.34
 inflection>=0.3.1
-future>=0.16.0
 six>=1.10.0
 uritemplate>=3.0.0
 

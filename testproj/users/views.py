@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from drf_yasg import openapi
-from drf_yasg.utils import no_body, swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema
 from users.serializers import UserListQuerySerializer, UserSerializerrr
 
 
@@ -36,7 +36,7 @@ class UserList(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @swagger_auto_schema(request_body=no_body, operation_id="users_dummy", operation_description="dummy operation")
+    @swagger_auto_schema(operation_id="users_dummy", operation_description="dummy operation")
     def patch(self, request):
         pass
 

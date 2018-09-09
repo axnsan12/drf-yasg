@@ -5,6 +5,7 @@ import operator
 import uuid
 from collections import OrderedDict
 from decimal import Decimal
+from inspect import isclass
 
 from django.core import validators
 from django.db import models
@@ -196,7 +197,7 @@ def get_related_model(model, source):
 
 
 class RelatedFieldInspector(FieldInspector):
-    """Provides conversions for ``RelatedField``\ s."""
+    """Provides conversions for ``RelatedField``\\ s."""
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
@@ -261,7 +262,12 @@ def find_regex(regex_field):
             regex_validator = validator
 
     # regex_validator.regex should be a compiled re object...
-    pattern = getattr(getattr(regex_validator, 'regex', None), 'pattern', None)
+    try:
+        pattern = getattr(getattr(regex_validator, 'regex', None), 'pattern', None)
+    except Exception:  # pragma: no cover
+        logger.warning('failed to compile regex validator of ' + str(regex_field), exc_info=True)
+        return None
+
     if pattern:
         # attempt some basic cleanup to remove regex constructs not supported by JavaScript
         #  -- swagger uses javascript-style regexes - see https://github.com/swagger-api/swagger-editor/issues/1601
@@ -511,7 +517,9 @@ class SerializerMethodFieldInspector(FieldInspector):
             # look for Python 3.5+ style type hinting of the return value
             hint_class = inspect.signature(method).return_annotation
 
-            if not issubclass(hint_class, inspect._empty):
+            if not isclass(hint_class) and hasattr(hint_class, '__args__'):
+                hint_class = hint_class.__args__[0]
+            if isclass(hint_class) and not issubclass(hint_class, inspect._empty):
                 type_info = get_basic_type_info_from_hint(hint_class)
 
                 if type_info is not None:
@@ -570,7 +578,7 @@ class ChoiceFieldInspector(FieldInspector):
 
 
 class FileFieldInspector(FieldInspector):
-    """Provides conversions for ``FileField``\ s."""
+    """Provides conversions for ``FileField``\\ s."""
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)

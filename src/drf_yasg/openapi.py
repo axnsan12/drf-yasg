@@ -434,9 +434,9 @@ class Schema(SwaggerDict):
         :param bool,.Schema,.SchemaRef additional_properties: allow wildcard properties not listed in `properties`
         :param list[str] required: list of requried property names
         :param .Schema,.SchemaRef items: type of array items, only valid if `type` is ``array``
-        :param default: only valid when insider another ``Schema``\ 's ``properties``;
+        :param default: only valid when insider another ``Schema``\\ 's ``properties``;
             the default value of this property if it is not provided, must conform to the type of this Schema
-        :param read_only: only valid when insider another ``Schema``\ 's ``properties``;
+        :param read_only: only valid when insider another ``Schema``\\ 's ``properties``;
             declares the property as read only - it must only be sent as part of responses, never in requests
         """
         super(Schema, self).__init__(**extra)
