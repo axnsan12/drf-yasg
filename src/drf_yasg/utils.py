@@ -404,7 +404,7 @@ def get_field_default(field):
                                "called; 'default' will not be set on schema", field, exc_info=True)
                 default = serializers.empty
 
-        if default is not serializers.empty:
+        if default is not serializers.empty and default is not None:
             try:
                 default = field.to_representation(default)
                 # JSON roundtrip ensures that the value is valid JSON;
