@@ -69,8 +69,8 @@
 
 <a id="oauth2-redirect-url" href="{% static 'drf-yasg/swagger-ui-dist/oauth2-redirect.html' %}" class="hidden"></a>
 
-<div id="django-session-auth" class="hidden">
-    {% if USE_SESSION_AUTH %}
+{% if USE_SESSION_AUTH %}
+    <div id="django-session-auth" class="hidden">
         {% csrf_token %}
         {% if request.user.is_authenticated %}
             <div class="hello">
@@ -91,8 +91,8 @@
                 </a>
             </div>
         {% endif %}
-    {% endif %}
-</div>
+    </div>
+{% endif %}
 </body>
 
 </html>
