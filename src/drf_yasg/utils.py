@@ -122,7 +122,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
         data.update(extra_overrides)
         if not data:  # pragma: no cover
             # no overrides to set, no use in doing more work
-            return
+            return view_method
 
         # if the method is an @action, it will have a bind_to_methods attribute, or a mapping attribute for drf>3.8
         bind_to_methods = getattr(view_method, 'bind_to_methods', [])
