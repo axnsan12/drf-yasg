@@ -1,4 +1,4 @@
-from future.utils import raise_from
+from six import raise_from
 
 import copy
 import json
