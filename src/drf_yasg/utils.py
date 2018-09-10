@@ -254,6 +254,22 @@ def param_list_to_odict(parameters):
     return result
 
 
+def merge_params(parameters, overrides):
+    """Merge `overrides` into `parameters`. This is the same as appending `overrides` to `parameters`, but any element
+    of `parameters` whose ``(name, in_)`` tuple collides with an element in `overrides` is replaced by it.
+
+    Raises an ``AssertionError`` if either list contains duplicate parameters.
+
+    :param list[.Parameter] parameters: initial parameters
+    :param list[.Parameter] overrides: overriding parameters
+    :return: merged list
+    :rtype: list[.Parameter]
+    """
+    parameters = param_list_to_odict(parameters)
+    parameters.update(param_list_to_odict(overrides))
+    return list(parameters.values())
+
+
 def filter_none(obj):
     """Remove ``None`` values from tuples, lists or dictionaries. Return other objects as-is.
 

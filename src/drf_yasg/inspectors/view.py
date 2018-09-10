@@ -8,8 +8,8 @@ from rest_framework.status import is_success
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
-    force_real_str, force_serializer_instance, get_consumes, get_produces, guess_response_status, is_list_view, no_body,
-    param_list_to_odict
+    force_real_str, force_serializer_instance, get_consumes, get_produces, guess_response_status, is_list_view,
+    merge_params, no_body, param_list_to_odict
 )
 from .base import ViewInspector
 
@@ -162,21 +162,19 @@ class SwaggerAutoSchema(ViewInspector):
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
-        parameters = param_list_to_odict(parameters)
         manual_parameters = self.overrides.get('manual_parameters', None) or []
 
         if any(param.in_ == openapi.IN_BODY for param in manual_parameters):  # pragma: no cover
             raise SwaggerGenerationError("specify the body parameter as a Schema or Serializer in request_body")
         if any(param.in_ == openapi.IN_FORM for param in manual_parameters):  # pragma: no cover
-            if any(param.in_ == openapi.IN_BODY for param in parameters.values()):
+            if any(param.in_ == openapi.IN_BODY for param in parameters):
                 raise SwaggerGenerationError("cannot add form parameters when the request has a request body; "
                                              "did you forget to set an appropriate parser class on the view?")
             if self.method not in self.body_methods:
                 raise SwaggerGenerationError("form parameters can only be applied to (" + ','.join(self.body_methods) +
                                              ") HTTP methods")
 
-        parameters.update(param_list_to_odict(manual_parameters))
-        return list(parameters.values())
+        return merge_params(parameters, manual_parameters)
 
     def get_responses(self):
         """Get the possible responses for this view as a swagger :class:`.Responses` object.

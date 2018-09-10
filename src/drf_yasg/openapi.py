@@ -291,6 +291,8 @@ class Paths(SwaggerDict):
 
 
 class PathItem(SwaggerDict):
+    OPERATION_NAMES = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch']
+
     def __init__(self, get=None, put=None, post=None, delete=None, options=None,
                  head=None, patch=None, parameters=None, **extra):
         """Information about a single path
@@ -314,6 +316,15 @@ class PathItem(SwaggerDict):
         self.options = options
         self.parameters = filter_none(parameters)
         self._insert_extras__()
+
+    @property
+    def operations(self):
+        """A list of all standard Operations on this PathItem object. See :attr:`.OPERATION_NAMES`.
+
+        :return: list of (method name, Operation) tuples
+        :rtype: list[tuple[str,Operation]]
+        """
+        return [(k, v) for k, v in self.items() if k in PathItem.OPERATION_NAMES and v]
 
 
 class Operation(SwaggerDict):
