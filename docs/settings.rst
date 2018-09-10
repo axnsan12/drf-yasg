@@ -364,6 +364,10 @@ URL which serves the UI; see :ref:`note on URL settings <url-settings>` above.
 LAZY_RENDERING
 --------------
 
+If set, enables lazy rendering mode in ReDoc. This mode is useful for APIs with big number of operations (e.g. > 50).
+In this mode ReDoc shows initial screen ASAP and then renders the rest operations asynchronously while showing
+progress bar on the top.
+
 **NOTE:** this feature might be removed in future versions of ReDoc (see https://github.com/Rebilly/ReDoc/issues/475)
 
 **Default**: :python:`False` |br|
@@ -372,11 +376,17 @@ LAZY_RENDERING
 HIDE_HOSTNAME
 -------------
 
+If set, the protocol and hostname is not shown in the operation definition.
+
 **Default**: :python:`False` |br|
 *Maps to attribute*: ``hideHostname``
 
 EXPAND_RESPONSES
 ----------------
+
+Specify which responses to expand by default by response codes. Values should be passed as comma-separated list without
+spaces e.g. expandResponses="200,201". Special value "all" expands all responses by default.
+Be careful: this option can slow-down documentation rendering time.
 
 **Default**: :python:`'all'` |br|
 *Maps to attribute*: ``expandResponses``
@@ -384,17 +394,23 @@ EXPAND_RESPONSES
 PATH_IN_MIDDLE
 --------------
 
+Show path link and HTTP verb in the middle panel instead of the right one.
+
 **Default**: :python:`False` |br|
 *Maps to attribute*: ``pathInMiddlePanel``
 
 NATIVE_SCROLLBARS
 -----------------
 
+Use native scrollbar for sidemenu instead of perfect-scroll (scrolling performance optimization for big specs).
+
 **Default**: :python:`False` |br|
 *Maps to attribute*: ``nativeScrollbars``
 
 REQUIRED_PROPS_FIRST
 --------------------
+
+Show required properties first ordered in the same order as in required array.
 
 **Default**: :python:`False` |br|
 *Maps to attribute*: ``requiredPropsFirst``
