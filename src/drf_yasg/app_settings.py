@@ -63,6 +63,7 @@ SWAGGER_DEFAULTS = {
         'patch',
         'trace'
     ],
+    'DISPLAY_OPERATION_ID': True,
 }
 
 REDOC_DEFAULTS = {

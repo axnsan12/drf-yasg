@@ -32,7 +32,6 @@ function initSwaggerUi() {
     var swaggerConfig = {
         url: specURL,
         dom_id: '#swagger-ui',
-        displayOperationId: true,
         displayRequestDuration: true,
         presets: [
             SwaggerUIBundle.presets.apis,

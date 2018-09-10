@@ -332,6 +332,14 @@ This does not filter the operations from the display.
 **Default**: :python:`['get','put','post','delete','options','head','patch','trace']` |br|
 *Maps to parameter*: ``supportedSubmitMethods``
 
+DISPLAY_OPERATION_ID
+--------------------
+
+Controls the display of operationId in operations list.
+
+**Default**: :python:`True`
+*Maps to parameter*: ``displayOperationId``
+
 **************
 REDOC_SETTINGS
 **************

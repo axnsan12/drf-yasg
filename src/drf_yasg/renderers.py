@@ -133,6 +133,7 @@ class SwaggerUIRenderer(_UIRenderer):
             'showCommonExtensions': swagger_settings.SHOW_COMMON_EXTENSIONS,
             'oauth2RedirectUrl': swagger_settings.OAUTH2_REDIRECT_URL,
             'supportedSubmitMethods': swagger_settings.SUPPORTED_SUBMIT_METHODS,
+            'displayOperationId': swagger_settings.DISPLAY_OPERATION_ID,
         }
 
         data = filter_none(data)
