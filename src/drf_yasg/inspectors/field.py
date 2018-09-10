@@ -232,9 +232,20 @@ class RelatedFieldInspector(FieldInspector):
                 # if the RelatedField has no queryset (e.g. read only), try to find the target model
                 # from the view queryset or ModelSerializer model, if present
                 view_queryset = getattr(self.view, 'queryset', None)
-                serializer_meta = getattr(get_parent_serializer(field), 'Meta', None)
-                this_model = getattr(view_queryset, 'model', None) or getattr(serializer_meta, 'model', None)
+                parent_serializer = get_parent_serializer(field)
+                if view_queryset is not None:
+                    # make sure the view is actually using *this* serializer
+                    try:
+                        if type(parent_serializer) != self.view.get_serializer_class():
+                            view_queryset = None
+                    except Exception as e:
+                        view_queryset = None
+
+                serializer_meta = getattr(parent_serializer, 'Meta', None)
+                this_model = getattr(serializer_meta, 'model', None) or getattr(view_queryset, 'model', None)
                 source = getattr(field, 'source', '') or field.field_name
+                if not source and isinstance(field.parent, serializers.ManyRelatedField):
+                    source = field.parent.field_name
                 model = get_related_model(this_model, source)
                 model_field = get_model_field(model, target_field)
 
