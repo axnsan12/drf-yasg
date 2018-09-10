@@ -15,7 +15,7 @@ from rest_framework.settings import api_settings as rest_framework_settings
 from . import openapi
 from .app_settings import swagger_settings
 from .errors import SwaggerGenerationError
-from .inspectors.field import get_basic_type_info, get_queryset_field
+from .inspectors.field import get_basic_type_info, get_queryset_field, get_queryset_from_view
 from .openapi import ReferenceResolver
 from .utils import force_real_str, get_consumes, get_produces
 
@@ -424,7 +424,7 @@ class OpenAPISchemaGenerator(object):
         :rtype: list[openapi.Parameter]
         """
         parameters = []
-        queryset = getattr(view_cls, 'queryset', None)
+        queryset = get_queryset_from_view(view_cls)
 
         for variable in sorted(uritemplate.variables(path)):
             model, model_field = get_queryset_field(queryset, variable)
