@@ -155,7 +155,9 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-autodoc_default_flags = ['private-members']
+autodoc_default_options = {
+    'private-members': None
+}
 autodoc_member_order = 'bysource'
 autoclass_content = 'both'
 autodoc_mock_imports = []

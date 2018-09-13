@@ -1,7 +1,8 @@
 node_modules/
 testproj/db.sqlite3
 testproj/staticfiles
-.vscode/
+\.pytest_cache/
+docs/\.doctrees/
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
@@ -159,5 +160,3 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
-
-\.pytest_cache/
