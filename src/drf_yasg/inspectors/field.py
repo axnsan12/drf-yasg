@@ -283,6 +283,10 @@ def find_regex(regex_field):
     regex_validator = None
     for validator in regex_field.validators:
         if isinstance(validator, validators.RegexValidator):
+            if isinstance(validator, validators.URLValidator) or validator == validators.validate_ipv4_address:
+                # skip the default url and IP regexes because they are complex and unhelpful
+                # validate_ipv4_address is a RegexValidator instance in Django 1.11
+                continue
             if regex_validator is not None:
                 # bail if multiple validators are found - no obvious way to choose
                 return None  # pragma: no cover
@@ -428,8 +432,7 @@ def get_basic_type_info(field):
         return None
 
     pattern = None
-    if swagger_type == openapi.TYPE_STRING and format != openapi.FORMAT_URI:
-        # uri skipped because default URLField regex is complex and unhelpful
+    if swagger_type == openapi.TYPE_STRING:
         pattern = find_regex(field)
 
     limits = find_limits(field)
