@@ -4,6 +4,20 @@ Changelog
 
 
 **********
+**1.10.2**
+**********
+
+*Release date: Sep 13, 2018*
+
+- **ADDED:** added the ``DISPLAY_OPERATION_ID `` ``swagger-ui`` setting
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-alpha.38
+- **IMPROVED:** Operation summary will now be parsed from multi-line view method docstrings (:issue:`205`)
+- **IMPROVED:** ``pattern`` will now work on any field with a ``RegexValidator``
+  (would previously not appear on fields with special formats such as ``EmailField``)
+- **FIXED:** fixed an issue with ``RelatedFieldInspector`` handling of nested serializers
+- **FIXED:** fixed handling of ``reverse_lazy`` in URL settings (:issue:`209`)
+
+**********
 **1.10.1**
 **********
 
@@ -19,7 +33,7 @@ Changelog
 - **FIXED:** fixed implementation of ``operation_summary`` and ``deprecated`` (:pr:`194`, :pr:`198`)
 - **FIXED:** fixed a bug related to nested ``typing`` hints (:pr:`195`)
 - **FIXED:** removed dependency on ``future`` (:issue:`196`)
-- **FIXED:** removed exceptions loged for fields with ``default=None`` (:issue:`203`)
+- **FIXED:** fixed exceptions logged for fields with ``default=None`` (:issue:`203`)
 - **FIXED:** fixed ``request_body=no_body`` handling and related tests (:issue:`188`, :issue:`199`)
 
 
