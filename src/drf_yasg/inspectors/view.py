@@ -321,16 +321,32 @@ class SwaggerAutoSchema(ViewInspector):
             operation_id = '_'.join(operation_keys)
         return operation_id
 
+    def _extract_description_and_summary(self):
+        description = self.overrides.get('operation_description', None)
+        summary = self.overrides.get('operation_summary', None)
+        if description is None:
+            description = self._sch.get_description(self.path, self.method) or ''
+            description = description.strip().replace('\r', '')
+
+            if description and (summary is None):
+                # description from docstring ... do summary magic
+                # https://www.python.org/dev/peps/pep-0257/#multi-line-docstrings
+                summary_max_len = 120  # OpenAPI 2.0 spec says summary should be under 120 characters
+                sections = description.split('\n\n', 1)
+                if len(sections) == 2:
+                    sections[0] = sections[0].strip()
+                    if len(sections[0]) < summary_max_len:
+                        summary, description = sections
+
+        return description, summary
+
     def get_description(self):
         """Return an operation description determined as appropriate from the view's method and class docstrings.
 
         :return: the operation description
         :rtype: str
         """
-        description = self.overrides.get('operation_description', None)
-        if description is None:
-            description = self._sch.get_description(self.path, self.method)
-        return description
+        return self._extract_description_and_summary()[0]
 
     def get_summary(self):
         """Return a summary description for this operation.
@@ -338,7 +354,7 @@ class SwaggerAutoSchema(ViewInspector):
         :return: the summary
         :rtype: str
         """
-        return self.overrides.get('operation_summary', None)
+        return self._extract_description_and_summary()[1]
 
     def get_security(self):
         """Return a list of security requirements for this operation.

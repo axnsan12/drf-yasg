@@ -391,7 +391,8 @@ paths:
         - snippets
     delete:
       operationId: snippetsDeleteBulk
-      description: SnippetList classdoc
+      summary: summary from docstring
+      description: description body is here, summary is not included
       parameters:
         - name: data
           in: body

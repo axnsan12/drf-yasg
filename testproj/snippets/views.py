@@ -46,6 +46,10 @@ class SnippetList(generics.ListCreateAPIView):
         ),
     )
     def delete(self, *args, **kwargs):
+        """summary from docstring
+
+        description body is here, summary is not included
+        """
         pass
 
 
