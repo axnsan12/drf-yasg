@@ -1,6 +1,7 @@
 import six
 
 from django.shortcuts import render, resolve_url
+from django.utils.functional import Promise
 from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer
 from rest_framework.utils import json
 
@@ -81,6 +82,9 @@ class _UIRenderer(BaseRenderer):
         renderer_context.update(self.get_auth_urls())
 
     def resolve_url(self, to):
+        if isinstance(to, Promise):
+            to = str(to)
+
         if to is None:
             return None
 
