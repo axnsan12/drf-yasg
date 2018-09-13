@@ -428,7 +428,8 @@ def get_basic_type_info(field):
         return None
 
     pattern = None
-    if swagger_type == openapi.TYPE_STRING and format in (None, openapi.FORMAT_SLUG):
+    if swagger_type == openapi.TYPE_STRING and format != openapi.FORMAT_URI:
+        # uri skipped because default URLField regex is complex and unhelpful
         pattern = find_regex(field)
 
     limits = find_limits(field)
