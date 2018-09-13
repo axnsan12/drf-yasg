@@ -311,6 +311,27 @@ class OpenAPISchemaGenerator(object):
         """
         return self._gen.determine_path_prefix(paths)
 
+    def should_include_endpoint(self, path, method, view, public):
+        """Check if a given endpoint should be included in the resulting schema.
+
+        :param str path: request path
+        :param str method: http request method
+        :param view: instantiated view callback
+        :param bool public: if True, all endpoints are included regardless of access through `request`
+        :returns: true if the view should be excluded
+        :rtype: bool
+        """
+        return public or self._gen.has_view_permissions(path, method, view)
+
+    def get_paths_object(self, paths):
+        """Construct the Swagger Paths object.
+
+        :param OrderedDict[str,openapi.PathItem] paths: mapping of paths to :class:`.PathItem` objects
+        :returns: the :class:`.Paths` object
+        :rtype: openapi.Paths
+        """
+        return openapi.Paths(paths=paths)
+
     def get_paths(self, endpoints, components, request, public):
         """Generate the Swagger Paths for the API from the given endpoints.
 
@@ -331,7 +352,7 @@ class OpenAPISchemaGenerator(object):
         for path, (view_cls, methods) in sorted(endpoints.items()):
             operations = {}
             for method, view in methods:
-                if not public and not self._gen.has_view_permissions(path, method, view):
+                if not self.should_include_endpoint(path, method, view, public):
                     continue
 
                 operation = self.get_operation(view, path, prefix, method, components, request)
@@ -346,7 +367,7 @@ class OpenAPISchemaGenerator(object):
                     path_suffix = '/' + path_suffix
                 paths[path_suffix] = self.get_path_item(path, view_cls, operations)
 
-        return openapi.Paths(paths=paths), prefix
+        return self.get_paths_object(paths), prefix
 
     def get_operation(self, view, path, prefix, method, components, request):
         """Get an :class:`.Operation` for the given API endpoint (path, method). This method delegates to
