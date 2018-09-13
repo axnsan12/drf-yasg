@@ -675,42 +675,56 @@ try:
     from djangorestframework_camel_case.render import CamelCaseJSONRenderer
     from djangorestframework_camel_case.render import camelize
 except ImportError:  # pragma: no cover
-    class CamelCaseJSONFilter(FieldInspector):
-        """Converts property names to camelCase if ``djangorestframework_camel_case`` is used."""
-        pass
-else:
-    def camelize_string(s):
-        """Hack to force ``djangorestframework_camel_case`` to camelize a plain string."""
+    CamelCaseJSONParser = CamelCaseJSONRenderer = None
+
+    def camelize(data):
+        return data
+
+
+class CamelCaseJSONFilter(FieldInspector):
+    """Converts property names to camelCase if ``djangorestframework_camel_case`` is used."""
+
+    def camelize_string(self, s):
+        """Hack to force ``djangorestframework_camel_case`` to camelize a plain string.
+
+        :param str s: the string
+        :return: camelized string
+        :rtype: str
+        """
         return next(iter(camelize({s: ''})))
 
-    def camelize_schema(schema_or_ref, components):
-        """Recursively camelize property names for the given schema using ``djangorestframework_camel_case``."""
-        schema = openapi.resolve_ref(schema_or_ref, components)
+    def camelize_schema(self, schema):
+        """Recursively camelize property names for the given schema using ``djangorestframework_camel_case``.
+        The target schema object must be modified in-place.
+
+        :param openapi.Schema schema: the :class:`.Schema` object
+        """
         if getattr(schema, 'properties', {}):
             schema.properties = OrderedDict(
-                (camelize_string(key), camelize_schema(val, components))
+                (self.camelize_string(key), self.camelize_schema(openapi.resolve_ref(val, self.components)) or val)
                 for key, val in schema.properties.items()
             )
 
             if getattr(schema, 'required', []):
-                schema.required = [camelize_string(p) for p in schema.required]
+                schema.required = [self.camelize_string(p) for p in schema.required]
 
-        return schema_or_ref
+    def process_result(self, result, method_name, obj, **kwargs):
+        if isinstance(result, openapi.Schema.OR_REF) and self.is_camel_case():
+            schema = openapi.resolve_ref(result, self.components)
+            self.camelize_schema(schema)
 
-    class CamelCaseJSONFilter(FieldInspector):
-        """Converts property names to camelCase if ``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer`` are used."""
+        return result
 
+    if CamelCaseJSONParser and CamelCaseJSONRenderer:
         def is_camel_case(self):
             return (
                 any(issubclass(parser, CamelCaseJSONParser) for parser in self.view.parser_classes) or
                 any(issubclass(renderer, CamelCaseJSONRenderer) for renderer in self.view.renderer_classes)
             )
+    else:
+        def is_camel_case(self):
+            return False
 
-        def process_result(self, result, method_name, obj, **kwargs):
-            if isinstance(result, openapi.Schema.OR_REF) and self.is_camel_case():
-                return camelize_schema(result, self.components)
-
-            return result
 
 try:
     from rest_framework_recursive.fields import RecursiveField
