@@ -9,7 +9,7 @@ Changelog
 
 *Release date: Sep 13, 2018*
 
-- **ADDED:** added the ``DISPLAY_OPERATION_ID `` ``swagger-ui`` setting
+- **ADDED:** added the ``DISPLAY_OPERATION_ID`` ``swagger-ui`` setting
 - **IMPROVED:** updated ``ReDoc`` to version 2.0.0-alpha.38
 - **IMPROVED:** Operation summary will now be parsed from multi-line view method docstrings (:issue:`205`)
 - **IMPROVED:** ``pattern`` will now work on any field with a ``RegexValidator``

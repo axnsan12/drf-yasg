@@ -28,7 +28,7 @@ class _SpecRenderer(BaseRenderer):
 
         if not isinstance(data, Swagger):  # pragma: no cover
             # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
-            # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
+            # in that case, it's probably better to let the default ``JSONRenderer`` render it
             # see https://github.com/axnsan12/drf-yasg/issues/58
             return JSONRenderer().render(data, media_type, renderer_context)
         return codec.encode(data)
@@ -68,15 +68,11 @@ class _UIRenderer(BaseRenderer):
             # see https://github.com/axnsan12/drf-yasg/issues/58
             return TemplateHTMLRenderer().render(swagger, accepted_media_type, renderer_context)
         self.set_context(renderer_context, swagger)
-        return render(
-            renderer_context['request'],
-            self.template,
-            renderer_context
-        )
+        return render(renderer_context['request'], self.template, renderer_context)
 
-    def set_context(self, renderer_context, swagger):
-        renderer_context['title'] = swagger.info.title
-        renderer_context['version'] = swagger.info.version
+    def set_context(self, renderer_context, swagger=None):
+        renderer_context['title'] = swagger.info.title or '' if swagger else ''
+        renderer_context['version'] = swagger.info.version or '' if swagger else ''
         renderer_context['oauth2_config'] = json.dumps(self.get_oauth2_config())
         renderer_context['USE_SESSION_AUTH'] = swagger_settings.USE_SESSION_AUTH
         renderer_context.update(self.get_auth_urls())
@@ -119,7 +115,7 @@ class SwaggerUIRenderer(_UIRenderer):
     template = 'drf-yasg/swagger-ui.html'
     format = 'swagger'
 
-    def set_context(self, renderer_context, swagger):
+    def set_context(self, renderer_context, swagger=None):
         super(SwaggerUIRenderer, self).set_context(renderer_context, swagger)
         renderer_context['swagger_settings'] = json.dumps(self.get_swagger_ui_settings())
 
@@ -152,7 +148,7 @@ class ReDocRenderer(_UIRenderer):
     template = 'drf-yasg/redoc.html'
     format = 'redoc'
 
-    def set_context(self, renderer_context, swagger):
+    def set_context(self, renderer_context, swagger=None):
         super(ReDocRenderer, self).set_context(renderer_context, swagger)
         renderer_context['redoc_settings'] = json.dumps(self.get_redoc_settings())
 

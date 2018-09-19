@@ -273,7 +273,7 @@ def merge_params(parameters, overrides):
 def filter_none(obj):
     """Remove ``None`` values from tuples, lists or dictionaries. Return other objects as-is.
 
-    :param obj:
+    :param obj: the object
     :return: collection with ``None`` values removed
     """
     if obj is None:
