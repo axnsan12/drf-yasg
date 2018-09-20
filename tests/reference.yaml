@@ -207,6 +207,7 @@ paths:
           pattern: ^69$
           default: '69'
           minLength: 1
+          x-nullable: true
         - name: image_styles
           in: formData
           description: Parameter with Items
@@ -885,6 +886,7 @@ definitions:
           - 3
           - 7
           - 8
+        x-nullable: true
       group:
         type: string
         format: uuid
@@ -903,6 +905,7 @@ definitions:
         pattern: ^69$
         default: '69'
         minLength: 1
+        x-nullable: true
       image_styles:
         description: Parameter with Items
         type: array
@@ -931,12 +934,14 @@ definitions:
         type: string
         maxLength: 30
         minLength: 1
+        x-nullable: true
       last_name:
         title: Last name
         description: <strong>Here's some HTML!</strong>
         type: string
         maxLength: 30
         minLength: 1
+        x-nullable: true
   Person:
     required:
       - identity
@@ -1488,6 +1493,7 @@ definitions:
         type: array
         items:
           type: integer
+        x-nullable: true
       exampleProjects:
         type: array
         items:
@@ -1552,6 +1558,7 @@ definitions:
       parent_id:
         type: integer
         title: Parent id
+        x-nullable: true
   TodoTree:
     required:
       - title

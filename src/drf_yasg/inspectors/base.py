@@ -192,7 +192,7 @@ class FieldInspector(BaseInspector):
 
             - arguments specified by the ``kwargs`` parameter of :meth:`._get_partial_types`
             - ``instance_kwargs`` passed to the constructor function
-            - ``title``, ``description``, ``required`` and ``default`` inferred from the field,
+            - ``title``, ``description``, ``required``, ``x-nullable`` and ``default`` inferred from the field,
               where appropriate
 
           If ``existing_object`` is not ``None``, it is updated instead of creating a new object.
@@ -225,6 +225,9 @@ class FieldInspector(BaseInspector):
                 instance_kwargs.setdefault('title', title)
             if description is not None:
                 instance_kwargs.setdefault('description', description)
+            if field.allow_null:
+                instance_kwargs['x_nullable'] = True
+
             instance_kwargs.update(kwargs)
 
             if existing_object is not None:
