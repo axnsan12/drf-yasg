@@ -1,4 +1,6 @@
+import re
 import logging
+from textwrap import dedent
 from collections import OrderedDict
 
 from rest_framework.request import is_form_media_type
@@ -14,6 +16,35 @@ from ..utils import (
 from .base import ViewInspector
 
 log = logging.getLogger(__name__)
+META_REGEX = re.compile(r'([\w_-]+):(.*)')
+
+
+def get_meta_text(text):
+    text_lines = text.splitlines()
+    meta = OrderedDict()
+
+    if text_lines == []:
+        return meta, text
+
+    start = None
+    for i, line in enumerate(text_lines):
+        is_meta = META_REGEX.match(line)
+        if is_meta:
+            key, value = is_meta.groups()
+            meta.update({key.lower(): value.lstrip()})
+            continue
+        if meta and line.startswith(' '*4):
+            last_key = next(reversed(meta))
+            meta[last_key] += "\n"+line.lstrip()
+            continue
+        if meta and line.strip() == '':
+            start = i+1
+            break
+        start = i
+        break
+
+    text = "\n".join(text_lines[start:]) if start is not None else ''
+    return meta, text
 
 
 class SwaggerAutoSchema(ViewInspector):
@@ -341,20 +372,21 @@ class SwaggerAutoSchema(ViewInspector):
         return description, summary
 
     def get_description(self):
-        """Return an operation description determined as appropriate from the view's method and class docstrings.
+        description = self.overrides.get('operation_description', None)
+        if description is None:
+            description = self._sch.get_description(self.path, self.method)
+        _, description = get_meta_text(description)
 
-        :return: the operation description
-        :rtype: str
-        """
-        return self._extract_description_and_summary()[0]
-
+        return description
+    
     def get_summary(self):
-        """Return a summary description for this operation.
+        summary = self.overrides.get('operation_summary', None)
+        if summary is not None:
+            return summary
 
-        :return: the summary
-        :rtype: str
-        """
-        return self._extract_description_and_summary()[1]
+        description = self._sch.get_description(self.path, self.method)
+        meta, _ = get_meta_text(description)
+        return meta.get('summary', None)
 
     def get_security(self):
         """Return a list of security requirements for this operation.
