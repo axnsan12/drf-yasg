@@ -414,6 +414,12 @@ class SwaggerAutoSchema(ViewInspector):
             of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: list[str]
         """
+        description = self._sch.get_description(self.path, self.method)
+        meta, _ = get_meta_text(description)
+        tags = meta.get('tags', None)
+        if tags is not None:
+            return [t.strip() for t in tags.split(',')]
+
         return [operation_keys[0]]
 
     def get_consumes(self):
