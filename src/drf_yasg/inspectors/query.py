@@ -58,17 +58,31 @@ class DjangoRestResponsePagination(PaginatorInspector):
     PageNumberPagination and CursorPagination
     """
 
+    COUNT_SCHEMA = openapi.Schema(
+        type=openapi.TYPE_INTEGER,
+        description='Total number of items available.')
+    NEXT_SCHEMA = openapi.Schema(
+        type=openapi.TYPE_INTEGER,
+        format=openapi.FORMAT_URI,
+        description='Next items in the paginated sequence.')
+    PREVIOUS_SCHEMA = openapi.Schema(
+        type=openapi.TYPE_INTEGER,
+        format=openapi.FORMAT_URI,
+        description='Previous items in the paginated sequence.')
+
     def get_paginated_response(self, paginator, response_schema):
         assert response_schema.type == openapi.TYPE_ARRAY, "array return expected for paged response"
         paged_schema = None
         if isinstance(paginator, (LimitOffsetPagination, PageNumberPagination, CursorPagination)):
             has_count = not isinstance(paginator, CursorPagination)
+            if not response_schema.get('description'):
+                response_schema['description'] = 'List of paginated items'
             paged_schema = openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties=OrderedDict((
-                    ('count', openapi.Schema(type=openapi.TYPE_INTEGER) if has_count else None),
-                    ('next', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)),
-                    ('previous', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)),
+                    ('count', self.COUNT_SCHEMA if has_count else None),
+                    ('next', self.NEXT_SCHEMA),
+                    ('previous', self.PREVIOUS_SCHEMA),
                     ('results', response_schema),
                 )),
                 required=['results']
