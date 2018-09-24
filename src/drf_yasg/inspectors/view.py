@@ -348,35 +348,22 @@ class SwaggerAutoSchema(ViewInspector):
         :rtype: str
         """
         operation_id = self.overrides.get('operation_id', '')
-        if not operation_id:
-            operation_id = '_'.join(operation_keys)
-        return operation_id
+        if operation_id:
+            return operation_id
+        
+        description = self._sch.get_description(self.path, self.method)
+        meta, _ = get_meta_text(description)
+        operation_id = meta.get('id', None)
+        if operation_id is not None:
+            return operation_id
 
-    def _extract_description_and_summary(self):
-        description = self.overrides.get('operation_description', None)
-        summary = self.overrides.get('operation_summary', None)
-        if description is None:
-            description = self._sch.get_description(self.path, self.method) or ''
-            description = description.strip().replace('\r', '')
-
-            if description and (summary is None):
-                # description from docstring ... do summary magic
-                # https://www.python.org/dev/peps/pep-0257/#multi-line-docstrings
-                summary_max_len = 120  # OpenAPI 2.0 spec says summary should be under 120 characters
-                sections = description.split('\n\n', 1)
-                if len(sections) == 2:
-                    sections[0] = sections[0].strip()
-                    if len(sections[0]) < summary_max_len:
-                        summary, description = sections
-
-        return description, summary
+        return '_'.join(operation_keys)
 
     def get_description(self):
         description = self.overrides.get('operation_description', None)
         if description is None:
             description = self._sch.get_description(self.path, self.method)
         _, description = get_meta_text(description)
-
         return description
     
     def get_summary(self):
@@ -404,7 +391,13 @@ class SwaggerAutoSchema(ViewInspector):
         :return: deprecation status
         :rtype: bool
         """
-        return self.overrides.get('deprecated', None)
+        deprecated = self.overrides.get('deprecated', None)
+        if deprecated is not None:
+            return deprecated
+
+        description = self._sch.get_description(self.path, self.method)
+        meta, _ = get_meta_text(description)
+        return meta.get('deprecated', None)
 
     def get_tags(self, operation_keys):
         """Get a list of tags for this operation. Tags determine how operations relate with each other, and in the UI
