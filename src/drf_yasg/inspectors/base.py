@@ -225,7 +225,7 @@ class FieldInspector(BaseInspector):
                 instance_kwargs.setdefault('title', title)
             if description is not None:
                 instance_kwargs.setdefault('description', description)
-            if field.allow_null:
+            if field.allow_null and not instance_kwargs.get('required', False) and not field.required:
                 instance_kwargs['x_nullable'] = True
 
             instance_kwargs.update(kwargs)
