@@ -5,7 +5,6 @@ import operator
 import uuid
 from collections import OrderedDict
 from decimal import Decimal
-from inspect import isclass
 
 from django.core import validators
 from django.db import models
@@ -18,10 +17,14 @@ from ..utils import decimal_as_float, filter_none, get_serializer_class, get_ser
 from .base import FieldInspector, NotHandled, SerializerInspector
 
 try:
-    # Python>=3.5
     import typing
 except ImportError:
     typing = None
+
+try:
+    from inspect import signature as inspect_signature
+except ImportError:
+    inspect_signature = None
 
 logger = logging.getLogger(__name__)
 
@@ -83,10 +86,10 @@ class InlineSerializerInspector(SerializerInspector):
 
             ref_name = self.get_serializer_ref_name(field)
 
-            def make_schema_definition():
+            def make_schema_definition(serializer=field):
                 properties = OrderedDict()
                 required = []
-                for property_name, child in field.fields.items():
+                for property_name, child in serializer.fields.items():
                     property_name = self.get_property_name(property_name)
                     prop_kwargs = {
                         'read_only': bool(child.read_only) or None
@@ -544,13 +547,13 @@ class SerializerMethodFieldInspector(FieldInspector):
                 serializer.read_only = True
 
             return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
-        elif typing:
+        elif typing and inspect_signature:
             # look for Python 3.5+ style type hinting of the return value
-            hint_class = inspect.signature(method).return_annotation
+            hint_class = inspect_signature(method).return_annotation
 
-            if not isclass(hint_class) and hasattr(hint_class, '__args__'):
+            if not inspect.isclass(hint_class) and hasattr(hint_class, '__args__'):
                 hint_class = hint_class.__args__[0]
-            if isclass(hint_class) and not issubclass(hint_class, inspect._empty):
+            if inspect.isclass(hint_class) and not issubclass(hint_class, inspect._empty):
                 type_info = get_basic_type_info_from_hint(hint_class)
 
                 if type_info is not None:
@@ -675,42 +678,56 @@ try:
     from djangorestframework_camel_case.render import CamelCaseJSONRenderer
     from djangorestframework_camel_case.render import camelize
 except ImportError:  # pragma: no cover
-    class CamelCaseJSONFilter(FieldInspector):
-        """Converts property names to camelCase if ``djangorestframework_camel_case`` is used."""
-        pass
-else:
-    def camelize_string(s):
-        """Hack to force ``djangorestframework_camel_case`` to camelize a plain string."""
+    CamelCaseJSONParser = CamelCaseJSONRenderer = None
+
+    def camelize(data):
+        return data
+
+
+class CamelCaseJSONFilter(FieldInspector):
+    """Converts property names to camelCase if ``djangorestframework_camel_case`` is used."""
+
+    def camelize_string(self, s):
+        """Hack to force ``djangorestframework_camel_case`` to camelize a plain string.
+
+        :param str s: the string
+        :return: camelized string
+        :rtype: str
+        """
         return next(iter(camelize({s: ''})))
 
-    def camelize_schema(schema_or_ref, components):
-        """Recursively camelize property names for the given schema using ``djangorestframework_camel_case``."""
-        schema = openapi.resolve_ref(schema_or_ref, components)
+    def camelize_schema(self, schema):
+        """Recursively camelize property names for the given schema using ``djangorestframework_camel_case``.
+        The target schema object must be modified in-place.
+
+        :param openapi.Schema schema: the :class:`.Schema` object
+        """
         if getattr(schema, 'properties', {}):
             schema.properties = OrderedDict(
-                (camelize_string(key), camelize_schema(val, components))
+                (self.camelize_string(key), self.camelize_schema(openapi.resolve_ref(val, self.components)) or val)
                 for key, val in schema.properties.items()
             )
 
             if getattr(schema, 'required', []):
-                schema.required = [camelize_string(p) for p in schema.required]
+                schema.required = [self.camelize_string(p) for p in schema.required]
 
-        return schema_or_ref
+    def process_result(self, result, method_name, obj, **kwargs):
+        if isinstance(result, openapi.Schema.OR_REF) and self.is_camel_case():
+            schema = openapi.resolve_ref(result, self.components)
+            self.camelize_schema(schema)
 
-    class CamelCaseJSONFilter(FieldInspector):
-        """Converts property names to camelCase if ``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer`` are used."""
+        return result
 
+    if CamelCaseJSONParser and CamelCaseJSONRenderer:
         def is_camel_case(self):
             return (
                 any(issubclass(parser, CamelCaseJSONParser) for parser in self.view.parser_classes) or
                 any(issubclass(renderer, CamelCaseJSONRenderer) for renderer in self.view.renderer_classes)
             )
+    else:
+        def is_camel_case(self):
+            return False
 
-        def process_result(self, result, method_name, obj, **kwargs):
-            if isinstance(result, openapi.Schema.OR_REF) and self.is_camel_case():
-                return camelize_schema(result, self.components)
-
-            return result
 
 try:
     from rest_framework_recursive.fields import RecursiveField

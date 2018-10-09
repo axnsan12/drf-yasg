@@ -12,7 +12,8 @@ from rest_framework.views import APIView
 
 from .app_settings import swagger_settings
 from .renderers import (
-    OpenAPIRenderer, ReDocOldRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer
+    OpenAPIRenderer, ReDocOldRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer,
+    _SpecRenderer
 )
 
 SPEC_RENDERERS = (SwaggerYAMLRenderer, SwaggerJSONRenderer, OpenAPIRenderer)
@@ -85,7 +86,12 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
         renderer_classes = _spec_renderers
 
         def get(self, request, version='', format=None):
-            generator = self.generator_class(info, request.version or version or '', url, patterns, urlconf)
+            version = request.version or version or ''
+            if isinstance(request.accepted_renderer, _SpecRenderer):
+                generator = self.generator_class(info, version, url, patterns, urlconf)
+            else:
+                generator = self.generator_class(info, version, url, patterns=[])
+
             schema = generator.get_schema(request, self.public)
             if schema is None:
                 raise exceptions.PermissionDenied()  # pragma: no cover
