@@ -33,7 +33,12 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 
 class ImageUploadSerializer(serializers.Serializer):
-    what_am_i_doing = serializers.RegexField(regex=r"^69$", help_text="test", default="69")
+    what_am_i_doing = serializers.RegexField(
+        regex=r"^69$",
+        help_text="test",
+        default="69",
+        allow_null=True
+    )
     image_styles = serializers.ListSerializer(
         child=serializers.ChoiceField(choices=['wide', 'tall', 'thumb', 'social']),
         help_text="Parameter with Items"
