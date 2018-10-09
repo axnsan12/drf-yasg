@@ -1,4 +1,6 @@
+import re
 import logging
+from textwrap import dedent
 from collections import OrderedDict
 
 from rest_framework.request import is_form_media_type
@@ -14,6 +16,35 @@ from ..utils import (
 from .base import ViewInspector
 
 log = logging.getLogger(__name__)
+META_REGEX = re.compile(r'([\w_-]+):(.*)')
+
+
+def get_meta_text(text):
+    text_lines = text.splitlines()
+    meta = OrderedDict()
+
+    if text_lines == []:
+        return meta, text
+
+    start = None
+    for i, line in enumerate(text_lines):
+        is_meta = META_REGEX.match(line)
+        if is_meta:
+            key, value = is_meta.groups()
+            meta.update({key.lower(): value.lstrip()})
+            continue
+        if meta and line.startswith(' '*4):
+            last_key = next(reversed(meta))
+            meta[last_key] += "\n"+line.lstrip()
+            continue
+        if meta and line.strip() == '':
+            start = i+1
+            break
+        start = i
+        break
+
+    text = "\n".join(text_lines[start:]) if start is not None else ''
+    return meta, text
 
 
 class SwaggerAutoSchema(ViewInspector):
@@ -317,44 +348,32 @@ class SwaggerAutoSchema(ViewInspector):
         :rtype: str
         """
         operation_id = self.overrides.get('operation_id', '')
-        if not operation_id:
-            operation_id = '_'.join(operation_keys)
-        return operation_id
+        if operation_id:
+            return operation_id
+        
+        description = self._sch.get_description(self.path, self.method)
+        meta, _ = get_meta_text(description)
+        operation_id = meta.get('id', None)
+        if operation_id is not None:
+            return operation_id
 
-    def _extract_description_and_summary(self):
-        description = self.overrides.get('operation_description', None)
-        summary = self.overrides.get('operation_summary', None)
-        if description is None:
-            description = self._sch.get_description(self.path, self.method) or ''
-            description = description.strip().replace('\r', '')
-
-            if description and (summary is None):
-                # description from docstring ... do summary magic
-                # https://www.python.org/dev/peps/pep-0257/#multi-line-docstrings
-                summary_max_len = 120  # OpenAPI 2.0 spec says summary should be under 120 characters
-                sections = description.split('\n\n', 1)
-                if len(sections) == 2:
-                    sections[0] = sections[0].strip()
-                    if len(sections[0]) < summary_max_len:
-                        summary, description = sections
-
-        return description, summary
+        return '_'.join(operation_keys)
 
     def get_description(self):
-        """Return an operation description determined as appropriate from the view's method and class docstrings.
-
-        :return: the operation description
-        :rtype: str
-        """
-        return self._extract_description_and_summary()[0]
-
+        description = self.overrides.get('operation_description', None)
+        if description is None:
+            description = self._sch.get_description(self.path, self.method)
+        _, description = get_meta_text(description)
+        return description
+    
     def get_summary(self):
-        """Return a summary description for this operation.
+        summary = self.overrides.get('operation_summary', None)
+        if summary is not None:
+            return summary
 
-        :return: the summary
-        :rtype: str
-        """
-        return self._extract_description_and_summary()[1]
+        description = self._sch.get_description(self.path, self.method)
+        meta, _ = get_meta_text(description)
+        return meta.get('summary', None)
 
     def get_security(self):
         """Return a list of security requirements for this operation.
@@ -372,7 +391,13 @@ class SwaggerAutoSchema(ViewInspector):
         :return: deprecation status
         :rtype: bool
         """
-        return self.overrides.get('deprecated', None)
+        deprecated = self.overrides.get('deprecated', None)
+        if deprecated is not None:
+            return deprecated
+
+        description = self._sch.get_description(self.path, self.method)
+        meta, _ = get_meta_text(description)
+        return meta.get('deprecated', None)
 
     def get_tags(self, operation_keys):
         """Get a list of tags for this operation. Tags determine how operations relate with each other, and in the UI
@@ -382,6 +407,12 @@ class SwaggerAutoSchema(ViewInspector):
             of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: list[str]
         """
+        description = self._sch.get_description(self.path, self.method)
+        meta, _ = get_meta_text(description)
+        tags = meta.get('tags', None)
+        if tags is not None:
+            return [t.strip() for t in tags.split(',')]
+
         return [operation_keys[0]]
 
     def get_consumes(self):
