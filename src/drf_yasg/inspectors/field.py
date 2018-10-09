@@ -5,7 +5,6 @@ import operator
 import uuid
 from collections import OrderedDict
 from decimal import Decimal
-from inspect import isclass
 
 from django.core import validators
 from django.db import models
@@ -18,10 +17,14 @@ from ..utils import decimal_as_float, filter_none, get_serializer_class, get_ser
 from .base import FieldInspector, NotHandled, SerializerInspector
 
 try:
-    # Python>=3.5
     import typing
 except ImportError:
     typing = None
+
+try:
+    from inspect import signature as inspect_signature
+except ImportError:
+    inspect_signature = None
 
 logger = logging.getLogger(__name__)
 
@@ -83,10 +86,10 @@ class InlineSerializerInspector(SerializerInspector):
 
             ref_name = self.get_serializer_ref_name(field)
 
-            def make_schema_definition():
+            def make_schema_definition(serializer=field):
                 properties = OrderedDict()
                 required = []
-                for property_name, child in field.fields.items():
+                for property_name, child in serializer.fields.items():
                     property_name = self.get_property_name(property_name)
                     prop_kwargs = {
                         'read_only': bool(child.read_only) or None
@@ -544,13 +547,13 @@ class SerializerMethodFieldInspector(FieldInspector):
                 serializer.read_only = True
 
             return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
-        elif typing:
+        elif typing and inspect_signature:
             # look for Python 3.5+ style type hinting of the return value
-            hint_class = inspect.signature(method).return_annotation
+            hint_class = inspect_signature(method).return_annotation
 
-            if not isclass(hint_class) and hasattr(hint_class, '__args__'):
+            if not inspect.isclass(hint_class) and hasattr(hint_class, '__args__'):
                 hint_class = hint_class.__args__[0]
-            if isclass(hint_class) and not issubclass(hint_class, inspect._empty):
+            if inspect.isclass(hint_class) and not issubclass(hint_class, inspect._empty):
                 type_info = get_basic_type_info_from_hint(hint_class)
 
                 if type_info is not None:
