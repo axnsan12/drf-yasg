@@ -4,6 +4,23 @@ Changelog
 
 
 **********
+**1.11.0**
+**********
+
+*Release date: TBD*
+
+- **ADDED:** ``PERSIST_AUTH``, ``REFETCH_SCHEMA_WITH_AUTH``, ``REFETCH_SCHEMA_ON_LOGOUT``
+  settings and related javascript implementation for persisting authentication data to swagger-ui localStorage
+- **IMPROVED:** UI-enabled views will now no longer generate the full specification document twice; the HTML part
+  of the view will only generate a barebones ``Swagger`` object with no ``paths`` and ``definitions``
+- **IMPROVED:** added the ``FETCH_SCHEMA_WITH_QUERY`` setting to enable fetching of the schema document using
+  query parameters passed to the UI view (:issue:`208`)
+- **IMPROVED:** added support for the very common ``x-nullable`` extension (:issue:`217`)
+- **IMPROVED:** extensibility of some classes was improved by adding more extension points, together with more blocks
+  for ``swagger-ui.html``/``redoc.html`` and some JavaScript hooks in ``swagger-ui-init.js``
+- **FIXED:** removed usage of ``inspect.signature`` on python 2.7 (:issue:`222`)
+
+**********
 **1.10.2**
 **********
 
