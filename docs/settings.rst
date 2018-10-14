@@ -248,6 +248,14 @@ Re-fetch the OpenAPI document without credentials after authorization is removed
 **Default**: :python:`'False` |br|
 *Maps to parameter*: -
 
+FETCH_SCHEMA_WITH_QUERY
+-----------------------
+
+Fetch the OpenAPI document using the query parameters passed to the swagger-ui page request.
+
+**Default**: :python:`'True` |br|
+*Maps to parameter*: -
+
 OPERATIONS_SORTER
 -----------------
 
@@ -440,6 +448,14 @@ Show required properties first ordered in the same order as in required array.
 
 **Default**: :python:`False` |br|
 *Maps to attribute*: ``requiredPropsFirst``
+
+FETCH_SCHEMA_WITH_QUERY
+-----------------------
+
+Fetch the OpenAPI document using the query parameters passed to the ReDoc page request.
+
+**Default**: :python:`'True` |br|
+*Maps to parameter*: -
 
 
 .. _FORCE_SCRIPT_NAME: https://docs.djangoproject.com/en/2.0/ref/settings/#force-script-name

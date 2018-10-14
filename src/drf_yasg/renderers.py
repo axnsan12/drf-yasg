@@ -137,6 +137,7 @@ class SwaggerUIRenderer(_UIRenderer):
             'persistAuth': swagger_settings.PERSIST_AUTH,
             'refetchWithAuth': swagger_settings.REFETCH_SCHEMA_WITH_AUTH,
             'refetchOnLogout': swagger_settings.REFETCH_SCHEMA_ON_LOGOUT,
+            'fetchSchemaWithQuery': swagger_settings.FETCH_SCHEMA_WITH_QUERY,
         }
 
         data = filter_none(data)
@@ -164,6 +165,7 @@ class ReDocRenderer(_UIRenderer):
             'pathInMiddlePanel': redoc_settings.PATH_IN_MIDDLE,
             'nativeScrollbars': redoc_settings.NATIVE_SCROLLBARS,
             'requiredPropsFirst': redoc_settings.REQUIRED_PROPS_FIRST,
+            'fetchSchemaWithQuery': redoc_settings.FETCH_SCHEMA_WITH_QUERY,
         }
 
         return filter_none(data)

@@ -91,13 +91,24 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
     var persistAuth = swaggerSettings.persistAuth;
     var refetchWithAuth = swaggerSettings.refetchWithAuth;
     var refetchOnLogout = swaggerSettings.refetchOnLogout;
+    var fetchSchemaWithQuery = swaggerSettings.fetchSchemaWithQuery;
     delete swaggerSettings['persistAuth'];
     delete swaggerSettings['refetchWithAuth'];
     delete swaggerSettings['refetchOnLogout'];
+    delete swaggerSettings['fetchSchemaWithQuery'];
 
     for (var p in swaggerSettings) {
         if (swaggerSettings.hasOwnProperty(p)) {
             swaggerUiConfig[p] = swaggerSettings[p];
+        }
+    }
+
+    if (fetchSchemaWithQuery) {
+        // only add query params from document for the first spec request
+        // this ensures we otherwise honor the spec selector box which might be manually modified
+        var query = new URLSearchParams(window.location.search).entries();
+        for (var it = query.next(); !it.done; it = query.next()) {
+            swaggerUiConfig.url = setQueryParam(swaggerUiConfig.url, it.value[0], it.value[1]);
         }
     }
 
@@ -132,7 +143,6 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
             var headers = request.headers || {};
             if (request.loadSpec) {
                 var newUrl = request.url;
-
                 if (refetchWithAuth) {
                     newUrl = applyAuth(savedAuth, newUrl, headers) || newUrl;
                 }
