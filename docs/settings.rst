@@ -222,6 +222,31 @@ set to ``None`` to remove the badge.
 **Default**: :python:`'http://online.swagger.io/validator/'` |br|
 *Maps to parameter*: ``validatorUrl``
 
+PERSIST_AUTH
+------------
+
+Persist swagger-ui authorization data to local storage. |br|
+**WARNING:** this may be a security risk as the data is stored unencrypted
+
+**Default**: :python:`'False` |br|
+*Maps to parameter*: -
+
+REFETCH_SCHEMA_WITH_AUTH
+------------------------
+
+Re-fetch the OpenAPI document with the new credentials after authorization is performed through swagger-ui.
+
+**Default**: :python:`'False` |br|
+*Maps to parameter*: -
+
+REFETCH_SCHEMA_ON_LOGOUT
+------------------------
+
+Re-fetch the OpenAPI document without credentials after authorization is removed through swagger-ui.
+
+**Default**: :python:`'False` |br|
+*Maps to parameter*: -
+
 OPERATIONS_SORTER
 -----------------
 

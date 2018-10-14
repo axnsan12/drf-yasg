@@ -42,6 +42,9 @@ SWAGGER_DEFAULTS = {
     'LOGOUT_URL': getattr(settings, 'LOGOUT_URL', None),
     'SPEC_URL': None,
     'VALIDATOR_URL': '',
+    'PERSIST_AUTH': False,
+    'REFETCH_SCHEMA_WITH_AUTH': False,
+    'REFETCH_SCHEMA_ON_LOGOUT': False,
 
     'OPERATIONS_SORTER': None,
     'TAGS_SORTER': None,

@@ -95,6 +95,9 @@ REST_FRAMEWORK = {
 SWAGGER_SETTINGS = {
     'LOGIN_URL': reverse_lazy('admin:login'),
     'LOGOUT_URL': '/admin/logout',
+    'PERSIST_AUTH': True,
+    'REFETCH_SCHEMA_WITH_AUTH': True,
+    'REFETCH_SCHEMA_ON_LOGOUT': True,
 
     'DEFAULT_INFO': 'testproj.urls.swagger_info',
 
@@ -106,6 +109,11 @@ SWAGGER_SETTINGS = {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header'
+        },
+        'Query': {
+            'type': 'apiKey',
+            'name': 'auth',
+            'in': 'query'
         }
     }
 }

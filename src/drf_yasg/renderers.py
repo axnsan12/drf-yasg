@@ -134,6 +134,9 @@ class SwaggerUIRenderer(_UIRenderer):
             'oauth2RedirectUrl': swagger_settings.OAUTH2_REDIRECT_URL,
             'supportedSubmitMethods': swagger_settings.SUPPORTED_SUBMIT_METHODS,
             'displayOperationId': swagger_settings.DISPLAY_OPERATION_ID,
+            'persistAuth': swagger_settings.PERSIST_AUTH,
+            'refetchWithAuth': swagger_settings.REFETCH_SCHEMA_WITH_AUTH,
+            'refetchOnLogout': swagger_settings.REFETCH_SCHEMA_ON_LOGOUT,
         }
 
         data = filter_none(data)
