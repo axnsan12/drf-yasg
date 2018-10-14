@@ -33,7 +33,7 @@ SWAGGER_DEFAULTS = {
 
     'USE_SESSION_AUTH': True,
     'SECURITY_DEFINITIONS': {
-        'basic': {
+        'Basic': {
             'type': 'basic'
         }
     },

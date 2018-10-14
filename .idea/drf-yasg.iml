@@ -27,12 +27,14 @@
     </content>
     <orderEntry type="jdk" jdkName="Python 3 (drf-yasg)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="immutable" level="application" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
     <option name="TEMPLATE_FOLDERS">
       <list>
         <option value="$MODULE_DIR$/src/drf_yasg/templates" />
+        <option value="$MODULE_DIR$/testproj/testproj/templates" />
       </list>
     </option>
   </component>
