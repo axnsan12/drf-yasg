@@ -27,9 +27,14 @@ securityDefinitions:
     in: header
     name: Authorization
     type: apiKey
+  Query:
+    in: query
+    name: auth
+    type: apiKey
 security:
   - Basic: []
   - Bearer: []
+  - Query: []
 paths:
   /articles/:
     get:
