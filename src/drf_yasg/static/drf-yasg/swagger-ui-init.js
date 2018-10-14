@@ -114,7 +114,7 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
         var oldOnComplete = swaggerUiConfig.onComplete;
         swaggerUiConfig.onComplete = function () {
             if (persistAuth) {
-                preauthorizeAny(savedAuth, window.ui);
+                preauthorizeAll(savedAuth, window.ui);
             }
 
             if (!hookedAuth) {
@@ -131,10 +131,7 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
         swaggerUiConfig.requestInterceptor = function (request) {
             var headers = request.headers || {};
             if (refetchWithAuth && request.loadSpec) {
-                var newUrl = applyAuth(savedAuth, request.url, headers) || request.url;
-                if (newUrl !== request.url) {
-                    request.url = newUrl;
-                }
+                request.url = applyAuth(savedAuth, request.url, headers) || request.url;
 
                 // need to manually remember requests for spec urls because
                 // responseInterceptor has no reference to the request...
@@ -150,7 +147,8 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
         var oldResponseInterceptor = swaggerUiConfig.responseInterceptor;
         swaggerUiConfig.responseInterceptor = function (response) {
             if (refetchWithAuth && specRequestsInFlight.indexOf(response.url) !== -1) {
-                // need setTimeout here because swagger-ui insists to updateUrl with the initial request url...
+                // need setTimeout here because swagger-ui insists to call updateUrl
+                // with the initial request url after the response...
                 if (response.ok) {
                     setTimeout(function () {
                         window.ui.specActions.updateUrl(response.url);
@@ -165,27 +163,6 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
                 response = oldResponseInterceptor(response);
             }
             return response;
-        }
-    }
-}
-
-/**
- * Call sui.preauthorize### according to the type of savedAuth.
- * @param savedAuth auth object saved from authActions.authorize
- * @param sui SwaggerUI or SwaggerUIBundle instance
- */
-function preauthorizeAny(savedAuth, sui) {
-    var schemeName = savedAuth.get("name"), schemeType = savedAuth.getIn(["schema", "type"]);
-    if (schemeType === "basic" && schemeName) {
-        var username = savedAuth.getIn(["value", "username"]);
-        var password = savedAuth.getIn(["value", "password"]);
-        if (username && password) {
-            sui.preauthorizeBasic(schemeName, username, password);
-        }
-    } else if (schemeType === "apiKey" && schemeName) {
-        var key = savedAuth.get("value");
-        if (key) {
-            sui.preauthorizeApiKey(schemeName, key);
         }
     }
 }
@@ -211,55 +188,89 @@ function removeQueryParam(url, key) {
 }
 
 /**
+ * Call sui.preauthorize### for all authorizations in authorization.
+ * @param authorization authorization object {key => authScheme} saved from authActions.authorize
+ * @param sui SwaggerUI or SwaggerUIBundle instance
+ */
+function preauthorizeAll(authorization, sui) {
+    authorization.valueSeq().forEach(function (authScheme) {
+        var schemeName = authScheme.get("name"), schemeType = authScheme.getIn(["schema", "type"]);
+        if (schemeType === "basic" && schemeName) {
+            var username = authScheme.getIn(["value", "username"]);
+            var password = authScheme.getIn(["value", "password"]);
+            if (username && password) {
+                sui.preauthorizeBasic(schemeName, username, password);
+            }
+        } else if (schemeType === "apiKey" && schemeName) {
+            var key = authScheme.get("value");
+            if (key) {
+                sui.preauthorizeApiKey(schemeName, key);
+            }
+        } else {
+            // TODO: OAuth2
+        }
+    });
+}
+
+/**
  * Manually apply auth headers from the given auth object.
- * @param {object} authScheme auth object saved from authActions.authorize
+ * @param {object} authorization authorization object {key => authScheme} saved from authActions.authorize
  * @param {string} requestUrl the request url
- * @param {object} requestHeaders target headers
+ * @param {object} requestHeaders target headers, modified in place by the function
  * @return string new request url
  */
-function applyAuth(authScheme, requestUrl, requestHeaders) {
-    requestHeaders = requestHeaders || {};
-    var schemeName = authScheme.get("name"), schemeType = authScheme.getIn(["schema", "type"]);
-    if (schemeType === "basic" && schemeName) {
-        var username = authScheme.getIn(["value", "username"]);
-        var password = authScheme.getIn(["value", "password"]);
-        if (username && password) {
-            requestHeaders["Authorization"] = "Basic " + btoa(username + ":" + password);
-        }
-    } else if (schemeType === "apiKey" && schemeName) {
-        var _in = authScheme.getIn(["schema", "in"]), paramName = authScheme.getIn(["schema", "name"]);
-        var key = authScheme.get("value");
-        if (key && paramName) {
-            if (_in === "header") {
-                requestHeaders[paramName] = key;
+function applyAuth(authorization, requestUrl, requestHeaders) {
+    authorization.valueSeq().forEach(function (authScheme) {
+        requestHeaders = requestHeaders || {};
+        var schemeName = authScheme.get("name"), schemeType = authScheme.getIn(["schema", "type"]);
+        if (schemeType === "basic" && schemeName) {
+            var username = authScheme.getIn(["value", "username"]);
+            var password = authScheme.getIn(["value", "password"]);
+            if (username && password) {
+                requestHeaders["Authorization"] = "Basic " + btoa(username + ":" + password);
             }
-            if (_in === "query") {
-                if (requestUrl) {
-                    requestUrl = addQueryParam(requestUrl, paramName, key);
+        } else if (schemeType === "apiKey" && schemeName) {
+            var _in = authScheme.getIn(["schema", "in"]), paramName = authScheme.getIn(["schema", "name"]);
+            var key = authScheme.get("value");
+            if (key && paramName) {
+                if (_in === "header") {
+                    requestHeaders[paramName] = key;
                 }
-                else {
-                    console.warn("WARNING: cannot apply apiKey query parameter via interceptor");
+                if (_in === "query") {
+                    if (requestUrl) {
+                        requestUrl = addQueryParam(requestUrl, paramName, key);
+                    }
+                    else {
+                        console.warn("WARNING: cannot apply apiKey query parameter via interceptor");
+                    }
                 }
             }
+        } else {
+            // TODO: OAuth2
         }
-    }
+    });
 
     return requestUrl;
 }
 
 /**
  * Remove the given authorization scheme from the url.
- * @param {object} authScheme
- * @param {string} requestUrl
+ * @param {object} authorization authorization object {key => authScheme} containing schemes to deauthorize
+ * @param {string} requestUrl request url
+ * @return string new request url
  */
-function deauthUrl(authScheme, requestUrl) {
-    var schemeType = authScheme.getIn(["schema", "type"]);
-    if (schemeType === "apiKey") {
-        var _in = authScheme.getIn(["schema", "in"]), paramName = authScheme.getIn(["schema", "name"]);
-        if (_in === "query" && requestUrl && paramName) {
-            requestUrl = removeQueryParam(requestUrl, paramName);
+function deauthUrl(authorization, requestUrl) {
+    authorization.valueSeq().forEach(function (authScheme) {
+        var schemeType = authScheme.getIn(["schema", "type"]);
+        if (schemeType === "apiKey") {
+            var _in = authScheme.getIn(["schema", "in"]), paramName = authScheme.getIn(["schema", "name"]);
+            if (_in === "query" && requestUrl && paramName) {
+                requestUrl = removeQueryParam(requestUrl, paramName);
+            }
+        } else {
+            // TODO: OAuth2?
         }
-    }
+    });
     return requestUrl;
 }
 
@@ -282,34 +293,39 @@ function hookAuthActions(sui, persistAuth, refetchWithAuth, refetchOnLogout) {
         originalAuthorize(authorization);
         // authorization is map of scheme name to scheme object
         // need to use ImmutableJS because schema is already an ImmutableJS object
-        var schemes = Immutable.fromJS(authorization);
-        savedAuth = schemes.valueSeq().first();
-
-        if (persistAuth) {
-            localStorage.setItem("drf-yasg-auth", JSON.stringify(savedAuth.toJSON()));
-        }
+        var newAuths = Immutable.fromJS(authorization);
+        savedAuth = savedAuth.merge(newAuths);
 
         if (refetchWithAuth) {
             var url = sui.specSelectors.url();
             url = applyAuth(savedAuth, url) || url;
             sui.specActions.download(url);
         }
+        if (persistAuth) {
+            localStorage.setItem("drf-yasg-auth", JSON.stringify(savedAuth.toJSON()));
+        }
     };
 
     var originalLogout = sui.authActions.logout;
     sui.authActions.logout = function (authorization) {
-        if (savedAuth.get("name") === authorization[0]) {
-            var oldAuth = savedAuth.set("value", null);
-            savedAuth = Immutable.fromJS({});
-            if (persistAuth) {
-                localStorage.removeItem("drf-yasg-auth");
-            }
+        // stash logged out methods for use with deauthUrl
+        var loggedOut = savedAuth.filter(function (val, key) {
+            return authorization.indexOf(key) !== -1;
+        }).mapEntries(function (entry) {
+            return [entry[0], entry[1].set("value", null)]
+        });
+        // remove logged out methods from savedAuth
+        savedAuth = savedAuth.filter(function (val, key) {
+            return authorization.indexOf(key) === -1;
+        });
 
-            if (refetchWithAuth) {
-                var url = sui.specSelectors.url();
-                url = deauthUrl(oldAuth, url) || url;
-                sui.specActions.download(url);
-            }
+        if (refetchWithAuth) {
+            var url = sui.specSelectors.url();
+            url = deauthUrl(loggedOut, url) || url;
+            sui.specActions.download(url);
+        }
+        if (persistAuth) {
+            localStorage.setItem("drf-yasg-auth", JSON.stringify(savedAuth.toJSON()));
         }
         originalLogout(authorization);
     };
