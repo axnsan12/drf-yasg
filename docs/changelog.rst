@@ -7,7 +7,7 @@ Changelog
 **1.11.0**
 **********
 
-*Release date: TBD*
+*Release date: Oct 14, 2018*
 
 - **ADDED:** ``PERSIST_AUTH``, ``REFETCH_SCHEMA_WITH_AUTH``, ``REFETCH_SCHEMA_ON_LOGOUT``
   settings and related javascript implementation for persisting authentication data to swagger-ui localStorage
