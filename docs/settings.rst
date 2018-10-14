@@ -226,7 +226,8 @@ PERSIST_AUTH
 ------------
 
 Persist swagger-ui authorization data to local storage. |br|
-**WARNING:** this may be a security risk as the data is stored unencrypted
+**WARNING:** This may be a security risk as the credentials are stored unencrypted and can be accessed
+by all javascript code running on the same domain.
 
 **Default**: :python:`'False` |br|
 *Maps to parameter*: -

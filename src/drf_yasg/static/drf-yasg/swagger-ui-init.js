@@ -126,16 +126,36 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
             }
         };
 
-        var specRequestsInFlight = [];
+        var specRequestsInFlight = {};
         var oldRequestInterceptor = swaggerUiConfig.requestInterceptor;
         swaggerUiConfig.requestInterceptor = function (request) {
             var headers = request.headers || {};
-            if (refetchWithAuth && request.loadSpec) {
-                request.url = applyAuth(savedAuth, request.url, headers) || request.url;
+            if (request.loadSpec) {
+                var newUrl = request.url;
 
-                // need to manually remember requests for spec urls because
-                // responseInterceptor has no reference to the request...
-                specRequestsInFlight.push(request.url);
+                if (refetchWithAuth) {
+                    newUrl = applyAuth(savedAuth, newUrl, headers) || newUrl;
+                }
+
+                if (newUrl !== request.url) {
+                    request.url = newUrl;
+
+                    if (window.ui) {
+                        // this visually updates the spec url before the request is done, i.e. while loading
+                        window.ui.specActions.updateUrl(request.url);
+                    } else {
+                        // setTimeout is needed here because the request interceptor can be called *during*
+                        // window.ui initialization (by the SwaggerUIBundle constructor)
+                        setTimeout(function () {
+                            window.ui.specActions.updateUrl(request.url);
+                        });
+                    }
+
+                    // need to manually remember requests for spec urls because
+                    // responseInterceptor has no reference to the request...
+                    var absUrl = new URL(request.url, currentPath);
+                    specRequestsInFlight[absUrl.href] = request.url;
+                }
             }
 
             if (oldRequestInterceptor) {
@@ -146,17 +166,20 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
 
         var oldResponseInterceptor = swaggerUiConfig.responseInterceptor;
         swaggerUiConfig.responseInterceptor = function (response) {
-            if (refetchWithAuth && specRequestsInFlight.indexOf(response.url) !== -1) {
-                // need setTimeout here because swagger-ui insists to call updateUrl
-                // with the initial request url after the response...
+            var absUrl = new URL(response.url, currentPath);
+            if (absUrl.href in specRequestsInFlight) {
+                var setToUrl = specRequestsInFlight[absUrl.href];
+                delete specRequestsInFlight[absUrl.href];
                 if (response.ok) {
+                    // need setTimeout here because swagger-ui insists to call updateUrl
+                    // with the initial request url after the response...
                     setTimeout(function () {
-                        window.ui.specActions.updateUrl(response.url);
+                        var currentUrl = new URL(window.ui.specSelectors.url(), currentPath);
+                        if (currentUrl.href !== absUrl.href) {
+                            window.ui.specActions.updateUrl(setToUrl);
+                        }
                     });
                 }
-                specRequestsInFlight = specRequestsInFlight.filter(function (val) {
-                    return val !== response.url;
-                });
             }
 
             if (oldResponseInterceptor) {
@@ -172,13 +195,13 @@ function _usp(url, fn) {
     var usp = new URLSearchParams(url[1]);
     fn(usp);
     url[1] = usp.toString();
-    return url.join('?');
+    return url[1] ? url.join('?') : url[0];
 }
 
-function addQueryParam(url, key, value) {
+function setQueryParam(url, key, value) {
     return _usp(url, function (usp) {
         usp.set(key, value);
-    })
+    });
 }
 
 function removeQueryParam(url, key) {
@@ -238,7 +261,7 @@ function applyAuth(authorization, requestUrl, requestHeaders) {
                 }
                 if (_in === "query") {
                     if (requestUrl) {
-                        requestUrl = addQueryParam(requestUrl, paramName, key);
+                        requestUrl = setQueryParam(requestUrl, paramName, key);
                     }
                     else {
                         console.warn("WARNING: cannot apply apiKey query parameter via interceptor");
@@ -299,7 +322,9 @@ function hookAuthActions(sui, persistAuth, refetchWithAuth, refetchOnLogout) {
         if (refetchWithAuth) {
             var url = sui.specSelectors.url();
             url = applyAuth(savedAuth, url) || url;
-            sui.specActions.download(url);
+            sui.specActions.updateUrl(url);
+            sui.specActions.download();
+            sui.authActions.showDefinitions(); // hide authorize dialog
         }
         if (persistAuth) {
             localStorage.setItem("drf-yasg-auth", JSON.stringify(savedAuth.toJSON()));
@@ -322,7 +347,9 @@ function hookAuthActions(sui, persistAuth, refetchWithAuth, refetchOnLogout) {
         if (refetchWithAuth) {
             var url = sui.specSelectors.url();
             url = deauthUrl(loggedOut, url) || url;
+            sui.specActions.updateUrl(url);
             sui.specActions.download(url);
+            sui.authActions.showDefinitions(); // hide authorize dialog
         }
         if (persistAuth) {
             localStorage.setItem("drf-yasg-auth", JSON.stringify(savedAuth.toJSON()));
