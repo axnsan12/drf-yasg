@@ -4,15 +4,8 @@ Customizing the web UI
 
 The web UI can be customized using the settings available in :ref:`swagger-ui-settings` and :ref:`redoc-ui-settings`.
 
-You can also extend one of the ``drf-yasg/swagger-ui.html`` or ``drf-yasg/redoc.html`` templates that are used for
-rendering. The customizable blocks are currently limited to:
+You can also extend one of the drf-yasg/swagger-ui.html_ or drf-yasg/redoc.html_ templates that are used for
+rendering. See the template source code (linked above) for a complete list of customizable blocks.
 
-{% block extra_styles %}
-  additional stylesheets
-
-{% block extra_scripts %}
-  additional scripts
-
-{% block user_context_message %}
-  *(swagger-ui session auth only)*
-  logged in user message
+.. _drf-yasg/swagger-ui.html: https://github.com/axnsan12/drf-yasg/blob/master/src/drf_yasg/templates/drf-yasg/swagger-ui.html
+.. _drf-yasg/redoc.html: https://github.com/axnsan12/drf-yasg/blob/master/src/drf_yasg/templates/drf-yasg/redoc.html

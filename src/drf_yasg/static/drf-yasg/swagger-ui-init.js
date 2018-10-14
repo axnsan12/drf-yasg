@@ -1,12 +1,16 @@
 "use strict";
 var currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
 var defaultSpecUrl = currentPath + '?format=openapi';
+
+// load the saved authorization state from localStorage; ImmutableJS is used for consistency with swagger-ui state
 var savedAuth = Immutable.fromJS({});
 try {
     savedAuth = Immutable.fromJS(JSON.parse(localStorage.getItem("drf-yasg-auth")) || {});
 } catch (e) {
     localStorage.removeItem("drf-yasg-auth");
 }
+
+// global SwaggerUI config object; can be changed directly or by hooking initSwaggerUiConfig
 var swaggerUiConfig = {
     url: defaultSpecUrl,
     dom_id: '#swagger-ui',
@@ -35,7 +39,7 @@ var swaggerUiConfig = {
     onComplete: function () {
         preauthorizeAny(savedAuth, window.ui);
         hookAuthActions(window.ui);
-    },
+    }
 };
 
 function patchSwaggerUi() {
@@ -62,29 +66,52 @@ function initSwaggerUi() {
         console.log("WARNING: skipping initSwaggerUi() because window.ui is already defined");
         return;
     }
+    if (document.querySelector('.auth-wrapper .authorize')) {
+        patchSwaggerUi();
+    }
+    else {
+        insertionQ('.auth-wrapper .authorize').every(patchSwaggerUi);
+    }
 
     var swaggerSettings = JSON.parse(document.getElementById('swagger-settings').innerHTML);
-    if (!('oauth2RedirectUrl' in swaggerSettings)) {
-        var oauth2RedirectUrl = document.getElementById('oauth2-redirect-url');
-        if (oauth2RedirectUrl) {
-            swaggerSettings['oauth2RedirectUrl'] = oauth2RedirectUrl.href;
-            oauth2RedirectUrl.parentNode.removeChild(oauth2RedirectUrl);
+
+    var oauth2RedirectUrl = document.getElementById('oauth2-redirect-url');
+    if (oauth2RedirectUrl) {
+        if (!('oauth2RedirectUrl' in swaggerSettings)) {
+            if (oauth2RedirectUrl) {
+                swaggerSettings['oauth2RedirectUrl'] = oauth2RedirectUrl.href;
+            }
         }
+        oauth2RedirectUrl.parentNode.removeChild(oauth2RedirectUrl);
     }
 
     console.log('swaggerSettings', swaggerSettings);
+    var oauth2Config = JSON.parse(document.getElementById('oauth2-config').innerHTML);
+    console.log('oauth2Config', oauth2Config);
+
+    initSwaggerUiConfig(swaggerSettings, oauth2Config);
+    window.ui = SwaggerUIBundle(swaggerUiConfig);
+    window.ui.initOAuth(oauth2Config);
+}
+
+/**
+ * Initialize the global swaggerUiConfig with any given additional settings.
+ * @param swaggerSettings SWAGGER_SETTINGS from Django settings
+ * @param oauth2Settings OAUTH2_CONFIG from Django settings
+ */
+function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
     for (var p in swaggerSettings) {
         if (swaggerSettings.hasOwnProperty(p)) {
             swaggerUiConfig[p] = swaggerSettings[p];
         }
     }
-
-    var oauth2Config = JSON.parse(document.getElementById('oauth2-config').innerHTML);
-    console.log('oauth2Config', oauth2Config);
-    window.ui = SwaggerUIBundle(swaggerUiConfig);
-    window.ui.initOAuth(oauth2Config);
 }
 
+/**
+ * Call sui.preauthorize### according to the type of savedAuth.
+ * @param savedAuth auth object saved from authActions.authorize
+ * @param sui SwaggerUI or SwaggerUIBundle instance
+ */
 function preauthorizeAny(savedAuth, sui) {
     var schemeName = savedAuth.get("name"), schemeType = savedAuth.getIn(["schema", "type"]);
     if (schemeType === "basic" && schemeName) {
@@ -101,6 +128,11 @@ function preauthorizeAny(savedAuth, sui) {
     }
 }
 
+/**
+ * Manually apply auth headers from the given auth object.
+ * @param savedAuth auth object saved from authActions.authorize
+ * @param requestHeaders target headers
+ */
 function applyAuth(savedAuth, requestHeaders) {
     var schemeName = savedAuth.get("name"), schemeType = savedAuth.getIn(["schema", "type"]);
     if (schemeType === "basic" && schemeName) {
@@ -121,6 +153,11 @@ function applyAuth(savedAuth, requestHeaders) {
     }
 }
 
+/**
+ * Hook the authorize and logout actions of SwaggerUI.
+ * The hooks are used to persist authorization data and trigger schema refetch.
+ * @param sui SwaggerUI or SwaggerUIBundle instance
+ */
 function hookAuthActions(sui) {
     var originalAuthorize = sui.authActions.authorize;
     sui.authActions.authorize = function (authorization) {
@@ -144,13 +181,4 @@ function hookAuthActions(sui) {
     };
 }
 
-window.addEventListener('load', function () {
-    initSwaggerUi();
-
-    if (document.querySelector('.auth-wrapper .authorize')) {
-        patchSwaggerUi();
-    }
-    else {
-        insertionQ('.auth-wrapper .authorize').every(patchSwaggerUi);
-    }
-});
+window.addEventListener('load', initSwaggerUi);

@@ -7,7 +7,6 @@ wget https://rebilly.github.io/ReDoc/releases/v1.x.x/redoc.min.js -O src/drf_yas
 
 cp -r node_modules/swagger-ui-dist src/drf_yasg/static/drf-yasg/
 pushd src/drf_yasg/static/drf-yasg/swagger-ui-dist/ >/dev/null
-rm -f swagger-ui.js
-rm -f package.json .npmignore README.md
-rm -f index.html *.map
+rm -f package.json .npmignore README.md favicon-16x16.png
+rm -f  swagger-ui.js index.html *.map
 popd >/dev/null

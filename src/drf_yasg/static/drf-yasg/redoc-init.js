@@ -23,7 +23,7 @@ for (var p in redocSettings) {
     }
 }
 
-document.body.appendChild(redoc);
+document.body.replaceChild(redoc, document.getElementById('redoc-placeholder'));
 
 function hideEmptyVersion() {
     // 'span.api-info-version' is for redoc 1.x, 'div.api-info span' is for redoc 2-alpha
