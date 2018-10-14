@@ -103,24 +103,29 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
         }
     }
 
+    var specURL = swaggerUiConfig.url;
     if (fetchSchemaWithQuery) {
         // only add query params from document for the first spec request
         // this ensures we otherwise honor the spec selector box which might be manually modified
-        var query = new URLSearchParams(window.location.search).entries();
+        var query = new URLSearchParams(window.location.search || '').entries();
         for (var it = query.next(); !it.done; it = query.next()) {
-            swaggerUiConfig.url = setQueryParam(swaggerUiConfig.url, it.value[0], it.value[1]);
+            specURL = setQueryParam(specURL, it.value[0], it.value[1]);
         }
     }
+    if (persistAuth) {
+        try {
+            savedAuth = Immutable.fromJS(JSON.parse(localStorage.getItem("drf-yasg-auth")) || {});
+        } catch (e) {
+            localStorage.removeItem("drf-yasg-auth");
+        }
+    }
+    if (refetchWithAuth) {
+        specURL = applyAuth(savedAuth, specURL) || specURL;
+    }
+    swaggerUiConfig.url = specURL;
 
     if (persistAuth || refetchWithAuth) {
         var hookedAuth = false;
-        if (persistAuth) {
-            try {
-                savedAuth = Immutable.fromJS(JSON.parse(localStorage.getItem("drf-yasg-auth")) || {});
-            } catch (e) {
-                localStorage.removeItem("drf-yasg-auth");
-            }
-        }
 
         var oldOnComplete = swaggerUiConfig.onComplete;
         swaggerUiConfig.onComplete = function () {
@@ -177,6 +182,7 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
         var oldResponseInterceptor = swaggerUiConfig.responseInterceptor;
         swaggerUiConfig.responseInterceptor = function (response) {
             var absUrl = new URL(response.url, currentPath);
+            console.log("response", response);
             if (absUrl.href in specRequestsInFlight) {
                 var setToUrl = specRequestsInFlight[absUrl.href];
                 delete specRequestsInFlight[absUrl.href];
@@ -202,7 +208,7 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
 
 function _usp(url, fn) {
     url = url.split('?');
-    var usp = new URLSearchParams(url[1]);
+    var usp = new URLSearchParams(url[1] || '');
     fn(usp);
     url[1] = usp.toString();
     return url[1] ? url.join('?') : url[0];

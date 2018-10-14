@@ -10,9 +10,9 @@ if (redocSettings.url) {
 }
 delete redocSettings.url;
 if (redocSettings.fetchSchemaWithQuery) {
-    var query = new URLSearchParams(window.location.search).entries();
+    var query = new URLSearchParams(window.location.search || '').entries();
     var url = specURL.split('?');
-    var usp = new URLSearchParams(url[1]);
+    var usp = new URLSearchParams(url[1] || '');
     for (var it = query.next(); !it.done; it = query.next()) {
         usp.set(it.value[0], it.value[1]);
     }
