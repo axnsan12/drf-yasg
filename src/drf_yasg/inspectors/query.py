@@ -50,6 +50,7 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
             type=coreapi_types.get(type(field.schema), openapi.TYPE_STRING),
             required=field.required,
             description=force_real_str(field.schema.description) if field.schema else None,
+            enum=field.schema.enum if type(field.schema) == coreschema.Enum else None,
         )
 
 
