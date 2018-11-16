@@ -36,7 +36,7 @@ class SwaggerAutoSchema(ViewInspector):
         description = self.get_description()
         summary = self.get_summary()
         security = self.get_security()
-        assert security is None or isinstance(security, list), "security must be a list of securiy requirement objects"
+        assert security is None or isinstance(security, list), "security must be a list of security requirement objects"
         deprecated = self.is_deprecated()
         tags = self.get_tags(operation_keys)
 
