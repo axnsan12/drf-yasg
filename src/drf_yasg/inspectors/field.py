@@ -322,8 +322,8 @@ limit_validators = [
     (validators.MaxLengthValidator, serializers.CharField, 'max_length', operator.__lt__),
 
     # minItems and maxItems apply to lists
-    (validators.MinLengthValidator, serializers.ListField, 'min_items', operator.__gt__),
-    (validators.MaxLengthValidator, serializers.ListField, 'max_items', operator.__lt__),
+    (validators.MinLengthValidator, (serializers.ListField, serializers.ListSerializer), 'min_items', operator.__gt__),
+    (validators.MaxLengthValidator, (serializers.ListField, serializers.ListSerializer), 'max_items', operator.__lt__),
 ]
 
 
