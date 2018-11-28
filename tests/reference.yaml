@@ -740,6 +740,19 @@ paths:
           description: this one too!
           required: false
           type: boolean
+        - name: styles
+          in: query
+          description: and this one is fancy!
+          required: true
+          type: array
+          items:
+            type: string
+            enum:
+              - a
+              - b
+              - c
+              - d
+          collectionFormat: multi
       responses:
         '200':
           description: ''
@@ -1159,6 +1172,7 @@ definitions:
               - fan
               - fancy
               - felix
+              - fennel
               - fish
               - flatline
               - forth
@@ -1184,6 +1198,7 @@ definitions:
               - haskell
               - haxeml
               - hexdump
+              - hlsl
               - hsail
               - html
               - html+cheetah
@@ -1450,6 +1465,7 @@ definitions:
               - xml+php
               - xml+smarty
               - xml+velocity
+              - xorg.conf
               - xquery
               - xslt
               - xtend

@@ -597,16 +597,22 @@ class ChoiceFieldInspector(FieldInspector):
                     if model_type:
                         enum_type = model_type.get('type', enum_type)
 
+            enum_values = list(field.choices.keys())
             if isinstance(field, serializers.MultipleChoiceField):
-                return SwaggerType(
+                result = SwaggerType(
                     type=openapi.TYPE_ARRAY,
                     items=ChildSwaggerType(
                         type=enum_type,
-                        enum=list(field.choices.keys())
+                        enum=enum_values
                     )
                 )
+                if swagger_object_type == openapi.Parameter:
+                    if result['in'] in (openapi.IN_FORM, openapi.IN_QUERY):
+                        result.collection_format = 'multi'
+            else:
+                result = SwaggerType(type=enum_type, enum=enum_values)
 
-            return SwaggerType(type=enum_type, enum=list(field.choices.keys()))
+            return result
 
         return NotHandled
 

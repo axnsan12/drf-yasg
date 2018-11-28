@@ -81,3 +81,4 @@ class UserSerializerrr(serializers.ModelSerializer):
 class UserListQuerySerializer(serializers.Serializer):
     username = serializers.CharField(help_text="this field is generated from a query_serializer", required=False)
     is_staff = serializers.BooleanField(help_text="this one too!", required=False)
+    styles = serializers.MultipleChoiceField(help_text="and this one is fancy!", choices=('a', 'b', 'c', 'd'))
