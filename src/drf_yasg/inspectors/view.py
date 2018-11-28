@@ -108,8 +108,8 @@ class SwaggerAutoSchema(ViewInspector):
             if body_override is no_body:
                 return no_body
             if self.method not in self.body_methods:
-                raise SwaggerGenerationError("request_body can only be applied to (" + ','.join(self.body_methods)
-                                             + "); are you looking for query_serializer or manual_parameters?")
+                raise SwaggerGenerationError("request_body can only be applied to (" + ','.join(self.body_methods) +
+                                             "); are you looking for query_serializer or manual_parameters?")
             if isinstance(body_override, openapi.Schema.OR_REF):
                 return body_override
             return force_serializer_instance(body_override)
@@ -171,8 +171,8 @@ class SwaggerAutoSchema(ViewInspector):
                 raise SwaggerGenerationError("cannot add form parameters when the request has a request body; "
                                              "did you forget to set an appropriate parser class on the view?")
             if self.method not in self.body_methods:
-                raise SwaggerGenerationError("form parameters can only be applied to (" + ','.join(self.body_methods)
-                                             + ") HTTP methods")
+                raise SwaggerGenerationError("form parameters can only be applied to (" + ','.join(self.body_methods) +
+                                             ") HTTP methods")
 
         return merge_params(parameters, manual_parameters)
 
