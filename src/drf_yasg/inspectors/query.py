@@ -44,12 +44,16 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
             coreschema.String: openapi.TYPE_STRING,
             coreschema.Boolean: openapi.TYPE_BOOLEAN,
         }
+
+        coreschema_attrs = ['format', 'pattern', 'enum', 'min_length', 'max_length']
+        schema = field.schema
         return openapi.Parameter(
             name=field.name,
             in_=location_to_in[field.location],
-            type=coreapi_types.get(type(field.schema), openapi.TYPE_STRING),
             required=field.required,
-            description=force_real_str(field.schema.description) if field.schema else None,
+            description=force_real_str(schema.description) if schema else None,
+            type=coreapi_types.get(type(schema), openapi.TYPE_STRING),
+            **OrderedDict((attr, getattr(schema, attr, None)) for attr in coreschema_attrs)
         )
 
 
