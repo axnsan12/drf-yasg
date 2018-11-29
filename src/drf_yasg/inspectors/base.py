@@ -335,8 +335,11 @@ class ViewInspector(BaseInspector):
             return []
 
         fields = []
-        for filter_backend in self.view.filter_backends:
-            fields += self.probe_inspectors(self.filter_inspectors, 'get_filter_parameters', filter_backend()) or []
+        try:
+            for filter_backend in self.view.filter_backends:
+                fields += self.probe_inspectors(self.filter_inspectors, 'get_filter_parameters', filter_backend()) or []
+        except Exception as identifier:
+            raise Exception("Error Iterating filter_backends of view {}".format(str(self.view)))
 
         return fields
 
