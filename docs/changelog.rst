@@ -4,6 +4,19 @@ Changelog
 
 
 **********
+**1.11.1**
+**********
+
+*Release date: Nov 29, 2018*
+
+- **IMPROVED:** updated ``swagger-ui`` to version 3.20.1
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-alpha.41
+- **FIXED:** ``minLength`` and ``maxLength`` will now also work for ``ListSerializer`` in addition to ``ListField``
+- **FIXED:** ``MultipleChoiceField`` will now use the ``multi`` ``collectionFormat`` where appropriate (:issue:`257`)
+- **FIXED:** the ``format``, ``pattern``, ``enum``, ``min_length`` and ``max_length`` attributes of
+  ``coreschema.Schema`` will now be persited into the converted ``openapi.Parameter`` (:issue:`212`, :pr:`233`)
+
+**********
 **1.11.0**
 **********
 
