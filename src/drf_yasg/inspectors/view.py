@@ -376,8 +376,8 @@ class SwaggerAutoSchema(ViewInspector):
 
     def get_tags(self, operation_keys):
         """Get a list of tags for this operation. Tags determine how operations relate with each other, and in the UI
-        each tag will show as a group containing the operations that use it. If not provided, tags will be inferred
-        from the operation url.
+        each tag will show as a group containing the operations that use it. If not provided in overrides,
+        tags will be inferred from the operation url.
 
         :param tuple[str] operation_keys: an array of keys derived from the pathdescribing the hierarchical layout
             of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
