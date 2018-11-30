@@ -376,13 +376,18 @@ class SwaggerAutoSchema(ViewInspector):
 
     def get_tags(self, operation_keys):
         """Get a list of tags for this operation. Tags determine how operations relate with each other, and in the UI
-        each tag will show as a group containing the operations that use it.
+        each tag will show as a group containing the operations that use it. If not provided, tags will be inferred
+        from the operation url.
 
         :param tuple[str] operation_keys: an array of keys derived from the pathdescribing the hierarchical layout
             of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: list[str]
         """
-        return [operation_keys[0]]
+        tags = self.overrides.get('tags')
+        if not tags:
+            tags = [operation_keys[0]]
+
+        return tags
 
     def get_consumes(self):
         """Return the MIME types this endpoint can consume.
