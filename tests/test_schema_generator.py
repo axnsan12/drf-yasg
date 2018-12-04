@@ -190,3 +190,32 @@ def test_action_mapping():
         assert action_ops['post']['description'] == 'mapping docstring post'
         assert action_ops['get']['description'] == 'mapping docstring get/delete'
         assert action_ops['delete']['description'] == 'mapping docstring get/delete'
+
+
+@pytest.mark.parametrize('choices, expected_type', [
+    (['A', 'B'], openapi.TYPE_STRING),
+    ([123, 456], openapi.TYPE_INTEGER),
+    ([1.2, 3.4], openapi.TYPE_NUMBER),
+    (['A', 456], openapi.TYPE_STRING)
+])
+def test_choice_field(choices, expected_type):
+    class DetailSerializer(serializers.Serializer):
+        detail = serializers.ChoiceField(choices)
+
+    class DetailViewSet(viewsets.ViewSet):
+        @swagger_auto_schema(responses={200: openapi.Response("OK", DetailSerializer)})
+        def retrieve(self, request, pk=None):
+            return Response({'detail': None})
+
+    router = routers.DefaultRouter()
+    router.register(r'details', DetailViewSet, base_name='details')
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        patterns=router.urls
+    )
+
+    swagger = generator.get_schema(None, True)
+    property_schema = swagger['definitions']['Detail']['properties']['detail']
+
+    assert property_schema == openapi.Schema(title='Detail', type=expected_type, enum=choices)
