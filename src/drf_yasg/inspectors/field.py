@@ -586,6 +586,7 @@ class ChoiceFieldInspector(FieldInspector):
 
         if isinstance(field, serializers.ChoiceField):
             enum_type = openapi.TYPE_STRING
+            enum_values = list(field.choices.keys())
 
             # for ModelSerializer, try to infer the type from the associated model field
             serializer = get_parent_serializer(field)
@@ -596,8 +597,14 @@ class ChoiceFieldInspector(FieldInspector):
                     model_type = get_basic_type_info(model_field)
                     if model_type:
                         enum_type = model_type.get('type', enum_type)
+            else:
+                # Try to infer field type based on enum values
+                enum_value_types = {type(v) for v in enum_values}
+                if len(enum_value_types) == 1:
+                    values_type = get_basic_type_info_from_hint(next(iter(enum_value_types)))
+                    if values_type:
+                        enum_type = values_type.get('type', enum_type)
 
-            enum_values = list(field.choices.keys())
             if isinstance(field, serializers.MultipleChoiceField):
                 result = SwaggerType(
                     type=openapi.TYPE_ARRAY,
