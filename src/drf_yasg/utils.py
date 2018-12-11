@@ -29,7 +29,7 @@ class unset(object):
 def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_body=None, query_serializer=None,
                         manual_parameters=None, operation_id=None, operation_description=None, operation_summary=None,
                         security=None, deprecated=None, responses=None, field_inspectors=None, filter_inspectors=None,
-                        paginator_inspectors=None, **extra_overrides):
+                        paginator_inspectors=None, tags=None, **extra_overrides):
     """Decorate a view method to customize the :class:`.Operation` object generated from it.
 
     `method` and `methods` are mutually exclusive and must only be present when decorating a view method that accepts
@@ -96,6 +96,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
         :attr:`.ViewInspector.filter_inspectors` on the :class:`.inspectors.SwaggerAutoSchema` instance
     :param list[.PaginatorInspector] paginator_inspectors: extra paginator inspectors; these will be tried before
         :attr:`.ViewInspector.paginator_inspectors` on the :class:`.inspectors.SwaggerAutoSchema` instance
+    :param list[str] tags: tags override
     :param extra_overrides: extra values that will be saved into the ``overrides`` dict; these values will be available
         in the handling :class:`.inspectors.SwaggerAutoSchema` instance via ``self.overrides``
     """
@@ -115,6 +116,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
             'filter_inspectors': list(filter_inspectors) if filter_inspectors else None,
             'paginator_inspectors': list(paginator_inspectors) if paginator_inspectors else None,
             'field_inspectors': list(field_inspectors) if field_inspectors else None,
+            'tags': list(tags) if tags else None,
         }
         data = filter_none(data)
         if auto_schema is not unset:
