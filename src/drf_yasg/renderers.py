@@ -1,6 +1,7 @@
+import django.template.loader
 import six
 
-from django.shortcuts import render, resolve_url
+from django.shortcuts import resolve_url
 from django.utils.functional import Promise
 from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer
 from rest_framework.utils import json
@@ -68,7 +69,7 @@ class _UIRenderer(BaseRenderer):
             # see https://github.com/axnsan12/drf-yasg/issues/58
             return TemplateHTMLRenderer().render(swagger, accepted_media_type, renderer_context)
         self.set_context(renderer_context, swagger)
-        return render(renderer_context['request'], self.template, renderer_context)
+        return django.template.loader.render_to_string(self.template, renderer_context, renderer_context['request'])
 
     def set_context(self, renderer_context, swagger=None):
         renderer_context['title'] = swagger.info.title or '' if swagger else ''
