@@ -10,7 +10,12 @@ from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.utils import swagger_auto_schema
 
 
-def test_choice_field():
+def test_no_form_parameters_with_non_form_parsers():
+    # see https://github.com/axnsan12/drf-yasg/issues/270
+    # test that manual form parameters for views that haven't set
+    # all their parsers classes to form parsers are not allowed
+    # even when the request body is empty
+
     @method_decorator(name='post', decorator=swagger_auto_schema(
         operation_description="Logins a user and returns a token",
         manual_parameters=[
@@ -20,13 +25,6 @@ def test_choice_field():
                 required=True,
                 type=openapi.TYPE_STRING,
                 description="Valid username or email for authentication"
-            ),
-            openapi.Parameter(
-                "password",
-                openapi.IN_FORM,
-                required=True,
-                type=openapi.TYPE_STRING,
-                description="Valid password for authentication",
             ),
         ]
     ))
