@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-set -ex
+set -e
 
-coverage combine
+coverage combine || true
 coverage report
 codecov
