@@ -8,8 +8,8 @@ from rest_framework.status import is_success
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
-    force_real_str, force_serializer_instance, get_consumes, get_produces, guess_response_status, is_list_view,
-    merge_params, no_body, param_list_to_odict
+    filter_none, force_real_str, force_serializer_instance, get_consumes, get_produces, guess_response_status,
+    is_list_view, merge_params, no_body, param_list_to_odict
 )
 from .base import ViewInspector
 
@@ -29,7 +29,7 @@ class SwaggerAutoSchema(ViewInspector):
         body = self.get_request_body_parameters(consumes)
         query = self.get_query_parameters()
         parameters = body + query
-        parameters = [param for param in parameters if param is not None]
+        parameters = filter_none(parameters)
         parameters = self.add_manual_parameters(parameters)
 
         operation_id = self.get_operation_id(operation_keys)
@@ -167,12 +167,13 @@ class SwaggerAutoSchema(ViewInspector):
         if any(param.in_ == openapi.IN_BODY for param in manual_parameters):  # pragma: no cover
             raise SwaggerGenerationError("specify the body parameter as a Schema or Serializer in request_body")
         if any(param.in_ == openapi.IN_FORM for param in manual_parameters):  # pragma: no cover
-            if any(param.in_ == openapi.IN_BODY for param in parameters):
+            has_body_parameter = any(param.in_ == openapi.IN_BODY for param in parameters)
+            if has_body_parameter or not any(is_form_media_type(encoding) for encoding in self.get_consumes()):
                 raise SwaggerGenerationError("cannot add form parameters when the request has a request body; "
                                              "did you forget to set an appropriate parser class on the view?")
             if self.method not in self.body_methods:
-                raise SwaggerGenerationError("form parameters can only be applied to (" + ','.join(self.body_methods) +
-                                             ") HTTP methods")
+                raise SwaggerGenerationError("form parameters can only be applied to "
+                                             "(" + ','.join(self.body_methods) + ") HTTP methods")
 
         return merge_params(parameters, manual_parameters)
 

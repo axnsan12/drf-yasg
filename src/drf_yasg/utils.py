@@ -335,11 +335,11 @@ def get_consumes(parser_classes):
     :rtype: list[str]
     """
     media_types = [parser.media_type for parser in parser_classes or []]
-    if all(is_form_media_type(encoding) for encoding in media_types):
+    non_form_media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
+    if len(non_form_media_types) == 0:
         return media_types
     else:
-        media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
-        return media_types
+        return non_form_media_types
 
 
 def get_produces(renderer_classes):
