@@ -73,7 +73,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
       # install test dependencies
       (venv) $ pip install -U -r requirements/test.txt
       # run tests in the current environment, faster than tox
-      (venv) $ pytest --cov
+      (venv) $ pytest -n auto --cov
       # (optional) run tests for other python versions in separate environments
       (venv) $ tox
 
