@@ -83,11 +83,6 @@ class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
                 description="path parameter override",
                 required=True
             ),
-            openapi.Parameter(
-                name='delete_form_param', in_=openapi.IN_FORM,
-                type=openapi.TYPE_INTEGER,
-                description="this should not crash (form parameter on DELETE method)"
-            ),
         ],
         responses={
             status.HTTP_204_NO_CONTENT: openapi.Response(

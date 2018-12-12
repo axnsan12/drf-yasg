@@ -468,10 +468,6 @@ paths:
           description: path parameter override
           required: true
           type: integer
-        - name: delete_form_param
-          in: formData
-          description: this should not crash (form parameter on DELETE method)
-          type: integer
       responses:
         '204':
           description: this should not crash (response object with no schema)
