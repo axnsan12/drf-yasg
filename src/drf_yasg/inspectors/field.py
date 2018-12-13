@@ -466,6 +466,17 @@ raw_type_info = [
 ]
 
 hinting_type_info = raw_type_info
+hint_class_inspectors = []
+
+
+def register_hint_class_inspector(inspector):
+    """Registers a user defined type hint inspector, which converts it to a swagger type.
+    It can be used for a custom JSON serializable types, like enums.
+
+    :param inspector: a callable of one argument of type hint class.
+    It should return a swagger type keywords arguments dict or NotHandled if the type wasn't handled.
+    """
+    hint_class_inspectors.append(inspector)
 
 
 def get_basic_type_info_from_hint(hint_class):
@@ -487,6 +498,9 @@ def get_basic_type_info_from_hint(hint_class):
             #     format = format(klass)
             break
     else:  # pragma: no cover
+        for check_class, build_swagger_type in hint_class_inspectors:
+            if issubclass(hint_class, check_class):
+                return build_swagger_type(hint_class)
         return None
 
     pattern = None
