@@ -469,7 +469,7 @@ hinting_type_info = [
 
 def inspect_union_hint_class(hint_class):
 
-    def is_union(type_) -> bool:
+    def is_union(type_):
         return get_origin_type(type_) == typing.Union
 
     def get_origin_type(type_):
