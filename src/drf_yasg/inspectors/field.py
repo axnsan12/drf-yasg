@@ -494,21 +494,16 @@ def get_basic_type_info_from_hint(hint_class):
             swagger_type, format = type_format
             if callable(swagger_type):
                 swagger_type = swagger_type()
-            # if callable(format):
-            #     format = format(klass)
             break
-    else:  # pragma: no cover
+    else:
         for check_class, build_swagger_type in hint_class_inspectors:
             if issubclass(hint_class, check_class):
                 return build_swagger_type(hint_class)
         return None
 
-    pattern = None
-
     result = OrderedDict([
         ('type', swagger_type),
         ('format', format),
-        ('pattern', pattern)
     ])
 
     return result
