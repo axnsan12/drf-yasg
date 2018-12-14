@@ -454,19 +454,66 @@ def decimal_return_type():
     return openapi.TYPE_STRING if rest_framework_settings.COERCE_DECIMAL_TO_STRING else openapi.TYPE_NUMBER
 
 
-raw_type_info = [
+hinting_type_info = [
     (bool, (openapi.TYPE_BOOLEAN, None)),
     (int, (openapi.TYPE_INTEGER, None)),
+    (str, (openapi.TYPE_STRING, None)),
     (float, (openapi.TYPE_NUMBER, None)),
+    (dict, (openapi.TYPE_OBJECT, None)),
     (Decimal, (decimal_return_type, openapi.FORMAT_DECIMAL)),
     (uuid.UUID, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
     (datetime.datetime, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
-    # TODO - support typing.List etc
 ]
 
-hinting_type_info = raw_type_info
-hint_class_inspectors = []
+
+def inspect_union_hint_class(hint_class):
+
+    def is_union(type_) -> bool:
+        return get_origin_type(type_) == typing.Union
+
+    def get_origin_type(type_):
+        return type_.__origin__ if hasattr(type_, '__origin__') else None
+
+    if is_union(hint_class):
+        child_type = hint_class.__args__[0]
+        return get_basic_type_info_from_hint(child_type)
+
+    return NotHandled
+
+
+def inspect_primitive_hint_class(hint_class):
+    for check_class, type_format in hinting_type_info:
+        if issubclass(hint_class, check_class):
+            swagger_type, format = type_format
+            if callable(swagger_type):
+                swagger_type = swagger_type()
+            return OrderedDict([
+                ('type', swagger_type),
+                ('format', format),
+            ])
+
+    return NotHandled
+
+
+def inspect_collection_hint_class(hint_class):
+    if issubclass(hint_class, (typing.List, typing.Set)):
+        args = hint_class.__args__
+        child_class = args[0] if args else str
+        child_type_info = get_basic_type_info_from_hint(child_class)
+        return OrderedDict([
+            ('type', openapi.TYPE_ARRAY),
+            ('items', openapi.Items(**child_type_info)),
+        ])
+
+    return NotHandled
+
+
+hint_class_inspectors = [
+    inspect_union_hint_class,
+    inspect_primitive_hint_class,
+    inspect_collection_hint_class,
+]
 
 
 def register_hint_class_inspector(inspector):
@@ -488,25 +535,11 @@ def get_basic_type_info_from_hint(hint_class):
     :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
     :rtype: OrderedDict
     """
-
-    for check_class, type_format in hinting_type_info:
-        if issubclass(hint_class, check_class):
-            swagger_type, format = type_format
-            if callable(swagger_type):
-                swagger_type = swagger_type()
-            break
-    else:
-        for check_class, build_swagger_type in hint_class_inspectors:
-            if issubclass(hint_class, check_class):
-                return build_swagger_type(hint_class)
-        return None
-
-    result = OrderedDict([
-        ('type', swagger_type),
-        ('format', format),
-    ])
-
-    return result
+    for hint_class_inspector in hint_class_inspectors:
+        result = hint_class_inspector(hint_class)
+        if result is not NotHandled:
+            return result
+    return None
 
 
 class SerializerMethodFieldInspector(FieldInspector):
