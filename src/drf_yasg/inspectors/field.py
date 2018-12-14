@@ -468,6 +468,8 @@ hinting_type_info = [
 
 
 def inspect_union_hint_class(hint_class):
+    if not typing:
+        return None
 
     def is_union(type_):
         return get_origin_type(type_) == typing.Union
@@ -497,6 +499,9 @@ def inspect_primitive_hint_class(hint_class):
 
 
 def inspect_collection_hint_class(hint_class):
+    if not typing:
+        return None
+
     if issubclass(hint_class, (typing.List, typing.Set)):
         args = hint_class.__args__
         child_class = args[0] if args else str
@@ -535,9 +540,6 @@ def get_basic_type_info_from_hint(hint_class):
     :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
     :rtype: OrderedDict
     """
-    if not typing:
-        return None
-
     for hint_class_inspector in hint_class_inspectors:
         result = hint_class_inspector(hint_class)
         if result is not NotHandled:
