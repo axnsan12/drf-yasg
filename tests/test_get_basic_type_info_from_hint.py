@@ -25,7 +25,7 @@ if typing:
         (List[bool], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_BOOLEAN)}),
         (Set[int], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER)}),
         (Union[List[int], type(None)], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER)}),
-        # Following cases are for stability reasons here. It's not 100% correct, but it should work somehow and not crash.
+        # Following cases are not 100% correct, but it should work somehow and not crash.
         (Union[int, bool], {'type': openapi.TYPE_INTEGER, 'format': None}),
         (List, {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_STRING)}),
     ])
