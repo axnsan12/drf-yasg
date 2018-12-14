@@ -25,7 +25,7 @@
       <excludeFolder url="file://$MODULE_DIR$/src/drf_yasg.egg-info" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.6.3 virtualenv at ~/.pyenv/versions/supplyshift" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3 (drf-yasg)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="immutable" level="application" />
   </component>
