@@ -535,10 +535,14 @@ def get_basic_type_info_from_hint(hint_class):
     :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
     :rtype: OrderedDict
     """
+    if not typing:
+        return None
+
     for hint_class_inspector in hint_class_inspectors:
         result = hint_class_inspector(hint_class)
         if result is not NotHandled:
             return result
+
     return None
 
 
