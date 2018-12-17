@@ -485,7 +485,7 @@ def inspect_union_hint_class(hint_class):
 
 def inspect_primitive_hint_class(hint_class):
     for check_class, type_format in hinting_type_info:
-        if issubclass(hint_class, check_class):
+        if issubclass(get_origin_type(hint_class), check_class):
             swagger_type, format = type_format
             if callable(swagger_type):
                 swagger_type = swagger_type()
