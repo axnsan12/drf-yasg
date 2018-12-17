@@ -467,17 +467,16 @@ hinting_type_info = [
 ]
 
 
+def get_origin_type(type_):
+    origin_type = type_.__origin__ if hasattr(type_, '__origin__') else None
+    return origin_type or type_
+
+
 def inspect_union_hint_class(hint_class):
     if not typing:
         return NotHandled
 
-    def is_union(type_):
-        return get_origin_type(type_) == typing.Union
-
-    def get_origin_type(type_):
-        return type_.__origin__ if hasattr(type_, '__origin__') else None
-
-    if is_union(hint_class):
+    if get_origin_type(hint_class) == typing.Union:
         child_type = hint_class.__args__[0]
         return get_basic_type_info_from_hint(child_type)
 
@@ -502,7 +501,7 @@ def inspect_collection_hint_class(hint_class):
     if not typing:
         return NotHandled
 
-    if issubclass(hint_class, (typing.List, typing.Set)):
+    if issubclass(get_origin_type(hint_class), (typing.List, typing.Set)):
         args = hint_class.__args__
         child_class = args[0] if args else str
         child_type_info = get_basic_type_info_from_hint(child_class)
