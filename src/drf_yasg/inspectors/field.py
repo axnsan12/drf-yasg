@@ -469,7 +469,7 @@ hinting_type_info = [
 
 def inspect_union_hint_class(hint_class):
     if not typing:
-        return None
+        return NotHandled
 
     def is_union(type_):
         return get_origin_type(type_) == typing.Union
@@ -500,7 +500,7 @@ def inspect_primitive_hint_class(hint_class):
 
 def inspect_collection_hint_class(hint_class):
     if not typing:
-        return None
+        return NotHandled
 
     if issubclass(hint_class, (typing.List, typing.Set)):
         args = hint_class.__args__
