@@ -508,7 +508,7 @@ def inspect_collection_hint_class(hint_class):
     if not typing:
         return NotHandled
 
-    if is_origin_type_subclasses(hint_class, typing.Collection):
+    if is_origin_type_subclasses(hint_class, (typing.Sequence, typing.AbstractSet)):
         args = hint_class.__args__
         child_class = args[0] if args else str
         child_type_info = get_basic_type_info_from_hint(child_class)
