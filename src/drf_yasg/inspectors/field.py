@@ -467,9 +467,16 @@ hinting_type_info = [
 ]
 
 
-def get_origin_type(type_):
-    origin_type = type_.__origin__ if hasattr(type_, '__origin__') else None
-    return origin_type or type_
+def get_origin_type(hint_class):
+    origin_type = hint_class.__origin__ if hasattr(hint_class, '__origin__') else None
+    return origin_type or hint_class
+
+
+def is_origin_type_subclasses(hint_class, check_class):
+    origin_type = get_origin_type(hint_class)
+    if not inspect.isclass(origin_type):
+        return False
+    return issubclass(origin_type, check_class)
 
 
 def inspect_union_hint_class(hint_class):
@@ -485,7 +492,7 @@ def inspect_union_hint_class(hint_class):
 
 def inspect_primitive_hint_class(hint_class):
     for check_class, type_format in hinting_type_info:
-        if issubclass(get_origin_type(hint_class), check_class):
+        if is_origin_type_subclasses(hint_class, check_class):
             swagger_type, format = type_format
             if callable(swagger_type):
                 swagger_type = swagger_type()
@@ -501,10 +508,12 @@ def inspect_collection_hint_class(hint_class):
     if not typing:
         return NotHandled
 
-    if issubclass(get_origin_type(hint_class), (typing.List, typing.Set)):
+    if is_origin_type_subclasses(hint_class, typing.Collection):
         args = hint_class.__args__
         child_class = args[0] if args else str
         child_type_info = get_basic_type_info_from_hint(child_class)
+        if not child_type_info:
+            child_type_info = {'type': openapi.TYPE_STRING}
         return OrderedDict([
             ('type', openapi.TYPE_ARRAY),
             ('items', openapi.Items(**child_type_info)),
