@@ -45,7 +45,6 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
       (venv) $ cd testproj
       (venv) $ python manage.py migrate
-      (venv) $ python manage.py shell -c "import createsuperuser"
       (venv) $ python manage.py runserver
       (venv) $ firefox localhost:8000/swagger/
 

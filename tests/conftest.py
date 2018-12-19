@@ -22,8 +22,7 @@ def mock_schema_request(db):
     from rest_framework.test import force_authenticate
 
     factory = APIRequestFactory()
-    user = User.objects.create_user(username='admin', is_staff=True, is_superuser=True)
-
+    user = User.objects.get(username='admin')
     request = factory.get('/swagger.json')
     force_authenticate(request, user=user)
     request = APIView().initialize_request(request)

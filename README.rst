@@ -297,7 +297,6 @@ For additional usage examples, you can take a look at the test project in the ``
    (venv) $ python -m pip install -U pip setuptools
    (venv) $ pip install -U -r requirements.txt
    (venv) $ python manage.py migrate
-   (venv) $ python manage.py shell -c "import createsuperuser"
    (venv) $ python manage.py runserver
    (venv) $ firefox localhost:8000/swagger/
 
