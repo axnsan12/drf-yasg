@@ -114,6 +114,7 @@ In ``urls.py``:
 .. code:: python
 
    ...
+   from rest_framework import permissions
    from drf_yasg.views import get_schema_view
    from drf_yasg import openapi
 
@@ -128,7 +129,6 @@ In ``urls.py``:
          contact=openapi.Contact(email="contact@snippets.local"),
          license=openapi.License(name="BSD License"),
       ),
-      validators=['flex', 'ssv'],
       public=True,
       permission_classes=(permissions.AllowAny,),
    )
