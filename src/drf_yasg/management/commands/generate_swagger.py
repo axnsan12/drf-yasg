@@ -43,7 +43,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '-f', '--format', dest='format',
-            default='', choices=('json', 'yaml'),
+            default='', choices=['json', 'yaml'],
             type=str,
             help='Output format. If not given, it is guessed from the output file extension and defaults to json.'
         )
