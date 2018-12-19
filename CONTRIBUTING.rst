@@ -35,6 +35,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
       $ virtualenv venv
       $ source venv/bin/activate
+      (venv) $ python -m pip install -U pip
       (venv) $ pip install -U -e .[validation]
       (venv) $ pip install -U -r requirements/dev.txt
 
@@ -57,8 +58,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
    .. code:: console
 
-      (venv) $ cd testproj
-      (venv) $ python manage.py generate_swagger ../tests/reference.yaml --overwrite --user admin --url http://test.local:8002/
+      (venv) $ python testproj/manage.py generate_swagger ../tests/reference.yaml --overwrite --user admin --url http://test.local:8002/
 
    After checking the git diff to verify that no unexpected changes appeared, you should commit the new
    ``reference.yaml`` together with your changes.
@@ -67,13 +67,13 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
    .. code:: console
 
-      # (optional) sort imports with isort and check flake8 linting
-      (venv) $ isort --apply
-      (venv) $ flake8 src/drf_yasg testproj tests setup.py
       # install test dependencies
       (venv) $ pip install -U -r requirements/test.txt
       # run tests in the current environment, faster than tox
       (venv) $ pytest -n auto --cov
+      # (optional) sort imports with isort and check flake8 linting
+      (venv) $ isort --apply
+      (venv) $ flake8 src/drf_yasg testproj tests setup.py
       # (optional) run tests for other python versions in separate environments
       (venv) $ tox
 

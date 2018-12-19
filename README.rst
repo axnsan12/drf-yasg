@@ -140,7 +140,7 @@ In ``urls.py``:
       ...
    ]
 
-This exposes 4 cached, validated and publicly available endpoints:
+This exposes 4 endpoints:
 
 * A JSON view of your API specification at ``/swagger.json``
 * A YAML view of your API specification at ``/swagger.yaml``
@@ -294,6 +294,7 @@ For additional usage examples, you can take a look at the test project in the ``
    $ virtualenv venv
    $ source venv/bin/activate
    (venv) $ cd testproj
+   (venv) $ python -m pip install -U pip
    (venv) $ pip install -U -r requirements.txt
    (venv) $ python manage.py migrate
    (venv) $ python manage.py shell -c "import createsuperuser"
