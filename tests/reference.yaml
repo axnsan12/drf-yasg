@@ -913,6 +913,10 @@ definitions:
       - image_styles
     type: object
     properties:
+      image_id:
+        type: string
+        format: uuid
+        readOnly: true
       what_am_i_doing:
         description: test
         type: string

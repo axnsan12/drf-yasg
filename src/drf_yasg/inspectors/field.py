@@ -58,6 +58,7 @@ class InlineSerializerInspector(SerializerInspector):
             )
             for key, value
             in fields.items()
+            if not getattr(value, 'read_only', False)
         ]
 
         return self.add_manual_parameters(serializer, parameters)

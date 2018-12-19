@@ -6,13 +6,13 @@ from rest_framework.request import is_form_media_type
 from rest_framework.schemas import AutoSchema
 from rest_framework.status import is_success
 
-from .base import ViewInspector
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
     filter_none, force_real_str, force_serializer_instance, get_consumes, get_produces, guess_response_status,
     is_list_view, merge_params, no_body, param_list_to_odict
 )
+from .base import ViewInspector
 
 log = logging.getLogger(__name__)
 
