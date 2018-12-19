@@ -33,6 +33,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 
 class ImageUploadSerializer(serializers.Serializer):
+    image_id = serializers.UUIDField(read_only=True)
     what_am_i_doing = serializers.RegexField(
         regex=r"^69$",
         help_text="test",

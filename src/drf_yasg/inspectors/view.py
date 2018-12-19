@@ -1,4 +1,5 @@
 import logging
+import warnings
 from collections import OrderedDict
 
 from rest_framework.request import is_form_media_type
@@ -22,6 +23,22 @@ class SwaggerAutoSchema(ViewInspector):
         self._sch = AutoSchema()
         self._sch.view = view
 
+    def _summary_and_description_compat(self):
+        # TODO: remove in 1.13
+        base_methods = (SwaggerAutoSchema.get_summary, SwaggerAutoSchema.get_description)
+        self_methods = (type(self).get_summary, type(self).get_description)
+        if self_methods != base_methods:
+            warnings.warn(
+                "`SwaggerAutoSchema` methods `get_summary` and `get_description` are deprecated and "
+                "will be removed in drf-yasg 1.13. Override `get_summary_and_description` instead.",
+                DeprecationWarning, stacklevel=2
+            )
+            # if get_summary or get_description are overriden by a child class,
+            # we must call them for backwards compatibility
+            return self.get_summary(), self.get_description()
+
+        return self.get_summary_and_description()
+
     def get_operation(self, operation_keys):
         consumes = self.get_consumes()
         produces = self.get_produces()
@@ -33,8 +50,7 @@ class SwaggerAutoSchema(ViewInspector):
         parameters = self.add_manual_parameters(parameters)
 
         operation_id = self.get_operation_id(operation_keys)
-        description = self.get_description()
-        summary = self.get_summary()
+        summary, description = self._summary_and_description_compat()
         security = self.get_security()
         assert security is None or isinstance(security, list), "security must be a list of security requirement objects"
         deprecated = self.is_deprecated()
@@ -322,7 +338,32 @@ class SwaggerAutoSchema(ViewInspector):
             operation_id = '_'.join(operation_keys)
         return operation_id
 
-    def _extract_description_and_summary(self):
+    def split_summary_from_description(self, description):
+        """Decide if and how to split a summary out of the given description. The default implementation
+        uses the first paragraph of the description as a summary if it is less than 120 characters long.
+
+        :param description: the full description to be analyzed
+        :return: summary and description
+        :rtype: tuple[str,str]
+        """
+        # https://www.python.org/dev/peps/pep-0257/#multi-line-docstrings
+        summary = None
+        summary_max_len = 120  # OpenAPI 2.0 spec says summary should be under 120 characters
+        sections = description.split('\n\n', 1)
+        if len(sections) == 2:
+            sections[0] = sections[0].strip()
+            if len(sections[0]) < summary_max_len:
+                summary, description = sections
+                description = description.strip()
+
+        return summary, description
+
+    def get_summary_and_description(self):
+        """Return an operation summary and description determined from the view's docstring.
+
+        :return: summary and description
+        :rtype: tuple[str,str]
+        """
         description = self.overrides.get('operation_description', None)
         summary = self.overrides.get('operation_summary', None)
         if description is None:
@@ -331,23 +372,9 @@ class SwaggerAutoSchema(ViewInspector):
 
             if description and (summary is None):
                 # description from docstring ... do summary magic
-                # https://www.python.org/dev/peps/pep-0257/#multi-line-docstrings
-                summary_max_len = 120  # OpenAPI 2.0 spec says summary should be under 120 characters
-                sections = description.split('\n\n', 1)
-                if len(sections) == 2:
-                    sections[0] = sections[0].strip()
-                    if len(sections[0]) < summary_max_len:
-                        summary, description = sections
+                summary, description = self.split_summary_from_description(description)
 
-        return description, summary
-
-    def get_description(self):
-        """Return an operation description determined as appropriate from the view's method and class docstrings.
-
-        :return: the operation description
-        :rtype: str
-        """
-        return self._extract_description_and_summary()[0]
+        return summary, description
 
     def get_summary(self):
         """Return a summary description for this operation.
@@ -355,7 +382,15 @@ class SwaggerAutoSchema(ViewInspector):
         :return: the summary
         :rtype: str
         """
-        return self._extract_description_and_summary()[1]
+        return self.get_summary_and_description()[0]
+
+    def get_description(self):
+        """Return an operation description determined as appropriate from the view's method and class docstrings.
+
+        :return: the operation description
+        :rtype: str
+        """
+        return self.get_summary_and_description()[1]
 
     def get_security(self):
         """Return a list of security requirements for this operation.
