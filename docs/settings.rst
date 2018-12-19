@@ -229,7 +229,7 @@ Persist swagger-ui authorization data to local storage. |br|
 **WARNING:** This may be a security risk as the credentials are stored unencrypted and can be accessed
 by all javascript code running on the same domain.
 
-**Default**: :python:`'False` |br|
+**Default**: :python:`False` |br|
 *Maps to parameter*: -
 
 REFETCH_SCHEMA_WITH_AUTH
@@ -237,7 +237,7 @@ REFETCH_SCHEMA_WITH_AUTH
 
 Re-fetch the OpenAPI document with the new credentials after authorization is performed through swagger-ui.
 
-**Default**: :python:`'False` |br|
+**Default**: :python:`False` |br|
 *Maps to parameter*: -
 
 REFETCH_SCHEMA_ON_LOGOUT
@@ -245,7 +245,7 @@ REFETCH_SCHEMA_ON_LOGOUT
 
 Re-fetch the OpenAPI document without credentials after authorization is removed through swagger-ui.
 
-**Default**: :python:`'False` |br|
+**Default**: :python:`False` |br|
 *Maps to parameter*: -
 
 FETCH_SCHEMA_WITH_QUERY
@@ -253,7 +253,7 @@ FETCH_SCHEMA_WITH_QUERY
 
 Fetch the OpenAPI document using the query parameters passed to the swagger-ui page request.
 
-**Default**: :python:`'True` |br|
+**Default**: :python:`True` |br|
 *Maps to parameter*: -
 
 OPERATIONS_SORTER
