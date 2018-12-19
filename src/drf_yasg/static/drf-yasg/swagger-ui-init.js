@@ -2,6 +2,17 @@
 var currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
 var defaultSpecUrl = currentPath + '?format=openapi';
 
+function slugify(text) {
+    return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')           // Replace spaces with -
+        .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+        .replace(/--+/g, '-')           // Replace multiple - with single -
+        .replace(/^-+/, '')             // Trim - from start of text
+        .replace(/-+$/, '');            // Trim - from end of text
+}
+
+var KEY_AUTH = slugify(window.location.pathname) + "-drf-yasg-auth";
+
 // load the saved authorization state from localStorage; ImmutableJS is used for consistency with swagger-ui state
 var savedAuth = Immutable.fromJS({});
 
@@ -56,8 +67,7 @@ function initSwaggerUi() {
     }
     if (document.querySelector('.auth-wrapper .authorize')) {
         patchSwaggerUi();
-    }
-    else {
+    } else {
         insertionQ('.auth-wrapper .authorize').every(patchSwaggerUi);
     }
 
@@ -114,9 +124,9 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
     }
     if (persistAuth) {
         try {
-            savedAuth = Immutable.fromJS(JSON.parse(localStorage.getItem("drf-yasg-auth")) || {});
+            savedAuth = Immutable.fromJS(JSON.parse(localStorage.getItem(KEY_AUTH)) || {});
         } catch (e) {
-            localStorage.removeItem("drf-yasg-auth");
+            localStorage.removeItem(KEY_AUTH);
         }
     }
     if (refetchWithAuth) {
@@ -278,8 +288,7 @@ function applyAuth(authorization, requestUrl, requestHeaders) {
                 if (_in === "query") {
                     if (requestUrl) {
                         requestUrl = setQueryParam(requestUrl, paramName, key);
-                    }
-                    else {
+                    } else {
                         console.warn("WARNING: cannot apply apiKey query parameter via interceptor");
                     }
                 }
@@ -343,7 +352,7 @@ function hookAuthActions(sui, persistAuth, refetchWithAuth, refetchOnLogout) {
             sui.authActions.showDefinitions(); // hide authorize dialog
         }
         if (persistAuth) {
-            localStorage.setItem("drf-yasg-auth", JSON.stringify(savedAuth.toJSON()));
+            localStorage.setItem(KEY_AUTH, JSON.stringify(savedAuth.toJSON()));
         }
     };
 
@@ -368,7 +377,7 @@ function hookAuthActions(sui, persistAuth, refetchWithAuth, refetchOnLogout) {
             sui.authActions.showDefinitions(); // hide authorize dialog
         }
         if (persistAuth) {
-            localStorage.setItem("drf-yasg-auth", JSON.stringify(savedAuth.toJSON()));
+            localStorage.setItem(KEY_AUTH, JSON.stringify(savedAuth.toJSON()));
         }
         originalLogout(authorization);
     };
