@@ -25,6 +25,10 @@ jobs:
 
     - stage: publish
       python: '3.6'
+      before_script:
+        # workaround for Travis' inability to build PEP517 projects; anything added to build-system.requires
+        # will also have to be added here until Travis implements this
+        - pip install setuptools-scm
       script: skip
       env: PYPI_DEPLOY=true
       deploy: &pypi
