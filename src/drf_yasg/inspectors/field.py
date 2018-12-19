@@ -514,12 +514,10 @@ class SerializerMethodFieldInspector(FieldInspector):
         if method is None:
             return NotHandled
 
+        # attribute added by the swagger_serializer_method decorator
         serializer = getattr(method, "_swagger_serializer", None)
 
         if serializer:
-            # attribute added by the swagger_serializer_method decorator
-            serializer = getattr(method, '_swagger_serializer', None)
-
             # in order of preference for description, use:
             # 1) field.help_text from SerializerMethodField(help_text)
             # 2) serializer.help_text from swagger_serializer_method(serializer)
