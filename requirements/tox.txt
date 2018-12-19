@@ -1,4 +1,2 @@
 # requirements for building and running tox
 tox>=3.1.2
-
--r setup.txt

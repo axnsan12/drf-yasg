@@ -17,7 +17,6 @@ with io.open('README.rst', encoding='utf-8') as readme:
     description = readme.read()
 
 requirements = read_req('base.txt')
-requirements_setup = read_req('setup.txt')
 requirements_validation = read_req('validation.txt')
 
 
@@ -28,7 +27,6 @@ def drf_yasg_setup(**kwargs):
         package_dir={'': 'src'},
         include_package_data=True,
         install_requires=requirements,
-        setup_requires=requirements_setup,
         extras_require={
             'validation': requirements_validation,
         },
