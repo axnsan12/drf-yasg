@@ -71,8 +71,8 @@ class DjangoRestResponsePagination(PaginatorInspector):
                 type=openapi.TYPE_OBJECT,
                 properties=OrderedDict((
                     ('count', openapi.Schema(type=openapi.TYPE_INTEGER) if has_count else None),
-                    ('next', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)),
-                    ('previous', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)),
+                    ('next', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI, x_nullable=True)),
+                    ('previous', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI, x_nullable=True)),
                     ('results', response_schema),
                 )),
                 required=['results']

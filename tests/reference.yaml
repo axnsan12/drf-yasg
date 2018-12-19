@@ -75,9 +75,11 @@ paths:
               next:
                 type: string
                 format: uri
+                x-nullable: true
               previous:
                 type: string
                 format: uri
+                x-nullable: true
               results:
                 type: array
                 items:
