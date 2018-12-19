@@ -294,7 +294,7 @@ For additional usage examples, you can take a look at the test project in the ``
    $ virtualenv venv
    $ source venv/bin/activate
    (venv) $ cd testproj
-   (venv) $ python -m pip install -U pip
+   (venv) $ python -m pip install -U pip setuptools
    (venv) $ pip install -U -r requirements.txt
    (venv) $ python manage.py migrate
    (venv) $ python manage.py shell -c "import createsuperuser"

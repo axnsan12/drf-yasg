@@ -35,7 +35,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
       $ virtualenv venv
       $ source venv/bin/activate
-      (venv) $ python -m pip install -U pip
+      (venv) $ python -m pip install -U pip setuptools
       (venv) $ pip install -U -e .[validation]
       (venv) $ pip install -U -r requirements/dev.txt
 
