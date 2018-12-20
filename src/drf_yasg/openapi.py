@@ -1,12 +1,16 @@
+import six
+
+import collections
 import logging
 import re
 from collections import OrderedDict
 
 from coreapi.compat import urlparse
 from django.urls import get_script_prefix
+from django.utils.functional import Promise
 from inflection import camelize
 
-from .utils import filter_none
+from .utils import filter_none, force_real_str
 
 logger = logging.getLogger(__name__)
 
@@ -128,13 +132,19 @@ class SwaggerDict(OrderedDict):
         if id(obj) in memo:
             return memo[id(obj)]
 
-        if isinstance(obj, dict):
+        if isinstance(obj, Promise) and hasattr(obj, '_proxy____cast'):
+            # handle __proxy__ objects from django.utils.functional.lazy
+            obj = obj._proxy____cast()
+
+        if isinstance(obj, collections.Mapping):
             result = OrderedDict()
             memo[id(obj)] = result
             for attr, val in obj.items():
                 result[attr] = SwaggerDict._as_odict(val, memo)
             return result
-        elif isinstance(obj, (list, tuple)):
+        elif isinstance(obj, six.string_types):
+            return force_real_str(obj)
+        elif isinstance(obj, collections.Iterable) and not isinstance(obj, collections.Iterator):
             return type(obj)(SwaggerDict._as_odict(elem, memo) for elem in obj)
 
         return obj

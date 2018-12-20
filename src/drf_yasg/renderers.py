@@ -4,7 +4,7 @@ from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.utils.functional import Promise
 from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer
-from rest_framework.utils import json
+from rest_framework.utils import encoders, json
 
 from .app_settings import redoc_settings, swagger_settings
 from .codecs import VALIDATORS, OpenAPICodecJson, OpenAPICodecYaml
@@ -76,7 +76,7 @@ class _UIRenderer(BaseRenderer):
     def set_context(self, renderer_context, swagger=None):
         renderer_context['title'] = swagger.info.title or '' if swagger else ''
         renderer_context['version'] = swagger.info.version or '' if swagger else ''
-        renderer_context['oauth2_config'] = json.dumps(self.get_oauth2_config())
+        renderer_context['oauth2_config'] = json.dumps(self.get_oauth2_config(), cls=encoders.JSONEncoder)
         renderer_context['USE_SESSION_AUTH'] = swagger_settings.USE_SESSION_AUTH
         renderer_context.update(self.get_auth_urls())
 
@@ -120,7 +120,7 @@ class SwaggerUIRenderer(_UIRenderer):
 
     def set_context(self, renderer_context, swagger=None):
         super(SwaggerUIRenderer, self).set_context(renderer_context, swagger)
-        renderer_context['swagger_settings'] = json.dumps(self.get_swagger_ui_settings())
+        renderer_context['swagger_settings'] = json.dumps(self.get_swagger_ui_settings(), cls=encoders.JSONEncoder)
 
     def get_swagger_ui_settings(self):
         data = {
@@ -157,7 +157,7 @@ class ReDocRenderer(_UIRenderer):
 
     def set_context(self, renderer_context, swagger=None):
         super(ReDocRenderer, self).set_context(renderer_context, swagger)
-        renderer_context['redoc_settings'] = json.dumps(self.get_redoc_settings())
+        renderer_context['redoc_settings'] = json.dumps(self.get_redoc_settings(), cls=encoders.JSONEncoder)
 
     def get_redoc_settings(self):
         data = {
