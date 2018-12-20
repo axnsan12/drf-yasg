@@ -96,7 +96,8 @@ REST_FRAMEWORK = {
 }
 
 OAUTH2_CLIENT_ID = '12ee6bgxtpSEgP8TioWcHSXOiDBOUrVav4mRbVEs'
-OAUTH2_CLIENT_SECRET = '5FvYALo7W4uNnWE2ySw7Yzpkxh9PSf5GuY37RvOys00ydEyph64dbl1ECOKI9ceQAKoz0JpiVQtq0DUnsxNhU3ubrJgZ9YbtiXymbLGJq8L7n4fiER7gXbXaNSbze3BN'
+OAUTH2_CLIENT_SECRET = '5FvYALo7W4uNnWE2ySw7Yzpkxh9PSf5GuY37RvOys00ydEyph64dbl1ECOKI9ceQ' \
+                       'AKoz0JpiVQtq0DUnsxNhU3ubrJgZ9YbtiXymbLGJq8L7n4fiER7gXbXaNSbze3BN'
 OAUTH2_APP_NAME = 'drf-yasg OAuth2 provider'
 
 OAUTH2_REDIRECT_URL = full_url_lazy(static_lazy('drf-yasg/swagger-ui-dist/oauth2-redirect.html'))
