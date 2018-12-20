@@ -13,5 +13,5 @@ def full_url(absolute_path):
         return "http://test.local:8002/no-reverse-match/"
 
 
-full_url_lazy = lazy(full_url, str, type(None))
+full_url_lazy = lazy(full_url, str)
 static_lazy = lazy(static, str)
