@@ -3,6 +3,8 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from django.urls import reverse_lazy
 
+from testproj.util import full_url_lazy, static_lazy
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ALLOWED_HOSTS = [
@@ -22,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'oauth2_provider',
     'corsheaders',
 
     'drf_yasg',
@@ -64,6 +67,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'testproj.wsgi.application'
 
+LOGIN_URL = reverse_lazy('admin:login')
+
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
@@ -90,8 +95,15 @@ REST_FRAMEWORK = {
     )
 }
 
-# drf-yasg
+OAUTH2_CLIENT_ID = '12ee6bgxtpSEgP8TioWcHSXOiDBOUrVav4mRbVEs'
+OAUTH2_CLIENT_SECRET = '5FvYALo7W4uNnWE2ySw7Yzpkxh9PSf5GuY37RvOys00ydEyph64dbl1ECOKI9ceQAKoz0JpiVQtq0DUnsxNhU3ubrJgZ9YbtiXymbLGJq8L7n4fiER7gXbXaNSbze3BN'
+OAUTH2_APP_NAME = 'drf-yasg OAuth2 provider'
 
+OAUTH2_REDIRECT_URL = full_url_lazy(static_lazy('drf-yasg/swagger-ui-dist/oauth2-redirect.html'))
+OAUTH2_AUTHORIZE_URL = full_url_lazy(reverse_lazy('oauth2_provider:authorize'))
+OAUTH2_TOKEN_URL = full_url_lazy(reverse_lazy('oauth2_provider:token'))
+
+# drf-yasg
 SWAGGER_SETTINGS = {
     'LOGIN_URL': reverse_lazy('admin:login'),
     'LOGOUT_URL': '/admin/logout',
@@ -114,7 +126,22 @@ SWAGGER_SETTINGS = {
             'type': 'apiKey',
             'name': 'auth',
             'in': 'query'
+        },
+        'OAuth2 password': {
+            'type': 'oauth2',
+            'flow': 'password',
+            'tokenUrl': OAUTH2_TOKEN_URL,
+            'scopes': {
+                'read': 'Read everything.',
+                'write': 'Write everything,',
+            }
         }
+    },
+    'OAUTH2_REDIRECT_URL': OAUTH2_REDIRECT_URL,
+    'OAUTH2_CONFIG': {
+        'clientId': OAUTH2_CLIENT_ID,
+        'clientSecret': OAUTH2_CLIENT_SECRET,
+        'appName': OAUTH2_APP_NAME,
     }
 }
 
@@ -126,13 +153,9 @@ REDOC_SETTINGS = {
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)

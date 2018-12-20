@@ -27,6 +27,13 @@ securityDefinitions:
     in: header
     name: Authorization
     type: apiKey
+  OAuth2 password:
+    flow: password
+    scopes:
+      read: Read everything.
+      write: Write everything,
+    tokenUrl: http://test.local:8002/o/token/
+    type: oauth2
   Query:
     in: query
     name: auth
@@ -34,6 +41,7 @@ securityDefinitions:
 security:
   - Basic: []
   - Bearer: []
+  - OAuth2 password: []
   - Query: []
 paths:
   /articles/:

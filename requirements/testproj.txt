@@ -8,3 +8,4 @@ djangorestframework-camel-case>=0.2.0
 djangorestframework-recursive>=0.1.2
 dj-database-url>=0.4.2
 user_agents>=1.1.0
+django-oauth-toolkit>=1.2.0

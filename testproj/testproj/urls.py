@@ -60,6 +60,8 @@ urlpatterns = [
     url(r'^$', root_redirect),
 
     url(r'^admin/', admin.site.urls),
+    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+
     url(r'^snippets/', include('snippets.urls')),
     url(r'^articles/', include('articles.urls')),
     url(r'^users/', include('users.urls')),
