@@ -112,7 +112,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
         def as_cached_view(cls, cache_timeout=0, cache_kwargs=None, **initkwargs):
             """
             Calls .as_view() and wraps the result in a cache_page decorator.
-            See https://docs.djangoproject.com/en/1.11/topics/cache/
+            See https://docs.djangoproject.com/en/dev/topics/cache/
 
             :param int cache_timeout: same as cache_page; set to 0 for no cache
             :param dict cache_kwargs: dictionary of kwargs to be passed to cache_page
@@ -131,7 +131,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
         def without_ui(cls, cache_timeout=0, cache_kwargs=None):
             """
             Instantiate this view with just JSON and YAML renderers, optionally wrapped with cache_page.
-            See https://docs.djangoproject.com/en/1.11/topics/cache/.
+            See https://docs.djangoproject.com/en/dev/topics/cache/.
 
             :param int cache_timeout: same as cache_page; set to 0 for no cache
             :param dict cache_kwargs: dictionary of kwargs to be passed to cache_page
@@ -143,7 +143,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
         def with_ui(cls, renderer='swagger', cache_timeout=0, cache_kwargs=None):
             """
             Instantiate this view with a Web UI renderer, optionally wrapped with cache_page.
-            See https://docs.djangoproject.com/en/1.11/topics/cache/.
+            See https://docs.djangoproject.com/en/dev/topics/cache/.
 
             :param str renderer: UI renderer; allowed values are ``swagger``, ``redoc``
             :param int cache_timeout: same as cache_page; set to 0 for no cache

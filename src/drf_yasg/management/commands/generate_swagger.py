@@ -158,6 +158,7 @@ class Command(BaseCommand):
         else:
             # normally this would be easily done with open(mode='x'/'w'),
             # but python 2 is a pain in the ass as usual
+            # TODO: simplify when dropping support for python 2.7
             flags = os.O_CREAT | os.O_WRONLY
             flags = flags | (os.O_TRUNC if overwrite else os.O_EXCL)
             with os.fdopen(os.open(output_file, flags), "w") as stream:

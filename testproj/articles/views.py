@@ -84,7 +84,10 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     pagination_class = ArticlePagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_fields = ('title',)
+    filterset_fields = ('title',)
+    # django-filter 1.1 compatibility; was renamed to filterset_fields in 2.0
+    # TODO: remove when dropping support for Django 1.11
+    filter_fields = filterset_fields
     ordering_fields = ('date_modified', 'date_created')
     ordering = ('date_created',)
 

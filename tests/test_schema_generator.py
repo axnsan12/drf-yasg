@@ -1,8 +1,10 @@
+import inspect
 import json
 from collections import OrderedDict
 
 import pytest
 from django.conf.urls import url
+from django.utils.inspect import get_func_args
 from rest_framework import routers, serializers, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -86,6 +88,14 @@ def test_securiy_requirements(swagger_settings, mock_schema_request):
     assert swagger['security'] == []
 
 
+def _basename_or_base_name(basename):
+    # freaking DRF... TODO: remove when dropping support for DRF 3.8
+    if 'basename' in get_func_args(routers.BaseRouter.register):
+        return {'basename': basename}
+    else:
+        return {'base_name': basename}
+
+
 def test_replaced_serializer():
     class DetailSerializer(serializers.Serializer):
         detail = serializers.CharField()
@@ -99,7 +109,7 @@ def test_replaced_serializer():
             return Response(serializer.data)
 
     router = routers.DefaultRouter()
-    router.register(r'details', DetailViewSet, base_name='details')
+    router.register(r'details', DetailViewSet, **_basename_or_base_name('details'))
 
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),
@@ -172,7 +182,7 @@ def test_action_mapping():
             pass
 
     router = routers.DefaultRouter()
-    router.register(r'action', ActionViewSet, base_name='action')
+    router.register(r'action', ActionViewSet, **_basename_or_base_name('action'))
 
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),
@@ -208,7 +218,7 @@ def test_choice_field(choices, expected_type):
             return Response({'detail': None})
 
     router = routers.DefaultRouter()
-    router.register(r'details', DetailViewSet, base_name='details')
+    router.register(r'details', DetailViewSet, **_basename_or_base_name('details'))
 
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),

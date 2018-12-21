@@ -12,6 +12,11 @@ from inflection import camelize
 
 from .utils import filter_none, force_real_str
 
+try:
+    from collections import abc as collections_abc
+except ImportError:
+    collections_abc = collections
+
 logger = logging.getLogger(__name__)
 
 TYPE_OBJECT = "object"  #:
@@ -136,7 +141,7 @@ class SwaggerDict(OrderedDict):
             # handle __proxy__ objects from django.utils.functional.lazy
             obj = obj._proxy____cast()
 
-        if isinstance(obj, collections.Mapping):
+        if isinstance(obj, collections_abc.Mapping):
             result = OrderedDict()
             memo[id(obj)] = result
             items = obj.items()
@@ -147,7 +152,7 @@ class SwaggerDict(OrderedDict):
             return result
         elif isinstance(obj, six.string_types):
             return force_real_str(obj)
-        elif isinstance(obj, collections.Iterable) and not isinstance(obj, collections.Iterator):
+        elif isinstance(obj, collections_abc.Iterable) and not isinstance(obj, collections_abc.Iterator):
             return type(obj)(SwaggerDict._as_odict(elem, memo) for elem in obj)
 
         return obj
