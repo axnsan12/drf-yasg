@@ -171,7 +171,7 @@ nitpick_ignore = [
     ('py:class', 'int'),
     ('py:class', 'bytes'),
     ('py:class', 'tuple'),
-    ('py:class', 'callable'),
+    ('py:class', 'function'),
     ('py:class', 'type'),
     ('py:class', 'OrderedDict'),
     ('py:class', 'None'),
@@ -181,6 +181,7 @@ nitpick_ignore = [
     ('py:class', 'collections.OrderedDict'),
 
     ('py:class', 'ruamel.yaml.dumper.SafeDumper'),
+    ('py:class', 'rest_framework.serializers.Serializer'),
     ('py:class', 'rest_framework.renderers.BaseRenderer'),
     ('py:class', 'rest_framework.schemas.generators.EndpointEnumerator'),
     ('py:class', 'rest_framework.views.APIView'),

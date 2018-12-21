@@ -62,7 +62,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
     :param tuple authentication_classes: authentication classes for the schema view itself
     :param tuple permission_classes: permission classes for the schema view itself
     :return: SchemaView class
-    :rtype: type[.SchemaView]
+    :rtype: type[drf_yasg.views.SchemaView]
     """
     _public = public
     _generator_class = generator_class or swagger_settings.DEFAULT_GENERATOR_CLASS

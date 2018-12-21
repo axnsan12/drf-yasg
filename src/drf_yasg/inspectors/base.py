@@ -203,7 +203,7 @@ class FieldInspector(BaseInspector):
             - :class:`.Schema` if `swagger_object_type` is :class:`.Schema`
             - :class:`.Items` if `swagger_object_type` is  :class:`.Parameter` or :class:`.Items`
 
-        :rtype: tuple[callable,(type[openapi.Schema] or type[openapi.Items])]
+        :rtype: (function,type[openapi.Schema] or type[openapi.Items])
         """
         assert swagger_object_type in (openapi.Schema, openapi.Parameter, openapi.Items)
         assert not isinstance(field, openapi.SwaggerDict), "passed field is already a SwaggerDict object"

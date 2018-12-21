@@ -230,8 +230,8 @@ class OpenAPISchemaGenerator(object):
     def get_schema(self, request=None, public=False):
         """Generate a :class:`.Swagger` object representing the API schema.
 
-        :param Request request: the request used for filtering
-            accesible endpoints and finding the spec URI
+        :param request: the request used for filtering accesible endpoints and finding the spec URI
+        :type request: rest_framework.request.Request or None
         :param bool public: if True, all endpoints are included regardless of access through `request`
 
         :return: the generated Swagger specification
@@ -262,9 +262,10 @@ class OpenAPISchemaGenerator(object):
     def create_view(self, callback, method, request=None):
         """Create a view instance from a view callback as registered in urlpatterns.
 
-        :param callable callback: view callback registered in urlpatterns
+        :param callback: view callback registered in urlpatterns
         :param str method: HTTP method
-        :param rest_framework.request.Request request: request to bind to the view
+        :param request: request to bind to the view
+        :type request: rest_framework.request.Request or None
         :return: the view instance
         """
         view = self._gen.create_view(callback, method, request)
@@ -282,9 +283,10 @@ class OpenAPISchemaGenerator(object):
     def get_endpoints(self, request):
         """Iterate over all the registered endpoints in the API and return a fake view with the right parameters.
 
-        :param rest_framework.request.Request request: request to bind to the endpoint views
+        :param request: request to bind to the endpoint views
+        :type request: rest_framework.request.Request or None
         :return: {path: (view_class, list[(http_method, view_instance)])
-        :rtype: dict
+        :rtype: dict[str,(type,list[(str,rest_framework.views.APIView)])]
         """
         enumerator = self.endpoint_enumerator_class(self._gen.patterns, self._gen.urlconf, request=request)
         endpoints = enumerator.get_api_endpoints()

@@ -1,4 +1,3 @@
-import inspect
 import json
 from collections import OrderedDict
 
@@ -156,7 +155,8 @@ def test_url_order():
     assert swagger['paths']['/test/']['get']['description'] == 'description override'
 
     # get_endpoints only includes one endpoint
-    assert len(generator.get_endpoints(None)['/test/'][1]) == 1
+    endpoints = generator.get_endpoints(None)
+    assert len(endpoints['/test/'][1]) == 1
 
 
 try:

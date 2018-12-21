@@ -246,8 +246,8 @@ class Swagger(SwaggerDict):
         :param list[dict[str,list[str]]] security: authentication mechanisms accepted globally
         :param list[str] consumes: consumed MIME types; can be overriden in Operation
         :param list[str] produces: produced MIME types; can be overriden in Operation
-        :param .Paths paths: paths object
-        :param dict[str,.Schema] definitions: named models
+        :param Paths paths: paths object
+        :param dict[str,Schema] definitions: named models
         """
         super(Swagger, self).__init__(**extra)
         self.swagger = '2.0'
@@ -298,7 +298,7 @@ class Paths(SwaggerDict):
     def __init__(self, paths, **extra):
         """A listing of all the paths in the API.
 
-        :param dict[str,.PathItem] paths:
+        :param dict[str,PathItem] paths:
         """
         super(Paths, self).__init__(**extra)
         for path, path_obj in paths.items():
@@ -315,14 +315,14 @@ class PathItem(SwaggerDict):
                  head=None, patch=None, parameters=None, **extra):
         """Information about a single path
 
-        :param .Operation get: operation for GET
-        :param .Operation put: operation for PUT
-        :param .Operation post: operation for POST
-        :param .Operation delete: operation for DELETE
-        :param .Operation options: operation for OPTIONS
-        :param .Operation head: operation for HEAD
-        :param .Operation patch: operation for PATCH
-        :param list[.Parameter] parameters: parameters that apply to all operations
+        :param Operation get: operation for GET
+        :param Operation put: operation for PUT
+        :param Operation post: operation for POST
+        :param Operation delete: operation for DELETE
+        :param Operation options: operation for OPTIONS
+        :param Operation head: operation for HEAD
+        :param Operation patch: operation for PATCH
+        :param list[Parameter] parameters: parameters that apply to all operations
         """
         super(PathItem, self).__init__(**extra)
         self.get = get
@@ -351,8 +351,8 @@ class Operation(SwaggerDict):
         """Information about an API operation (path + http method combination)
 
         :param str operation_id: operation ID, should be unique across all operations
-        :param .Responses responses: responses returned
-        :param list[.Parameter] parameters: parameters accepted
+        :param Responses responses: responses returned
+        :param list[Parameter] parameters: parameters accepted
         :param list[str] consumes: content types accepted
         :param list[str] produces: content types produced
         :param str summary: operation summary; should be < 120 characters
@@ -408,7 +408,7 @@ class Parameter(SwaggerDict):
         :param str description: parameter description
         :param bool required: whether the parameter is required for the operation
         :param schema: required if `in_` is ``body``
-        :type schema: .Schema or .SchemaRef
+        :type schema: Schema or SchemaRef
         :param str type: parameter type; required if `in_` is not ``body``; must not be ``object``
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
@@ -461,12 +461,12 @@ class Schema(SwaggerDict):
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
         :param properties: object properties; required if `type` is ``object``
-        :type properties: dict[str,(.Schema or .SchemaRef)]
+        :type properties: dict[str,Schema or SchemaRef]
         :param additional_properties: allow wildcard properties not listed in `properties`
-        :type additional_properties: bool or .Schema or .SchemaRef
+        :type additional_properties: bool or Schema or SchemaRef
         :param list[str] required: list of requried property names
         :param items: type of array items, only valid if `type` is ``array``
-        :type items: .Schema or .SchemaRef
+        :type items: Schema or SchemaRef
         :param default: only valid when insider another ``Schema``\\ 's ``properties``;
             the default value of this property if it is not provided, must conform to the type of this Schema
         :param read_only: only valid when insider another ``Schema``\\ 's ``properties``;
@@ -565,7 +565,7 @@ def resolve_ref(ref_or_obj, resolver):
     """Resolve `ref_or_obj` if it is a reference type. Return it unchaged if not.
 
     :param ref_or_obj: object to derefernece
-    :type ref_or_obj: .SwaggerDict or ._Ref
+    :type ref_or_obj: SwaggerDict or _Ref
     :param resolver: component resolver which must contain the referenced object
     """
     if isinstance(ref_or_obj, _Ref):
@@ -578,8 +578,8 @@ class Responses(SwaggerDict):
         """Describes the expected responses of an :class:`.Operation`.
 
         :param responses: mapping of status code to response definition
-        :type responses: dict[(str or int),.Response]
-        :param .Response default: description of the response structure to expect if another status code is returned
+        :type responses: dict[str or int,Response]
+        :param Response default: description of the response structure to expect if another status code is returned
         """
         super(Responses, self).__init__(**extra)
         for status, response in responses.items():
@@ -595,7 +595,7 @@ class Response(SwaggerDict):
 
         :param str description: response description
         :param schema: sturcture of the response body
-        :type schema: .Schema or .SchemaRef
+        :type schema: Schema or SchemaRef
         :param dict examples: example bodies mapped by mime type
         """
         super(Response, self).__init__(**extra)
@@ -668,7 +668,7 @@ class ReferenceResolver(object):
         """Set an object in the given scope only if it does not exist.
 
         :param str name: reference name
-        :param callable maker: object factory, called only if necessary
+        :param function maker: object factory, called only if necessary
         :param str scope: reference scope
         """
         scope = self._check_scope(scope)

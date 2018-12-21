@@ -344,7 +344,7 @@ class SwaggerAutoSchema(ViewInspector):
 
         :param description: the full description to be analyzed
         :return: summary and description
-        :rtype: tuple[str,str]
+        :rtype: (str,str)
         """
         # https://www.python.org/dev/peps/pep-0257/#multi-line-docstrings
         summary = None
@@ -362,7 +362,7 @@ class SwaggerAutoSchema(ViewInspector):
         """Return an operation summary and description determined from the view's docstring.
 
         :return: summary and description
-        :rtype: tuple[str,str]
+        :rtype: (str,str)
         """
         description = self.overrides.get('operation_description', None)
         summary = self.overrides.get('operation_summary', None)
