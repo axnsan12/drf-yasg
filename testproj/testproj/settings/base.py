@@ -3,7 +3,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from django.urls import reverse_lazy
 
-from testproj.util import full_url_lazy, static_lazy
+from testproj.util import static_lazy
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -100,9 +100,9 @@ OAUTH2_CLIENT_SECRET = '5FvYALo7W4uNnWE2ySw7Yzpkxh9PSf5GuY37RvOys00ydEyph64dbl1E
                        'AKoz0JpiVQtq0DUnsxNhU3ubrJgZ9YbtiXymbLGJq8L7n4fiER7gXbXaNSbze3BN'
 OAUTH2_APP_NAME = 'drf-yasg OAuth2 provider'
 
-OAUTH2_REDIRECT_URL = full_url_lazy(static_lazy('drf-yasg/swagger-ui-dist/oauth2-redirect.html'))
-OAUTH2_AUTHORIZE_URL = full_url_lazy(reverse_lazy('oauth2_provider:authorize'))
-OAUTH2_TOKEN_URL = full_url_lazy(reverse_lazy('oauth2_provider:token'))
+OAUTH2_REDIRECT_URL = static_lazy('drf-yasg/swagger-ui-dist/oauth2-redirect.html')
+OAUTH2_AUTHORIZE_URL = reverse_lazy('oauth2_provider:authorize')
+OAUTH2_TOKEN_URL = reverse_lazy('oauth2_provider:token')
 
 # drf-yasg
 SWAGGER_SETTINGS = {

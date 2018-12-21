@@ -3,7 +3,6 @@ import six
 import collections
 import logging
 import re
-import sys
 from collections import OrderedDict
 
 from coreapi.compat import urlparse

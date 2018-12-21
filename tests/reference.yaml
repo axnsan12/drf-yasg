@@ -32,7 +32,7 @@ securityDefinitions:
     scopes:
       read: Read everything.
       write: Write everything,
-    tokenUrl: http://test.local:8002/o/token/
+    tokenUrl: /o/token/
     type: oauth2
   Query:
     in: query

@@ -192,7 +192,6 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
         var oldResponseInterceptor = swaggerUiConfig.responseInterceptor;
         swaggerUiConfig.responseInterceptor = function (response) {
             var absUrl = new URL(response.url, currentPath);
-            console.log("response", response);
             if (absUrl.href in specRequestsInFlight) {
                 var setToUrl = specRequestsInFlight[absUrl.href];
                 delete specRequestsInFlight[absUrl.href];

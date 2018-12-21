@@ -2,6 +2,7 @@ import six
 
 from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
+from django.utils.encoding import force_text
 from django.utils.functional import Promise
 from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer
 from rest_framework.utils import encoders, json
@@ -120,7 +121,14 @@ class SwaggerUIRenderer(_UIRenderer):
 
     def set_context(self, renderer_context, swagger=None):
         super(SwaggerUIRenderer, self).set_context(renderer_context, swagger)
-        renderer_context['swagger_settings'] = json.dumps(self.get_swagger_ui_settings(), cls=encoders.JSONEncoder)
+        swagger_ui_settings = self.get_swagger_ui_settings()
+
+        request = renderer_context['request']
+        oauth_redirect_url = force_text(swagger_ui_settings.get('oauth2RedirectUrl', ''))
+        if request and oauth_redirect_url:
+            swagger_ui_settings['oauth2RedirectUrl'] = request.build_absolute_uri(oauth_redirect_url)
+
+        renderer_context['swagger_settings'] = json.dumps(swagger_ui_settings, cls=encoders.JSONEncoder)
 
     def get_swagger_ui_settings(self):
         data = {
