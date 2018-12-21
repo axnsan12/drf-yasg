@@ -16,7 +16,7 @@ from . import openapi
 from .app_settings import swagger_settings
 from .errors import SwaggerGenerationError
 from .inspectors.field import get_basic_type_info, get_queryset_field, get_queryset_from_view
-from .openapi import ReferenceResolver
+from .openapi import ReferenceResolver, SwaggerDict
 from .utils import force_real_str, get_consumes, get_produces
 
 logger = logging.getLogger(__name__)
@@ -216,14 +216,14 @@ class OpenAPISchemaGenerator(object):
 
         security_definitions = swagger_settings.SECURITY_DEFINITIONS
         if security_definitions is not None:
-            security_definitions = OrderedDict(sorted([(key, OrderedDict(sorted(sd.items())))
-                                                       for key, sd in swagger_settings.SECURITY_DEFINITIONS.items()]))
+            security_definitions = SwaggerDict._as_odict(security_definitions, {})
+
         security_requirements = swagger_settings.SECURITY_REQUIREMENTS
         if security_requirements is None:
             security_requirements = [{security_scheme: []} for security_scheme in swagger_settings.SECURITY_DEFINITIONS]
 
-        security_requirements = sorted(security_requirements, key=lambda od: list(sorted(od)))
-        security_requirements = [OrderedDict(sorted(sr.items())) for sr in security_requirements]
+        security_requirements = [SwaggerDict._as_odict(sr, {}) for sr in security_requirements]
+        security_requirements = sorted(security_requirements, key=list)
 
         url = self.url
         if url is None and request is not None:

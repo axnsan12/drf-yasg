@@ -3,6 +3,7 @@ import six
 import collections
 import logging
 import re
+import sys
 from collections import OrderedDict
 
 from coreapi.compat import urlparse
@@ -139,7 +140,10 @@ class SwaggerDict(OrderedDict):
         if isinstance(obj, collections.Mapping):
             result = OrderedDict()
             memo[id(obj)] = result
-            for attr, val in obj.items():
+            items = obj.items()
+            if not isinstance(obj, OrderedDict):
+                items = sorted(items)
+            for attr, val in items:
                 result[attr] = SwaggerDict._as_odict(val, memo)
             return result
         elif isinstance(obj, six.string_types):
