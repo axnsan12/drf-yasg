@@ -65,13 +65,15 @@ def drf_yasg_setup(**kwargs):
 
 
 try:
+    import setuptools_scm
     drf_yasg_setup(use_scm_version=True)
-except LookupError as e:
+except (ImportError, LookupError) as e:
     if os.getenv('CI', 'false') == 'true' or os.getenv('TRAVIS', 'false') == 'true':
         # don't silently fail on travis - we don't want to accidentally push a dummy version to PyPI
         raise
 
-    if 'setuptools-scm' in str(e):
+    err_msg = str(e)
+    if 'setuptools-scm' in err_msg or 'setuptools_scm' in err_msg:
         import time
 
         timestamp_ms = int(time.time() * 1000)
