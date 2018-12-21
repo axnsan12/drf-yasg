@@ -42,8 +42,8 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
     :param .inspectors.SwaggerAutoSchema auto_schema: custom class to use for generating the Operation object;
         this overrides both the class-level ``swagger_schema`` attribute and the ``DEFAULT_AUTO_SCHEMA_CLASS``
         setting, and can be set to ``None`` to prevent this operation from being generated
-    :param .Schema,.SchemaRef,.Serializer request_body: custom request body, or :class:`.no_body`. The value given here
-        will be used as the ``schema`` property of a :class:`.Parameter` with ``in: 'body'``.
+    :param request_body: custom request body which will be used as the ``schema`` property of a
+        :class:`.Parameter` with ``in: 'body'``.
 
         A Schema or SchemaRef is not valid if this request consumes form-data, because ``form`` and ``body`` parameters
         are mutually exclusive in an :class:`.Operation`. If you need to set custom ``form`` parameters, you can use
@@ -51,6 +51,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
         If a ``Serializer`` class or instance is given, it will be automatically converted into a :class:`.Schema`
         used as a ``body`` :class:`.Parameter`, or into a list of ``form`` :class:`.Parameter`\\ s, as appropriate.
+    :type request_body: .Schema or .SchemaRef or .Serializer or type[.no_body]
 
     :param .Serializer query_serializer: if you use a ``Serializer`` to parse query parameters, you can pass it here
         and have :class:`.Parameter` objects be generated automatically from it.
@@ -75,7 +76,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
         is requried to call this API; an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
         authentication schemes), and ``None`` will inherit the top-level secuirty requirements
     :param bool deprecated: deprecation status for operation
-    :param dict[str,(.Schema,.SchemaRef,.Response,str,Serializer)] responses: a dict of documented manual responses
+    :param responses: a dict of documented manual responses
         keyed on response status code. If no success (``2xx``) response is given, one will automatically be
         generated from the request body and http method. If any ``2xx`` response is given the automatic response is
         suppressed.
@@ -89,6 +90,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
         * a ``Serializer`` class or instance will be converted into a :class:`.Schema` and treated as above
         * a :class:`.Response` object will be used as-is; however if its ``schema`` attribute is a ``Serializer``,
           it will automatically be converted into a :class:`.Schema`
+    :type responses: dict[str,(.Schema or .SchemaRef or .Response or str or .Serializer)]
 
     :param list[.FieldInspector] field_inspectors: extra serializer and field inspectors; these will be tried
         before :attr:`.ViewInspector.field_inspectors` on the :class:`.inspectors.SwaggerAutoSchema` instance

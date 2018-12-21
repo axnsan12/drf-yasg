@@ -175,6 +175,7 @@ nitpick_ignore = [
     ('py:class', 'type'),
     ('py:class', 'OrderedDict'),
     ('py:class', 'None'),
+    ('py:obj', 'None'),
 
     ('py:class', 'Exception'),
     ('py:class', 'collections.OrderedDict'),

@@ -159,7 +159,7 @@ class FieldInspector(BaseInspector):
         :param kwargs: extra attributes for constructing the object;
            if swagger_object_type is Parameter, ``name`` and ``in_`` should be provided
         :return: the swagger object
-        :rtype: openapi.Parameter,openapi.Items,openapi.Schema,openapi.SchemaRef
+        :rtype: openapi.Parameter or openapi.Items or openapi.Schema or openapi.SchemaRef
         """
         return NotHandled
 
@@ -168,7 +168,7 @@ class FieldInspector(BaseInspector):
 
         All arguments are the same as :meth:`.field_to_swagger_object`.
 
-        :rtype: openapi.Parameter,openapi.Items,openapi.Schema,openapi.SchemaRef
+        :rtype: openapi.Parameter or openapi.Items or openapi.Schema or openapi.SchemaRef
         """
         return self.probe_inspectors(
             self.field_inspectors, 'field_to_swagger_object', field, {'field_inspectors': self.field_inspectors},
@@ -203,7 +203,7 @@ class FieldInspector(BaseInspector):
             - :class:`.Schema` if `swagger_object_type` is :class:`.Schema`
             - :class:`.Items` if `swagger_object_type` is  :class:`.Parameter` or :class:`.Items`
 
-        :rtype: tuple[callable,(type[openapi.Schema],type[openapi.Items])]
+        :rtype: tuple[callable,(type[openapi.Schema] or type[openapi.Items])]
         """
         assert swagger_object_type in (openapi.Schema, openapi.Parameter, openapi.Items)
         assert not isinstance(field, openapi.SwaggerDict), "passed field is already a SwaggerDict object"
@@ -368,7 +368,7 @@ class ViewInspector(BaseInspector):
 
         :param serializers.BaseSerializer serializer: the ``Serializer`` instance
         :returns: the converted :class:`.Schema`, or ``None`` in case of an unknown serializer
-        :rtype: openapi.Schema,openapi.SchemaRef
+        :rtype: openapi.Schema or openapi.SchemaRef
         """
         return self.probe_inspectors(
             self.field_inspectors, 'get_schema', serializer, {'field_inspectors': self.field_inspectors}

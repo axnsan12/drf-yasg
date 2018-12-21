@@ -203,7 +203,7 @@ class OpenAPISchemaGenerator(object):
         and helps clients configure their authorization credentials.
 
         :return: the security schemes usable with this API
-        :rtype: dict[str,dict]|None
+        :rtype: dict[str,dict] or None
         """
         security_definitions = swagger_settings.SECURITY_DEFINITIONS
         if security_definitions is not None:
@@ -217,7 +217,7 @@ class OpenAPISchemaGenerator(object):
 
         :param security_definitions: security definitions as returned by :meth:`.get_security_definitions`
         :return:
-        :rtype: dict[str,list[str]]|None
+        :rtype: list[dict[str,list[str]]] or None
         """
         security_requirements = swagger_settings.SECURITY_REQUIREMENTS
         if security_requirements is None:

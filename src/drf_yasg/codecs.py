@@ -170,7 +170,7 @@ def yaml_sane_dump(data, binary):
     :param dict data: the data to be dumped
     :param bool binary: True to return a utf-8 encoded binary object, False to return a string
     :return: the serialized YAML
-    :rtype: str,bytes
+    :rtype: str or bytes
     """
     return yaml.dump(data, Dumper=SaneYamlDumper, default_flow_style=False, encoding='utf-8' if binary else None)
 

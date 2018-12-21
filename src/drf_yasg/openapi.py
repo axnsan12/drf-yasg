@@ -237,8 +237,8 @@ class Swagger(SwaggerDict):
         :param str _prefix: api path prefix to use in setting basePath; this will be appended to the wsgi
             SCRIPT_NAME prefix or Django's FORCE_SCRIPT_NAME if applicable
         :param str _version: version string to override Info
-        :param dict[str,dict[str,str]] security_definitions: list of supported authentication mechanisms
-        :param list[dict] security: authentication mechanisms accepted by default; can be overriden in Operation
+        :param dict[str,dict] security_definitions: list of supported authentication mechanisms
+        :param list[dict[str,list[str]]] security: authentication mechanisms accepted globally
         :param list[str] consumes: consumed MIME types; can be overriden in Operation
         :param list[str] produces: produced MIME types; can be overriden in Operation
         :param .Paths paths: paths object
@@ -402,7 +402,8 @@ class Parameter(SwaggerDict):
         :param str in_: parameter location
         :param str description: parameter description
         :param bool required: whether the parameter is required for the operation
-        :param .Schema,.SchemaRef schema: required if `in_` is ``body``
+        :param schema: required if `in_` is ``body``
+        :type schema: .Schema or .SchemaRef
         :param str type: parameter type; required if `in_` is not ``body``; must not be ``object``
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
@@ -454,10 +455,13 @@ class Schema(SwaggerDict):
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
-        :param dict[str,(.Schema,.SchemaRef)] properties: object properties; required if `type` is ``object``
-        :param bool,.Schema,.SchemaRef additional_properties: allow wildcard properties not listed in `properties`
+        :param properties: object properties; required if `type` is ``object``
+        :type properties: dict[str,(.Schema or .SchemaRef)]
+        :param additional_properties: allow wildcard properties not listed in `properties`
+        :type additional_properties: bool or .Schema or .SchemaRef
         :param list[str] required: list of requried property names
-        :param .Schema,.SchemaRef items: type of array items, only valid if `type` is ``array``
+        :param items: type of array items, only valid if `type` is ``array``
+        :type items: .Schema or .SchemaRef
         :param default: only valid when insider another ``Schema``\\ 's ``properties``;
             the default value of this property if it is not provided, must conform to the type of this Schema
         :param read_only: only valid when insider another ``Schema``\\ 's ``properties``;
@@ -508,7 +512,7 @@ class _Ref(SwaggerDict):
         :param str name: referenced object name, e.g. "Article"
         :param str scope: reference scope, e.g. "definitions"
         :param type[.SwaggerDict] expected_type: the expected type that will be asserted on the object found in resolver
-        :param bool ignore_unresolved: allow the reference to be not defined in resolver
+        :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
         super(_Ref, self).__init__()
         assert not type(self) == _Ref, "do not instantiate _Ref directly"
@@ -543,7 +547,7 @@ class SchemaRef(_Ref):
 
         :param .ReferenceResolver resolver: component resolver which must contain the definition
         :param str schema_name: schema name
-        :param bool ignore_unresolved: allow the reference to be not defined in resolver
+        :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
         assert SCHEMA_DEFINITIONS in resolver.scopes
         super(SchemaRef, self).__init__(resolver, schema_name, SCHEMA_DEFINITIONS, Schema, ignore_unresolved)
@@ -555,7 +559,8 @@ Schema.OR_REF = (Schema, SchemaRef)
 def resolve_ref(ref_or_obj, resolver):
     """Resolve `ref_or_obj` if it is a reference type. Return it unchaged if not.
 
-    :param SwaggerDict,_Ref ref_or_obj:
+    :param ref_or_obj: object to derefernece
+    :type ref_or_obj: .SwaggerDict or ._Ref
     :param resolver: component resolver which must contain the referenced object
     """
     if isinstance(ref_or_obj, _Ref):
@@ -567,7 +572,8 @@ class Responses(SwaggerDict):
     def __init__(self, responses, default=None, **extra):
         """Describes the expected responses of an :class:`.Operation`.
 
-        :param dict[(str,int),.Response] responses: mapping of status code to response definition
+        :param responses: mapping of status code to response definition
+        :type responses: dict[(str or int),.Response]
         :param .Response default: description of the response structure to expect if another status code is returned
         """
         super(Responses, self).__init__(**extra)
@@ -583,7 +589,8 @@ class Response(SwaggerDict):
         """Describes the structure of an operation's response.
 
         :param str description: response description
-        :param .Schema,.SchemaRef schema: sturcture of the response body
+        :param schema: sturcture of the response body
+        :type schema: .Schema or .SchemaRef
         :param dict examples: example bodies mapped by mime type
         """
         super(Response, self).__init__(**extra)
