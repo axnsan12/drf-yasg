@@ -121,8 +121,7 @@ class SaneYamlDumper(yaml.SafeDumper):
         """
         return super(SaneYamlDumper, self).increase_indent(flow=flow, indentless=False, **kwargs)
 
-    @staticmethod
-    def represent_odict(dump, mapping, flow_style=None):  # pragma: no cover
+    def represent_odict(self, mapping, flow_style=None):  # pragma: no cover
         """https://gist.github.com/miracle2k/3184458
 
         Make PyYAML output an OrderedDict.
@@ -134,22 +133,22 @@ class SaneYamlDumper(yaml.SafeDumper):
         tag = YAML_MAP_TAG
         value = []
         node = yaml.MappingNode(tag, value, flow_style=flow_style)
-        if dump.alias_key is not None:
-            dump.represented_objects[dump.alias_key] = node
+        if self.alias_key is not None:
+            self.represented_objects[self.alias_key] = node
         best_style = True
         if hasattr(mapping, 'items'):
             mapping = mapping.items()
         for item_key, item_value in mapping:
-            node_key = dump.represent_data(item_key)
-            node_value = dump.represent_data(item_value)
+            node_key = self.represent_data(item_key)
+            node_value = self.represent_data(item_value)
             if not (isinstance(node_key, yaml.ScalarNode) and not node_key.style):
                 best_style = False
             if not (isinstance(node_value, yaml.ScalarNode) and not node_value.style):
                 best_style = False
             value.append((node_key, node_value))
         if flow_style is None:
-            if dump.default_flow_style is not None:
-                node.flow_style = dump.default_flow_style
+            if self.default_flow_style is not None:
+                node.flow_style = self.default_flow_style
             else:
                 node.flow_style = best_style
         return node

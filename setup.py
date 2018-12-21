@@ -65,7 +65,9 @@ def drf_yasg_setup(**kwargs):
 
 
 try:
-    import setuptools_scm
+    # noinspection PyUnresolvedReferences
+    import setuptools_scm  # noqa: F401
+
     drf_yasg_setup(use_scm_version=True)
 except (ImportError, LookupError) as e:
     if os.getenv('CI', 'false') == 'true' or os.getenv('TRAVIS', 'false') == 'true':
