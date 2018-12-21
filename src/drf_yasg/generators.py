@@ -198,6 +198,35 @@ class OpenAPISchemaGenerator(object):
     def url(self):
         return self._gen.url
 
+    def get_security_definitions(self):
+        """Get the security schemes for this API. This determines what is usable in security requirements,
+        and helps clients configure their authorization credentials.
+
+        :return: the security schemes usable with this API
+        :rtype: dict[str,dict]|None
+        """
+        security_definitions = swagger_settings.SECURITY_DEFINITIONS
+        if security_definitions is not None:
+            security_definitions = SwaggerDict._as_odict(security_definitions, {})
+
+        return security_definitions
+
+    def get_security_requirements(self, security_definitions):
+        """Get the base (global) security requirements of the API. This is never called if
+        :meth:`.get_security_definitions` returns `None`.
+
+        :param security_definitions: security definitions as returned by :meth:`.get_security_definitions`
+        :return:
+        :rtype: dict[str,list[str]]|None
+        """
+        security_requirements = swagger_settings.SECURITY_REQUIREMENTS
+        if security_requirements is None:
+            security_requirements = [{security_scheme: []} for security_scheme in security_definitions]
+
+        security_requirements = [SwaggerDict._as_odict(sr, {}) for sr in security_requirements]
+        security_requirements = sorted(security_requirements, key=list)
+        return security_requirements
+
     def get_schema(self, request=None, public=False):
         """Generate a :class:`.Swagger` object representing the API schema.
 
@@ -214,16 +243,11 @@ class OpenAPISchemaGenerator(object):
         self.produces = get_produces(rest_framework_settings.DEFAULT_RENDERER_CLASSES)
         paths, prefix = self.get_paths(endpoints, components, request, public)
 
-        security_definitions = swagger_settings.SECURITY_DEFINITIONS
-        if security_definitions is not None:
-            security_definitions = SwaggerDict._as_odict(security_definitions, {})
-
-        security_requirements = swagger_settings.SECURITY_REQUIREMENTS
-        if security_requirements is None:
-            security_requirements = [{security_scheme: []} for security_scheme in swagger_settings.SECURITY_DEFINITIONS]
-
-        security_requirements = [SwaggerDict._as_odict(sr, {}) for sr in security_requirements]
-        security_requirements = sorted(security_requirements, key=list)
+        security_definitions = self.get_security_definitions()
+        if security_definitions:
+            security_requirements = self.get_security_requirements(security_definitions)
+        else:
+            security_requirements = None
 
         url = self.url
         if url is None and request is not None:
