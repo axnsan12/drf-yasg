@@ -123,7 +123,7 @@ class SwaggerUIRenderer(_UIRenderer):
         super(SwaggerUIRenderer, self).set_context(renderer_context, swagger)
         swagger_ui_settings = self.get_swagger_ui_settings()
 
-        request = renderer_context['request']
+        request = renderer_context.get('request', None)
         oauth_redirect_url = force_text(swagger_ui_settings.get('oauth2RedirectUrl', ''))
         if request and oauth_redirect_url:
             swagger_ui_settings['oauth2RedirectUrl'] = request.build_absolute_uri(oauth_redirect_url)

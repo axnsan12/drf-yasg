@@ -3,6 +3,7 @@ from rest_framework import generics, versioning
 
 from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer
+from testproj.urls import required_urlpatterns
 
 
 class SnippetList(generics.ListCreateAPIView):
@@ -21,6 +22,6 @@ class SnippetList(generics.ListCreateAPIView):
 
 app_name = 'test_ns_versioning'
 
-urlpatterns = [
+urlpatterns = required_urlpatterns + [
     url(r"^$", SnippetList.as_view())
 ]

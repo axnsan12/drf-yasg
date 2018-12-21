@@ -47,6 +47,12 @@ def root_redirect(request):
     return redirect(schema_view, permanent=True)
 
 
+# urlpatterns required for settings values
+required_urlpatterns = [
+    url(r'^admin/', admin.site.urls),
+    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+]
+
 urlpatterns = [
     url(r'^swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', SchemaView.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
@@ -59,13 +65,10 @@ urlpatterns = [
 
     url(r'^$', root_redirect),
 
-    url(r'^admin/', admin.site.urls),
-    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-
     url(r'^snippets/', include('snippets.urls')),
     url(r'^articles/', include('articles.urls')),
     url(r'^users/', include('users.urls')),
     url(r'^todo/', include('todo.urls')),
     url(r'^people/', include('people.urls')),
     url(r'^plain/', plain_view),
-]
+] + required_urlpatterns

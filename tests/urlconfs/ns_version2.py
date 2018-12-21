@@ -2,6 +2,7 @@ from django.conf.urls import url
 from rest_framework import fields
 
 from snippets.serializers import SnippetSerializer
+from testproj.urls import required_urlpatterns
 
 from .ns_version1 import SnippetList as SnippetListV1
 
@@ -19,6 +20,6 @@ class SnippetListV2(SnippetListV1):
 
 app_name = '2.0'
 
-urlpatterns = [
+urlpatterns = required_urlpatterns + [
     url(r"^$", SnippetListV2.as_view())
 ]

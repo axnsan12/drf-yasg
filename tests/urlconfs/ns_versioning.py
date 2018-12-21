@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 from rest_framework import versioning
 
-from testproj.urls import SchemaView
+from testproj.urls import SchemaView, required_urlpatterns
 
 from . import ns_version1, ns_version2
 
@@ -17,7 +17,7 @@ schema_patterns = [
 ]
 
 
-urlpatterns = [
+urlpatterns = required_urlpatterns + [
     url(VERSION_PREFIX_NS + r"v1.0/snippets/", include(ns_version1, namespace='1.0')),
     url(VERSION_PREFIX_NS + r"v2.0/snippets/", include(ns_version2)),
     url(VERSION_PREFIX_NS + r'v1.0/', include((schema_patterns, '1.0'))),
