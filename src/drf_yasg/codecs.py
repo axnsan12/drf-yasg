@@ -2,6 +2,7 @@ from six import raise_from
 
 import copy
 import json
+import logging
 from collections import OrderedDict
 
 from coreapi.compat import force_bytes
@@ -10,6 +11,7 @@ from ruamel import yaml
 from . import openapi
 from .errors import SwaggerValidationError
 
+logger = logging.getLogger(__name__)
 
 def _validate_flex(spec):
     from flex.core import parse as validate_flex
@@ -70,7 +72,10 @@ class _OpenAPICodec(object):
                 errors[validator] = str(e)
 
         if errors:
-            raise SwaggerValidationError("spec validation failed", errors, spec, self)
+            exc = SwaggerValidationError("spec validation failed: {}".format(errors), errors, spec, self)
+            logger.warning(str(exc))
+            raise exc
+
         return force_bytes(self._dump_dict(spec))
 
     def encode_error(self, err):
