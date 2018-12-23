@@ -249,6 +249,21 @@ paths:
         - multipart/form-data
       tags:
         - articles
+    delete:
+      operationId: articles_image_delete
+      description: image method docstring
+      parameters:
+        - name: delete_form_param
+          in: formData
+          description: this should not crash (form parameter on DELETE method)
+          type: integer
+      responses:
+        '204':
+          description: ''
+      consumes:
+        - multipart/form-data
+      tags:
+        - articles
     parameters:
       - name: slug
         in: path
