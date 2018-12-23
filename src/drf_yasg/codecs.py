@@ -13,6 +13,7 @@ from .errors import SwaggerValidationError
 
 logger = logging.getLogger(__name__)
 
+
 def _validate_flex(spec):
     from flex.core import parse as validate_flex
     from flex.exceptions import ValidationError

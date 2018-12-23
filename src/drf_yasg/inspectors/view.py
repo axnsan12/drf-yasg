@@ -12,9 +12,9 @@ from ..utils import (
     filter_none, force_real_str, force_serializer_instance, get_consumes, get_produces, guess_response_status,
     is_list_view, merge_params, no_body, param_list_to_odict
 )
-from .base import ViewInspector
+from .base import ViewInspector, call_view_method
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class SwaggerAutoSchema(ViewInspector):
@@ -103,21 +103,12 @@ class SwaggerAutoSchema(ViewInspector):
         """Return the serializer as defined by the view's ``get_serializer()`` method.
 
         :return: the view's ``Serializer``
+        :rtype: rest_framework.serializers.Serializer
         """
-        if not hasattr(self.view, 'get_serializer'):
-            return None
-        try:
-            return self.view.get_serializer()
-        except Exception:
-            log.warning("view's get_serializer raised exception (%s %s %s)",
-                        self.method, self.path, type(self.view).__name__, exc_info=True)
-            return None
+        return call_view_method(self.view, 'get_serializer')
 
     def _get_request_body_override(self):
-        """Parse the request_body key in the override dict. This method is not public API.
-
-        :return:
-        """
+        """Parse the request_body key in the override dict. This method is not public API."""
         body_override = self.overrides.get('request_body', None)
 
         if body_override is not None:
@@ -136,6 +127,7 @@ class SwaggerAutoSchema(ViewInspector):
         """Return the request serializer (used for parsing the request payload) for this endpoint.
 
         :return: the request serializer, or one of :class:`.Schema`, :class:`.SchemaRef`, ``None``
+        :rtype: rest_framework.serializers.Serializer
         """
         body_override = self._get_request_body_override()
 
@@ -430,11 +422,11 @@ class SwaggerAutoSchema(ViewInspector):
 
         :rtype: list[str]
         """
-        return get_consumes(getattr(self.view, 'parser_classes', []))
+        return get_consumes(self.get_parser_classes())
 
     def get_produces(self):
         """Return the MIME types this endpoint can produce.
 
         :rtype: list[str]
         """
-        return get_produces(getattr(self.view, 'renderer_classes', []))
+        return get_produces(self.get_renderer_classes())

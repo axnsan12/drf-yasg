@@ -95,12 +95,12 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
     :type responses: dict[str,(drf_yasg.openapi.Schema or drf_yasg.openapi.SchemaRef or drf_yasg.openapi.Response or
         str or rest_framework.serializers.Serializer)]
 
-    :param list[drf_yasg.inspectors.FieldInspector] field_inspectors: extra serializer and field inspectors; these will
-        be tried before :attr:`.ViewInspector.field_inspectors` on the :class:`.inspectors.SwaggerAutoSchema` instance
-    :param list[drf_yasg.inspectors.FilterInspector] filter_inspectors: extra filter inspectors; these will be tried
-        before :attr:`.ViewInspector.filter_inspectors` on the :class:`.inspectors.SwaggerAutoSchema` instance
-    :param list[drf_yasg.inspectors.PaginatorInspector] paginator_inspectors: extra paginator inspectors; these will be
-        tried before :attr:`.ViewInspector.paginator_inspectors` on the :class:`.inspectors.SwaggerAutoSchema` instance
+    :param list[type[drf_yasg.inspectors.FieldInspector]] field_inspectors: extra serializer and field inspectors; these
+        will be tried before :attr:`.ViewInspector.field_inspectors` on the :class:`.inspectors.SwaggerAutoSchema`
+    :param list[type[drf_yasg.inspectors.FilterInspector]] filter_inspectors: extra filter inspectors; these will be
+        tried before :attr:`.ViewInspector.filter_inspectors` on the :class:`.inspectors.SwaggerAutoSchema`
+    :param list[type[drf_yasg.inspectors.PaginatorInspector]] paginator_inspectors: extra paginator inspectors; these
+        will be tried before :attr:`.ViewInspector.paginator_inspectors` on the :class:`.inspectors.SwaggerAutoSchema`
     :param list[str] tags: tags override
     :param extra_overrides: extra values that will be saved into the ``overrides`` dict; these values will be available
         in the handling :class:`.inspectors.SwaggerAutoSchema` instance via ``self.overrides``
@@ -300,6 +300,7 @@ def force_serializer_instance(serializer):
     an assertion error.
 
     :param serializer: serializer class or instance
+    :type serializer: serializers.BaseSerializer or type[serializers.BaseSerializer]
     :return: serializer instance
     :rtype: serializers.BaseSerializer
     """
@@ -332,13 +333,38 @@ def get_serializer_class(serializer):
     return type(serializer)
 
 
+def get_object_classes(classes_or_instances, expected_base_class=None):
+    """Given a list of instances or class objects, return the list of their classes.
+
+    :param classes_or_instances: mixed list to parse
+    :type classes_or_instances: list[type or object]
+    :param expected_base_class: if given, only subclasses or instances of this type will be returned
+    :type expected_base_class: type
+    :return: list of classes
+    :rtype: list
+    """
+    classes_or_instances = classes_or_instances or []
+    result = []
+    for obj in classes_or_instances:
+        if inspect.isclass(obj):
+            if not expected_base_class or issubclass(obj, expected_base_class):
+                result.append(obj)
+        else:
+            if not expected_base_class or isinstance(obj, expected_base_class):
+                result.append(type(obj))
+
+    return result
+
+
 def get_consumes(parser_classes):
     """Extract ``consumes`` MIME types from a list of parser classes.
 
     :param list parser_classes: parser classes
+    :type parser_classes: list[rest_framework.parsers.BaseParser or type[rest_framework.parsers.BaseParser]]
     :return: MIME types for ``consumes``
     :rtype: list[str]
     """
+    parser_classes = get_object_classes(parser_classes)
     media_types = [parser.media_type for parser in parser_classes or []]
     non_form_media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
     if len(non_form_media_types) == 0:
@@ -351,9 +377,11 @@ def get_produces(renderer_classes):
     """Extract ``produces`` MIME types from a list of renderer classes.
 
     :param list renderer_classes: renderer classes
+    :type renderer_classes: list[rest_framework.renderers.BaseRenderer or type[rest_framework.renderers.BaseRenderer]]
     :return: MIME types for ``produces``
     :rtype: list[str]
     """
+    renderer_classes = get_object_classes(renderer_classes)
     media_types = [renderer.media_type for renderer in renderer_classes or []]
     media_types = [encoding for encoding in media_types
                    if not any(excluded in encoding for excluded in swagger_settings.EXCLUDED_MEDIA_TYPES)]
@@ -378,7 +406,7 @@ def get_serializer_ref_name(serializer):
 
     :param serializer: Serializer instance
     :return: Serializer's ``ref_name`` or ``None`` for inline serializer
-    :rtype: str
+    :rtype: str or None
     """
     serializer_meta = getattr(serializer, 'Meta', None)
     serializer_name = type(serializer).__name__

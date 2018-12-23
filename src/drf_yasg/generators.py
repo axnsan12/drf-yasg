@@ -8,9 +8,9 @@ from coreapi.compat import urlparse
 from rest_framework import versioning
 from rest_framework.compat import URLPattern, URLResolver, get_original_route
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
-from rest_framework.schemas.generators import SchemaGenerator, endpoint_ordering
+from rest_framework.schemas.generators import SchemaGenerator, endpoint_ordering, get_pk_name
 from rest_framework.schemas.inspectors import get_pk_description
-from rest_framework.settings import api_settings as rest_framework_settings
+from rest_framework.settings import api_settings
 
 from . import openapi
 from .app_settings import swagger_settings
@@ -132,7 +132,7 @@ class EndpointEnumerator(_EndpointEnumerator):
 
     def unescape_path(self, path):
         """Remove backslashe escapes from all path components outside {parameters}. This is needed because
-        ``simplify_regex`` does not handle this correctly - note however that this implementation is
+        ``simplify_regex`` does not handle this correctly.
 
         **NOTE:** this might destructively affect some url regex patterns that contain metacharacters (e.g. \\w, \\d)
         outside path parameter groups; if you are in this category, God help you
@@ -164,7 +164,7 @@ class OpenAPISchemaGenerator(object):
     def __init__(self, info, version='', url=None, patterns=None, urlconf=None):
         """
 
-        :param .Info info: information about the API
+        :param openapi.Info info: information about the API
         :param str version: API version string; if omitted, `info.default_version` will be used
         :param str url: API scheme, host and port; if ``None`` is passed and ``DEFAULT_API_URL`` is not set, the url
             will be inferred from the request made against the schema view, so you should generally not need to set
@@ -216,7 +216,7 @@ class OpenAPISchemaGenerator(object):
         :meth:`.get_security_definitions` returns `None`.
 
         :param security_definitions: security definitions as returned by :meth:`.get_security_definitions`
-        :return:
+        :return: the security schemes accepted by default
         :rtype: list[dict[str,list[str]]] or None
         """
         security_requirements = swagger_settings.SECURITY_REQUIREMENTS
@@ -239,8 +239,8 @@ class OpenAPISchemaGenerator(object):
         """
         endpoints = self.get_endpoints(request)
         components = ReferenceResolver(openapi.SCHEMA_DEFINITIONS)
-        self.consumes = get_consumes(rest_framework_settings.DEFAULT_PARSER_CLASSES)
-        self.produces = get_produces(rest_framework_settings.DEFAULT_RENDERER_CLASSES)
+        self.consumes = get_consumes(api_settings.DEFAULT_PARSER_CLASSES)
+        self.produces = get_produces(api_settings.DEFAULT_RENDERER_CLASSES)
         paths, prefix = self.get_paths(endpoints, components, request, public)
 
         security_definitions = self.get_security_definitions()
@@ -280,6 +280,24 @@ class OpenAPISchemaGenerator(object):
         setattr(view, 'swagger_fake_view', True)
         return view
 
+    def coerce_path(self, path, view):
+        """Coerce {pk} path arguments into the name of the model field, where possible. This is cleaner for an
+        external representation (i.e. "this is an identifier", not "this is a database primary key").
+
+        :param str path: the path
+        :param rest_framework.views.APIView view: associated view
+        :rtype: str
+        """
+        if '{pk}' not in path:
+            return path
+
+        model = getattr(get_queryset_from_view(view), 'model', None)
+        if model:
+            field_name = get_pk_name(model)
+        else:
+            field_name = 'id'
+        return path.replace('{pk}', '{%s}' % field_name)
+
     def get_endpoints(self, request):
         """Iterate over all the registered endpoints in the API and return a fake view with the right parameters.
 
@@ -295,7 +313,7 @@ class OpenAPISchemaGenerator(object):
         view_cls = {}
         for path, method, callback in endpoints:
             view = self.create_view(callback, method, request)
-            path = self._gen.coerce_path(path, method, view)
+            path = self.coerce_path(path, view)
             view_paths[path].append((method, view))
             view_cls[path] = callback.cls
         return {path: (view_cls[path], methods) for path, methods in view_paths.items()}
@@ -313,7 +331,7 @@ class OpenAPISchemaGenerator(object):
         :param str subpath: path to the operation with any common prefix/base path removed
         :param str method: HTTP method
         :param view: the view associated with the operation
-        :rtype: tuple
+        :rtype: list[str]
         """
         return self._gen.get_keys(subpath, method, view)
 

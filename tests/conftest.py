@@ -55,7 +55,7 @@ def swagger_dict(swagger, codec_json):
 
 
 @pytest.fixture
-def validate_schema(db):
+def validate_schema():
     def validate_schema(swagger):
         from flex.core import parse as validate_flex
         from swagger_spec_validator.validator20 import validate_spec as validate_ssv

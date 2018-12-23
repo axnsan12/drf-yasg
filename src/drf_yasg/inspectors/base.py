@@ -4,7 +4,7 @@ import logging
 from rest_framework import serializers
 
 from .. import openapi
-from ..utils import force_real_str, get_field_default, is_list_view
+from ..utils import force_real_str, get_field_default, get_object_classes, is_list_view
 
 #: Sentinel value that inspectors must return to signal that they do not know how to handle an object
 NotHandled = object()
@@ -12,14 +12,38 @@ NotHandled = object()
 logger = logging.getLogger(__name__)
 
 
+def call_view_method(view, method_name, fallback_attr=None, default=None):
+    """Call a view method which might throw an exception. If an exception is thrown, log an informative error message
+    and return the value of fallback_attr, or default if not present.
+
+    :param rest_framework.views.APIView view:
+    :param str method_name: name of a method on the view
+    :param str fallback_attr: name of an attribute on the view to fall back on, if calling the method fails
+    :param default: default value if all else fails
+    :return: view method's return value, or value of view's fallback_attr, or default
+    """
+    if hasattr(view, method_name):
+        try:
+            return getattr(view, method_name)()
+        except Exception:  # pragma: no cover
+            logger.warning("view's %s.get_parsers raised exception during schema generation; use "
+                           "`getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this",
+                           type(view).__name__, exc_info=True)
+
+    if fallback_attr and hasattr(view, fallback_attr):
+        return getattr(view, fallback_attr)
+
+    return default
+
+
 class BaseInspector(object):
     def __init__(self, view, path, method, components, request):
         """
-        :param view: the view associated with this endpoint
+        :param rest_framework.views.APIView view: the view associated with this endpoint
         :param str path: the path component of the operation URL
         :param str method: the http method of the operation
         :param openapi.ReferenceResolver components: referenceable components
-        :param Request request: the request made against the schema view; can be None
+        :param rest_framework.request.Request request: the request made against the schema view; can be None
         """
         self.view = view
         self.path = path
@@ -80,6 +104,22 @@ class BaseInspector(object):
             result = inspector.process_result(result, method_name, obj, **kwargs)
 
         return result
+
+    def get_renderer_classes(self):
+        """Get the renderer classes of this view by calling `get_renderers`.
+
+        :return: renderer classes
+        :rtype: list[type[rest_framework.renderers.BaseRenderer]]
+        """
+        return get_object_classes(call_view_method(self.view, 'get_renderers', 'renderer_classes', []))
+
+    def get_parser_classes(self):
+        """Get the parser classes of this view by calling `get_parsers`.
+
+        :return: parser classes
+        :rtype: list[type[rest_framework.parsers.BaseParser]]
+        """
+        return get_object_classes(call_view_method(self.view, 'get_parsers', 'parser_classes', []))
 
 
 class PaginatorInspector(BaseInspector):
@@ -335,7 +375,7 @@ class ViewInspector(BaseInspector):
             return []
 
         fields = []
-        for filter_backend in self.view.filter_backends:
+        for filter_backend in getattr(self.view, 'filter_backends'):
             fields += self.probe_inspectors(self.filter_inspectors, 'get_filter_parameters', filter_backend()) or []
 
         return fields
@@ -361,7 +401,8 @@ class ViewInspector(BaseInspector):
         if not self.should_page():
             return []
 
-        return self.probe_inspectors(self.paginator_inspectors, 'get_paginator_parameters', self.view.paginator) or []
+        return self.probe_inspectors(self.paginator_inspectors, 'get_paginator_parameters',
+                                     getattr(self.view, 'paginator')) or []
 
     def serializer_to_schema(self, serializer):
         """Convert a serializer to an OpenAPI :class:`.Schema`.
@@ -394,4 +435,4 @@ class ViewInspector(BaseInspector):
         :rtype: openapi.Schema
         """
         return self.probe_inspectors(self.paginator_inspectors, 'get_paginated_response',
-                                     self.view.paginator, response_schema=response_schema)
+                                     getattr(self.view, 'paginator'), response_schema=response_schema)
