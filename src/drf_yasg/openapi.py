@@ -373,6 +373,17 @@ class Operation(SwaggerDict):
         self._insert_extras__()
 
 
+def _check_type(type, format, enum, pattern, items, _obj_type):
+    if items and type != TYPE_ARRAY:
+        raise AssertionError("items can only be used when type is array")
+    if type == TYPE_ARRAY and not items:
+        raise AssertionError("TYPE_ARRAY requires the items attribute")
+    if pattern and type != TYPE_STRING:
+        raise AssertionError("pattern can only be used when type is string")
+    if (format or enum or pattern) and type in (TYPE_OBJECT, TYPE_ARRAY, None):
+        raise AssertionError("[format, enum, pattern] can only be applied to primitive " + _obj_type)
+
+
 class Items(SwaggerDict):
     def __init__(self, type=None, format=None, enum=None, pattern=None, items=None, **extra):
         """Used when defining an array :class:`.Parameter` to describe the array elements.
@@ -391,10 +402,7 @@ class Items(SwaggerDict):
         self.pattern = pattern
         self.items = items
         self._insert_extras__()
-        if items and type != TYPE_ARRAY:
-            raise AssertionError("items can only be used when type is array")
-        if pattern and type != TYPE_STRING:
-            raise AssertionError("pattern can only be used when type is string")
+        _check_type(type, format, enum, pattern, items, self.__class__)
 
 
 class Parameter(SwaggerDict):
@@ -439,12 +447,9 @@ class Parameter(SwaggerDict):
             self.required = True
         if self['in'] != IN_BODY and schema is not None:
             raise AssertionError("schema can only be applied to a body Parameter, not %s" % type)
-        if (format or enum or pattern or default) and not type:
-            raise AssertionError("[format, enum, pattern, default] can only be applied to non-body Parameter")
-        if items and type != TYPE_ARRAY:
-            raise AssertionError("items can only be used when type is array")
-        if pattern and type != TYPE_STRING:
-            raise AssertionError("pattern can only be used when type is string")
+        if default and not type:
+            raise AssertionError("default can only be applied to a non-body Parameter")
+        _check_type(type, format, enum, pattern, items, self.__class__)
 
 
 class Schema(SwaggerDict):
@@ -493,12 +498,7 @@ class Schema(SwaggerDict):
         self._insert_extras__()
         if (properties or (additional_properties is not None)) and type != TYPE_OBJECT:
             raise AssertionError("only object Schema can have properties")
-        if (format or enum or pattern) and type in (TYPE_OBJECT, TYPE_ARRAY):
-            raise AssertionError("[format, enum, pattern] can only be applied to primitive Schema")
-        if items and type != TYPE_ARRAY:
-            raise AssertionError("items can only be used when type is array")
-        if pattern and type != TYPE_STRING:
-            raise AssertionError("pattern can only be used when type is string")
+        _check_type(type, format, enum, pattern, items, self.__class__)
 
     def _remove_read_only(self):
         # readOnly is only valid for Schemas inside another Schema's properties;
@@ -595,7 +595,8 @@ class Response(SwaggerDict):
 
         :param str description: response description
         :param schema: sturcture of the response body
-        :type schema: Schema or SchemaRef
+        :type schema: Schema or SchemaRef or rest_framework.serializers.Serializer
+            or type[rest_framework.serializers.Serializer]
         :param dict examples: example bodies mapped by mime type
         """
         super(Response, self).__init__(**extra)

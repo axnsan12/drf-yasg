@@ -814,6 +814,14 @@ paths:
           in: query
           description: test manual param
           type: boolean
+        - name: test_array
+          in: query
+          description: test query array arg
+          required: true
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
       responses:
         '200':
           description: response description
