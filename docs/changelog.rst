@@ -34,7 +34,7 @@ install the build requirements yourself (just ```setuptools`` and ``setuptools-s
 
 Additionally, for correct package version detection, a full git checkout is required when building (this was always the
 case). Building without ``.git`` or without ``setuptools-scm`` will result in a distribution with a version like
-``drf-yasg-0.0.0rc0+noscm00000167d19bd859``.
+``drf-yasg-1!0.0.0.dev0+noscm.00000167d19bd859``.
 
 **********
 **1.11.1**

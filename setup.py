@@ -77,13 +77,15 @@ except (ImportError, LookupError) as e:
     err_msg = str(e)
     if 'setuptools-scm' in err_msg or 'setuptools_scm' in err_msg:
         import time
+        import traceback
 
         timestamp_ms = int(time.time() * 1000)
         timestamp_str = hex(timestamp_ms)[2:].zfill(16)
-        dummy_version = '0.0.0rc0+noscm' + timestamp_str
+        dummy_version = '1!0.0.0.dev0+noscm.' + timestamp_str
 
         drf_yasg_setup(version=dummy_version)
-        print(str(e), file=sys.stderr)
-        print("failed to detect version, build was done using dummy version " + dummy_version, file=sys.stderr)
+
+        traceback.print_exc(file=sys.stderr)
+        print("failed to detect version, package was built with dummy version " + dummy_version, file=sys.stderr)
     else:
         raise
