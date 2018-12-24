@@ -211,7 +211,7 @@ caching the schema view in-memory, with some sane defaults:
 4. Validation
 =============
 
-Given the numerous methods to manually customzie the generated schema, it makes sense to validate the result to ensure
+Given the numerous methods to manually customize the generated schema, it makes sense to validate the result to ensure
 it still conforms to OpenAPI 2.0. To this end, validation is provided at the generation point using python swagger
 libraries, and can be activated by passing :python:`validators=['flex', 'ssv']` to ``get_schema_view``; if the generated
 schema is not valid, a :python:`SwaggerValidationError` is raised by the handling codec.
