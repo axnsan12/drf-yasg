@@ -30,7 +30,7 @@ Changelog
 Starting with this version, the ``setup_requires`` argument was dropped from ``setup.py`` in favor of
 ``build-system.requires`` in ``pyproject.toml`` . This means that for correctly building or installing from sdist,
 you will need to use a PEP517/PEP518 compliant tool (tox>=3.3.0, setuptools>=40, pip>=10.0, pep517.build) or manually
-install the build requirements yourself (just ```setuptools`` and ``setuptools-scm``, for now).
+install the build requirements yourself (just ``setuptools`` and ``setuptools-scm``, for now).
 
 Additionally, for correct package version detection, a full git checkout is required when building (this was always the
 case). Building without ``.git`` or without ``setuptools-scm`` will result in a distribution with a version like
