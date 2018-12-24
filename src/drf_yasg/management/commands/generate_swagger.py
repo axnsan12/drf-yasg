@@ -56,7 +56,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '-m', '--mock-request', dest='mock',
             default=False, action='store_true',
-            help='Use a mock request when generating the swagger schema. This is useful if your views or serializers'
+            help='Use a mock request when generating the swagger schema. This is useful if your views or serializers '
                  'depend on context from a request in order to function.'
         )
         parser.add_argument(
@@ -85,11 +85,9 @@ class Command(BaseCommand):
 
     def write_schema(self, schema, stream, format):
         if format == 'json':
-            codec = OpenAPICodecJson(validators=[])
-            swagger_json = codec.encode(schema)
-            swagger_json = json.loads(swagger_json.decode('utf-8'), object_pairs_hook=OrderedDict)
-            pretty_json = json.dumps(swagger_json, indent=4, ensure_ascii=True)
-            stream.write(pretty_json)
+            codec = OpenAPICodecJson(validators=[], pretty=True)
+            swagger_json = codec.encode(schema).decode('utf-8')
+            stream.write(swagger_json)
         elif format == 'yaml':
             codec = OpenAPICodecYaml(validators=[])
             swagger_yaml = codec.encode(schema).decode('utf-8')
@@ -141,6 +139,7 @@ class Command(BaseCommand):
         request = None
         if mock:
             request = self.get_mock_request(api_url, format, user)
+
 
         if request and api_version:
             request.version = api_version

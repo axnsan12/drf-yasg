@@ -88,7 +88,7 @@ class _OpenAPICodec(object):
 
         :param dict spec: a python dict
         :return: string representation of ``spec``
-        :rtype: str
+        :rtype: str or bytes
         """
         raise NotImplementedError("override this method")
 
@@ -105,9 +105,22 @@ class _OpenAPICodec(object):
 class OpenAPICodecJson(_OpenAPICodec):
     media_type = 'application/json'
 
+    def __init__(self, validators, pretty=False, media_type='application/json'):
+        super(OpenAPICodecJson, self).__init__(validators)
+        self.pretty = pretty
+        self.media_type = media_type
+
     def _dump_dict(self, spec):
-        """Dump ``spec`` into JSON."""
-        return json.dumps(spec)
+        """Dump ``spec`` into JSON.
+
+        :rtype: str"""
+        if self.pretty:
+            out = json.dumps(spec, indent=4, separators=(',', ': '))
+            if out[-1] != '\n':
+                out += '\n'
+            return out
+        else:
+            return json.dumps(spec)
 
 
 YAML_MAP_TAG = u'tag:yaml.org,2002:map'
@@ -201,6 +214,12 @@ def yaml_sane_load(stream):
 class OpenAPICodecYaml(_OpenAPICodec):
     media_type = 'application/yaml'
 
+    def __init__(self, validators, media_type='application/yaml'):
+        super(OpenAPICodecYaml, self).__init__(validators)
+        self.media_type = media_type
+
     def _dump_dict(self, spec):
-        """Dump ``spec`` into YAML."""
+        """Dump ``spec`` into YAML.
+
+        :rtype: bytes"""
         return yaml_sane_dump(spec, binary=True)
