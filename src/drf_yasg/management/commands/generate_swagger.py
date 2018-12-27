@@ -141,7 +141,7 @@ class Command(BaseCommand):
         if mock:
             request = self.get_mock_request(api_url, format, user)
 
-
+        api_version = api_version or api_settings.DEFAULT_VERSION
         if request and api_version:
             request.version = api_version
 
