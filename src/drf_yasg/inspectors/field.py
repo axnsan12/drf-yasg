@@ -177,7 +177,7 @@ def get_queryset_from_view(view, serializer=None):
     :return: queryset or ``None``
     """
     try:
-        queryset = call_view_method(view, 'get_queryset', 'queryset', None)
+        queryset = call_view_method(view, 'get_queryset', 'queryset')
 
         if queryset is not None and serializer is not None:
             # make sure the view is actually using *this* serializer

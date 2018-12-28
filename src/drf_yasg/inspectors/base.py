@@ -1,3 +1,5 @@
+import six
+
 import inspect
 import logging
 
@@ -12,21 +14,44 @@ NotHandled = object()
 logger = logging.getLogger(__name__)
 
 
+def is_callable_method(cls_or_instance, method_name):
+    method = getattr(cls_or_instance, method_name)
+    if inspect.ismethod(method) and getattr(method, '__self__', None):
+        # bound classmethod or instance method
+        return method, True
+
+    try:
+        # inspect.getattr_static was added in python 3.2
+        from inspect import getattr_static
+
+        # on python 3, both unbound instance methods (i.e. getattr(cls, mth)) and static methods are plain functions
+        # getattr_static allows us to check the type of the method descriptor; for `@staticmethod` this is staticmethod
+        return method, isinstance(getattr_static(cls_or_instance, method_name, None), staticmethod)
+    except ImportError:
+        # python 2 still has unbound methods, so ismethod <=> !staticmethod TODO: remove when dropping python 2.7
+        return method, not inspect.ismethod(method)
+
+
 def call_view_method(view, method_name, fallback_attr=None, default=None):
     """Call a view method which might throw an exception. If an exception is thrown, log an informative error message
-    and return the value of fallback_attr, or default if not present.
+    and return the value of fallback_attr, or default if not present. The method must be callable without any arguments
+    except cls or self.
 
-    :param rest_framework.views.APIView view:
+    :param view: view class or instance; if a class is passed, instance methods won't be called
+    :type view: rest_framework.views.APIView or type[rest_framework.views.APIView]
     :param str method_name: name of a method on the view
     :param str fallback_attr: name of an attribute on the view to fall back on, if calling the method fails
     :param default: default value if all else fails
     :return: view method's return value, or value of view's fallback_attr, or default
+    :rtype: any or None
     """
     if hasattr(view, method_name):
         try:
-            return getattr(view, method_name)()
+            view_method, is_callabale = is_callable_method(view, method_name)
+            if is_callabale:
+                return view_method()
         except Exception:  # pragma: no cover
-            logger.warning("view's %s.get_parsers raised exception during schema generation; use "
+            logger.warning("view's %s raised exception during schema generation; use "
                            "`getattr(self, 'swagger_fake_view', False)` to detect and short-circuit this",
                            type(view).__name__, exc_info=True)
 
