@@ -2,6 +2,17 @@
 Changelog
 #########
 
+
+**********
+**1.12.1**
+**********
+
+*Release date: Dec 28, 2018*
+
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-rc.0
+- **FIXED:** management command will now correctly fall back to ``DEFAULT_VERSION`` for mock request
+- **FIXED:** fixed bad "raised exception during schema generation" warnings caused by missing ``self`` parameter
+
 **********
 **1.12.0**
 **********
