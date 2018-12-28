@@ -96,7 +96,10 @@ class Command(BaseCommand):
         return request
 
     def get_schema_generator(self, generator_class_name, api_info, api_version, api_url):
-        generator_class = import_string(generator_class_name) or swagger_settings.DEFAULT_GENERATOR_CLASS
+        generator_class = swagger_settings.DEFAULT_GENERATOR_CLASS
+        if generator_class_name:
+            generator_class = import_string(generator_class_name)
+
         return generator_class(
             info=api_info,
             version=api_version,
