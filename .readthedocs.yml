@@ -1,0 +1,15 @@
+requirements_file: requirements/docs.txt
+
+build:
+  image: latest
+
+python:
+  version: 3.6
+  setup_py_install: false
+  pip_install: true  # need this for correct pyproject.toml handling
+  extra_requirements:
+    - validation
+
+# extra formats in addition to the default HTML web docs
+formats:
+    - pdf
