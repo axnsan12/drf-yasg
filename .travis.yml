@@ -58,8 +58,9 @@ script:
 after_success:
   - |
     if [[ -z "$TOXENV" && -z "$PYPI_DEPLOY" ]]; then
-      chmod +x coverage.sh
-      ./coverage.sh
+      coverage combine || true
+      coverage report
+      codecov
     fi
 
 branches:
