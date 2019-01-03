@@ -48,6 +48,11 @@ author = 'Cristi V.'
 
 # The full version, including alpha/beta/rc tags.
 release = get_distribution('drf_yasg').version
+if 'noscm' in release:
+    raise AssertionError('Invalid package version string: %s. \n'
+                         'The documentation must be built with drf_yasg installed from a distribution package, '
+                         'which must have been built with a proper version number (i.e. from a full source checkout).'
+                         % (release,))
 
 # The short X.Y.Z version.
 version = '.'.join(release.split('.')[:3])
