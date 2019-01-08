@@ -230,7 +230,7 @@ class OpenAPISchemaGenerator(object):
     def get_schema(self, request=None, public=False):
         """Generate a :class:`.Swagger` object representing the API schema.
 
-        :param request: the request used for filtering accesible endpoints and finding the spec URI
+        :param request: the request used for filtering accessible endpoints and finding the spec URI
         :type request: rest_framework.request.Request or None
         :param bool public: if True, all endpoints are included regardless of access through `request`
 
