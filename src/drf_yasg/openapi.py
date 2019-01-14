@@ -10,7 +10,7 @@ from django.urls import get_script_prefix
 from django.utils.functional import Promise
 from inflection import camelize
 
-from .utils import filter_none, force_real_str
+from .utils import dict_has_ordered_keys, filter_none, force_real_str
 
 try:
     from collections import abc as collections_abc
@@ -145,7 +145,7 @@ class SwaggerDict(OrderedDict):
             result = OrderedDict()
             memo[id(obj)] = result
             items = obj.items()
-            if not isinstance(obj, OrderedDict):
+            if not dict_has_ordered_keys(obj):
                 items = sorted(items)
             for attr, val in items:
                 result[attr] = SwaggerDict._as_odict(val, memo)

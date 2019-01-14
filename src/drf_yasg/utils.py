@@ -1,5 +1,6 @@
 import inspect
 import logging
+import sys
 from collections import OrderedDict
 
 from django.db import models
@@ -389,8 +390,7 @@ def get_produces(renderer_classes):
 
 
 def decimal_as_float(field):
-    """
-    Returns true if ``field`` is a django-rest-framework DecimalField and its ``coerce_to_string`` attribute or the
+    """Returns true if ``field`` is a django-rest-framework DecimalField and its ``coerce_to_string`` attribute or the
     ``COERCE_DECIMAL_TO_STRING`` setting is set to ``False``.
 
     :rtype: bool
@@ -401,8 +401,7 @@ def decimal_as_float(field):
 
 
 def get_serializer_ref_name(serializer):
-    """
-    Get serializer's ref_name (or None for ModelSerializer if it is named 'NestedSerializer')
+    """Get serializer's ref_name (or None for ModelSerializer if it is named 'NestedSerializer')
 
     :param serializer: Serializer instance
     :return: Serializer's ``ref_name`` or ``None`` for inline serializer
@@ -469,3 +468,16 @@ def get_field_default(field):
                 default = serializers.empty
 
     return default
+
+
+def dict_has_ordered_keys(obj):
+    """Check if a given object is a dict that maintains insertion order.
+
+    :param obj: the dict object to check
+    :rtype: bool
+    """
+    if sys.version_info >= (3, 7):
+        # the Python 3.7 language spec says that dict must maintain insertion order.
+        return isinstance(obj, dict)
+
+    return isinstance(obj, OrderedDict)
