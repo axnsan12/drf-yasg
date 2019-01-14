@@ -116,24 +116,24 @@ SWAGGER_SETTINGS = {
             'type': 'basic'
         },
         'Bearer': {
-            'type': 'apiKey',
+            'in': 'header',
             'name': 'Authorization',
-            'in': 'header'
-        },
-        'Query': {
             'type': 'apiKey',
-            'name': 'auth',
-            'in': 'query'
         },
         'OAuth2 password': {
-            'type': 'oauth2',
             'flow': 'password',
-            'tokenUrl': OAUTH2_TOKEN_URL,
             'scopes': {
                 'read': 'Read everything.',
                 'write': 'Write everything,',
-            }
-        }
+            },
+            'tokenUrl': OAUTH2_TOKEN_URL,
+            'type': 'oauth2',
+        },
+        'Query': {
+            'in': 'query',
+            'name': 'auth',
+            'type': 'apiKey',
+        },
     },
     'OAUTH2_REDIRECT_URL': OAUTH2_REDIRECT_URL,
     'OAUTH2_CONFIG': {
