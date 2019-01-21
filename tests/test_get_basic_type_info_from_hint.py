@@ -7,7 +7,7 @@ from drf_yasg.inspectors.field import get_basic_type_info_from_hint
 
 try:
     import typing
-    from typing import Dict, List, Union, Set
+    from typing import Dict, List, Union, Optional, Set
 except ImportError:
     typing = None
 
@@ -24,9 +24,11 @@ if typing:
         (List[str], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_STRING)}),
         (List[bool], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_BOOLEAN)}),
         (Set[int], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER)}),
+        (Optional[bool], {'type': openapi.TYPE_BOOLEAN, 'format': None}),
+        (Optional[List[int]], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER)}),
         (Union[List[int], type(None)], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER)}),
         # Following cases are not 100% correct, but it should work somehow and not crash.
-        (Union[int, bool], {'type': openapi.TYPE_INTEGER, 'format': None}),
+        (Union[int, float], None),
         (List, {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_STRING)}),
     ])
     def test_get_basic_type_info_from_hint(hint_class, expected_swagger_type_info):
