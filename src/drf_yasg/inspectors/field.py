@@ -469,8 +469,7 @@ hinting_type_info = [
 
 
 def get_origin_type(hint_class):
-    origin_type = hint_class.__origin__ if hasattr(hint_class, '__origin__') else None
-    return origin_type or hint_class
+    return getattr(hint_class, '__origin__', None) or hint_class
 
 
 def is_origin_type_subclasses(hint_class, check_class):
