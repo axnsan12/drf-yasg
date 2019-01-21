@@ -529,16 +529,6 @@ hint_class_inspectors = [
 ]
 
 
-def register_hint_class_inspector(inspector):
-    """Registers a user defined type hint inspector, which converts it to a swagger type.
-    It can be used for a custom JSON serializable types, like enums.
-
-    :param inspector: a callable of one argument of type hint class.
-    It should return a swagger type keywords arguments dict or NotHandled if the type wasn't handled.
-    """
-    hint_class_inspectors.append(inspector)
-
-
 def get_basic_type_info_from_hint(hint_class):
     """Given a class (eg from a SerializerMethodField's return type hint,
     return its basic type information - ``type``, ``format``, ``pattern``,
