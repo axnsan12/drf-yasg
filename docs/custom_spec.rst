@@ -314,7 +314,7 @@ implemented like so:
    ))
    class ArticleViewSet(viewsets.ModelViewSet):
       filter_backends = (DjangoFilterBackend,)
-      filter_fields = ('title',)
+      filterset_fields = ('title',)
       ...
 
 

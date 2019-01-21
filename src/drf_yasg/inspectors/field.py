@@ -14,7 +14,7 @@ from rest_framework.settings import api_settings as rest_framework_settings
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import decimal_as_float, filter_none, get_serializer_class, get_serializer_ref_name
-from .base import FieldInspector, NotHandled, SerializerInspector
+from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
 
 try:
     import typing
@@ -177,11 +177,11 @@ def get_queryset_from_view(view, serializer=None):
     :return: queryset or ``None``
     """
     try:
-        queryset = getattr(view, 'queryset', None)
+        queryset = call_view_method(view, 'get_queryset', 'queryset')
 
         if queryset is not None and serializer is not None:
             # make sure the view is actually using *this* serializer
-            assert type(serializer) == view.get_serializer_class()
+            assert type(serializer) == call_view_method(view, 'get_serializer_class', 'serializer_class')
 
         return queryset
     except Exception:  # pragma: no cover
@@ -533,12 +533,10 @@ class SerializerMethodFieldInspector(FieldInspector):
         if method is None:
             return NotHandled
 
+        # attribute added by the swagger_serializer_method decorator
         serializer = getattr(method, "_swagger_serializer", None)
 
         if serializer:
-            # attribute added by the swagger_serializer_method decorator
-            serializer = getattr(method, '_swagger_serializer', None)
-
             # in order of preference for description, use:
             # 1) field.help_text from SerializerMethodField(help_text)
             # 2) serializer.help_text from swagger_serializer_method(serializer)
@@ -754,8 +752,8 @@ class CamelCaseJSONFilter(FieldInspector):
     if CamelCaseJSONParser and CamelCaseJSONRenderer:
         def is_camel_case(self):
             return (
-                any(issubclass(parser, CamelCaseJSONParser) for parser in self.view.parser_classes) or
-                any(issubclass(renderer, CamelCaseJSONRenderer) for renderer in self.view.renderer_classes)
+                any(issubclass(parser, CamelCaseJSONParser) for parser in self.get_parser_classes()) or
+                any(issubclass(renderer, CamelCaseJSONRenderer) for renderer in self.get_renderer_classes())
             )
     else:
         def is_camel_case(self):

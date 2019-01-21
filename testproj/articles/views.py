@@ -1,10 +1,10 @@
 import datetime
+import functools
 
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 # noinspection PyDeprecation
-from rest_framework.decorators import detail_route, list_route
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.parsers import MultiPartParser
@@ -62,7 +62,7 @@ class ArticlePagination(LimitOffsetPagination):
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
     operation_description="description from swagger_auto_schema via method_decorator",
-    filter_inspectors=[DjangoFilterDescriptionInspector]
+    filter_inspectors=[DjangoFilterDescriptionInspector],
 ))
 class ArticleViewSet(viewsets.ModelViewSet):
     """
@@ -84,7 +84,10 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     pagination_class = ArticlePagination
     filter_backends = (DjangoFilterBackend, OrderingFilter)
-    filter_fields = ('title',)
+    filterset_fields = ('title',)
+    # django-filter 1.1 compatibility; was renamed to filterset_fields in 2.0
+    # TODO: remove when dropping support for Django 1.11
+    filter_fields = filterset_fields
     ordering_fields = ('date_modified', 'date_created')
     ordering = ('date_created',)
 
@@ -92,46 +95,35 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     try:
         from rest_framework.decorators import action
-
-        @swagger_auto_schema(auto_schema=NoPagingAutoSchema, filter_inspectors=[DjangoFilterDescriptionInspector])
-        @action(detail=False, methods=['get'])
-        def today(self, request):
-            today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
-            today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
-            articles = self.get_queryset().filter(date_created__range=(today_min, today_max)).all()
-            serializer = self.serializer_class(articles, many=True)
-            return Response(serializer.data)
-
-        @swagger_auto_schema(method='get', operation_description="image GET description override")
-        @swagger_auto_schema(method='post', request_body=serializers.ImageUploadSerializer)
-        @action(detail=True, methods=['get', 'post'], parser_classes=(MultiPartParser,))
-        def image(self, request, slug=None):
-            """
-            image method docstring
-            """
-            pass
+        list_route = functools.partial(action, detail=False)
+        detail_route = functools.partial(action, detail=True)
     except ImportError:
+        # TODO: remove when dropping support for DRF 3.7
         action = None
+        from rest_framework.decorators import list_route, detail_route
 
-        # noinspection PyDeprecation
-        @swagger_auto_schema(auto_schema=NoPagingAutoSchema, filter_inspectors=[DjangoFilterDescriptionInspector])
-        @list_route(methods=['get'])
-        def today(self, request):
-            today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
-            today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
-            articles = self.get_queryset().filter(date_created__range=(today_min, today_max)).all()
-            serializer = self.serializer_class(articles, many=True)
-            return Response(serializer.data)
+    @swagger_auto_schema(auto_schema=NoPagingAutoSchema, filter_inspectors=[DjangoFilterDescriptionInspector])
+    @list_route(methods=['get'])
+    def today(self, request):
+        today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+        today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+        articles = self.get_queryset().filter(date_created__range=(today_min, today_max)).all()
+        serializer = self.serializer_class(articles, many=True)
+        return Response(serializer.data)
 
-        # noinspection PyDeprecation
-        @swagger_auto_schema(method='get', operation_description="image GET description override")
-        @swagger_auto_schema(method='post', request_body=serializers.ImageUploadSerializer)
-        @detail_route(methods=['get', 'post'], parser_classes=(MultiPartParser,))
-        def image(self, request, slug=None):
-            """
-            image method docstring
-            """
-            pass
+    @swagger_auto_schema(method='get', operation_description="image GET description override")
+    @swagger_auto_schema(method='post', request_body=serializers.ImageUploadSerializer)
+    @swagger_auto_schema(method='delete', manual_parameters=[openapi.Parameter(
+        name='delete_form_param', in_=openapi.IN_FORM,
+        type=openapi.TYPE_INTEGER,
+        description="this should not crash (form parameter on DELETE method)"
+    )])
+    @detail_route(methods=['get', 'post', 'delete'], parser_classes=(MultiPartParser,))
+    def image(self, request, slug=None):
+        """
+        image method docstring
+        """
+        pass
 
     @swagger_auto_schema(request_body=no_body, operation_id='no_body_test')
     def update(self, request, *args, **kwargs):

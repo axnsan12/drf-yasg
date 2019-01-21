@@ -4,6 +4,50 @@ Changelog
 
 
 **********
+**1.12.1**
+**********
+
+*Release date: Dec 28, 2018*
+
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-rc.0
+- **FIXED:** management command will now correctly fall back to ``DEFAULT_VERSION`` for mock request
+- **FIXED:** fixed bad "raised exception during schema generation" warnings caused by missing ``self`` parameter
+
+**********
+**1.12.0**
+**********
+
+*Release date: Dec 23, 2018*
+
+- **ADDED:** ``get_security_definitions`` and ``get_security_requirements`` hooks to ``OpenAPISchemaGenerator``
+- **ADDED:** added ``get_summary_and_description`` and ``split_summary_from_description`` extension points to
+  ``SwaggerAutoSchema`` to allow for better customisation
+- **IMPROVED:** updated ``swagger-ui`` to version 3.20.4
+- **IMPROVED:** paginator ``next`` and ``previous`` fields are now marked as ``x-nullable`` (:issue:`263`)
+- **IMPROVED:** added the ``tags`` argument to ``swagger_auto_schema`` (:pr:`259`)
+- **IMPROVED:** type of ``enum`` will now be automatically detected from ``ChoiceField`` if all ``choices`` values
+  are objects of the same Python class (:pr:`264`)
+- **IMPROVED:** ``SwaggerValidationError`` details will now be logged and shown in the exception message
+- **FIXED:** user implementations of ``get_queryset``, ``get_parsers`` and ``get_renderers`` will no longer be bypassed
+- **FIXED:** fixed handling of lazy objects in user-supplied values
+- **FIXED:** ``read_only`` serializer fields will be correctly ignored when generating form parameters (:issue:`261`)
+- **FIXED:** fixed incorrect return type from ``UIRenderer`` (:pr:`268`)
+- **FIXED:** fixed incosistent ordering of global ``securityDefinitions`` and ``security`` objects
+- **DEPRECATED:** the ``get_summary`` and ``get_description`` extension points have been deprecated in favor of the
+  new ``get_summary_and_description``, and will be removed in a future release
+
+**IMPORTANT PACKAGING NOTE**
+
+Starting with this version, the ``setup_requires`` argument was dropped from ``setup.py`` in favor of
+``build-system.requires`` in ``pyproject.toml`` . This means that for correctly building or installing from sdist,
+you will need to use a PEP517/PEP518 compliant tool (tox>=3.3.0, setuptools>=40, pip>=10.0, pep517.build) or manually
+install the build requirements yourself (just ``setuptools`` and ``setuptools-scm``, for now).
+
+Additionally, for correct package version detection, a full git checkout is required when building (this was always the
+case). Building without ``.git`` or without ``setuptools-scm`` will result in a distribution with a version like
+``drf-yasg-1!0.0.0.dev0+noscm.00000167d19bd859``.
+
+**********
 **1.11.1**
 **********
 

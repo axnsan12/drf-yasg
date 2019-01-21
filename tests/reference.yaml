@@ -27,6 +27,13 @@ securityDefinitions:
     in: header
     name: Authorization
     type: apiKey
+  OAuth2 password:
+    flow: password
+    scopes:
+      read: Read everything.
+      write: Write everything,
+    tokenUrl: /o/token/
+    type: oauth2
   Query:
     in: query
     name: auth
@@ -34,6 +41,7 @@ securityDefinitions:
 security:
   - Basic: []
   - Bearer: []
+  - OAuth2 password: []
   - Query: []
 paths:
   /articles/:
@@ -75,9 +83,11 @@ paths:
               next:
                 type: string
                 format: uri
+                x-nullable: true
               previous:
                 type: string
                 format: uri
+                x-nullable: true
               results:
                 type: array
                 items:
@@ -235,6 +245,21 @@ paths:
           description: ''
           schema:
             $ref: '#/definitions/ImageUpload'
+      consumes:
+        - multipart/form-data
+      tags:
+        - articles
+    delete:
+      operationId: articles_image_delete
+      description: image method docstring
+      parameters:
+        - name: delete_form_param
+          in: formData
+          description: this should not crash (form parameter on DELETE method)
+          type: integer
+      responses:
+        '204':
+          description: ''
       consumes:
         - multipart/form-data
       tags:
@@ -804,6 +829,14 @@ paths:
           in: query
           description: test manual param
           type: boolean
+        - name: test_array
+          in: query
+          description: test query array arg
+          required: true
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
       responses:
         '200':
           description: response description

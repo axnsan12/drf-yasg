@@ -2,6 +2,7 @@ from six import raise_from
 
 import copy
 import json
+import logging
 from collections import OrderedDict
 
 from coreapi.compat import force_bytes
@@ -9,6 +10,8 @@ from ruamel import yaml
 
 from . import openapi
 from .errors import SwaggerValidationError
+
+logger = logging.getLogger(__name__)
 
 
 def _validate_flex(spec):
@@ -70,7 +73,10 @@ class _OpenAPICodec(object):
                 errors[validator] = str(e)
 
         if errors:
-            raise SwaggerValidationError("spec validation failed", errors, spec, self)
+            exc = SwaggerValidationError("spec validation failed: {}".format(errors), errors, spec, self)
+            logger.warning(str(exc))
+            raise exc
+
         return force_bytes(self._dump_dict(spec))
 
     def encode_error(self, err):
@@ -82,7 +88,7 @@ class _OpenAPICodec(object):
 
         :param dict spec: a python dict
         :return: string representation of ``spec``
-        :rtype: str
+        :rtype: str or bytes
         """
         raise NotImplementedError("override this method")
 
@@ -99,9 +105,22 @@ class _OpenAPICodec(object):
 class OpenAPICodecJson(_OpenAPICodec):
     media_type = 'application/json'
 
+    def __init__(self, validators, pretty=False, media_type='application/json'):
+        super(OpenAPICodecJson, self).__init__(validators)
+        self.pretty = pretty
+        self.media_type = media_type
+
     def _dump_dict(self, spec):
-        """Dump ``spec`` into JSON."""
-        return json.dumps(spec)
+        """Dump ``spec`` into JSON.
+
+        :rtype: str"""
+        if self.pretty:
+            out = json.dumps(spec, indent=4, separators=(',', ': '))
+            if out[-1] != '\n':
+                out += '\n'
+            return out
+        else:
+            return json.dumps(spec)
 
 
 YAML_MAP_TAG = u'tag:yaml.org,2002:map'
@@ -121,8 +140,7 @@ class SaneYamlDumper(yaml.SafeDumper):
         """
         return super(SaneYamlDumper, self).increase_indent(flow=flow, indentless=False, **kwargs)
 
-    @staticmethod
-    def represent_odict(dump, mapping, flow_style=None):  # pragma: no cover
+    def represent_odict(self, mapping, flow_style=None):  # pragma: no cover
         """https://gist.github.com/miracle2k/3184458
 
         Make PyYAML output an OrderedDict.
@@ -134,22 +152,22 @@ class SaneYamlDumper(yaml.SafeDumper):
         tag = YAML_MAP_TAG
         value = []
         node = yaml.MappingNode(tag, value, flow_style=flow_style)
-        if dump.alias_key is not None:
-            dump.represented_objects[dump.alias_key] = node
+        if self.alias_key is not None:
+            self.represented_objects[self.alias_key] = node
         best_style = True
         if hasattr(mapping, 'items'):
             mapping = mapping.items()
         for item_key, item_value in mapping:
-            node_key = dump.represent_data(item_key)
-            node_value = dump.represent_data(item_value)
+            node_key = self.represent_data(item_key)
+            node_value = self.represent_data(item_value)
             if not (isinstance(node_key, yaml.ScalarNode) and not node_key.style):
                 best_style = False
             if not (isinstance(node_value, yaml.ScalarNode) and not node_value.style):
                 best_style = False
             value.append((node_key, node_value))
         if flow_style is None:
-            if dump.default_flow_style is not None:
-                node.flow_style = dump.default_flow_style
+            if self.default_flow_style is not None:
+                node.flow_style = self.default_flow_style
             else:
                 node.flow_style = best_style
         return node
@@ -170,7 +188,7 @@ def yaml_sane_dump(data, binary):
     :param dict data: the data to be dumped
     :param bool binary: True to return a utf-8 encoded binary object, False to return a string
     :return: the serialized YAML
-    :rtype: str,bytes
+    :rtype: str or bytes
     """
     return yaml.dump(data, Dumper=SaneYamlDumper, default_flow_style=False, encoding='utf-8' if binary else None)
 
@@ -196,6 +214,12 @@ def yaml_sane_load(stream):
 class OpenAPICodecYaml(_OpenAPICodec):
     media_type = 'application/yaml'
 
+    def __init__(self, validators, media_type='application/yaml'):
+        super(OpenAPICodecYaml, self).__init__(validators)
+        self.media_type = media_type
+
     def _dump_dict(self, spec):
-        """Dump ``spec`` into YAML."""
+        """Dump ``spec`` into YAML.
+
+        :rtype: bytes"""
         return yaml_sane_dump(spec, binary=True)

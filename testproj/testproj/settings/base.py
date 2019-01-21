@@ -3,6 +3,8 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from django.urls import reverse_lazy
 
+from testproj.util import static_lazy
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ALLOWED_HOSTS = [
@@ -22,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'oauth2_provider',
     'corsheaders',
 
     'drf_yasg',
@@ -64,9 +67,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'testproj.wsgi.application'
 
-# Password validation
-# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
+LOGIN_URL = reverse_lazy('admin:login')
 
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -83,15 +86,22 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Django Rest Framework
-
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     )
 }
 
-# drf-yasg
+OAUTH2_CLIENT_ID = '12ee6bgxtpSEgP8TioWcHSXOiDBOUrVav4mRbVEs'
+OAUTH2_CLIENT_SECRET = '5FvYALo7W4uNnWE2ySw7Yzpkxh9PSf5GuY37RvOys00ydEyph64dbl1ECOKI9ceQ' \
+                       'AKoz0JpiVQtq0DUnsxNhU3ubrJgZ9YbtiXymbLGJq8L7n4fiER7gXbXaNSbze3BN'
+OAUTH2_APP_NAME = 'drf-yasg OAuth2 provider'
 
+OAUTH2_REDIRECT_URL = static_lazy('drf-yasg/swagger-ui-dist/oauth2-redirect.html')
+OAUTH2_AUTHORIZE_URL = reverse_lazy('oauth2_provider:authorize')
+OAUTH2_TOKEN_URL = reverse_lazy('oauth2_provider:token')
+
+# drf-yasg
 SWAGGER_SETTINGS = {
     'LOGIN_URL': reverse_lazy('admin:login'),
     'LOGOUT_URL': '/admin/logout',
@@ -106,15 +116,30 @@ SWAGGER_SETTINGS = {
             'type': 'basic'
         },
         'Bearer': {
-            'type': 'apiKey',
+            'in': 'header',
             'name': 'Authorization',
-            'in': 'header'
+            'type': 'apiKey',
+        },
+        'OAuth2 password': {
+            'flow': 'password',
+            'scopes': {
+                'read': 'Read everything.',
+                'write': 'Write everything,',
+            },
+            'tokenUrl': OAUTH2_TOKEN_URL,
+            'type': 'oauth2',
         },
         'Query': {
-            'type': 'apiKey',
+            'in': 'query',
             'name': 'auth',
-            'in': 'query'
-        }
+            'type': 'apiKey',
+        },
+    },
+    'OAUTH2_REDIRECT_URL': OAUTH2_REDIRECT_URL,
+    'OAUTH2_CONFIG': {
+        'clientId': OAUTH2_CLIENT_ID,
+        'clientSecret': OAUTH2_CLIENT_SECRET,
+        'appName': OAUTH2_APP_NAME,
     }
 }
 
@@ -123,21 +148,13 @@ REDOC_SETTINGS = {
 }
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.11/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
@@ -145,11 +162,9 @@ STATICFILES_DIRS = [
 ]
 
 # Testing
-
 TEST_RUNNER = 'testproj.runner.PytestTestRunner'
 
 # Logging configuration
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,

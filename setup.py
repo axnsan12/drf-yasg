@@ -17,7 +17,6 @@ with io.open('README.rst', encoding='utf-8') as readme:
     description = readme.read()
 
 requirements = read_req('base.txt')
-requirements_setup = read_req('setup.txt')
 requirements_validation = read_req('validation.txt')
 
 
@@ -28,7 +27,6 @@ def drf_yasg_setup(**kwargs):
         package_dir={'': 'src'},
         include_package_data=True,
         install_requires=requirements,
-        setup_requires=requirements_setup,
         extras_require={
             'validation': requirements_validation,
         },
@@ -67,21 +65,27 @@ def drf_yasg_setup(**kwargs):
 
 
 try:
+    # noinspection PyUnresolvedReferences
+    import setuptools_scm  # noqa: F401
+
     drf_yasg_setup(use_scm_version=True)
-except LookupError as e:
+except (ImportError, LookupError) as e:
     if os.getenv('CI', 'false') == 'true' or os.getenv('TRAVIS', 'false') == 'true':
         # don't silently fail on travis - we don't want to accidentally push a dummy version to PyPI
         raise
 
-    if 'setuptools-scm' in str(e):
+    err_msg = str(e)
+    if 'setuptools-scm' in err_msg or 'setuptools_scm' in err_msg:
         import time
+        import traceback
 
         timestamp_ms = int(time.time() * 1000)
         timestamp_str = hex(timestamp_ms)[2:].zfill(16)
-        dummy_version = '0.0.0rc0+noscm' + timestamp_str
+        dummy_version = '1!0.0.0.dev0+noscm.' + timestamp_str
 
         drf_yasg_setup(version=dummy_version)
-        print(str(e), file=sys.stderr)
-        print("failed to detect version, build was done using dummy version " + dummy_version, file=sys.stderr)
+
+        traceback.print_exc(file=sys.stderr)
+        print("failed to detect version, package was built with dummy version " + dummy_version, file=sys.stderr)
     else:
         raise

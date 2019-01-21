@@ -1,9 +1,9 @@
 # requirements for running the tests via pytest
-pytest>=2.9,<3.7  # <3.7 because of incompatible pluggy requirement
+pytest>=4.0
 pytest-pythonpath>=0.7.1
-pytest-cov>=2.5.1
-pytest-xdist>=1.22.0
-pytest-django>=3.2.0
+pytest-cov>=2.6.0
+pytest-xdist>=1.25.0
+pytest-django>=3.4.4
 datadiff==2.0.0
 
 -r testproj.txt

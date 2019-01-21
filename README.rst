@@ -11,9 +11,16 @@ Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framewor
 
 Compatible with
 
-- **Django Rest Framework**: 3.7.7, 3.8
+- **Django Rest Framework**: 3.7.7, 3.8, 3.9
 - **Django**: 1.11, 2.0, 2.1
 - **Python**: 2.7, 3.4, 3.5, 3.6, 3.7
+
+Only the latest patch version of each ``major.minor`` series of Python, Django and Django REST Framework is supported.
+
+**Only the latest version of drf-yasg is supported.** Support of old versions is dropped immediately with the release
+of a new version. Please do not create issues before upgrading to the latest release available at the time. Regression
+reports are accepted and will be resolved with a new release as quickly as possible. Removed features will usually go
+through a deprecation cycle of a few minor releases.
 
 Resources:
 
@@ -114,6 +121,7 @@ In ``urls.py``:
 .. code:: python
 
    ...
+   from rest_framework import permissions
    from drf_yasg.views import get_schema_view
    from drf_yasg import openapi
 
@@ -128,7 +136,6 @@ In ``urls.py``:
          contact=openapi.Contact(email="contact@snippets.local"),
          license=openapi.License(name="BSD License"),
       ),
-      validators=['flex', 'ssv'],
       public=True,
       permission_classes=(permissions.AllowAny,),
    )
@@ -140,7 +147,7 @@ In ``urls.py``:
       ...
    ]
 
-This exposes 4 cached, validated and publicly available endpoints:
+This exposes 4 endpoints:
 
 * A JSON view of your API specification at ``/swagger.json``
 * A YAML view of your API specification at ``/swagger.yaml``
@@ -204,7 +211,7 @@ caching the schema view in-memory, with some sane defaults:
 4. Validation
 =============
 
-Given the numerous methods to manually customzie the generated schema, it makes sense to validate the result to ensure
+Given the numerous methods to manually customize the generated schema, it makes sense to validate the result to ensure
 it still conforms to OpenAPI 2.0. To this end, validation is provided at the generation point using python swagger
 libraries, and can be activated by passing :python:`validators=['flex', 'ssv']` to ``get_schema_view``; if the generated
 schema is not valid, a :python:`SwaggerValidationError` is raised by the handling codec.
@@ -294,9 +301,9 @@ For additional usage examples, you can take a look at the test project in the ``
    $ virtualenv venv
    $ source venv/bin/activate
    (venv) $ cd testproj
+   (venv) $ python -m pip install -U pip setuptools
    (venv) $ pip install -U -r requirements.txt
    (venv) $ python manage.py migrate
-   (venv) $ python manage.py shell -c "import createsuperuser"
    (venv) $ python manage.py runserver
    (venv) $ firefox localhost:8000/swagger/
 

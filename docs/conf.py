@@ -48,6 +48,11 @@ author = 'Cristi V.'
 
 # The full version, including alpha/beta/rc tags.
 release = get_distribution('drf_yasg').version
+if 'noscm' in release:
+    raise AssertionError('Invalid package version string: %s. \n'
+                         'The documentation must be built with drf_yasg installed from a distribution package, '
+                         'which must have been built with a proper version number (i.e. from a full source checkout).'
+                         % (release,))
 
 # The short X.Y.Z version.
 version = '.'.join(release.split('.')[:3])
@@ -171,16 +176,19 @@ nitpick_ignore = [
     ('py:class', 'int'),
     ('py:class', 'bytes'),
     ('py:class', 'tuple'),
-    ('py:class', 'callable'),
+    ('py:class', 'function'),
     ('py:class', 'type'),
     ('py:class', 'OrderedDict'),
     ('py:class', 'None'),
+    ('py:obj', 'None'),
 
     ('py:class', 'Exception'),
     ('py:class', 'collections.OrderedDict'),
 
     ('py:class', 'ruamel.yaml.dumper.SafeDumper'),
+    ('py:class', 'rest_framework.serializers.Serializer'),
     ('py:class', 'rest_framework.renderers.BaseRenderer'),
+    ('py:class', 'rest_framework.parsers.BaseParser'),
     ('py:class', 'rest_framework.schemas.generators.EndpointEnumerator'),
     ('py:class', 'rest_framework.views.APIView'),
 

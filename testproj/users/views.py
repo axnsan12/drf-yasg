@@ -49,6 +49,8 @@ class UserList(APIView):
 @swagger_auto_schema(method='put', request_body=UserSerializerrr, tags=['Users'])
 @swagger_auto_schema(methods=['get'], manual_parameters=[
     openapi.Parameter('test', openapi.IN_QUERY, "test manual param", type=openapi.TYPE_BOOLEAN),
+    openapi.Parameter('test_array', openapi.IN_QUERY, "test query array arg", type=openapi.TYPE_ARRAY,
+                      items=openapi.Items(type=openapi.TYPE_STRING), required=True, collection_format='multi'),
 ], responses={
     200: openapi.Response('response description', UserSerializerrr),
 }, tags=['Users'])
