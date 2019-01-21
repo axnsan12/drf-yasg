@@ -474,9 +474,7 @@ def get_origin_type(hint_class):
 
 def is_origin_type_subclasses(hint_class, check_class):
     origin_type = get_origin_type(hint_class)
-    if not inspect.isclass(origin_type):
-        return False
-    return issubclass(origin_type, check_class)
+    return inspect.isclass(origin_type) and issubclass(origin_type, check_class)
 
 
 def inspect_union_hint_class(hint_class):
