@@ -81,7 +81,7 @@ A very simple working configuration was provided by :ghuser:`Vigrond`, originall
             'type': 'oauth2',
             'authorizationUrl': '/yourapp/o/authorize',
             'tokenUrl': '/yourapp/o/token/',
-            'flow": "accessCode',
+            'flow': 'accessCode',
             'scopes': {
              'read:groups': 'read groups',
             }
