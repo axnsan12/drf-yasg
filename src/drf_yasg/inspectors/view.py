@@ -22,22 +22,17 @@ class SwaggerAutoSchema(ViewInspector):
         super(SwaggerAutoSchema, self).__init__(view, path, method, components, request, overrides)
         self._sch = AutoSchema()
         self._sch.view = view
+        self._summary_and_description_compat()
 
     def _summary_and_description_compat(self):
-        # TODO: remove in 1.13
+        # TODO: remove in 1.14
         base_methods = (SwaggerAutoSchema.get_summary, SwaggerAutoSchema.get_description)
         self_methods = (type(self).get_summary, type(self).get_description)
         if self_methods != base_methods:
-            warnings.warn(
-                "`SwaggerAutoSchema` methods `get_summary` and `get_description` are deprecated and "
-                "will be removed in drf-yasg 1.13. Override `get_summary_and_description` instead.",
-                DeprecationWarning, stacklevel=2
+            raise NotImplementedError(
+                "`SwaggerAutoSchema` methods `get_summary` and `get_description` were removed in "
+                "drf-yasg 1.13 and will have no effect. Override `get_summary_and_description` instead."
             )
-            # if get_summary or get_description are overriden by a child class,
-            # we must call them for backwards compatibility
-            return self.get_summary(), self.get_description()
-
-        return self.get_summary_and_description()
 
     def get_operation(self, operation_keys):
         consumes = self.get_consumes()
@@ -50,7 +45,7 @@ class SwaggerAutoSchema(ViewInspector):
         parameters = self.add_manual_parameters(parameters)
 
         operation_id = self.get_operation_id(operation_keys)
-        summary, description = self._summary_and_description_compat()
+        summary, description = self.get_summary_and_description()
         security = self.get_security()
         assert security is None or isinstance(security, list), "security must be a list of security requirement objects"
         deprecated = self.is_deprecated()
@@ -363,7 +358,7 @@ class SwaggerAutoSchema(ViewInspector):
             description = description.strip().replace('\r', '')
 
             if description and (summary is None):
-                # description from docstring ... do summary magic
+                # description from docstring... do summary magic
                 summary, description = self.split_summary_from_description(description)
 
         return summary, description
