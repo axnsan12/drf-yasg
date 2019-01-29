@@ -15,8 +15,12 @@ logger = logging.getLogger(__name__)
 
 
 def _validate_flex(spec):
-    from flex.core import parse as validate_flex
-    from flex.exceptions import ValidationError
+    try:
+        from flex.core import parse as validate_flex
+        from flex.exceptions import ValidationError
+    except ImportError:
+        return
+
     try:
         validate_flex(spec)
     except ValidationError as ex:

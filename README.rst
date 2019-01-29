@@ -47,8 +47,7 @@ Features
   `redoc <https://github.com/Rebilly/ReDoc>`_ for viewing the generated documentation
 - schema view is cacheable out of the box
 - generated Swagger schema can be automatically validated by
-  `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`_ or
-  `flex <https://github.com/pipermerriam/flex>`_
+  `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`_
 - supports Django REST Framework API versioning with ``URLPathVersioning`` and ``NamespaceVersioning``; other DRF
   or custom versioning schemes are not currently supported
 
@@ -166,7 +165,7 @@ a. ``get_schema_view`` parameters
 - ``patterns`` - passed to SchemaGenerator
 - ``urlconf`` - passed to SchemaGenerator
 - ``public`` - if False, includes only endpoints the current user has access to
-- ``validators`` - a list of validator names to apply on the generated schema; allowed values are ``flex``, ``ssv``
+- ``validators`` - a list of validator names to apply on the generated schema; only ``ssv`` is currently supported
 - ``generator_class`` - schema generator class to use; should be a subclass of ``OpenAPISchemaGenerator``
 - ``authentication_classes`` - authentication classes for the schema view itself
 - ``permission_classes`` - permission classes for the schema view itself
@@ -213,7 +212,7 @@ caching the schema view in-memory, with some sane defaults:
 
 Given the numerous methods to manually customize the generated schema, it makes sense to validate the result to ensure
 it still conforms to OpenAPI 2.0. To this end, validation is provided at the generation point using python swagger
-libraries, and can be activated by passing :python:`validators=['flex', 'ssv']` to ``get_schema_view``; if the generated
+libraries, and can be activated by passing :python:`validators=['ssv']` to ``get_schema_view``; if the generated
 schema is not valid, a :python:`SwaggerValidationError` is raised by the handling codec.
 
 **Warning:** This internal validation can slow down your server.
