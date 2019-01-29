@@ -1,5 +1,4 @@
 import logging
-import warnings
 from collections import OrderedDict
 
 from rest_framework.request import is_form_media_type
