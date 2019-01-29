@@ -11,7 +11,6 @@ try:
 except ImportError:
     typing = None
 
-
 if typing:
     @pytest.mark.parametrize('hint_class, expected_swagger_type_info', [
         (int, {'type': openapi.TYPE_INTEGER, 'format': None}),
@@ -24,9 +23,13 @@ if typing:
         (List[str], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_STRING)}),
         (List[bool], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_BOOLEAN)}),
         (Set[int], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER)}),
-        (Optional[bool], {'type': openapi.TYPE_BOOLEAN, 'format': None}),
-        (Optional[List[int]], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER)}),
-        (Union[List[int], type(None)], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER)}),
+        (Optional[bool], {'type': openapi.TYPE_BOOLEAN, 'format': None, 'x-nullable': True}),
+        (Optional[List[int]], {
+            'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER), 'x-nullable': True
+        }),
+        (Union[List[int], type(None)], {
+            'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER), 'x-nullable': True
+        }),
         # Following cases are not 100% correct, but it should work somehow and not crash.
         (Union[int, float], None),
         (List, {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_STRING)}),
