@@ -455,18 +455,39 @@ def decimal_return_type():
     return openapi.TYPE_STRING if rest_framework_settings.COERCE_DECIMAL_TO_STRING else openapi.TYPE_NUMBER
 
 
-raw_type_info = [
+def get_origin_type(hint_class):
+    return getattr(hint_class, '__origin__', None) or hint_class
+
+
+def is_origin_type_subclasses(hint_class, check_class):
+    origin_type = get_origin_type(hint_class)
+    return inspect.isclass(origin_type) and issubclass(origin_type, check_class)
+
+
+hinting_type_info = [
     (bool, (openapi.TYPE_BOOLEAN, None)),
     (int, (openapi.TYPE_INTEGER, None)),
+    (str, (openapi.TYPE_STRING, None)),
     (float, (openapi.TYPE_NUMBER, None)),
+    (dict, (openapi.TYPE_OBJECT, None)),
     (Decimal, (decimal_return_type, openapi.FORMAT_DECIMAL)),
     (uuid.UUID, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
     (datetime.datetime, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
-    # TODO - support typing.List etc
 ]
 
-hinting_type_info = raw_type_info
+if typing:
+    def inspect_collection_hint_class(hint_class):
+        args = hint_class.__args__
+        child_class = args[0] if args else str
+        child_type_info = get_basic_type_info_from_hint(child_class)
+        if not child_type_info:
+            child_type_info = {'type': openapi.TYPE_STRING}
+        return OrderedDict([
+            ('type', openapi.TYPE_ARRAY),
+            ('items', openapi.Items(**child_type_info)),
+        ])
+    hinting_type_info.append(((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class))
 
 
 def get_basic_type_info_from_hint(hint_class):
@@ -478,27 +499,25 @@ def get_basic_type_info_from_hint(hint_class):
     :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
     :rtype: OrderedDict
     """
-
-    for check_class, type_format in hinting_type_info:
-        if issubclass(hint_class, check_class):
-            swagger_type, format = type_format
-            if callable(swagger_type):
-                swagger_type = swagger_type()
-            # if callable(format):
-            #     format = format(klass)
-            break
-    else:  # pragma: no cover
+    if typing and get_origin_type(hint_class) == typing.Union:
+        if len(hint_class.__args__) == 2 and hint_class.__args__[1] == type(None):
+            child_type = hint_class.__args__[0]
+            return get_basic_type_info_from_hint(child_type)
         return None
 
-    pattern = None
+    for check_class, info in hinting_type_info:
+        if is_origin_type_subclasses(hint_class, check_class):
+            if callable(info):
+                return info(hint_class)
+            swagger_type, format = info
+            if callable(swagger_type):
+                swagger_type = swagger_type()
+            return OrderedDict([
+                ('type', swagger_type),
+                ('format', format),
+            ])
 
-    result = OrderedDict([
-        ('type', swagger_type),
-        ('format', format),
-        ('pattern', pattern)
-    ])
-
-    return result
+    return None
 
 
 class SerializerMethodFieldInspector(FieldInspector):
