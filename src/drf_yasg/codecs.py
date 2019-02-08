@@ -8,6 +8,7 @@ from collections import OrderedDict
 from coreapi.compat import force_bytes
 from ruamel import yaml
 
+from .app_settings import swagger_settings
 from . import openapi
 from .errors import SwaggerValidationError
 
@@ -119,12 +120,12 @@ class OpenAPICodecJson(_OpenAPICodec):
 
         :rtype: str"""
         if self.pretty:
-            out = json.dumps(spec, indent=4, separators=(',', ': '))
+            out = json.dumps(spec, indent=4, separators=(',', ': '), cls=swagger_settings.JSON_ENCODER_CLASS)
             if out[-1] != '\n':
                 out += '\n'
             return out
         else:
-            return json.dumps(spec)
+            return json.dumps(spec, cls=swagger_settings.JSON_ENCODER_CLASS)
 
 
 YAML_MAP_TAG = u'tag:yaml.org,2002:map'

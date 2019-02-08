@@ -18,6 +18,7 @@ SWAGGER_DEFAULTS = {
         'drf_yasg.inspectors.SimpleFieldInspector',
         'drf_yasg.inspectors.StringDefaultFieldInspector',
     ],
+    'JSON_ENCODER_CLASS': 'rest_framework.utils.encoders.JSONEncoder',
     'DEFAULT_FILTER_INSPECTORS': [
         'drf_yasg.inspectors.CoreAPICompatInspector',
     ],
@@ -82,6 +83,7 @@ REDOC_DEFAULTS = {
 }
 
 IMPORT_STRINGS = [
+    'JSON_ENCODER_CLASS',
     'DEFAULT_GENERATOR_CLASS',
     'DEFAULT_AUTO_SCHEMA_CLASS',
     'DEFAULT_FIELD_INSPECTORS',

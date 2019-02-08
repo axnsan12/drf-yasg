@@ -459,7 +459,7 @@ def get_field_default(field):
                 default = field.to_representation(default)
                 # JSON roundtrip ensures that the value is valid JSON;
                 # for example, sets and tuples get transformed into lists
-                default = json.loads(json.dumps(default, cls=encoders.JSONEncoder))
+                default = json.loads(json.dumps(default, cls=swagger_settings.JSON_ENCODER_CLASS))
                 if decimal_as_float(field):
                     default = float(default)
             except Exception:  # pragma: no cover
