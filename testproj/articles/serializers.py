@@ -4,6 +4,10 @@ from rest_framework import serializers
 from articles.models import Article, ArticleGroup
 
 
+class OtherStuffSerializer(serializers.Serializer):
+    bar = serializers.CharField()
+
+
 class ArticleSerializer(serializers.ModelSerializer):
     references = serializers.DictField(
         help_text=_("this is a really bad example"),
@@ -13,12 +17,14 @@ class ArticleSerializer(serializers.ModelSerializer):
     uuid = serializers.UUIDField(help_text="should articles have UUIDs?", read_only=True)
     cover_name = serializers.FileField(use_url=False, source='cover', required=True)
     group = serializers.SlugRelatedField(slug_field='uuid', queryset=ArticleGroup.objects.all())
+    other_stuff = OtherStuffSerializer(required=False)
     original_group = serializers.SlugRelatedField(slug_field='uuid', read_only=True)
 
     class Meta:
         model = Article
         fields = ('title', 'author', 'body', 'slug', 'date_created', 'date_modified',
-                  'references', 'uuid', 'cover', 'cover_name', 'article_type', 'group', 'original_group', )
+                  'references', 'uuid', 'cover', 'cover_name', 'article_type', 'group',
+                  'original_group', 'other_stuff',)
         read_only_fields = ('date_created', 'date_modified',
                             'references', 'uuid', 'cover_name')
         lookup_field = 'slug'

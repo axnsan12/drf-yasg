@@ -28,8 +28,8 @@ def _check_base(swagger, prefix, validate_schema):
 def _check_v1(swagger):
     assert swagger['info']['version'] == '1.0'
     versioned_post = swagger['paths']['/snippets/']['post']
-    assert versioned_post['responses']['201']['schema']['$ref'] == '#/definitions/Snippet'
-    assert 'v2field' not in swagger['definitions']['Snippet']['properties']
+    assert versioned_post['responses']['201']['schema']['$ref'] == '#/definitions/snippets.serializers.Snippet'
+    assert 'v2field' not in swagger['definitions']['snippets.serializers.Snippet']['properties']
 
 
 def _check_v2(swagger):

@@ -52,3 +52,17 @@ def test_no_nested_model(swagger_dict):
     # ForeignKey models in deep ModelViewSets might wrongly be labeled as 'Nested' in the definitions section
     # see https://github.com/axnsan12/drf-yasg/issues/59
     assert 'Nested' not in swagger_dict['definitions']
+
+
+def test_same_name_serializers(swagger_dict):
+    article_definition = swagger_dict['definitions']['articles.serializers.Article']
+    assert article_definition['properties']['other_stuff']['$ref'] == '#/definitions/articles.serializers.OtherStuff'
+    articles_other_stuff_definition = swagger_dict['definitions']['articles.serializers.OtherStuff']
+    assert 'foo' not in articles_other_stuff_definition['properties']
+    assert 'bar' in articles_other_stuff_definition['properties']
+
+    user_definition = swagger_dict['definitions']['users.serializers.UserSerializerrr']
+    assert user_definition['properties']['other_stuff']['$ref'] == '#/definitions/users.serializers.OtherStuff'
+    users_other_stuff_definition = swagger_dict['definitions']['users.serializers.OtherStuff']
+    assert 'foo' in users_other_stuff_definition['properties']
+    assert 'bar' not in users_other_stuff_definition['properties']

@@ -119,11 +119,11 @@ def test_replaced_serializer():
 
     for _ in range(3):
         swagger = generator.get_schema(None, True)
-        assert 'Detail' in swagger['definitions']
-        assert 'detail' in swagger['definitions']['Detail']['properties']
+        assert 'test_schema_generator.Detail' in swagger['definitions']
+        assert 'detail' in swagger['definitions']['test_schema_generator.Detail']['properties']
         responses = swagger['paths']['/details/{id}/']['get']['responses']
         assert '404' in responses
-        assert responses['404']['schema']['$ref'] == "#/definitions/Detail"
+        assert responses['404']['schema']['$ref'] == "#/definitions/test_schema_generator.Detail"
 
 
 def test_url_order():
@@ -226,6 +226,6 @@ def test_choice_field(choices, expected_type):
     )
 
     swagger = generator.get_schema(None, True)
-    property_schema = swagger['definitions']['Detail']['properties']['detail']
+    property_schema = swagger['definitions']['test_schema_generator.Detail']['properties']['detail']
 
     assert property_schema == openapi.Schema(title='Detail', type=expected_type, enum=choices)

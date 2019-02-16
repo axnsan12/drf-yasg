@@ -415,7 +415,7 @@ def get_serializer_ref_name(serializer):
         logger.debug("Forcing inline output for ModelSerializer named 'NestedSerializer':\n" + str(serializer))
         ref_name = None
     else:
-        ref_name = serializer_name
+        ref_name = '{module}.{name}'.format(module=serializer.__module__, name=serializer_name)
         if ref_name.endswith('Serializer'):
             ref_name = ref_name[:-len('Serializer')]
     return ref_name

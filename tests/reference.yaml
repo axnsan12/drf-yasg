@@ -91,7 +91,7 @@ paths:
               results:
                 type: array
                 items:
-                  $ref: '#/definitions/Article'
+                  $ref: '#/definitions/articles.serializers.Article'
       tags:
         - articles
     post:
@@ -102,12 +102,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Article'
+            $ref: '#/definitions/articles.serializers.Article'
       responses:
         '201':
           description: ''
           schema:
-            $ref: '#/definitions/Article'
+            $ref: '#/definitions/articles.serializers.Article'
       tags:
         - articles
     parameters: []
@@ -132,7 +132,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Article'
+              $ref: '#/definitions/articles.serializers.Article'
       tags:
         - articles
     parameters: []
@@ -145,7 +145,7 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Article'
+            $ref: '#/definitions/articles.serializers.Article'
       tags:
         - articles
     put:
@@ -156,7 +156,7 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Article'
+            $ref: '#/definitions/articles.serializers.Article'
       tags:
         - articles
     patch:
@@ -168,12 +168,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Article'
+            $ref: '#/definitions/articles.serializers.Article'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Article'
+            $ref: '#/definitions/articles.serializers.Article'
         '404':
           description: slug not found
       tags:
@@ -205,7 +205,7 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Article'
+            $ref: '#/definitions/articles.serializers.Article'
       consumes:
         - multipart/form-data
       tags:
@@ -244,7 +244,7 @@ paths:
         '201':
           description: ''
           schema:
-            $ref: '#/definitions/ImageUpload'
+            $ref: '#/definitions/articles.serializers.ImageUpload'
       consumes:
         - multipart/form-data
       tags:
@@ -283,7 +283,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Person'
+              $ref: '#/definitions/people.serializers.Person'
       tags:
         - people
     post:
@@ -294,12 +294,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Person'
+            $ref: '#/definitions/people.serializers.Person'
       responses:
         '201':
           description: ''
           schema:
-            $ref: '#/definitions/Person'
+            $ref: '#/definitions/people.serializers.Person'
       tags:
         - people
     parameters: []
@@ -312,7 +312,7 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Person'
+            $ref: '#/definitions/people.serializers.Person'
       tags:
         - people
     patch:
@@ -323,12 +323,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Person'
+            $ref: '#/definitions/people.serializers.Person'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Person'
+            $ref: '#/definitions/people.serializers.Person'
       tags:
         - people
     delete:
@@ -355,7 +355,7 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Identity'
+            $ref: '#/definitions/people.serializers.Identity'
       tags:
         - people
     patch:
@@ -366,12 +366,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Identity'
+            $ref: '#/definitions/people.serializers.Identity'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Identity'
+            $ref: '#/definitions/people.serializers.Identity'
       tags:
         - people
     parameters:
@@ -401,7 +401,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Snippet'
+              $ref: '#/definitions/snippets.serializers.Snippet'
       tags:
         - snippets
     post:
@@ -412,12 +412,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Snippet'
+            $ref: '#/definitions/snippets.serializers.Snippet'
       responses:
         '201':
           description: ''
           schema:
-            $ref: '#/definitions/Snippet'
+            $ref: '#/definitions/snippets.serializers.Snippet'
       tags:
         - snippets
     delete:
@@ -449,7 +449,7 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Snippet'
+            $ref: '#/definitions/snippets.serializers.Snippet'
       tags:
         - snippets
     put:
@@ -460,12 +460,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Snippet'
+            $ref: '#/definitions/snippets.serializers.Snippet'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Snippet'
+            $ref: '#/definitions/snippets.serializers.Snippet'
       tags:
         - snippets
     patch:
@@ -476,12 +476,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Snippet'
+            $ref: '#/definitions/snippets.serializers.Snippet'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Snippet'
+            $ref: '#/definitions/snippets.serializers.Snippet'
       tags:
         - snippets
     delete:
@@ -515,7 +515,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Todo'
+              $ref: '#/definitions/todo.serializer.Todo'
       tags:
         - todo
     parameters: []
@@ -530,7 +530,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TodoAnother'
+              $ref: '#/definitions/todo.serializer.TodoAnother'
       tags:
         - todo
     parameters: []
@@ -543,7 +543,7 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoAnother'
+            $ref: '#/definitions/todo.serializer.TodoAnother'
       tags:
         - todo
     parameters:
@@ -563,7 +563,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TodoRecursive'
+              $ref: '#/definitions/todo.serializer.TodoRecursive'
       tags:
         - todo
     post:
@@ -574,12 +574,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            $ref: '#/definitions/todo.serializer.TodoRecursive'
       responses:
         '201':
           description: ''
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            $ref: '#/definitions/todo.serializer.TodoRecursive'
       tags:
         - todo
     parameters: []
@@ -601,12 +601,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            $ref: '#/definitions/todo.serializer.TodoRecursive'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            $ref: '#/definitions/todo.serializer.TodoRecursive'
       tags:
         - todo
     patch:
@@ -617,12 +617,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            $ref: '#/definitions/todo.serializer.TodoRecursive'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            $ref: '#/definitions/todo.serializer.TodoRecursive'
       tags:
         - todo
     delete:
@@ -651,7 +651,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TodoTree'
+              $ref: '#/definitions/todo.serializer.TodoTree'
       tags:
         - todo
     parameters: []
@@ -664,7 +664,7 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoTree'
+            $ref: '#/definitions/todo.serializer.TodoTree'
       tags:
         - todo
     parameters:
@@ -684,7 +684,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TodoYetAnother'
+              $ref: '#/definitions/todo.serializer.TodoYetAnother'
       tags:
         - todo
     parameters: []
@@ -697,7 +697,7 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoYetAnother'
+            $ref: '#/definitions/todo.serializer.TodoYetAnother'
       tags:
         - todo
     parameters:
@@ -715,7 +715,7 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Todo'
+            $ref: '#/definitions/todo.serializer.Todo'
       tags:
         - todo
     parameters:
@@ -733,7 +733,7 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoYetAnother'
+            $ref: '#/definitions/todo.serializer.TodoYetAnother'
       tags:
         - todo
     parameters:
@@ -780,7 +780,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/UserSerializerrr'
+              $ref: '#/definitions/users.serializers.UserSerializerrr'
       tags:
         - Users
     post:
@@ -841,7 +841,7 @@ paths:
         '200':
           description: response description
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/users.serializers.UserSerializerrr'
       tags:
         - Users
     put:
@@ -852,12 +852,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/users.serializers.UserSerializerrr'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/users.serializers.UserSerializerrr'
       tags:
         - Users
     parameters:
@@ -866,7 +866,15 @@ paths:
         required: true
         type: string
 definitions:
-  Article:
+  articles.serializers.OtherStuff:
+    required:
+      - bar
+    type: object
+    properties:
+      bar:
+        type: string
+        minLength: 1
+  articles.serializers.Article:
     required:
       - title
       - body
@@ -941,7 +949,9 @@ definitions:
         type: string
         format: uuid
         readOnly: true
-  ImageUpload:
+      other_stuff:
+        $ref: '#/definitions/articles.serializers.OtherStuff'
+  articles.serializers.ImageUpload:
     required:
       - image_styles
     type: object
@@ -972,7 +982,7 @@ definitions:
         type: string
         readOnly: true
         format: uri
-  Identity:
+  people.serializers.Identity:
     title: Identity
     type: object
     properties:
@@ -993,7 +1003,7 @@ definitions:
         maxLength: 30
         minLength: 1
         x-nullable: true
-  Person:
+  people.serializers.Person:
     required:
       - identity
     type: object
@@ -1003,7 +1013,7 @@ definitions:
         type: integer
         readOnly: true
       identity:
-        $ref: '#/definitions/Identity'
+        $ref: '#/definitions/people.serializers.Identity'
   Project:
     required:
       - projectName
@@ -1020,7 +1030,7 @@ definitions:
         description: Github repository of the project
         type: string
         minLength: 1
-  Snippet:
+  snippets.serializers.Snippet:
     required:
       - code
       - language
@@ -1570,7 +1580,7 @@ definitions:
         format: decimal
         default: 0.0
         minimum: 0.0
-  Todo:
+  todo.serializer.Todo:
     required:
       - title
     type: object
@@ -1580,7 +1590,7 @@ definitions:
         type: string
         maxLength: 50
         minLength: 1
-  TodoAnother:
+  todo.serializer.TodoAnother:
     required:
       - title
       - todo
@@ -1592,8 +1602,8 @@ definitions:
         maxLength: 50
         minLength: 1
       todo:
-        $ref: '#/definitions/Todo'
-  TodoRecursive:
+        $ref: '#/definitions/todo.serializer.Todo'
+  todo.serializer.TodoRecursive:
     required:
       - title
     type: object
@@ -1608,12 +1618,12 @@ definitions:
         maxLength: 50
         minLength: 1
       parent:
-        $ref: '#/definitions/TodoRecursive'
+        $ref: '#/definitions/todo.serializer.TodoRecursive'
       parent_id:
         type: integer
         title: Parent id
         x-nullable: true
-  TodoTree:
+  todo.serializer.TodoTree:
     required:
       - title
       - children
@@ -1631,8 +1641,8 @@ definitions:
       children:
         type: array
         items:
-          $ref: '#/definitions/TodoTree'
-  TodoYetAnother:
+          $ref: '#/definitions/todo.serializer.TodoTree'
+  todo.serializer.TodoYetAnother:
     required:
       - title
     type: object
@@ -1677,7 +1687,7 @@ definitions:
       todo:
         title: child
         todo: null
-  OtherStuff:
+  users.serializers.OtherStuff:
     title: Other stuff
     description: the decorator should determine the serializer class for this
     required:
@@ -1688,7 +1698,7 @@ definitions:
         title: Foo
         type: string
         minLength: 1
-  MethodFieldExample:
+  user.serializers.MethodFieldExample:
     title: Hint example
     type: object
     properties:
@@ -1741,7 +1751,7 @@ definitions:
         description: No hint on the method, so this is expected to fallback to string
         type: string
         readOnly: true
-  UserSerializerrr:
+  users.serializers.UserSerializerrr:
     required:
       - username
       - articles
@@ -1798,9 +1808,9 @@ definitions:
         readOnly: true
         uniqueItems: true
       other_stuff:
-        $ref: '#/definitions/OtherStuff'
+        $ref: '#/definitions/users.serializers.OtherStuff'
       hint_example:
-        $ref: '#/definitions/MethodFieldExample'
+        $ref: '#/definitions/user.serializers.MethodFieldExample'
       help_text_example_1:
         title: Help text example 1
         description: help text on field is set, so this should appear in swagger

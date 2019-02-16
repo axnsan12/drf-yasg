@@ -80,3 +80,6 @@ class MethodFieldExampleSerializer(serializers.Serializer):
 
     def get_non_hinted_number(self, obj):
         return 1.0
+
+    class Meta:
+        ref_name = 'user.serializers.MethodFieldExample'
