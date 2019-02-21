@@ -33,6 +33,10 @@ if typing:
         # Following cases are not 100% correct, but it should work somehow and not crash.
         (Union[int, float], None),
         (List, {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_STRING)}),
+        ('SomeType', None),
+        (type('SomeType', (object,), {}), None),
+        (None, None),
+        (6, None),
     ])
     def test_get_basic_type_info_from_hint(hint_class, expected_swagger_type_info):
         type_info = get_basic_type_info_from_hint(hint_class)
