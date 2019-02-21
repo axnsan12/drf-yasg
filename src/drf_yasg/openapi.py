@@ -400,7 +400,7 @@ class Items(SwaggerDict):
         self.format = format
         self.enum = enum
         self.pattern = pattern
-        self.items = items
+        self.items_ = items
         self._insert_extras__()
         _check_type(type, format, enum, pattern, items, self.__class__)
 
@@ -434,7 +434,7 @@ class Parameter(SwaggerDict):
         self.format = format
         self.enum = enum
         self.pattern = pattern
-        self.items = items
+        self.items_ = items
         self.default = default
         self._insert_extras__()
         if (not schema and not type) or (schema and type):
@@ -492,7 +492,7 @@ class Schema(SwaggerDict):
         self.format = format
         self.enum = enum
         self.pattern = pattern
-        self.items = items
+        self.items_ = items
         self.read_only = read_only
         self.default = default
         self._insert_extras__()
