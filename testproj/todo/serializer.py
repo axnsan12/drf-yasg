@@ -41,10 +41,11 @@ class TodoYetAnotherSerializer(serializers.ModelSerializer):
 
 class TodoTreeSerializer(serializers.ModelSerializer):
     children = serializers.ListField(child=RecursiveField(), source='children.all')
+    many_children = RecursiveField(many=True, source='children')
 
     class Meta:
         model = TodoTree
-        fields = ('id', 'title', 'children')
+        fields = ('id', 'title', 'children', 'many_children')
 
 
 class TodoRecursiveSerializer(serializers.ModelSerializer):

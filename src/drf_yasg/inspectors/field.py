@@ -794,10 +794,19 @@ else:
             if isinstance(field, RecursiveField) and swagger_object_type == openapi.Schema:
                 assert use_references is True, "Can not create schema for RecursiveField when use_references is False"
 
-                ref_name = get_serializer_ref_name(field.proxied)
-                assert ref_name is not None, "Can't create RecursiveField schema for inline " + str(type(field.proxied))
+                proxied = field.proxied
+                if isinstance(field.proxied, serializers.ListSerializer):
+                    proxied = proxied.child
+
+                ref_name = get_serializer_ref_name(proxied)
+                assert ref_name is not None, "Can't create RecursiveField schema for inline " + str(type(proxied))
 
                 definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
-                return openapi.SchemaRef(definitions, ref_name, ignore_unresolved=True)
+
+                ref = openapi.SchemaRef(definitions, ref_name, ignore_unresolved=True)
+                if isinstance(field.proxied, serializers.ListSerializer):
+                    ref = openapi.Items(type=openapi.TYPE_ARRAY, items=ref)
+
+                return ref
 
             return NotHandled

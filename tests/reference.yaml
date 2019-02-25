@@ -1617,6 +1617,7 @@ definitions:
     required:
       - title
       - children
+      - many_children
     type: object
     properties:
       id:
@@ -1629,6 +1630,10 @@ definitions:
         maxLength: 50
         minLength: 1
       children:
+        type: array
+        items:
+          $ref: '#/definitions/TodoTree'
+      many_children:
         type: array
         items:
           $ref: '#/definitions/TodoTree'
