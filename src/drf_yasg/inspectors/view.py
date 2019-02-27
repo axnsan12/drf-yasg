@@ -21,17 +21,6 @@ class SwaggerAutoSchema(ViewInspector):
         super(SwaggerAutoSchema, self).__init__(view, path, method, components, request, overrides)
         self._sch = AutoSchema()
         self._sch.view = view
-        self._summary_and_description_compat()
-
-    def _summary_and_description_compat(self):
-        # TODO: remove in 1.14
-        base_methods = (SwaggerAutoSchema.get_summary, SwaggerAutoSchema.get_description)
-        self_methods = (type(self).get_summary, type(self).get_description)
-        if self_methods != base_methods:
-            raise NotImplementedError(
-                "`SwaggerAutoSchema` methods `get_summary` and `get_description` were removed in "
-                "drf-yasg 1.13 and will have no effect. Override `get_summary_and_description` instead."
-            )
 
     def get_operation(self, operation_keys):
         consumes = self.get_consumes()
@@ -361,22 +350,6 @@ class SwaggerAutoSchema(ViewInspector):
                 summary, description = self.split_summary_from_description(description)
 
         return summary, description
-
-    def get_summary(self):
-        """Return a summary description for this operation.
-
-        :return: the summary
-        :rtype: str
-        """
-        return self.get_summary_and_description()[0]
-
-    def get_description(self):
-        """Return an operation description determined as appropriate from the view's method and class docstrings.
-
-        :return: the operation description
-        :rtype: str
-        """
-        return self.get_summary_and_description()[1]
 
     def get_security(self):
         """Return a list of security requirements for this operation.
