@@ -72,6 +72,10 @@ class InlineSerializerInspector(SerializerInspector):
     def get_serializer_ref_name(self, serializer):
         return get_serializer_ref_name(serializer)
 
+    def _has_ref_name(self, serializer):
+        serializer_meta = getattr(serializer, 'Meta', None)
+        return hasattr(serializer_meta, 'ref_name')
+
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
 
@@ -118,6 +122,7 @@ class InlineSerializerInspector(SerializerInspector):
                     # it is better to just remove title from inline models
                     del result.title
 
+                setattr(result, '_serializer', serializer)
                 return result
 
             if not ref_name or not use_references:
@@ -130,8 +135,12 @@ class InlineSerializerInspector(SerializerInspector):
             actual_serializer = get_serializer_class(getattr(actual_schema, '_serializer', None))
             this_serializer = get_serializer_class(field)
             if actual_serializer and actual_serializer != this_serializer:  # pragma: no cover
-                logger.warning("Schema for %s will override distinct serializer %s because they "
-                               "share the same ref_name", actual_serializer, this_serializer)
+                explicit_refs = self._has_ref_name(actual_serializer) and self._has_ref_name(this_serializer)
+                if not explicit_refs:
+                    raise SwaggerGenerationError(
+                        "Schema for %s would override distinct serializer %s because they implicitly share the same "
+                        "ref_name; explicitly set the ref_name atribute on both serializers' Meta classes"
+                        % (actual_serializer, this_serializer))
 
             return openapi.SchemaRef(definitions, ref_name)
 
