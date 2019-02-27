@@ -77,9 +77,11 @@ class InlineSerializerInspector(SerializerInspector):
 
         if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
             child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)
+            limits = find_limits(field) or {}
             return SwaggerType(
                 type=openapi.TYPE_ARRAY,
                 items=child_schema,
+                **limits
             )
         elif isinstance(field, serializers.Serializer):
             if swagger_object_type != openapi.Schema:

@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.compat import MinValueValidator
+from rest_framework.compat import MinValueValidator, MaxLengthValidator
 
 from snippets.models import LANGUAGE_CHOICES, STYLE_CHOICES, Snippet
 
@@ -65,11 +65,13 @@ class SnippetSerializer(serializers.Serializer):
     )
     title = serializers.CharField(required=False, allow_blank=True, max_length=100)
     code = serializers.CharField(style={'base_template': 'textarea.html'})
+    tags = serializers.ListField(child=serializers.CharField(min_length=2), min_length=3, max_length=15)
     linenos = serializers.BooleanField(required=False)
     language = LanguageSerializer(help_text="Sample help text for language")
     styles = serializers.MultipleChoiceField(choices=STYLE_CHOICES, default=['friendly'])
     lines = serializers.ListField(child=serializers.IntegerField(), allow_empty=True, allow_null=True, required=False)
-    example_projects = serializers.ListSerializer(child=ExampleProjectSerializer(), read_only=True)
+    example_projects = serializers.ListSerializer(child=ExampleProjectSerializer(), read_only=True,
+                                                  validators=[MaxLengthValidator(100)])
     difficulty_factor = serializers.FloatField(help_text="this is here just to test FloatField",
                                                read_only=True, default=lambda: 6.9)
     rate_as_string = serializers.DecimalField(max_digits=6, decimal_places=3, default=Decimal('0.0'),
