@@ -902,6 +902,11 @@ definitions:
         type: string
         format: date-time
         readOnly: true
+      read_only_nullable:
+        type: string
+        readOnly: true
+        minLength: 1
+        x-nullable: true
       references:
         description: this is a really bad example
         type: object
@@ -1515,6 +1520,12 @@ definitions:
               - yaml+jinja
               - zephir
             default: python
+          readOnlyNullable:
+            title: Read only nullable
+            type: string
+            readOnly: true
+            minLength: 1
+            x-nullable: true
       styles:
         type: array
         items:

@@ -10,6 +10,7 @@ from snippets.models import LANGUAGE_CHOICES, STYLE_CHOICES, Snippet
 class LanguageSerializer(serializers.Serializer):
     name = serializers.ChoiceField(
         choices=LANGUAGE_CHOICES, default='python', help_text='The name of the programming language')
+    read_only_nullable = serializers.CharField(read_only=True, allow_null=True)
 
     class Meta:
         ref_name = None

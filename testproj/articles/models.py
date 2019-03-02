@@ -20,6 +20,7 @@ class Article(models.Model):
                               on_delete=models.PROTECT)
     original_group = models.ForeignKey('ArticleGroup', related_name='articles_as_original', blank=True, default=None,
                                        on_delete=models.PROTECT)
+    read_only_nullable = models.CharField(max_length=20, null=True, blank=True)
 
 
 class ArticleGroup(models.Model):
