@@ -7,6 +7,8 @@ drf-yasg - Yet another Swagger generator
 
 |travis| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
 
+|bmac-button|
+
 Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
 
 Compatible with
@@ -29,9 +31,7 @@ Resources:
 * **Changelog**: https://drf-yasg.readthedocs.io/en/stable/changelog.html
 * **Live demo**: https://drf-yasg-demo.herokuapp.com/
 
-.. image:: https://www.herokucdn.com/deploy/button.svg
-   :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg
-   :alt: heroku deploy button
+|heroku-button|
 
 ********
 Features
@@ -377,6 +377,14 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
 .. |rtd-badge| image:: https://img.shields.io/readthedocs/drf-yasg.svg
    :target: https://drf-yasg.readthedocs.io/
    :alt: ReadTheDocs
+
+.. |bmac-button| image:: https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png
+   :target: https://www.buymeacoffee.com/cvijdea
+   :alt: Buy Me A Coffee
+
+.. |heroku-button| image:: https://www.herokucdn.com/deploy/button.svg
+   :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg
+   :alt: Heroku deploy button
 
 .. |nbsp| unicode:: 0xA0
    :trim:
