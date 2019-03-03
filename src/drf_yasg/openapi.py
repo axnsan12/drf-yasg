@@ -617,16 +617,25 @@ class ReferenceResolver(object):
     ::
 
         > components = ReferenceResolver('definitions', 'parameters')
-        > definitions = ReferenceResolver.with_scope('definitions')
+        > definitions = components.with_scope('definitions')
         > definitions.set('Article', Schema(...))
         > print(components)
         {'definitions': OrderedDict([('Article', Schema(...)]), 'parameters': OrderedDict()}
     """
 
-    def __init__(self, *scopes):
+    def __init__(self, *scopes, force_init=False):
         """
         :param str scopes: an enumeration of the valid scopes this resolver will contain
         """
+        if not force_init:
+            raise AssertionError(
+                "Creating an instance of ReferenceResolver almost certainly won't do what you want it to do.\n"
+                "See https://github.com/axnsan12/drf-yasg/issues/211, "
+                "https://github.com/axnsan12/drf-yasg/issues/271, "
+                "https://github.com/axnsan12/drf-yasg/issues/325.\n"
+                "Pass `force_init=True` to override this."
+            )
+
         self._objects = OrderedDict()
         self._force_scope = None
         for scope in scopes:
@@ -641,7 +650,7 @@ class ReferenceResolver(object):
         :rtype: .ReferenceResolver
         """
         assert scope in self.scopes, "unknown scope %s" % scope
-        ret = ReferenceResolver()
+        ret = ReferenceResolver(force_init=True)
         ret._objects = self._objects
         ret._force_scope = scope
         return ret

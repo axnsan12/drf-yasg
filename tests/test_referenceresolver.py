@@ -5,7 +5,7 @@ from drf_yasg.openapi import ReferenceResolver
 
 def test_basic():
     scopes = ['s1', 's2']
-    rr = ReferenceResolver(*scopes)
+    rr = ReferenceResolver(*scopes, force_init=True)
     assert scopes == rr.scopes == list(rr.keys()) == list(rr)
     rr.set('o1', 1, scope='s1')
     assert rr.has('o1', scope='s1')
@@ -25,7 +25,7 @@ def test_basic():
 
 def test_scoped():
     scopes = ['s1', 's2']
-    rr = ReferenceResolver(*scopes)
+    rr = ReferenceResolver(*scopes, force_init=True)
     r1 = rr.with_scope('s1')
     r2 = rr.with_scope('s2')
     with pytest.raises(AssertionError):
