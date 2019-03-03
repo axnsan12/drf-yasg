@@ -167,7 +167,8 @@ class SwaggerDict(OrderedDict):
     def __reduce__(self):
         # for pickle supprt; this skips calls to all SwaggerDict __init__ methods and relies
         # on the already set attributes instead
-        return _bare_SwaggerDict, (type(self),), vars(self), None, iter(self.items())
+        attrs = {k: v for k ,v in vars(self).items() if not k.startswith('_NP_')}
+        return _bare_SwaggerDict, (type(self),), attrs, None, iter(self.items())
 
 
 class Contact(SwaggerDict):

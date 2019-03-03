@@ -122,7 +122,7 @@ class InlineSerializerInspector(SerializerInspector):
                     # it is better to just remove title from inline models
                     del result.title
 
-                setattr(result, '_serializer', serializer)
+                setattr(result, '_NP_serializer', get_serializer_class(serializer))
                 return result
 
             if not ref_name or not use_references:
@@ -132,7 +132,7 @@ class InlineSerializerInspector(SerializerInspector):
             actual_schema = definitions.setdefault(ref_name, make_schema_definition)
             actual_schema._remove_read_only()
 
-            actual_serializer = get_serializer_class(getattr(actual_schema, '_serializer', None))
+            actual_serializer = getattr(actual_schema, '_NP_serializer', None)
             this_serializer = get_serializer_class(field)
             if actual_serializer and actual_serializer != this_serializer:  # pragma: no cover
                 explicit_refs = self._has_ref_name(actual_serializer) and self._has_ref_name(this_serializer)
