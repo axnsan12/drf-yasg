@@ -624,10 +624,11 @@ class ReferenceResolver(object):
         {'definitions': OrderedDict([('Article', Schema(...)]), 'parameters': OrderedDict()}
     """
 
-    def __init__(self, *scopes, force_init=False):
+    def __init__(self, *scopes, **kwargs):
         """
         :param str scopes: an enumeration of the valid scopes this resolver will contain
         """
+        force_init = kwargs.pop('force_init', False)
         if not force_init:
             raise AssertionError(
                 "Creating an instance of ReferenceResolver almost certainly won't do what you want it to do.\n"
