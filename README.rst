@@ -7,6 +7,8 @@ drf-yasg - Yet another Swagger generator
 
 |travis| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
 
+|bmac-button|
+
 Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
 
 Compatible with
@@ -29,9 +31,7 @@ Resources:
 * **Changelog**: https://drf-yasg.readthedocs.io/en/stable/changelog.html
 * **Live demo**: https://drf-yasg-demo.herokuapp.com/
 
-.. image:: https://www.herokucdn.com/deploy/button.svg
-   :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg
-   :alt: heroku deploy button
+|heroku-button|
 
 ********
 Features
@@ -306,45 +306,6 @@ For additional usage examples, you can take a look at the test project in the ``
    (venv) $ python manage.py runserver
    (venv) $ firefox localhost:8000/swagger/
 
-**********
-Background
-**********
-
-``OpenAPI 2.0``/``Swagger`` is a format designed to encode information about a Web API into an easily parsable schema
-that can then be used for rendering documentation, generating code, etc.
-
-More details are available on `swagger.io <https://swagger.io/>`__ and on the `OpenAPI 2.0 specification
-page <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md>`__.
-
-From here on, the terms “OpenAPI” and “Swagger” are used interchangeably.
-
-Swagger in Django Rest Framework
-================================
-
-Since Django Rest Framework 3.7, there is now `built in support <http://www.django-rest-framework.org/api-guide/schemas/>`__
-for automatic OpenAPI 2.0 schema generation. However, this generation is based on the `coreapi <http://www.coreapi.org/>`__
-standard, which for the moment is vastly inferior to OpenAPI in both features and tooling support. In particular,
-the OpenAPI codec/compatibility layer provided has a few major problems:
-
-* there is no support for documenting response schemas and status codes
-* nested schemas do not work properly
-* does not handle more complex fields such as ``FileField``, ``ChoiceField``, …
-
-In short this makes the generated schema unusable for code generation, and mediocre at best for documentation.
-
-Other libraries
-===============
-
-There are currently two decent Swagger schema generators that I could find for django-rest-framework:
-
-* `django-rest-swagger <https://github.com/marcgibbons/django-rest-swagger>`__
-* `drf-openapi <https://github.com/limdauto/drf_openapi>`__
-
-``django-rest-swagger`` is just a wrapper around DRF 3.7 schema generation with an added UI, and
-thus presents the same problems, while also being unmaintained. ``drf-openapi`` was
-`discontinued by the author <https://github.com/limdauto/drf_openapi/commit/1673c6e039eec7f089336a83bdc31613f32f7e21>`_
-on April 3rd, 2018.
-
 ************************
 Third-party integrations
 ************************
@@ -377,6 +338,14 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
 .. |rtd-badge| image:: https://img.shields.io/readthedocs/drf-yasg.svg
    :target: https://drf-yasg.readthedocs.io/
    :alt: ReadTheDocs
+
+.. |bmac-button| image:: https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png
+   :target: https://www.buymeacoffee.com/cvijdea
+   :alt: Buy Me A Coffee
+
+.. |heroku-button| image:: https://www.herokucdn.com/deploy/button.svg
+   :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg
+   :alt: Heroku deploy button
 
 .. |nbsp| unicode:: 0xA0
    :trim:

@@ -72,14 +72,20 @@ class InlineSerializerInspector(SerializerInspector):
     def get_serializer_ref_name(self, serializer):
         return get_serializer_ref_name(serializer)
 
+    def _has_ref_name(self, serializer):
+        serializer_meta = getattr(serializer, 'Meta', None)
+        return hasattr(serializer_meta, 'ref_name')
+
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
 
         if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
             child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)
+            limits = find_limits(field) or {}
             return SwaggerType(
                 type=openapi.TYPE_ARRAY,
                 items=child_schema,
+                **limits
             )
         elif isinstance(field, serializers.Serializer):
             if swagger_object_type != openapi.Schema:
@@ -116,6 +122,7 @@ class InlineSerializerInspector(SerializerInspector):
                     # it is better to just remove title from inline models
                     del result.title
 
+                setattr(result, '_NP_serializer', get_serializer_class(serializer))
                 return result
 
             if not ref_name or not use_references:
@@ -125,11 +132,15 @@ class InlineSerializerInspector(SerializerInspector):
             actual_schema = definitions.setdefault(ref_name, make_schema_definition)
             actual_schema._remove_read_only()
 
-            actual_serializer = get_serializer_class(getattr(actual_schema, '_serializer', None))
+            actual_serializer = getattr(actual_schema, '_NP_serializer', None)
             this_serializer = get_serializer_class(field)
             if actual_serializer and actual_serializer != this_serializer:  # pragma: no cover
-                logger.warning("Schema for %s will override distinct serializer %s because they "
-                               "share the same ref_name", actual_serializer, this_serializer)
+                explicit_refs = self._has_ref_name(actual_serializer) and self._has_ref_name(this_serializer)
+                if not explicit_refs:
+                    raise SwaggerGenerationError(
+                        "Schema for %s would override distinct serializer %s because they implicitly share the same "
+                        "ref_name; explicitly set the ref_name atribute on both serializers' Meta classes"
+                        % (actual_serializer, this_serializer))
 
             return openapi.SchemaRef(definitions, ref_name)
 
@@ -490,6 +501,20 @@ if typing:
     hinting_type_info.append(((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class))
 
 
+def _get_union_types(hint_class):
+    if typing:
+        origin_type = get_origin_type(hint_class)
+        if origin_type is typing.Union:
+            return hint_class.__args__
+        try:
+            # python 3.5.2 and lower compatibility
+            if issubclass(origin_type, typing.Union):
+                return hint_class.__union_params__
+        except TypeError:
+            pass
+    return None
+
+
 def get_basic_type_info_from_hint(hint_class):
     """Given a class (eg from a SerializerMethodField's return type hint,
     return its basic type information - ``type``, ``format``, ``pattern``,
@@ -499,11 +524,11 @@ def get_basic_type_info_from_hint(hint_class):
     :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
     :rtype: OrderedDict
     """
-    if typing and get_origin_type(hint_class) == typing.Union:
+    union_types = _get_union_types(hint_class)
+    if typing and union_types:
         # Optional is implemented as Union[T, None]
-        if len(hint_class.__args__) == 2 and hint_class.__args__[1] == type(None):  # noqa: E721
-            child_type = hint_class.__args__[0]
-            result = get_basic_type_info_from_hint(child_type)
+        if len(union_types) == 2 and isinstance(None, union_types[1]):
+            result = get_basic_type_info_from_hint(union_types[0])
             result['x-nullable'] = True
             return result
 
@@ -780,10 +805,19 @@ else:
             if isinstance(field, RecursiveField) and swagger_object_type == openapi.Schema:
                 assert use_references is True, "Can not create schema for RecursiveField when use_references is False"
 
-                ref_name = get_serializer_ref_name(field.proxied)
-                assert ref_name is not None, "Can't create RecursiveField schema for inline " + str(type(field.proxied))
+                proxied = field.proxied
+                if isinstance(field.proxied, serializers.ListSerializer):
+                    proxied = proxied.child
+
+                ref_name = get_serializer_ref_name(proxied)
+                assert ref_name is not None, "Can't create RecursiveField schema for inline " + str(type(proxied))
 
                 definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
-                return openapi.SchemaRef(definitions, ref_name, ignore_unresolved=True)
+
+                ref = openapi.SchemaRef(definitions, ref_name, ignore_unresolved=True)
+                if isinstance(field.proxied, serializers.ListSerializer):
+                    ref = openapi.Items(type=openapi.TYPE_ARRAY, items=ref)
+
+                return ref
 
             return NotHandled

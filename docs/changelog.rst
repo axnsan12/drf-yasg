@@ -2,6 +2,19 @@
 Changelog
 #########
 
+**********
+**1.14.0**
+**********
+
+*Release date: Mar 04, 2019*
+
+- **IMPROVED:** updated ``swagger-ui`` to version 3.21.0
+- **FIXED:** implicit ``ref_name`` collisions will now throw an exception
+- **FIXED:** ``RecursiveField`` will now also work as a child of ``ListSerializer`` (:pr:`321`)
+- **FIXED:** fixed ``minLength`` and ``maxLength`` for ``ListSerializer`` and ``ListField``
+- **FIXED:** the ``items`` property of ``Schema``, ``Parameter`` and ``Items`` objects was renamed to ``items_``; this
+  is a *mildly breaking change* and was needed to fix the collision with the ``items`` method of ``dict`` (:pr:`308`)
+- **REMOVED:** the ``get_summary`` and ``get_description`` methods have been removed (previously deprecated in 1.12.0)
 
 **********
 **1.13.0**
@@ -9,7 +22,7 @@ Changelog
 
 *Release date: Jan 29, 2019*
 
-- **IMPROVED:** type hint inspection is now supported for collections and``Optional`` (:pr:`272`)
+- **IMPROVED:** type hint inspection is now supported for collections and ``Optional`` (:pr:`272`)
 - **IMPROVED:** updated ``swagger-ui`` to version 3.20.5
 - **IMPROVED:** updated ``ReDoc`` to version 2.0.0-rc.2
 - **DEPRECATED:** quietly dropped support for the ``flex`` validator; it will still work if the library is installed,

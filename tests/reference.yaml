@@ -902,6 +902,11 @@ definitions:
         type: string
         format: date-time
         readOnly: true
+      read_only_nullable:
+        type: string
+        readOnly: true
+        minLength: 1
+        x-nullable: true
       references:
         description: this is a really bad example
         type: object
@@ -1023,6 +1028,7 @@ definitions:
   Snippet:
     required:
       - code
+      - tags
       - language
     type: object
     properties:
@@ -1057,6 +1063,13 @@ definitions:
         title: Code
         type: string
         minLength: 1
+      tags:
+        type: array
+        items:
+          type: string
+          minLength: 2
+        maxItems: 15
+        minItems: 3
       linenos:
         title: Linenos
         type: boolean
@@ -1507,6 +1520,12 @@ definitions:
               - yaml+jinja
               - zephir
             default: python
+          readOnlyNullable:
+            title: Read only nullable
+            type: string
+            readOnly: true
+            minLength: 1
+            x-nullable: true
       styles:
         type: array
         items:
@@ -1553,6 +1572,7 @@ definitions:
         items:
           $ref: '#/definitions/Project'
         readOnly: true
+        maxItems: 100
       difficultyFactor:
         title: Difficulty factor
         description: this is here just to test FloatField
@@ -1617,6 +1637,7 @@ definitions:
     required:
       - title
       - children
+      - many_children
     type: object
     properties:
       id:
@@ -1629,6 +1650,10 @@ definitions:
         maxLength: 50
         minLength: 1
       children:
+        type: array
+        items:
+          $ref: '#/definitions/TodoTree'
+      many_children:
         type: array
         items:
           $ref: '#/definitions/TodoTree'

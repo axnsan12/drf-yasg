@@ -7,7 +7,7 @@ from rest_framework import viewsets
 # noinspection PyDeprecation
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, FileUploadParser
 from rest_framework.response import Response
 
 from articles import serializers
@@ -118,7 +118,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
         type=openapi.TYPE_INTEGER,
         description="this should not crash (form parameter on DELETE method)"
     )])
-    @detail_route(methods=['get', 'post', 'delete'], parser_classes=(MultiPartParser,))
+    @detail_route(methods=['get', 'post', 'delete'], parser_classes=(MultiPartParser, FileUploadParser))
     def image(self, request, slug=None):
         """
         image method docstring

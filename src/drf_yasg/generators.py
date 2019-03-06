@@ -238,7 +238,7 @@ class OpenAPISchemaGenerator(object):
         :rtype: openapi.Swagger
         """
         endpoints = self.get_endpoints(request)
-        components = ReferenceResolver(openapi.SCHEMA_DEFINITIONS)
+        components = ReferenceResolver(openapi.SCHEMA_DEFINITIONS, force_init=True)
         self.consumes = get_consumes(api_settings.DEFAULT_PARSER_CLASSES)
         self.produces = get_produces(api_settings.DEFAULT_RENDERER_CLASSES)
         paths, prefix = self.get_paths(endpoints, components, request, public)

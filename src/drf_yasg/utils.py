@@ -7,6 +7,7 @@ from django.db import models
 from django.utils.encoding import force_text
 from rest_framework import serializers, status
 from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.parsers import FileUploadParser
 from rest_framework.request import is_form_media_type
 from rest_framework.settings import api_settings as rest_framework_settings
 from rest_framework.utils import encoders, json
@@ -366,6 +367,7 @@ def get_consumes(parser_classes):
     :rtype: list[str]
     """
     parser_classes = get_object_classes(parser_classes)
+    parser_classes = [pc for pc in parser_classes if not issubclass(pc, FileUploadParser)]
     media_types = [parser.media_type for parser in parser_classes or []]
     non_form_media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
     if len(non_form_media_types) == 0:

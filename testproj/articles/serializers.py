@@ -17,10 +17,9 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('title', 'author', 'body', 'slug', 'date_created', 'date_modified',
+        fields = ('title', 'author', 'body', 'slug', 'date_created', 'date_modified', 'read_only_nullable',
                   'references', 'uuid', 'cover', 'cover_name', 'article_type', 'group', 'original_group', )
-        read_only_fields = ('date_created', 'date_modified',
-                            'references', 'uuid', 'cover_name')
+        read_only_fields = ('date_created', 'date_modified', 'references', 'uuid', 'cover_name', 'read_only_nullable')
         lookup_field = 'slug'
         extra_kwargs = {
             'body': {'help_text': 'body serializer help_text'},
@@ -29,6 +28,7 @@ class ArticleSerializer(serializers.ModelSerializer):
                 'help_text': _("The ID of the user that created this article; if none is provided, "
                                "defaults to the currently logged in user.")
             },
+            'read_only_nullable': {'allow_null': True},
         }
 
 

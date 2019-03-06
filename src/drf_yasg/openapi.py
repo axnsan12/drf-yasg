@@ -167,7 +167,8 @@ class SwaggerDict(OrderedDict):
     def __reduce__(self):
         # for pickle supprt; this skips calls to all SwaggerDict __init__ methods and relies
         # on the already set attributes instead
-        return _bare_SwaggerDict, (type(self),), vars(self), None, iter(self.items())
+        attrs = {k: v for k, v in vars(self).items() if not k.startswith('_NP_')}
+        return _bare_SwaggerDict, (type(self),), attrs, None, iter(self.items())
 
 
 class Contact(SwaggerDict):
@@ -400,7 +401,7 @@ class Items(SwaggerDict):
         self.format = format
         self.enum = enum
         self.pattern = pattern
-        self.items = items
+        self.items_ = items
         self._insert_extras__()
         _check_type(type, format, enum, pattern, items, self.__class__)
 
@@ -434,7 +435,7 @@ class Parameter(SwaggerDict):
         self.format = format
         self.enum = enum
         self.pattern = pattern
-        self.items = items
+        self.items_ = items
         self.default = default
         self._insert_extras__()
         if (not schema and not type) or (schema and type):
@@ -492,7 +493,7 @@ class Schema(SwaggerDict):
         self.format = format
         self.enum = enum
         self.pattern = pattern
-        self.items = items
+        self.items_ = items
         self.read_only = read_only
         self.default = default
         self._insert_extras__()
@@ -617,16 +618,26 @@ class ReferenceResolver(object):
     ::
 
         > components = ReferenceResolver('definitions', 'parameters')
-        > definitions = ReferenceResolver.with_scope('definitions')
+        > definitions = components.with_scope('definitions')
         > definitions.set('Article', Schema(...))
         > print(components)
         {'definitions': OrderedDict([('Article', Schema(...)]), 'parameters': OrderedDict()}
     """
 
-    def __init__(self, *scopes):
+    def __init__(self, *scopes, **kwargs):
         """
         :param str scopes: an enumeration of the valid scopes this resolver will contain
         """
+        force_init = kwargs.pop('force_init', False)
+        if not force_init:
+            raise AssertionError(
+                "Creating an instance of ReferenceResolver almost certainly won't do what you want it to do.\n"
+                "See https://github.com/axnsan12/drf-yasg/issues/211, "
+                "https://github.com/axnsan12/drf-yasg/issues/271, "
+                "https://github.com/axnsan12/drf-yasg/issues/325.\n"
+                "Pass `force_init=True` to override this."
+            )
+
         self._objects = OrderedDict()
         self._force_scope = None
         for scope in scopes:
@@ -641,7 +652,7 @@ class ReferenceResolver(object):
         :rtype: .ReferenceResolver
         """
         assert scope in self.scopes, "unknown scope %s" % scope
-        ret = ReferenceResolver()
+        ret = ReferenceResolver(force_init=True)
         ret._objects = self._objects
         ret._force_scope = scope
         return ret
