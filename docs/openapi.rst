@@ -14,7 +14,7 @@ This library generates OpenAPI 2.0 documents. The authoritative specification fo
 be the official documentation over at `swagger.io <https://swagger.io/>`__ and the `OpenAPI 2.0 specification
 page <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md>`__.
 
-Beause the above specifications are a bit heavy and convoluted, here is a general overview of how the specification
+Because the above specifications are a bit heavy and convoluted, here is a general overview of how the specification
 is structured, starting from the root ``Swagger`` object.
 
 * :class:`.Swagger` object
