@@ -217,6 +217,9 @@ def is_list_view(path, method, view):
     # for ViewSets, it could be the default 'list' action, or a list_route
     action = getattr(view, 'action', '')
     method = getattr(view, action, None) or method
+    is_list = getattr(method,'is_list', False)
+    if is_list:
+        return True
     detail = getattr(method, 'detail', None)
     suffix = getattr(view, 'suffix', None)
     if action in ('list', 'create') or detail is False or suffix == 'List':
