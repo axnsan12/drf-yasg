@@ -412,7 +412,7 @@ class ViewInspector(BaseInspector):
             return False
 
         if self.method.lower() != 'get':
-            return False
+            return self.overrides.get('should_page', False)
 
         return is_list_view(self.path, self.method, self.view)
 
