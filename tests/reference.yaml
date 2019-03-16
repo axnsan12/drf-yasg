@@ -440,6 +440,46 @@ paths:
       tags:
         - snippets
     parameters: []
+  /snippets/views/{snippet_pk}/:
+    get:
+      operationId: snippetsViewsRead
+      description: SnippetViewerList classdoc
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/SnippetViewer'
+      tags:
+        - snippets
+    parameters:
+      - name: snippet_pk
+        in: path
+        required: true
+        type: string
   /snippets/{id}/:
     get:
       operationId: snippetsRead
@@ -1590,6 +1630,22 @@ definitions:
         format: decimal
         default: 0.0
         minimum: 0.0
+  SnippetViewer:
+    required:
+      - snippet
+      - viewer
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      snippet:
+        title: Snippet
+        type: integer
+      viewer:
+        title: Viewer
+        type: integer
   Todo:
     required:
       - title

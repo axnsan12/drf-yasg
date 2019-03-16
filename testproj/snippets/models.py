@@ -18,3 +18,8 @@ class Snippet(models.Model):
 
     class Meta:
         ordering = ('created',)
+
+
+class SnippetViewer(models.Model):
+    snippet = models.ForeignKey(Snippet, on_delete=models.CASCADE, related_name='viewers')
+    viewer = models.ForeignKey('auth.User', related_name='snippet_views', on_delete=models.CASCADE)
