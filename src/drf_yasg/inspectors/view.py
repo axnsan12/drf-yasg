@@ -33,7 +33,7 @@ class SwaggerAutoSchema(ViewInspector):
         parameters = self.add_manual_parameters(parameters)
 
         operation_id = self.get_operation_id(operation_keys)
-        summary, description = self.get_summary_and_description()
+        summary, description = self.get_summary_and_description(operation_keys)
         security = self.get_security()
         assert security is None or isinstance(security, list), "security must be a list of security requirement objects"
         deprecated = self.is_deprecated()
@@ -333,7 +333,7 @@ class SwaggerAutoSchema(ViewInspector):
 
         return summary, description
 
-    def get_summary_and_description(self):
+    def get_summary_and_description(self, operation_keys):
         """Return an operation summary and description determined from the view's docstring.
 
         :return: summary and description
