@@ -208,7 +208,8 @@ class SwaggerAutoSchema(ViewInspector):
             default_schema = self.serializer_to_schema(default_schema) or ''
 
         if default_schema:
-            if is_list_view(self.path, self.method, self.view) and self.method.lower() == 'get':
+            if self.overrides.get('is_list', False) or\
+                (is_list_view(self.path, self.method, self.view) and self.method.lower() == 'get'):
                 default_schema = openapi.Schema(type=openapi.TYPE_ARRAY, items=default_schema)
             if self.should_page():
                 default_schema = self.get_paginated_response(default_schema) or default_schema
