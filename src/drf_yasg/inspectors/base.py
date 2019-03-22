@@ -341,6 +341,9 @@ class ViewInspector(BaseInspector):
     #: methods that are assumed to require a request body determined by the view's ``serializer_class``
     implicit_body_methods = ('PUT', 'PATCH', 'POST')
 
+    #: methods which are assumed to return a list of objects when present on non-detail endpoints
+    implicit_list_response_methods = ('GET',)
+
     # real values set in __init__ to prevent import errors
     field_inspectors = []  #:
     filter_inspectors = []  #:
@@ -375,19 +378,30 @@ class ViewInspector(BaseInspector):
         raise NotImplementedError("ViewInspector must implement get_operation()!")
 
     # methods below provided as default implementations for probing inspectors
+    def is_list_view(self):
+        """Determine whether this view is a list or a detail view. The difference between the two is that
+        detail views depend on a pk/id path parameter. Note that a non-detail view does not necessarily imply a list
+        reponse (:meth:`.has_list_response`), nor are list responses limited to non-detail views.
+
+        For example, one might have a `/topic/<pk>/posts` endpoint which is a detail view that has a list response.
+
+        :rtype: bool"""
+        return is_list_view(self.path, self.method, self.view)
+
+    def has_list_response(self):
+        """Determine whether this view returns multiple objects. By default this is any non-detail view
+        (see :meth:`.is_list_view`) whose request method is one of :attr:`.implicit_list_response_methods`.
+
+        :rtype: bool
+        """
+        return self.is_list_view() and (self.method.upper() in self.implicit_list_response_methods)
 
     def should_filter(self):
         """Determine whether filter backend parameters should be included for this request.
 
         :rtype: bool
         """
-        if not getattr(self.view, 'filter_backends', None):
-            return False
-
-        if self.method.lower() not in ["get", "delete"]:
-            return False
-
-        return is_list_view(self.path, self.method, self.view)
+        return getattr(self.view, 'filter_backends', None) and self.has_list_response()
 
     def get_filter_parameters(self):
         """Return the parameters added to the view by its filter backends.
@@ -408,13 +422,7 @@ class ViewInspector(BaseInspector):
 
         :rtype: bool
         """
-        if not getattr(self.view, 'paginator', None):
-            return False
-
-        if self.method.lower() != 'get':
-            return False
-
-        return is_list_view(self.path, self.method, self.view)
+        return getattr(self.view, 'paginator', None) and self.has_list_response()
 
     def get_pagination_parameters(self):
         """Return the parameters added to the view by its paginator.
