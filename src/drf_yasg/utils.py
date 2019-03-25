@@ -6,7 +6,7 @@ from collections import OrderedDict
 from django.db import models
 from django.utils.encoding import force_text
 from rest_framework import serializers, status
-from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin, ListModelMixin
 from rest_framework.parsers import FileUploadParser
 from rest_framework.request import is_form_media_type
 from rest_framework.settings import api_settings as rest_framework_settings
@@ -220,6 +220,9 @@ def is_list_view(path, method, view):
     detail = getattr(method, 'detail', None)
     suffix = getattr(view, 'suffix', None)
     if action in ('list', 'create') or detail is False or suffix == 'List':
+        return True
+
+    if isinstance(view, ListModelMixin):
         return True
 
     if action in ('retrieve', 'update', 'partial_update', 'destroy') or detail is True or suffix == 'Instance':
