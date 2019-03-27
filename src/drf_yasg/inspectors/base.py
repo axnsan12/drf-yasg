@@ -272,7 +272,8 @@ class FieldInspector(BaseInspector):
         assert not isinstance(field, openapi.SwaggerDict), "passed field is already a SwaggerDict object"
         title = force_real_str(field.label) if field.label else None
         title = title if swagger_object_type == openapi.Schema else None  # only Schema has title
-        description = force_real_str(field.help_text) if field.help_text else None
+        help_text = getattr(field, 'help_text', None)
+        description = force_real_str(help_text) if help_text else None
         description = description if swagger_object_type != openapi.Items else None  # Items has no description either
 
         def SwaggerType(existing_object=None, **instance_kwargs):
