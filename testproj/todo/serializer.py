@@ -4,7 +4,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_recursive.fields import RecursiveField
 
-from .models import Todo, TodoAnother, TodoTree, TodoYetAnother
+from .models import Pack, Todo, TodoAnother, TodoTree, TodoYetAnother
 
 
 class TodoSerializer(serializers.ModelSerializer):
@@ -57,3 +57,14 @@ class TodoRecursiveSerializer(serializers.ModelSerializer):
     class Meta:
         model = TodoTree
         fields = ('id', 'title', 'parent', 'parent_id')
+
+
+class HarvestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pack
+        fields = (
+            'size_code',
+        )
+        read_only_fields = (
+            'size_code',
+        )

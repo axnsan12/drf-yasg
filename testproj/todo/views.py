@@ -1,11 +1,13 @@
-from rest_framework import viewsets
+from rest_framework import mixins, permissions, viewsets
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import RetrieveAPIView
 
 from drf_yasg.utils import swagger_auto_schema
 
-from .models import Todo, TodoAnother, TodoTree, TodoYetAnother
+from .models import Pack, Todo, TodoAnother, TodoTree, TodoYetAnother
 from .serializer import (
-    TodoAnotherSerializer, TodoRecursiveSerializer, TodoSerializer, TodoTreeSerializer, TodoYetAnotherSerializer
+    HarvestSerializer, TodoAnotherSerializer, TodoRecursiveSerializer, TodoSerializer, TodoTreeSerializer,
+    TodoYetAnotherSerializer
 )
 
 
@@ -75,3 +77,16 @@ class TodoRecursiveView(viewsets.ModelViewSet):
     @swagger_auto_schema(responses={200: TodoRecursiveSerializer(many=True)})
     def list(self, request, *args, **kwargs):
         return super(TodoRecursiveView, self).list(request, *args, **kwargs)
+
+
+class HarvestViewSet(mixins.ListModelMixin,
+                     mixins.UpdateModelMixin,
+                     viewsets.GenericViewSet):
+
+    queryset = Pack.objects.all()
+    serializer_class = HarvestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def perform_update(self, serializer):
+        pass

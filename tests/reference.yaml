@@ -592,6 +592,60 @@ paths:
         description: A unique integer value identifying this todo another.
         required: true
         type: integer
+  /todo/harvest/:
+    get:
+      operationId: todo_harvest_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Harvest'
+      tags:
+        - todo
+    parameters: []
+  /todo/harvest/{id}/:
+    put:
+      operationId: todo_harvest_update
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Harvest'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Harvest'
+      tags:
+        - todo
+    patch:
+      operationId: todo_harvest_partial_update
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Harvest'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Harvest'
+      tags:
+        - todo
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this pack.
+        required: true
+        type: integer
   /todo/recursive/:
     get:
       operationId: todo_recursive_list
@@ -1669,6 +1723,17 @@ definitions:
         minLength: 1
       todo:
         $ref: '#/definitions/Todo'
+  Harvest:
+    type: object
+    properties:
+      size_code:
+        title: Size code
+        type: string
+        enum:
+          - '50'
+          - '100'
+          - '200'
+        readOnly: true
   TodoRecursive:
     required:
       - title
