@@ -7,7 +7,7 @@ from decimal import Decimal
 from django.db import models
 from django.utils.encoding import force_text
 from rest_framework import serializers, status
-from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin, ListModelMixin
+from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.parsers import FileUploadParser
 from rest_framework.request import is_form_media_type
 from rest_framework.settings import api_settings as rest_framework_settings

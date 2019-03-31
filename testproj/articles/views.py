@@ -7,7 +7,7 @@ from rest_framework import viewsets
 # noinspection PyDeprecation
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.parsers import MultiPartParser, FileUploadParser
+from rest_framework.parsers import FileUploadParser, MultiPartParser
 from rest_framework.response import Response
 
 from articles import serializers

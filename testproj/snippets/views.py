@@ -4,7 +4,7 @@ from inflection import camelize
 from rest_framework import generics, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.parsers import FormParser, FileUploadParser
+from rest_framework.parsers import FileUploadParser, FormParser
 
 from drf_yasg import openapi
 from drf_yasg.inspectors import SwaggerAutoSchema
