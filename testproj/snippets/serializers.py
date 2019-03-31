@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.compat import MaxLengthValidator, MinValueValidator
 
-from snippets.models import LANGUAGE_CHOICES, STYLE_CHOICES, Snippet
+from snippets.models import LANGUAGE_CHOICES, STYLE_CHOICES, Snippet, SnippetViewer
 
 
 class LanguageSerializer(serializers.Serializer):
@@ -100,3 +100,9 @@ class SnippetSerializer(serializers.Serializer):
         instance.style = validated_data.get('style', instance.style)
         instance.save()
         return instance
+
+
+class SnippetViewerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SnippetViewer
+        fields = '__all__'

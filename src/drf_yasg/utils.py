@@ -6,7 +6,7 @@ from collections import OrderedDict
 from django.db import models
 from django.utils.encoding import force_text
 from rest_framework import serializers, status
-from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.mixins import DestroyModelMixin, RetrieveModelMixin, UpdateModelMixin, ListModelMixin
 from rest_framework.parsers import FileUploadParser
 from rest_framework.request import is_form_media_type
 from rest_framework.settings import api_settings as rest_framework_settings
@@ -225,6 +225,10 @@ def is_list_view(path, method, view):
     if action in ('retrieve', 'update', 'partial_update', 'destroy') or detail is True or suffix == 'Instance':
         # a detail action is surely not a list route
         return False
+
+    # for GenericAPIView, if it's a list view then it should be a list view
+    if isinstance(view, ListModelMixin):
+        return True
 
     # for GenericAPIView, if it's a detail view it can't also be a list view
     if isinstance(view, (RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin)):
