@@ -13,7 +13,9 @@ from rest_framework.settings import api_settings as rest_framework_settings
 
 from .. import openapi
 from ..errors import SwaggerGenerationError
-from ..utils import decimal_as_float, filter_none, get_serializer_class, get_serializer_ref_name
+from ..utils import (
+    decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
+)
 from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
 
 try:
@@ -635,7 +637,14 @@ class ChoiceFieldInspector(FieldInspector):
 
         if isinstance(field, serializers.ChoiceField):
             enum_type = openapi.TYPE_STRING
-            enum_values = list(field.choices.keys())
+            enum_values = []
+            for choice in field.choices.keys():
+                if isinstance(field, serializers.MultipleChoiceField):
+                    choice = field_value_to_representation(field, [choice])[0]
+                else:
+                    choice = field_value_to_representation(field, choice)
+
+                enum_values.append(choice)
 
             # for ModelSerializer, try to infer the type from the associated model field
             serializer = get_parent_serializer(field)
