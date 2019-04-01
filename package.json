@@ -1,8 +1,8 @@
 {
   "name": "drf-yasg",
   "dependencies": {
-    "redoc": "^2.0.0-rc.2",
-    "swagger-ui-dist": "^3.21.0"
+    "redoc": "^2.0.0-rc.4",
+    "swagger-ui-dist": "^3.22.0"
   },
   "repository": {
     "type": "git",

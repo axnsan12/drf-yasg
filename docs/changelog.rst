@@ -2,6 +2,21 @@
 Changelog
 #########
 
+
+**********
+**1.15.0**
+**********
+
+*Release date: Mar 04, 2019*
+
+- **IMPROVED:** updated ``swagger-ui`` to version 3.21.0
+- **FIXED:** implicit ``ref_name`` collisions will now throw an exception
+- **FIXED:** ``RecursiveField`` will now also work as a child of ``ListSerializer`` (:pr:`321`)
+- **FIXED:** fixed ``minLength`` and ``maxLength`` for ``ListSerializer`` and ``ListField``
+- **FIXED:** the ``items`` property of ``Schema``, ``Parameter`` and ``Items`` objects was renamed to ``items_``; this
+  is a *mildly breaking change* and was needed to fix the collision with the ``items`` method of ``dict`` (:pr:`308`)
+- **REMOVED:** the ``get_summary`` and ``get_description`` methods have been removed (previously deprecated in 1.12.0)
+
 **********
 **1.14.0**
 **********
