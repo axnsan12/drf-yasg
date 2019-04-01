@@ -7,15 +7,13 @@ Changelog
 **1.15.0**
 **********
 
-*Release date: Mar 04, 2019*
+*Release date: Apr 01, 2019*
 
-- **IMPROVED:** updated ``swagger-ui`` to version 3.21.0
-- **FIXED:** implicit ``ref_name`` collisions will now throw an exception
-- **FIXED:** ``RecursiveField`` will now also work as a child of ``ListSerializer`` (:pr:`321`)
-- **FIXED:** fixed ``minLength`` and ``maxLength`` for ``ListSerializer`` and ``ListField``
-- **FIXED:** the ``items`` property of ``Schema``, ``Parameter`` and ``Items`` objects was renamed to ``items_``; this
-  is a *mildly breaking change* and was needed to fix the collision with the ``items`` method of ``dict`` (:pr:`308`)
-- **REMOVED:** the ``get_summary`` and ``get_description`` methods have been removed (previously deprecated in 1.12.0)
+- **ADDED:** added ``is_list_view`` and ``has_list_response`` extension points to ``SwaggerAutoSchema`` (:issue:`331`)
+- **IMPROVED:** updated ``swagger-ui`` to version 3.22.0
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-rc.4
+- **FIXED:** ``ListModelMixin`` will now always be treated as a list view (:issue:`306`)
+- **FIXED:** non-primtive values in field ``choices`` will now be handled properly (:issue:`340`)
 
 **********
 **1.14.0**

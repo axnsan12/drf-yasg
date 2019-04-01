@@ -227,7 +227,6 @@ def is_list_view(path, method, view):
         # a detail action is surely not a list route
         return False
 
-    # for GenericAPIView, if it's a list view then it should be a list view
     if isinstance(view, ListModelMixin):
         return True
 
@@ -446,7 +445,7 @@ def field_value_to_representation(field, value):
     """Convert a python value related to a field (default, choices, etc.) into its OpenAPI-compatible representation.
 
     :param serializers.Field field: field associated with the value
-    :param obj value: value
+    :param object value: value
     :return: the converted value
     """
     value = field.to_representation(value)

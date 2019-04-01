@@ -378,7 +378,6 @@ class ViewInspector(BaseInspector):
         """
         raise NotImplementedError("ViewInspector must implement get_operation()!")
 
-    # methods below provided as default implementations for probing inspectors
     def is_list_view(self):
         """Determine whether this view is a list or a detail view. The difference between the two is that
         detail views depend on a pk/id path parameter. Note that a non-detail view does not necessarily imply a list
