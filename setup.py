@@ -57,6 +57,7 @@ def drf_yasg_setup(**kwargs):
             'Framework :: Django :: 1.11',
             'Framework :: Django :: 2.0',
             'Framework :: Django :: 2.1',
+            'Framework :: Django :: 2.2',
             'Topic :: Documentation',
             'Topic :: Software Development :: Code Generators',
         ],
