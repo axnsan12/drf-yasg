@@ -160,6 +160,7 @@ class OpenAPISchemaGenerator(object):
     Method implementations shamelessly stolen and adapted from rest-framework ``SchemaGenerator``.
     """
     endpoint_enumerator_class = EndpointEnumerator
+    reference_resolver_class = ReferenceResolver
 
     def __init__(self, info, version='', url=None, patterns=None, urlconf=None):
         """
@@ -238,7 +239,7 @@ class OpenAPISchemaGenerator(object):
         :rtype: openapi.Swagger
         """
         endpoints = self.get_endpoints(request)
-        components = ReferenceResolver(openapi.SCHEMA_DEFINITIONS, force_init=True)
+        components = self.reference_resolver_class(openapi.SCHEMA_DEFINITIONS, force_init=True)
         self.consumes = get_consumes(api_settings.DEFAULT_PARSER_CLASSES)
         self.produces = get_produces(api_settings.DEFAULT_RENDERER_CLASSES)
         paths, prefix = self.get_paths(endpoints, components, request, public)
