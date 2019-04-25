@@ -17,12 +17,15 @@ logger = logging.getLogger(__name__)
 
 
 class SwaggerAutoSchema(ViewInspector):
-    def __init__(self, view, path, method, components, request, overrides):
+    def __init__(self, view, path, method, components, request, overrides, operation_keys=None):
         super(SwaggerAutoSchema, self).__init__(view, path, method, components, request, overrides)
         self._sch = AutoSchema()
         self._sch.view = view
+        self.operation_keys = operation_keys
 
-    def get_operation(self, operation_keys):
+    def get_operation(self, operation_keys=None):
+        operation_keys = operation_keys or self.operation_keys
+
         consumes = self.get_consumes()
         produces = self.get_produces()
 
@@ -300,7 +303,7 @@ class SwaggerAutoSchema(ViewInspector):
 
         return natural_parameters + serializer_parameters
 
-    def get_operation_id(self, operation_keys):
+    def get_operation_id(self, operation_keys=None):
         """Return an unique ID for this operation. The ID must be unique across
         all :class:`.Operation` objects in the API.
 
@@ -308,6 +311,8 @@ class SwaggerAutoSchema(ViewInspector):
             of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: str
         """
+        operation_keys = operation_keys or self.operation_keys
+
         operation_id = self.overrides.get('operation_id', '')
         if not operation_id:
             operation_id = '_'.join(operation_keys)
@@ -369,7 +374,7 @@ class SwaggerAutoSchema(ViewInspector):
         """
         return self.overrides.get('deprecated', None)
 
-    def get_tags(self, operation_keys):
+    def get_tags(self, operation_keys=None):
         """Get a list of tags for this operation. Tags determine how operations relate with each other, and in the UI
         each tag will show as a group containing the operations that use it. If not provided in overrides,
         tags will be inferred from the operation url.
@@ -378,6 +383,8 @@ class SwaggerAutoSchema(ViewInspector):
             of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: list[str]
         """
+        operation_keys = operation_keys or self.operation_keys
+
         tags = self.overrides.get('tags')
         if not tags:
             tags = [operation_keys[0]]
