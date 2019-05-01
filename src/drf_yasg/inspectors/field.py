@@ -389,7 +389,8 @@ model_field_to_basic_type = [
     (models.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (models.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
-    (models.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
+    (models.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL
+                                                    if decimal_field_type == openapi.TYPE_STRING else None)),
     (models.DurationField, (openapi.TYPE_INTEGER, None)),
     (models.FloatField, (openapi.TYPE_NUMBER, None)),
     (models.IntegerField, (openapi.TYPE_INTEGER, None)),
@@ -416,7 +417,8 @@ serializer_field_to_basic_type = [
     (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (serializers.IntegerField, (openapi.TYPE_INTEGER, None)),
     (serializers.FloatField, (openapi.TYPE_NUMBER, None)),
-    (serializers.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
+    (serializers.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL
+                                                        if decimal_field_type == openapi.TYPE_STRING else None)),
     (serializers.DurationField, (openapi.TYPE_NUMBER, None)),  # ?
     (serializers.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (serializers.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
@@ -483,7 +485,8 @@ hinting_type_info = [
     (str, (openapi.TYPE_STRING, None)),
     (float, (openapi.TYPE_NUMBER, None)),
     (dict, (openapi.TYPE_OBJECT, None)),
-    (Decimal, (decimal_return_type, openapi.FORMAT_DECIMAL)),
+    (Decimal, (decimal_return_type, openapi.FORMAT_DECIMAL
+                                        if decimal_field_type == openapi.TYPE_STRING else None)),
     (uuid.UUID, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
     (datetime.datetime, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
