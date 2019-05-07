@@ -340,7 +340,7 @@ values for Parameters.
 OAUTH2_REDIRECT_URL
 -------------------
 
-Used when OAuth2 authenitcation of API requests via swagger-ui is desired. If ``None`` is passed, the
+Used when OAuth2 authentication of API requests via swagger-ui is desired. If ``None`` is passed, the
 ``oauth2RedirectUrl`` parameter will be set to ``{% static 'drf-yasg/swagger-ui-dist/oauth2-redirect.html' %}``. This
 is the default `https://github.com/swagger-api/swagger-ui/blob/master/dist/oauth2-redirect.html <oauth2-redirect>`_
 file provided by ``swagger-ui``.
@@ -351,7 +351,7 @@ file provided by ``swagger-ui``.
 OAUTH2_CONFIG
 -------------
 
-Used when OAuth2 authenitcation of API requests via swagger-ui is desired. Provides OAuth2 configuration parameters
+Used when OAuth2 authentication of API requests via swagger-ui is desired. Provides OAuth2 configuration parameters
 to the ``SwaggerUIBundle#initOAuth`` method, and must be a dictionary. See
 `OAuth2 configuration <https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/oauth2.md>`_.
 
