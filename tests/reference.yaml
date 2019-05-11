@@ -1205,11 +1205,13 @@ definitions:
               - aspx-vb
               - asy
               - at
+              - augeas
               - autoit
               - awk
               - basemake
               - bash
               - bat
+              - bbcbasic
               - bbcode
               - bc
               - befunge
@@ -1217,6 +1219,7 @@ definitions:
               - blitzbasic
               - blitzmax
               - bnf
+              - boa
               - boo
               - boogie
               - brainfuck
@@ -1238,6 +1241,7 @@ definitions:
               - cfs
               - chai
               - chapel
+              - charmci
               - cheetah
               - cirru
               - clay
@@ -1281,6 +1285,7 @@ definitions:
               - d
               - d-objdump
               - dart
+              - dasm16
               - delphi
               - dg
               - diff
@@ -1315,10 +1320,12 @@ definitions:
               - fennel
               - fish
               - flatline
+              - floscript
               - forth
               - fortran
               - fortranfixed
               - foxpro
+              - freefem
               - fsharp
               - gap
               - gas
@@ -1340,6 +1347,7 @@ definitions:
               - hexdump
               - hlsl
               - hsail
+              - hspec
               - html
               - html+cheetah
               - html+django
@@ -1359,6 +1367,7 @@ definitions:
               - hybris
               - hylang
               - i6t
+              - icon
               - idl
               - idris
               - iex
@@ -1474,6 +1483,7 @@ definitions:
               - pike
               - pkgconfig
               - plpgsql
+              - pony
               - postgresql
               - postscript
               - pot
@@ -1526,6 +1536,7 @@ definitions:
               - rst
               - rts
               - rust
+              - sarl
               - sas
               - sass
               - sc
@@ -1534,9 +1545,12 @@ definitions:
               - scheme
               - scilab
               - scss
+              - sgf
               - shen
               - silver
+              - slash
               - slim
+              - slurm
               - smali
               - smalltalk
               - smarty
@@ -1571,15 +1585,19 @@ definitions:
               - text
               - thrift
               - todotxt
+              - toml
               - trac-wiki
               - treetop
               - ts
               - tsql
+              - ttl
               - turtle
               - twig
               - typoscript
               - typoscriptcssdata
               - typoscripthtmldata
+              - ucode
+              - unicon
               - urbiscript
               - vala
               - vb.net
@@ -1649,6 +1667,12 @@ definitions:
             - perldoc
             - rainbow_dash
             - rrt
+            - sas
+            - solarized-dark
+            - solarized-light
+            - stata
+            - stata-dark
+            - stata-light
             - tango
             - trac
             - vim
