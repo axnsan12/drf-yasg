@@ -491,7 +491,8 @@ hinting_type_info = [
 ]
 
 if sys.version_info < (3, 0):
-    hinting_type_info.append((unicode, (openapi.TYPE_STRING, None)))
+    # noinspection PyUnresolvedReferences
+    hinting_type_info.append((unicode, (openapi.TYPE_STRING, None)))  # noqa: F821
 
 if typing:
     def inspect_collection_hint_class(hint_class):
@@ -531,11 +532,14 @@ def get_basic_type_info_from_hint(hint_class):
     :rtype: OrderedDict
     """
     union_types = _get_union_types(hint_class)
+
     if typing and union_types:
         # Optional is implemented as Union[T, None]
         if len(union_types) == 2 and isinstance(None, union_types[1]):
             result = get_basic_type_info_from_hint(union_types[0])
-            result['x-nullable'] = True
+            if result:
+                result['x-nullable'] = True
+
             return result
 
         return None
@@ -606,9 +610,7 @@ class SerializerMethodFieldInspector(FieldInspector):
             # look for Python 3.5+ style type hinting of the return value
             hint_class = inspect_signature(method).return_annotation
 
-            if not inspect.isclass(hint_class) and hasattr(hint_class, '__args__'):
-                hint_class = hint_class.__args__[0]
-            if inspect.isclass(hint_class) and not issubclass(hint_class, inspect._empty):
+            if not issubclass(hint_class, inspect._empty):
                 type_info = get_basic_type_info_from_hint(hint_class)
 
                 if type_info is not None:

@@ -9,7 +9,7 @@ from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
     filter_none, force_real_str, force_serializer_instance, get_consumes, get_produces, guess_response_status,
-    is_list_view, merge_params, no_body, param_list_to_odict
+    merge_params, no_body, param_list_to_odict
 )
 from .base import ViewInspector, call_view_method
 
