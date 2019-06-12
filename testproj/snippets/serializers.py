@@ -69,7 +69,7 @@ class SnippetSerializer(serializers.Serializer):
     tags = serializers.ListField(child=serializers.CharField(min_length=2), min_length=3, max_length=15)
     linenos = serializers.BooleanField(required=False)
     language = LanguageSerializer(help_text="Sample help text for language")
-    styles = serializers.MultipleChoiceField(choices=STYLE_CHOICES, default=['friendly'])
+    styles = serializers.MultipleChoiceField(choices=STYLE_CHOICES, default=['solarized-dark'])
     lines = serializers.ListField(child=serializers.IntegerField(), allow_empty=True, allow_null=True, required=False)
     example_projects = serializers.ListSerializer(child=ExampleProjectSerializer(), read_only=True,
                                                   validators=[MaxLengthValidator(100)])

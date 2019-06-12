@@ -3,6 +3,7 @@ testproj/db.sqlite3
 testproj/staticfiles
 \.pytest_cache/
 docs/\.doctrees/
+pip-wheel-metadata/
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
