@@ -19,6 +19,18 @@ with io.open('README.rst', encoding='utf-8') as readme:
 requirements = read_req('base.txt')
 requirements_validation = read_req('validation.txt')
 
+py3_supported_range = (4, 7)
+
+# convert inclusive range to exclusive range
+py3_supported_range = (py3_supported_range[0], py3_supported_range[1] + 1)
+python_requires = ", ".join([">=2.7"] + ["!=3.{}.*".format(v) for v in range(0, py3_supported_range[0])])
+python_classifiers = [
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 2',
+    'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: 3',
+] + ['Programming Language :: Python :: 3.{}'.format(v) for v in range(*py3_supported_range)]
+
 
 def drf_yasg_setup(**kwargs):
     setup(
@@ -38,21 +50,13 @@ def drf_yasg_setup(**kwargs):
         author_email='cristi@cvjd.me',
         keywords='drf django django-rest-framework schema swagger openapi codegen swagger-codegen '
                  'documentation drf-yasg django-rest-swagger drf-openapi',
-        python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
+        python_requires=python_requires,
         classifiers=[
             'Intended Audience :: Developers',
             'License :: OSI Approved :: BSD License',
             'Development Status :: 5 - Production/Stable',
             'Operating System :: OS Independent',
             'Environment :: Web Environment',
-            'Programming Language :: Python',
-            'Programming Language :: Python :: 2',
-            'Programming Language :: Python :: 2.7',
-            'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3.4',
-            'Programming Language :: Python :: 3.5',
-            'Programming Language :: Python :: 3.6',
-            'Programming Language :: Python :: 3.7',
             'Framework :: Django',
             'Framework :: Django :: 1.11',
             'Framework :: Django :: 2.0',
@@ -60,7 +64,7 @@ def drf_yasg_setup(**kwargs):
             'Framework :: Django :: 2.2',
             'Topic :: Documentation',
             'Topic :: Software Development :: Code Generators',
-        ],
+        ] + python_classifiers,
         **kwargs
     )
 
