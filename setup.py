@@ -19,7 +19,7 @@ with io.open('README.rst', encoding='utf-8') as readme:
 requirements = read_req('base.txt')
 requirements_validation = read_req('validation.txt')
 
-py3_supported_range = (4, 7)
+py3_supported_range = (5, 7)
 
 # convert inclusive range to exclusive range
 py3_supported_range = (py3_supported_range[0], py3_supported_range[1] + 1)
