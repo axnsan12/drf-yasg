@@ -2,6 +2,7 @@ import datetime
 import inspect
 import logging
 import operator
+import sys
 import uuid
 from collections import OrderedDict
 from decimal import Decimal
@@ -488,6 +489,9 @@ hinting_type_info = [
     (datetime.datetime, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
 ]
+
+if sys.version_info < (3, 0):
+    hinting_type_info.append((unicode, (openapi.TYPE_STRING, None)))
 
 if typing:
     def inspect_collection_hint_class(hint_class):

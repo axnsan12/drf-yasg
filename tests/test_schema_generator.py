@@ -204,6 +204,7 @@ def test_action_mapping():
 
 @pytest.mark.parametrize('choices, expected_type', [
     (['A', 'B'], openapi.TYPE_STRING),
+    ([u'A', u'B'], openapi.TYPE_STRING),
     ([123, 456], openapi.TYPE_INTEGER),
     ([1.2, 3.4], openapi.TYPE_NUMBER),
     (['A', 456], openapi.TYPE_STRING)
