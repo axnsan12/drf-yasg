@@ -1,10 +1,8 @@
 import datetime
-import functools
 
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
-# noinspection PyDeprecation
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.parsers import FileUploadParser, MultiPartParser
