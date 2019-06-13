@@ -140,7 +140,12 @@ SWAGGER_SETTINGS = {
         'clientId': OAUTH2_CLIENT_ID,
         'clientSecret': OAUTH2_CLIENT_SECRET,
         'appName': OAUTH2_APP_NAME,
-    }
+    },
+    "DEFAULT_PAGINATOR_INSPECTORS": [
+        'testproj.inspectors.UnknownPaginatorInspector',
+        'drf_yasg.inspectors.DjangoRestResponsePagination',
+        'drf_yasg.inspectors.CoreAPICompatInspector',
+    ]
 }
 
 REDOC_SETTINGS = {

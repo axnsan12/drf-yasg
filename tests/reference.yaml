@@ -276,7 +276,10 @@ paths:
     get:
       operationId: people_list
       description: ''
-      parameters: []
+      parameters:
+        - name: unknown_paginator
+          in: query
+          type: string
       responses:
         '200':
           description: ''
