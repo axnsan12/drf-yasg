@@ -2,6 +2,17 @@
 Changelog
 #########
 
+
+**********
+**1.16.0**
+**********
+
+*Release date: Jun 13, 2019*
+
+- **ADDED:** added `reference_resolver_class` attribute hook to `SwaggerAutoSchema` (:pr:`350`)
+- **ADDED:** added `operation_keys` attribute to `SwaggerAutoSchema`, along with `__init__` parameter (:pr:`355`)
+- **FIXED:** fixed potential crash on `issubclass` check without `isclass` check
+
 **********
 **1.15.1**
 **********
@@ -14,7 +25,6 @@ Changelog
 - **FIXED:** fixed an issue with inspection of typing hints on Python 3.7 (:issue:`371`)
 
 **Python 3.4 support has been dropped!**
-
 
 **********
 **1.15.0**
