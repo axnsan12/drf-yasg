@@ -87,14 +87,14 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
 
 * for ``ViewSet``, ``GenericViewSet``, ``ModelViewSet``, because each viewset corresponds to multiple **paths**, you have
   to decorate the *action methods*, i.e. ``list``, ``create``, ``retrieve``, etc. |br|
-  Additionally, ``@action``\ s, ``@list_route``\ s or ``@detail_route``\ s defined on the viewset, like function based
-  api views, can respond to multiple HTTP methods and thus have multiple operations that must be decorated separately:
+  Additionally, ``@action``\ s defined on the viewset, like function based api views, can respond to multiple HTTP
+  methods and thus have multiple operations that must be decorated separately:
 
 
    .. code-block:: python
 
       class ArticleViewSet(viewsets.ModelViewSet):
-         # method or 'methods' can be skipped because the list_route only handles a single method (GET)
+         # method or 'methods' can be skipped because the action only handles a single method (GET)
          @swagger_auto_schema(operation_description='GET /articles/today/')
          @action(detail=False, methods=['get'])
          def today(self, request):

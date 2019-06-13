@@ -166,7 +166,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
             if len(available_http_methods) > 1:
                 assert _methods, \
-                    "on multi-method api_view, action, detail_route or list_route, you must specify " \
+                    "on multi-method api_view or action, you must specify " \
                     "swagger_auto_schema on a per-method basis using one of the `method` or `methods` arguments"
             else:
                 # for a single-method view we assume that single method as the decorator target
@@ -179,8 +179,8 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
             view_method._swagger_auto_schema = existing_data
         else:
             assert not _methods, \
-                "the methods argument should only be specified when decorating an action, detail_route or " \
-                "list_route; you should also ensure that you put the swagger_auto_schema decorator " \
+                "the methods argument should only be specified when decorating an action; " \
+                "you should also ensure that you put the swagger_auto_schema decorator " \
                 "AFTER (above) the _route decorator"
             assert not existing_data, "swagger_auto_schema applied twice to method"
             view_method._swagger_auto_schema = data
@@ -215,7 +215,7 @@ def is_list_view(path, method, view):
     :param APIView view: target view
     :rtype: bool
     """
-    # for ViewSets, it could be the default 'list' action, or a list_route
+    # for ViewSets, it could be the default 'list' action, or an @action(detail=False)
     action = getattr(view, 'action', '')
     method = getattr(view, action, None) or method
     detail = getattr(method, 'detail', None)
