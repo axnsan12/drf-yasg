@@ -440,7 +440,7 @@ class OpenAPISchemaGenerator(object):
         if view_inspector_cls is None:
             return None
 
-        view_inspector = view_inspector_cls(view, path, method, components, request, overrides)
+        view_inspector = view_inspector_cls(view, path, method, components, request, overrides, operation_keys)
         operation = view_inspector.get_operation(operation_keys)
         if operation is None:
             return None
