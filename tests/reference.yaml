@@ -1110,7 +1110,7 @@ definitions:
     type: object
     properties:
       projectName:
-        title: Project name
+        title: project name custom title
         description: Name of the project
         type: string
         minLength: 1

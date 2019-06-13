@@ -17,7 +17,7 @@ class LanguageSerializer(serializers.Serializer):
 
 
 class ExampleProjectSerializer(serializers.Serializer):
-    project_name = serializers.CharField(help_text='Name of the project')
+    project_name = serializers.CharField(label='project name custom title', help_text='Name of the project')
     github_repo = serializers.CharField(required=True, help_text='Github repository of the project')
 
     class Meta:
