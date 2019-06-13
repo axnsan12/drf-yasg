@@ -2,6 +2,19 @@
 Changelog
 #########
 
+**********
+**1.15.1**
+**********
+
+*Release date: Jun 13, 2019*
+
+- **IMPROVED:** updated ``swagger-ui`` to version 3.22.3
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-rc.8-1
+- **FIXED:** fixed an issue with inspection of typing hints on Python 2.7 (:issue:`363`)
+- **FIXED:** fixed an issue with inspection of typing hints on Python 3.7 (:issue:`371`)
+
+**Python 3.4 support has been dropped!**
+
 
 **********
 **1.15.0**
