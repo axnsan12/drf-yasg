@@ -610,7 +610,7 @@ class SerializerMethodFieldInspector(FieldInspector):
             # look for Python 3.5+ style type hinting of the return value
             hint_class = inspect_signature(method).return_annotation
 
-            if not issubclass(hint_class, inspect._empty):
+            if inspect.isclass(hint_class) and not issubclass(hint_class, inspect._empty):
                 type_info = get_basic_type_info_from_hint(hint_class)
 
                 if type_info is not None:
