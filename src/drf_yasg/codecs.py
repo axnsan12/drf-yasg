@@ -194,7 +194,7 @@ def yaml_sane_dump(data, binary):
     :return: the serialized YAML
     :rtype: str or bytes
     """
-    return yaml.dump(data, Dumper=SaneYamlDumper, default_flow_style=False, encoding='utf-8' if binary else None)
+    return yaml.dump(data, Dumper=SaneYamlDumper, default_flow_style=False, allow_unicode=True)
 
 
 class SaneYamlLoader(yaml.SafeLoader):
