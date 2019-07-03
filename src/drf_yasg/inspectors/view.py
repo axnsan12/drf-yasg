@@ -16,6 +16,21 @@ from .base import ViewInspector, call_view_method
 logger = logging.getLogger(__name__)
 
 
+def serializer_to_description(serializer):
+    """
+    Format the serializer's doc text into a single line for a parameter or
+    response description.
+    """
+    if not (serializer and serializer.__doc__):
+        return ''
+    return ' '.join(
+        l.strip()
+        for l in serializer.__doc__.splitlines()
+        if l.strip()
+    )
+
+
+
 class SwaggerAutoSchema(ViewInspector):
     def __init__(self, view, path, method, components, request, overrides, operation_keys=None):
         super(SwaggerAutoSchema, self).__init__(view, path, method, components, request, overrides)
@@ -83,7 +98,7 @@ class SwaggerAutoSchema(ViewInspector):
         else:
             if schema is None:
                 schema = self.get_request_body_schema(serializer)
-            return [self.make_body_parameter(schema)] if schema is not None else []
+            return [self.make_body_parameter(schema, serializer)] if schema is not None else []
 
     def get_view_serializer(self):
         """Return the serializer as defined by the view's ``get_serializer()`` method.
@@ -141,13 +156,17 @@ class SwaggerAutoSchema(ViewInspector):
         """
         return self.serializer_to_schema(serializer)
 
-    def make_body_parameter(self, schema):
+    def make_body_parameter(self, schema, serializer=None):
         """Given a :class:`.Schema` object, create an ``in: body`` :class:`.Parameter`.
 
         :param openapi.Schema schema: the request body schema
         :rtype: openapi.Parameter
         """
-        return openapi.Parameter(name='data', in_=openapi.IN_BODY, required=True, schema=schema)
+        description = serializer_to_description(serializer)
+        return openapi.Parameter(
+            name='data', in_=openapi.IN_BODY, required=True, schema=schema,
+            description=description
+        )
 
     def add_manual_parameters(self, parameters):
         """Add/replace parameters from the given list of automatically generated request parameters.
@@ -246,6 +265,7 @@ class SwaggerAutoSchema(ViewInspector):
         """
         responses = OrderedDict()
         for sc, serializer in response_serializers.items():
+            description = serializer_to_description(serializer)
             if isinstance(serializer, str):
                 response = openapi.Response(
                     description=force_real_str(serializer)
@@ -259,13 +279,13 @@ class SwaggerAutoSchema(ViewInspector):
                     response.schema = self.serializer_to_schema(serializer)
             elif isinstance(serializer, openapi.Schema.OR_REF):
                 response = openapi.Response(
-                    description='',
+                    description=description,
                     schema=serializer,
                 )
             else:
                 serializer = force_serializer_instance(serializer)
                 response = openapi.Response(
-                    description='',
+                    description=description,
                     schema=self.serializer_to_schema(serializer),
                 )
 
