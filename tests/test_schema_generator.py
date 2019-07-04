@@ -3,11 +3,14 @@ from collections import OrderedDict
 
 import pytest
 from django.conf.urls import url
+from django.contrib.postgres import fields as postgres_fields
+from django.db import models
 from django.utils.inspect import get_func_args
 from rest_framework import routers, serializers, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from django_fake_model import models as fake_models
 from drf_yasg import codecs, openapi
 from drf_yasg.codecs import yaml_sane_load
 from drf_yasg.errors import SwaggerGenerationError
@@ -230,3 +233,43 @@ def test_choice_field(choices, expected_type):
     property_schema = swagger['definitions']['Detail']['properties']['detail']
 
     assert property_schema == openapi.Schema(title='Detail', type=expected_type, enum=choices)
+
+
+@pytest.mark.parametrize('choices, field, expected_type', [
+    ([1, 2, 3], models.IntegerField, openapi.TYPE_INTEGER),
+    (["A", "B"], models.CharField, openapi.TYPE_STRING),
+])
+def test_nested_choice_in_array_field(choices, field, expected_type):
+
+    # Create a model class on the fly to avoid warnings about using the several
+    # model class name several times
+    model_class = type(
+        "%sModel" % field.__name__,
+        (fake_models.FakeModel,),
+        {
+            "array": postgres_fields.ArrayField(
+                field(choices=((i, "choice %s" % i) for i in choices))
+            ),
+            "__module__": "test_models",
+        }
+    )
+
+    class ArraySerializer(serializers.ModelSerializer):
+        class Meta:
+            model = model_class
+            fields = ("array",)
+
+    class ArrayViewSet(viewsets.ModelViewSet):
+        serializer_class = ArraySerializer
+
+    router = routers.DefaultRouter()
+    router.register(r'arrays', ArrayViewSet, **_basename_or_base_name('arrays'))
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title='Test array model generator', default_version='v1'),
+        patterns=router.urls
+    )
+
+    swagger = generator.get_schema(None, True)
+    property_schema = swagger['definitions']['Array']['properties']['array']['items']
+    assert property_schema == openapi.Schema(title='Array', type=expected_type, enum=choices)

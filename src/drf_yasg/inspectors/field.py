@@ -656,7 +656,11 @@ class ChoiceFieldInspector(FieldInspector):
             serializer = get_parent_serializer(field)
             if isinstance(serializer, serializers.ModelSerializer):
                 model = getattr(getattr(serializer, 'Meta'), 'model')
-                model_field = get_model_field(model, field.source)
+                # Use the parent source for nested fields
+                model_field = get_model_field(model, field.source or field.parent.source)
+                # If the field has a base_field its type must be used
+                if getattr(model_field, "base_field", None):
+                    model_field = model_field.base_field
                 if model_field:
                     model_type = get_basic_type_info(model_field)
                     if model_type:
