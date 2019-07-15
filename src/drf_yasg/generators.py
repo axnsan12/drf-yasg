@@ -37,17 +37,19 @@ class EndpointEnumerator(_EndpointEnumerator):
     def get_version_regex_from_path_regex(self, path_regex, version_param):
         if path_regex.endswith(')'):
             logger.warning("url pattern does not end in $ ('%s') - unexpected things might happen", path_regex)
-        version_param_regex = re.compile(rf"\(\?P<{version_param}>(?P<value>.+?)\)")
+        version_param_regex = re.compile(r"\(\?P<%s>(?P<value>.+?)\)" % version_param)
         version_match = re.search(version_param_regex, path_regex)
         return version_match and version_match.group("value")
 
 
-    def should_include_endpoint(self, path, callback, app_name='', namespace='', url_name=None, version_regex=None):
+    def should_include_endpoint(self, path, callback, app_name='', namespace='', url_name=None):
         if not super(EndpointEnumerator, self).should_include_endpoint(path, callback):
             return False
 
         version = getattr(self.request, 'version', None)
         versioning_class = getattr(callback.cls, 'versioning_class', None)
+        version_param = version and getattr(versioning_class, 'version_param', 'version')
+        version_regex = self.get_version_regex_from_path_regex(path_regex, version_param)
         if versioning_class is not None:
             if issubclass(versioning_class, versioning.NamespaceVersioning):
                 if version and version not in namespace.split(':'):
@@ -102,12 +104,8 @@ class EndpointEnumerator(_EndpointEnumerator):
                 try:
                     path = self.get_path_from_regex(path_regex)
                     callback = pattern.callback
-                    versioning_class = getattr(callback.cls, 'versioning_class', None)
-                    version = getattr(self.request, 'version', None)
-                    version_param = version and getattr(versioning_class, 'version_param', 'version')
-                    version_regex = self.get_version_regex_from_path_regex(path_regex, version_param)
                     url_name = pattern.name
-                    if self.should_include_endpoint(path, callback, app_name or '', namespace or '', url_name, version_regex):
+                    if self.should_include_endpoint(path, callback, app_name or '', namespace or '', url_name):
                         path = self.replace_version(path, callback)
 
                         # avoid adding endpoints that have already been seen,
