@@ -34,12 +34,23 @@ class EndpointEnumerator(_EndpointEnumerator):
             logger.warning("url pattern does not end in $ ('%s') - unexpected things might happen", path_regex)
         return self.unescape_path(super(EndpointEnumerator, self).get_path_from_regex(path_regex))
 
+    def get_regex_from_converter(self, converter):
+        if converter == "string":
+            return r"[^/]+"
+        if converter == "int":
+            return r"[0-9]+"
+        if converter == "slug":
+            return r"[A-Za-z0-9_\-]+"
+        else:
+            logger.warning("the '%s' converter does not supported", converter)
+
     def get_version_regex_from_path_regex(self, path_regex, version_param):
         if path_regex.endswith(')'):
             logger.warning("url pattern does not end in $ ('%s') - unexpected things might happen", path_regex)
-        version_param_regex = re.compile(r"\(\?P<%s>(?P<value>.+?)\)" % version_param)
+        version_param_regex = re.compile(r"\(\?P<%s>(?P<value>.+?)\)|<(?P<converter>.+?):%s>" % (version_param, version_param))
         version_match = re.search(version_param_regex, path_regex)
-        return version_match and version_match.group("value")
+        if version_match:
+            return version_match.group("value") or self.get_regex_from_converter(version_match.group("converter"))
 
 
     def should_include_endpoint(self, path, callback, app_name='', namespace='', url_name=None):
