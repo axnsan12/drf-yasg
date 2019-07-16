@@ -4,6 +4,15 @@ Changelog
 
 
 **********
+**1.16.1**
+**********
+
+*Release date: Jul 16, 2019*
+
+- **FIXED:** fixed DRF 3.10 compatibility (:pr:`408`, :issue:`410`, :issue:`411`)
+- **IMPROVED:** better enum type detection for nested `ChoiceField`s (:pr:`400`)
+
+**********
 **1.16.0**
 **********
 
