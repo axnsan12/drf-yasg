@@ -3,23 +3,15 @@ import logging
 import re
 from collections import OrderedDict, defaultdict
 
-import uritemplate
 import rest_framework
+import uritemplate
 from coreapi.compat import urlparse
+from packaging.version import Version
 from rest_framework import versioning
 from rest_framework.compat import URLPattern, URLResolver, get_original_route
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
 from rest_framework.schemas.generators import endpoint_ordering, get_pk_name
-
 from rest_framework.settings import api_settings
-
-from packaging.version import Version
-if Version(rest_framework.__version__) < Version('3.10'):
-    from rest_framework.schemas.generators import SchemaGenerator
-    from rest_framework.schemas.inspectors import get_pk_description
-else:
-    from rest_framework.schemas import SchemaGenerator
-    from rest_framework.schemas.utils import get_pk_description
 
 from . import openapi
 from .app_settings import swagger_settings
@@ -27,6 +19,14 @@ from .errors import SwaggerGenerationError
 from .inspectors.field import get_basic_type_info, get_queryset_field, get_queryset_from_view
 from .openapi import ReferenceResolver, SwaggerDict
 from .utils import force_real_str, get_consumes, get_produces
+
+if Version(rest_framework.__version__) < Version('3.10'):
+    from rest_framework.schemas.generators import SchemaGenerator
+    from rest_framework.schemas.inspectors import get_pk_description
+else:
+    from rest_framework.schemas import SchemaGenerator
+    from rest_framework.schemas.utils import get_pk_description
+
 
 logger = logging.getLogger(__name__)
 
