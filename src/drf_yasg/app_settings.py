@@ -12,6 +12,7 @@ SWAGGER_DEFAULTS = {
         'drf_yasg.inspectors.ChoiceFieldInspector',
         'drf_yasg.inspectors.FileFieldInspector',
         'drf_yasg.inspectors.DictFieldInspector',
+        'drf_yasg.inspectors.JSONFieldInspector',
         'drf_yasg.inspectors.HiddenFieldInspector',
         'drf_yasg.inspectors.RelatedFieldInspector',
         'drf_yasg.inspectors.SerializerMethodFieldInspector',

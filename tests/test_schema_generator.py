@@ -273,3 +273,23 @@ def test_nested_choice_in_array_field(choices, field, expected_type):
     swagger = generator.get_schema(None, True)
     property_schema = swagger['definitions']['Array']['properties']['array']['items']
     assert property_schema == openapi.Schema(title='Array', type=expected_type, enum=choices)
+
+
+def test_json_field():
+    class TestJSONFieldSerializer(serializers.Serializer):
+        json = serializers.JSONField()
+
+    class JSONViewSet(viewsets.ModelViewSet):
+        serializer_class = TestJSONFieldSerializer
+
+    router = routers.DefaultRouter()
+    router.register(r'jsons', JSONViewSet, **_basename_or_base_name('jsons'))
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title='Test json field generator', default_version='v1'),
+        patterns=router.urls
+    )
+
+    swagger = generator.get_schema(None, True)
+    property_schema = swagger["definitions"]["TestJSONField"]["properties"]["json"]
+    assert property_schema == openapi.Schema(title='Json', type=openapi.TYPE_OBJECT)
