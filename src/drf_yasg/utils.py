@@ -5,7 +5,7 @@ from collections import OrderedDict
 from decimal import Decimal
 
 from django.db import models
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from rest_framework import serializers, status
 from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.parsers import FileUploadParser
@@ -434,7 +434,7 @@ def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     Fix for https://github.com/axnsan12/drf-yasg/issues/159
     """
     if s is not None:
-        s = force_text(s, encoding, strings_only, errors)
+        s = force_str(s, encoding, strings_only, errors)
         if type(s) != str:
             s = '' + s
 

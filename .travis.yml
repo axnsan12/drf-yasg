@@ -4,12 +4,13 @@ python:
   - '3.5'
   - '3.6'
   - '3.7'
+  - '3.8-dev'
 
 dist: xenial
 
 cache: pip
 
-jobs:
+matrix:
   include:
     - python: '3.6'
       env: TOXENV=docs
@@ -38,6 +39,7 @@ jobs:
   allow_failures:
     - env: TOXENV=lint
     - env: TOXENV=djmaster
+    - python: '3.8-dev'
 
   fast_finish: true
 
@@ -58,11 +60,6 @@ after_success:
       coverage report
       codecov
     fi
-
-branches:
-  only:
-    - master
-    - /^v?\d+\.\d+(\.\d+)?(-?\S+)?$/
 
 stages:
   - test
