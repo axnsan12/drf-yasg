@@ -144,10 +144,24 @@ class SwaggerAutoSchema(ViewInspector):
     def make_body_parameter(self, schema):
         """Given a :class:`.Schema` object, create an ``in: body`` :class:`.Parameter`.
 
+        Tries to use the schema's description to describe the parameter.
+
         :param openapi.Schema schema: the request body schema
         :rtype: openapi.Parameter
         """
-        return openapi.Parameter(name='data', in_=openapi.IN_BODY, required=True, schema=schema)
+        is_array = (schema.get('type', openapi.TYPE_OBJECT) == openapi.TYPE_ARRAY)
+        base_schema = schema['items'] if is_array else schema
+        # Schema is now a reference, but we can resolve that to our components
+        # to get the component's description.
+        param = openapi.Parameter(name='data', in_=openapi.IN_BODY, required=True, schema=schema)
+        if hasattr(base_schema, 'resolve'):
+            component = base_schema.resolve(self.components)
+            if hasattr(component, 'description'):
+                description = component.description
+                if is_array:
+                    description = 'list of: ' + description
+                param.description = description
+        return param
 
     def add_manual_parameters(self, parameters):
         """Add/replace parameters from the given list of automatically generated request parameters.
