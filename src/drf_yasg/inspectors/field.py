@@ -752,11 +752,23 @@ class HiddenFieldInspector(FieldInspector):
         return NotHandled
 
 
+class JSONFieldInspector(FieldInspector):
+    """Provides conversion for ``JSONField``."""
+
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+        SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
+
+        if isinstance(field, serializers.JSONField) and swagger_object_type == openapi.Schema:
+            return SwaggerType(type=openapi.TYPE_OBJECT)
+
+        return NotHandled
+
+
 class StringDefaultFieldInspector(FieldInspector):
     """For otherwise unhandled fields, return them as plain :data:`.TYPE_STRING` objects."""
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):  # pragma: no cover
-        # TODO unhandled fields: TimeField JSONField
+        # TODO unhandled fields: TimeField
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
         return SwaggerType(type=openapi.TYPE_STRING)
 
