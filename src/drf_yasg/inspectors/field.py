@@ -114,14 +114,21 @@ class InlineSerializerInspector(SerializerInspector):
                     if child.required and not getattr(child_schema, 'read_only', False):
                         required.append(property_name)
 
+                description = getattr(serializer, 'help_text', None)
+                if description is None and serializer.__doc__ is not None:
+                    description = ' '.join(
+                        l.strip() for l in serializer.__doc__.splitlines() if len(l.strip()) > 0
+                    )
+
                 result = SwaggerType(
                     type=openapi.TYPE_OBJECT,
                     properties=properties,
                     required=required or None,
+                    description=description,
                 )
                 if not ref_name and 'title' in result:
                     # on an inline model, the title is derived from the field name
-                    # but is visno coverually displayed like the model name, which is confusing
+                    # but is visually displayed like the model name, which is confusing
                     # it is better to just remove title from inline models
                     del result.title
 
