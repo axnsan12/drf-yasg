@@ -374,8 +374,12 @@ def get_consumes(parser_classes):
     parser_classes = [pc for pc in parser_classes if not issubclass(pc, FileUploadParser)]
     media_types = [parser.media_type for parser in parser_classes or []]
     non_form_media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
+    # Because some data to parse could be nested array and are not supported by form media type like multipart/form-data,
+    # we must be sure to have explicit form media types **only**.
     if len(non_form_media_types) == 0:
         return media_types
+    # Otherwise, enforce a media type like application/json to be able to parse nested array, but it won't be able to
+    # support file upload...
     else:
         return non_form_media_types
 
