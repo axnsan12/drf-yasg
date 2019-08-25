@@ -352,40 +352,41 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
 
 drf-extra-fields
 ===============================
-Integration with `drf-extra-fields <https://github.com/Hipo/drf-extra-fields>` has a problem with Base64 fields. The drf-yasg will generate Base64 file or image fields as Readonly and not required. Here is a workaround code for display the Base64 fields correctly.
-```python
-from drf_yasg import openapi
-from drf_yasg.inspectors import FieldInspector, SwaggerAutoSchema
-from drf_yasg.app_settings import swagger_settings
+Integration with `drf-extra-fields <https://github.com/Hipo/drf-extra-fields>`_ has a problem with Base64 fields. The drf-yasg will generate Base64 file or image fields as Readonly and not required. Here is a workaround code for display the Base64 fields correctly.
+
+.. code:: python
+
+  from drf_yasg import openapi
+  from drf_yasg.inspectors import FieldInspector, SwaggerAutoSchema
+  from drf_yasg.app_settings import swagger_settings
 
 
-class Base64FileFieldInspector(FieldInspector):
-    BASE_64_FIELDS = ['Base64ImageField', 'Base64FileField', 'Base64FieldMixin']
+  class Base64FileFieldInspector(FieldInspector):
+      BASE_64_FIELDS = ['Base64ImageField', 'Base64FileField', 'Base64FieldMixin']
 
-    def __classlookup(self, cls):
-        """List all base class of the given class"""
-        c = list(cls.__bases__)
-        for base in c:
-            c.extend(self.__classlookup(base))
-        return c
+      def __classlookup(self, cls):
+          """List all base class of the given class"""
+          c = list(cls.__bases__)
+          for base in c:
+              c.extend(self.__classlookup(base))
+          return c
 
-    def process_result(self, result, method_name, obj, **kwargs):
-        if isinstance(result, openapi.Schema.OR_REF):
-            base_classes = [x.__name__ for x in self.__classlookup(obj.__class__)]
-            if any(item in Base64FileFieldInspector.BASE_64_FIELDS for item in base_classes):
-                schema = openapi.resolve_ref(result, self.components)
-                schema.pop('readOnly', None)
-                schema.pop('format', None)  # Remove $url format from string
+      def process_result(self, result, method_name, obj, **kwargs):
+          if isinstance(result, openapi.Schema.OR_REF):
+              base_classes = [x.__name__ for x in self.__classlookup(obj.__class__)]
+              if any(item in Base64FileFieldInspector.BASE_64_FIELDS for item in base_classes):
+                  schema = openapi.resolve_ref(result, self.components)
+                  schema.pop('readOnly', None)
+                  schema.pop('format', None)  # Remove $url format from string
 
-        return result
-
-
-class Base64FileAutoSchema(SwaggerAutoSchema):
-    field_inspectors = [Base64FileFieldInspector] + swagger_settings.DEFAULT_FIELD_INSPECTORS
+          return result
 
 
-class FormAttachmentViewSet(viewsets.ModelViewSet):
-    queryset = .......
-    serializer_class = ..........
-    swagger_schema = Base64FileAutoSchema
-```
+  class Base64FileAutoSchema(SwaggerAutoSchema):
+      field_inspectors = [Base64FileFieldInspector] + swagger_settings.DEFAULT_FIELD_INSPECTORS
+
+
+  class FormAttachmentViewSet(viewsets.ModelViewSet):
+      queryset = .......
+      serializer_class = ..........
+      swagger_schema = Base64FileAutoSchema
