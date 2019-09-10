@@ -1377,6 +1377,7 @@ definitions:
         title: Foo
         type: string
         minLength: 1
+        example: bar
   MethodFieldExample:
     title: Hint example
     type: object
