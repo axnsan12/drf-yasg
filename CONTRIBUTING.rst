@@ -6,7 +6,7 @@
 Contributing
 ############
 
-Contributions are always welcome and appreciated! Here are some ways you can contribut.
+Contributions are always welcome and appreciated! Here are some ways you can contribute.
 
 ******
 Issues
