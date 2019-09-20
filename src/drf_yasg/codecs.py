@@ -106,27 +106,6 @@ class _OpenAPICodec(object):
         return swagger.as_odict()
 
 
-class OpenAPICodecJson(_OpenAPICodec):
-    media_type = 'application/json'
-
-    def __init__(self, validators, pretty=False, media_type='application/json'):
-        super(OpenAPICodecJson, self).__init__(validators)
-        self.pretty = pretty
-        self.media_type = media_type
-
-    def _dump_dict(self, spec):
-        """Dump ``spec`` into JSON.
-
-        :rtype: str"""
-        if self.pretty:
-            out = json.dumps(spec, indent=4, separators=(',', ': '))
-            if out[-1] != '\n':
-                out += '\n'
-            return out
-        else:
-            return json.dumps(spec)
-
-
 YAML_MAP_TAG = u'tag:yaml.org,2002:map'
 
 
