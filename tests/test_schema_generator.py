@@ -16,7 +16,7 @@ from drf_yasg import codecs, openapi
 from drf_yasg.codecs import yaml_sane_load
 from drf_yasg.errors import SwaggerGenerationError
 from drf_yasg.generators import OpenAPISchemaGenerator
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema, run_validators
 
 try:
     import typing
@@ -24,8 +24,8 @@ except ImportError:
     typing = None
 
 
-def test_schema_is_valid(swagger, codec_yaml):
-    codec_yaml.encode(swagger)
+def test_schema_is_valid(swagger):
+    run_validators(swagger, ['ssv', 'flex'])
 
 
 def test_invalid_schema_fails(codec_json, mock_schema_request):

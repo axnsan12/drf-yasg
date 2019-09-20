@@ -501,3 +501,26 @@ def dict_has_ordered_keys(obj):
         return isinstance(obj, dict)
 
     return isinstance(obj, OrderedDict)
+
+
+def run_validators(schema, validators):
+    from .codecs import VALIDATORS, SwaggerValidationError
+    import copy
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    errors = {}
+
+    for validator in validators:
+        try:
+            # validate a deepcopy of the spec to prevent the validator from messing with it
+            # for example, swagger_spec_validator adds an x-scope property to all references
+            VALIDATORS[validator](copy.deepcopy(schema.as_odict()))
+        except SwaggerValidationError as e:
+            errors[validator] = str(e)
+
+    if errors:
+        exc = SwaggerValidationError("spec validation failed: {}".format(errors), errors, schema, None)
+        logger.warning(str(exc))
+        raise exc

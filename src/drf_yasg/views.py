@@ -1,4 +1,3 @@
-import logging
 import warnings
 from functools import WRAPPER_ASSIGNMENTS, wraps
 
@@ -15,6 +14,7 @@ from .renderers import (
     OpenAPIRenderer, ReDocOldRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer,
     _UIRenderer
 )
+from .utils import run_validators
 
 from rest_framework.schemas import coreapi, openapi
 
@@ -24,8 +24,6 @@ UI_RENDERERS = {
     'redoc': (ReDocRenderer, SwaggerUIRenderer),
     'redoc-old': (ReDocOldRenderer, ReDocRenderer, SwaggerUIRenderer),
 }
-
-logger = logging.getLogger(__name__)
 
 
 def deferred_never_cache(view_func):
@@ -92,9 +90,6 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
         renderer_classes = _spec_renderers
 
         def get(self, request, version='', format=None):
-            from .codecs import VALIDATORS, SwaggerValidationError
-            import copy
-
             version = request.version or version or ''
             if isinstance(request.accepted_renderer, _UIRenderer):
                 self.schema_generator = self.generator_class(info, version, url, patterns=[])
@@ -103,20 +98,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
 
             schema = self.schema_generator.get_schema(request, self.public)
 
-            errors = {}
-
-            for validator in validators:
-                try:
-                    # validate a deepcopy of the spec to prevent the validator from messing with it
-                    # for example, swagger_spec_validator adds an x-scope property to all references
-                    VALIDATORS[validator](copy.deepcopy(schema.as_odict()))
-                except SwaggerValidationError as e:
-                    errors[validator] = str(e)
-
-            if errors:
-                exc = SwaggerValidationError("spec validation failed: {}".format(errors), errors, schema, None)
-                logger.warning(str(exc))
-                raise exc
+            run_validators(schema, validators)
 
             return Response(schema)
 
