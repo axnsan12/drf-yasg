@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from .app_settings import swagger_settings
 from .renderers import (
     OpenAPIRenderer, ReDocOldRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer,
-    _SpecRenderer
+    _UIRenderer
 )
 
 from rest_framework.schemas import coreapi, openapi
@@ -90,10 +90,10 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
 
         def get(self, request, version='', format=None):
             version = request.version or version or ''
-            if isinstance(request.accepted_renderer, _SpecRenderer):
-                self.schema_generator = self.generator_class(info, version, url, patterns, urlconf)
-            else:
+            if isinstance(request.accepted_renderer, _UIRenderer):
                 self.schema_generator = self.generator_class(info, version, url, patterns=[])
+            else:
+                self.schema_generator = self.generator_class(info, version, url, patterns, urlconf)
 
             return super().get(request=request, version=version, format=format)
 
