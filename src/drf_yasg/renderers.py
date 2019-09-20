@@ -46,11 +46,12 @@ class OpenAPIRenderer(_JSONOpenAPIRenderer):
         return cls
 
 
-class SwaggerJSONRenderer(_SpecRenderer):
-    """Renders the schema as a JSON document with the generic ``application/json`` mime type."""
-    media_type = 'application/json'
+class SwaggerJSONRenderer(_JSONOpenAPIRenderer):
     format = 'json'
-    codec_class = OpenAPICodecJson
+
+    @classmethod
+    def with_validators(cls, validators):
+        return cls
 
 
 class SwaggerYAMLRenderer(_YAMLOpenAPIRenderer):
