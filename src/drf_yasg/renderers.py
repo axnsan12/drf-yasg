@@ -4,7 +4,7 @@ from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.functional import Promise
-from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer
+from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer, JSONOpenAPIRenderer as _JSONOpenAPIRenderer
 from rest_framework.utils import encoders, json
 
 from .app_settings import redoc_settings, swagger_settings
@@ -37,11 +37,13 @@ class _SpecRenderer(BaseRenderer):
         return codec.encode(data)
 
 
-class OpenAPIRenderer(_SpecRenderer):
+class OpenAPIRenderer(_JSONOpenAPIRenderer):
     """Renders the schema as a JSON document with the ``application/openapi+json`` specific mime type."""
-    media_type = 'application/openapi+json'
     format = 'openapi'
-    codec_class = OpenAPICodecJson
+
+    @classmethod
+    def with_validators(cls, validators):
+        return cls
 
 
 class SwaggerJSONRenderer(_SpecRenderer):
