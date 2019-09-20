@@ -1,9 +1,3 @@
-from django.http import HttpResponse
-
-from .codecs import _OpenAPICodec
-from .errors import SwaggerValidationError
-
-
 class SwaggerExceptionMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response
