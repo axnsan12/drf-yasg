@@ -8,7 +8,6 @@ from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRen
 from rest_framework.utils import encoders, json
 
 from .app_settings import redoc_settings, swagger_settings
-from .codecs import VALIDATORS, OpenAPICodecJson, OpenAPICodecYaml
 from .openapi import Swagger
 from .utils import filter_none
 
