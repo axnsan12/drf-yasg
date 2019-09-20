@@ -4,7 +4,7 @@ from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.functional import Promise
-from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer, JSONOpenAPIRenderer as _JSONOpenAPIRenderer
+from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer, JSONOpenAPIRenderer as _JSONOpenAPIRenderer, OpenAPIRenderer as _YAMLOpenAPIRenderer
 from rest_framework.utils import encoders, json
 
 from .app_settings import redoc_settings, swagger_settings
@@ -53,11 +53,17 @@ class SwaggerJSONRenderer(_SpecRenderer):
     codec_class = OpenAPICodecJson
 
 
-class SwaggerYAMLRenderer(_SpecRenderer):
-    """Renders the schema as a YAML document."""
-    media_type = 'application/yaml'
+class SwaggerYAMLRenderer(_YAMLOpenAPIRenderer):
     format = 'yaml'
-    codec_class = OpenAPICodecYaml
+
+    @classmethod
+    def with_validators(cls, validators):
+        return cls
+
+    def render(self, data, media_type=None, renderer_context=None):
+        from .codecs import yaml_sane_dump
+
+        return yaml_sane_dump(data, True)
 
 
 class _UIRenderer(BaseRenderer):
