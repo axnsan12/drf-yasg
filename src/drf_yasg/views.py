@@ -78,7 +78,6 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
         _perm_classes = api_settings.DEFAULT_PERMISSION_CLASSES
     info = info or swagger_settings.DEFAULT_INFO
     validators = validators or []
-    _spec_renderers = tuple(renderer.with_validators(validators) for renderer in SPEC_RENDERERS)
 
     from rest_framework.schemas.views import SchemaView as _SchemaView
 
@@ -87,7 +86,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
         generator_class = _generator_class
         authentication_classes = _auth_classes
         permission_classes = _perm_classes
-        renderer_classes = _spec_renderers
+        renderer_classes = SPEC_RENDERERS
 
         def get(self, request, version='', format=None):
             version = request.version or version or ''
@@ -158,7 +157,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
             :return: a view instance
             """
             assert renderer in UI_RENDERERS, "supported default renderers are " + ", ".join(UI_RENDERERS)
-            renderer_classes = UI_RENDERERS[renderer] + _spec_renderers
+            renderer_classes = UI_RENDERERS[renderer] + SPEC_RENDERERS
 
             return cls.as_view(cache_timeout=cache_timeout, cache_kwargs=cache_kwargs, renderer_classes=renderer_classes)
 

@@ -16,25 +16,13 @@ class OpenAPIRenderer(_JSONOpenAPIRenderer):
     """Renders the schema as a JSON document with the ``application/openapi+json`` specific mime type."""
     format = 'openapi'
 
-    @classmethod
-    def with_validators(cls, validators):
-        return cls
-
 
 class SwaggerJSONRenderer(_JSONOpenAPIRenderer):
     format = 'json'
 
-    @classmethod
-    def with_validators(cls, validators):
-        return cls
-
 
 class SwaggerYAMLRenderer(_YAMLOpenAPIRenderer):
     format = 'yaml'
-
-    @classmethod
-    def with_validators(cls, validators):
-        return cls
 
     def render(self, data, media_type=None, renderer_context=None):
         from .codecs import yaml_sane_dump
