@@ -30,11 +30,6 @@ def mock_schema_request(db):
 
 
 @pytest.fixture
-def codec_json():
-    return codecs.OpenAPICodecJson(['flex', 'ssv'])
-
-
-@pytest.fixture
 def swagger(mock_schema_request):
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),
@@ -44,9 +39,8 @@ def swagger(mock_schema_request):
 
 
 @pytest.fixture
-def swagger_dict(swagger, codec_json):
-    json_bytes = codec_json.encode(swagger)
-    return json.loads(json_bytes.decode('utf-8'), object_pairs_hook=OrderedDict)
+def swagger_dict(swagger):
+    return json.loads(json.dumps(swagger), object_pairs_hook=OrderedDict)
 
 
 @pytest.fixture

@@ -28,7 +28,7 @@ def test_schema_is_valid(swagger):
     run_validators(swagger, ['ssv', 'flex'])
 
 
-def test_invalid_schema_fails(codec_json, mock_schema_request):
+def test_invalid_schema_fails(mock_schema_request):
     # noinspection PyTypeChecker
     bad_generator = OpenAPISchemaGenerator(
         info=openapi.Info(
@@ -40,12 +40,11 @@ def test_invalid_schema_fails(codec_json, mock_schema_request):
 
     swagger = bad_generator.get_schema(mock_schema_request, True)
     with pytest.raises(codecs.SwaggerValidationError):
-        codec_json.encode(swagger)
+        run_validators(swagger, ['ssv', 'flex'])
 
 
-def test_json_codec_roundtrip(codec_json, swagger, validate_schema):
-    json_bytes = codec_json.encode(swagger)
-    validate_schema(json.loads(json_bytes.decode('utf-8')))
+def test_json_codec_roundtrip(swagger, validate_schema):
+    validate_schema(json.loads(json.dumps(swagger)))
 
 
 def test_yaml_codec_roundtrip(swagger, validate_schema):

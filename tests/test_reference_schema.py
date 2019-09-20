@@ -26,7 +26,7 @@ class NoOpPaginatorInspector(PaginatorInspector):
     pass
 
 
-def test_noop_inspectors(swagger_settings, mock_schema_request, codec_json, reference_schema, compare_schemas):
+def test_noop_inspectors(swagger_settings, mock_schema_request, reference_schema, compare_schemas):
     from drf_yasg import app_settings
 
     def set_inspectors(inspectors, setting_name):
@@ -43,8 +43,7 @@ def test_noop_inspectors(swagger_settings, mock_schema_request, codec_json, refe
     )
     swagger = generator.get_schema(mock_schema_request, True)
 
-    json_bytes = codec_json.encode(swagger)
-    swagger_dict = json.loads(json_bytes.decode('utf-8'), object_pairs_hook=OrderedDict)
+    swagger_dict = json.loads(json.dumps(swagger), object_pairs_hook=OrderedDict)
     compare_schemas(swagger_dict, reference_schema)
 
 
