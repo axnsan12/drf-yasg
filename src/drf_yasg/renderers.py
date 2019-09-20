@@ -13,30 +13,6 @@ from .openapi import Swagger
 from .utils import filter_none
 
 
-class _SpecRenderer(BaseRenderer):
-    """Base class for text renderers. Handles encoding and validation."""
-    charset = 'utf-8'
-    validators = []
-    codec_class = None
-
-    @classmethod
-    def with_validators(cls, validators):
-        assert all(vld in VALIDATORS for vld in validators), "allowed validators are " + ", ".join(VALIDATORS)
-        return type(cls.__name__, (cls,), {'validators': validators})
-
-    def render(self, data, media_type=None, renderer_context=None):
-        assert self.codec_class, "must override codec_class"
-        codec = self.codec_class(self.validators)
-
-        if not isinstance(data, Swagger):  # pragma: no cover
-            # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
-            # in that case, it's probably better to let the default ``JSONRenderer`` render it
-            # see https://github.com/axnsan12/drf-yasg/issues/58
-            return JSONRenderer().render(data, media_type, renderer_context)
-
-        return codec.encode(data)
-
-
 class OpenAPIRenderer(_JSONOpenAPIRenderer):
     """Renders the schema as a JSON document with the ``application/openapi+json`` specific mime type."""
     format = 'openapi'
