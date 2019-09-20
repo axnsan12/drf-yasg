@@ -44,5 +44,5 @@ class VersionedSchemaView(SchemaView):
 
 urlpatterns = required_urlpatterns + [
     url(VERSION_PREFIX_URL + r"snippets/$", SnippetList.as_view()),
-    url(VERSION_PREFIX_URL + r'swagger(?P<format>.json|.yaml)$', VersionedSchemaView.without_ui(), name='vschema-json'),
+    url(VERSION_PREFIX_URL + r'swagger.(?P<format>json|yaml)$', VersionedSchemaView.without_ui(), name='vschema-json'),
 ]
