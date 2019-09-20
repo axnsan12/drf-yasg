@@ -35,11 +35,6 @@ def codec_json():
 
 
 @pytest.fixture
-def codec_yaml():
-    return codecs.OpenAPICodecYaml(['ssv', 'flex'])
-
-
-@pytest.fixture
 def swagger(mock_schema_request):
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),

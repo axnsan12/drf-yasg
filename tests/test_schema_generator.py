@@ -13,7 +13,7 @@ from rest_framework.response import Response
 
 from django_fake_model import models as fake_models
 from drf_yasg import codecs, openapi
-from drf_yasg.codecs import yaml_sane_load
+from drf_yasg.codecs import yaml_sane_load, yaml_sane_dump
 from drf_yasg.errors import SwaggerGenerationError
 from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.utils import swagger_auto_schema, run_validators
@@ -48,16 +48,16 @@ def test_json_codec_roundtrip(codec_json, swagger, validate_schema):
     validate_schema(json.loads(json_bytes.decode('utf-8')))
 
 
-def test_yaml_codec_roundtrip(codec_yaml, swagger, validate_schema):
-    yaml_bytes = codec_yaml.encode(swagger)
+def test_yaml_codec_roundtrip(swagger, validate_schema):
+    yaml_bytes = yaml_sane_dump(swagger, True)
     assert b'omap' not in yaml_bytes  # ensure no ugly !!omap is outputted
     assert b'&id' not in yaml_bytes and b'*id' not in yaml_bytes  # ensure no YAML references are generated
     validate_schema(yaml_sane_load(yaml_bytes.decode('utf-8')))
 
 
-def test_yaml_and_json_match(codec_yaml, codec_json, swagger):
-    yaml_schema = yaml_sane_load(codec_yaml.encode(swagger).decode('utf-8'))
-    json_schema = json.loads(codec_json.encode(swagger).decode('utf-8'), object_pairs_hook=OrderedDict)
+def test_yaml_and_json_match(swagger):
+    yaml_schema = yaml_sane_load(yaml_sane_dump(swagger, False))
+    json_schema = json.loads(json.dumps(swagger), object_pairs_hook=OrderedDict)
     assert yaml_schema == json_schema
 
 
