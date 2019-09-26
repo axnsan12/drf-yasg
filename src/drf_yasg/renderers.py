@@ -1,15 +1,33 @@
+import rest_framework
 import six
 
 from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.functional import Promise
-from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer, JSONOpenAPIRenderer as _JSONOpenAPIRenderer, OpenAPIRenderer as _YAMLOpenAPIRenderer
+from packaging.version import Version
+from rest_framework.renderers import BaseRenderer, TemplateHTMLRenderer
 from rest_framework.utils import encoders, json
 
 from .app_settings import redoc_settings, swagger_settings
 from .openapi import Swagger
 from .utils import filter_none
+
+if Version(rest_framework.__version__) >= Version('3.10'):
+    from rest_framework.renderers import JSONOpenAPIRenderer as _JSONOpenAPIRenderer, OpenAPIRenderer as _YAMLOpenAPIRenderer
+else:
+    from rest_framework.renderers import JSONRenderer
+
+    class _JSONOpenAPIRenderer(JSONRenderer):
+        media_type = 'application/vnd.oai.openapi+json'
+        charset = None
+
+        def get_indent(self, *args, **kwargs):
+            return 2
+
+    class _YAMLOpenAPIRenderer(BaseRenderer):
+        media_type = 'application/vnd.oai.openapi'
+        charset = None
 
 
 class OpenAPIRenderer(_JSONOpenAPIRenderer):
