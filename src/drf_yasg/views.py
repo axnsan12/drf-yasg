@@ -4,10 +4,8 @@ from functools import WRAPPER_ASSIGNMENTS, wraps
 from django.utils.cache import add_never_cache_headers
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
-from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
-from rest_framework.views import APIView
 
 from .app_settings import swagger_settings
 from .renderers import (
@@ -15,8 +13,6 @@ from .renderers import (
     _UIRenderer
 )
 from .utils import run_validators
-
-from rest_framework.schemas import coreapi, openapi
 
 SPEC_RENDERERS = (SwaggerYAMLRenderer, SwaggerJSONRenderer, OpenAPIRenderer)
 UI_RENDERERS = {
