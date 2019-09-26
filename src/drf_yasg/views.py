@@ -121,7 +121,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
             """
 
             cache_kwargs = cache_kwargs or {}
-            view = super().as_view(**initkwargs)
+            view = super(SchemaView, cls).as_view(**initkwargs)
             if cache_timeout != 0:
                 view = cls.apply_cache(view, cache_timeout, cache_kwargs)
             elif cache_kwargs:
