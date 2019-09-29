@@ -376,7 +376,7 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
 
 
       class AnotherSerializer(serializers.ModelSerializer):
-         chilf = OneSerializer()
+         child = OneSerializer()
 
          class Meta:
             model = SomeParentModel
