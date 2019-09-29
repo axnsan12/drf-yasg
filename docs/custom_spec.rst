@@ -44,6 +44,7 @@ You can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decorator on
 some properties of the generated :class:`.Operation`. For example, in a ``ViewSet``,
 
 .. code-block:: python
+   from drf_yasg.utils import swagger_auto_schema
 
    @swagger_auto_schema(operation_description="partial_update description override", responses={404: 'slug not found'})
    def partial_update(self, request, *args, **kwargs):
