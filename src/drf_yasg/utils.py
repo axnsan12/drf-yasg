@@ -1,6 +1,7 @@
 import inspect
 import logging
 import sys
+import textwrap
 from collections import OrderedDict
 from decimal import Decimal
 
@@ -437,6 +438,9 @@ def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
         s = force_text(s, encoding, strings_only, errors)
         if type(s) != str:
             s = '' + s
+
+        # Remove common indentation to get the correct Markdown rendering
+        s = textwrap.dedent(s)
 
     return s
 
