@@ -334,3 +334,20 @@ def test_optional_return_type(py_type, expected_type):
     swagger = generator.get_schema(None, True)
     property_schema = swagger["definitions"]["OptionalMethod"]["properties"]["x"]
     assert property_schema == openapi.Schema(title='X', type=expected_type, readOnly=True)
+
+
+EXPECTED_DESCRIPTION = """\
+  description: |-
+    This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg) Django Rest Framework library.
+
+    The `swagger-ui` view can be found [here](/cached/swagger).
+    The `ReDoc` view can be found [here](/cached/redoc).
+    The swagger YAML document can be found [here](/cached/swagger.yaml).
+
+    You can log in using the pre-existing `admin` user with password `passwordadmin`.
+"""
+
+def test_multiline_strings(call_generate_swagger):
+    output = call_generate_swagger(format='yaml')
+    print("|\n|".join(output.splitlines()[:20]))
+    assert EXPECTED_DESCRIPTION in output
