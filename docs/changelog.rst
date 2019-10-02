@@ -2,6 +2,17 @@
 Changelog
 #########
 
+**********
+**1.17.0**
+**********
+
+*Release date: Oct 03, 2019*
+
+- **ADDED:** added `JSONFieldInspector` for `JSONField` support (:pr:`417`)
+- **IMPROVED:** updated ``swagger-ui`` to version 3.23.11
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-rc.14 (:issue:`398`)
+- **FIXED:** fixed a type hint support issue (:pr:`428`, :issue:`450`)
+- **FIXED:** fixed packaging issue caused by a missing requirement (:issue:`412`)
 
 **********
 **1.16.1**
@@ -9,8 +20,8 @@ Changelog
 
 *Release date: Jul 16, 2019*
 
-- **FIXED:** fixed DRF 3.10 compatibility (:pr:`408`, :issue:`410`, :issue:`411`)
 - **IMPROVED:** better enum type detection for nested `ChoiceField`\ s (:pr:`400`)
+- **FIXED:** fixed DRF 3.10 compatibility (:pr:`408`, :issue:`410`, :issue:`411`)
 
 **********
 **1.16.0**
