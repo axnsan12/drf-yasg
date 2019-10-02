@@ -1,8 +1,7 @@
 import warnings
-from functools import wraps
+from functools import WRAPPER_ASSIGNMENTS, wraps
 
 from django.utils.cache import add_never_cache_headers
-from django.utils.decorators import available_attrs
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
 from rest_framework import exceptions
@@ -30,7 +29,7 @@ def deferred_never_cache(view_func):
     never be cached.
     """
 
-    @wraps(view_func, assigned=available_attrs(view_func))
+    @wraps(view_func, assigned=WRAPPER_ASSIGNMENTS)
     def _wrapped_view_func(request, *args, **kwargs):
         response = view_func(request, *args, **kwargs)
 
