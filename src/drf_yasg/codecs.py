@@ -1,11 +1,8 @@
-import json
-import logging
-
 from collections import OrderedDict
+
 from ruamel import yaml
 from six import binary_type, raise_from, text_type
 
-from . import openapi
 from .errors import SwaggerValidationError
 
 
