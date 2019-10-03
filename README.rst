@@ -177,9 +177,7 @@ b. ``SchemaView`` options
 -  :python:`SchemaView.with_ui(renderer, cache_timeout, cache_kwargs)` - get a view instance using the
    specified UI renderer; one of ``swagger``, ``redoc``
 -  :python:`SchemaView.without_ui(cache_timeout, cache_kwargs)` - get a view instance with no UI renderer;
-   same as ``as_cached_view`` with no kwargs
--  :python:`SchemaView.as_cached_view(cache_timeout, cache_kwargs, **initkwargs)` - same as ``as_view``,
-   but with optional caching
+   same as ``as_view`` with no kwargs
 -  you can, of course, call :python:`as_view` as usual
 
 All of the first 3 methods take two optional arguments, ``cache_timeout`` and ``cache_kwargs``; if present,
