@@ -163,7 +163,7 @@ class EndpointEnumerator(_EndpointEnumerator):
         return clean_path
 
 
-class OpenAPISchemaGenerator(object):
+class OpenAPISchemaGenerator(SchemaGenerator):
     """
     This class iterates over all registered API endpoints and returns an appropriate OpenAPI 2.0 compliant schema.
     Method implementations shamelessly stolen and adapted from rest-framework ``SchemaGenerator``.
@@ -188,7 +188,8 @@ class OpenAPISchemaGenerator(object):
         :param urlconf: if patterns is not given, use this urlconf to enumerate patterns;
             if not given, the default urlconf is used
         """
-        self._gen = SchemaGenerator(info.title, url, info.get('description', ''), patterns, urlconf)
+        super(OpenAPISchemaGenerator, self).__init__(info.title, url, info.get('description', ''), patterns, urlconf)
+
         self.info = info
         self.version = version
         self.consumes = []
@@ -203,10 +204,6 @@ class OpenAPISchemaGenerator(object):
                 raise SwaggerGenerationError("`url` must be an absolute HTTP(S) url")
             if parsed_url.path:
                 logger.warning("path component of api base URL %s is ignored; use FORCE_SCRIPT_NAME instead" % url)
-
-    @property
-    def url(self):
-        return self._gen.url
 
     def get_security_definitions(self):
         """Get the security schemes for this API. This determines what is usable in security requirements,
@@ -278,7 +275,7 @@ class OpenAPISchemaGenerator(object):
         :type request: rest_framework.request.Request or None
         :return: the view instance
         """
-        view = self._gen.create_view(callback, method, request)
+        view = super(OpenAPISchemaGenerator, self).create_view(callback, method, request)
         overrides = getattr(callback, '_swagger_auto_schema', None)
         if overrides is not None:
             # decorated function based view must have its decorator information passed on to the re-instantiated view
@@ -290,24 +287,6 @@ class OpenAPISchemaGenerator(object):
         setattr(view, 'swagger_fake_view', True)
         return view
 
-    def coerce_path(self, path, view):
-        """Coerce {pk} path arguments into the name of the model field, where possible. This is cleaner for an
-        external representation (i.e. "this is an identifier", not "this is a database primary key").
-
-        :param str path: the path
-        :param rest_framework.views.APIView view: associated view
-        :rtype: str
-        """
-        if '{pk}' not in path:
-            return path
-
-        model = getattr(get_queryset_from_view(view), 'model', None)
-        if model:
-            field_name = get_pk_name(model)
-        else:
-            field_name = 'id'
-        return path.replace('{pk}', '{%s}' % field_name)
-
     def get_endpoints(self, request):
         """Iterate over all the registered endpoints in the API and return a fake view with the right parameters.
 
@@ -316,54 +295,17 @@ class OpenAPISchemaGenerator(object):
         :return: {path: (view_class, list[(http_method, view_instance)])
         :rtype: dict[str,(type,list[(str,rest_framework.views.APIView)])]
         """
-        enumerator = self.endpoint_enumerator_class(self._gen.patterns, self._gen.urlconf, request=request)
+        enumerator = self.endpoint_enumerator_class(self.patterns, self.urlconf, request=request)
         endpoints = enumerator.get_api_endpoints()
 
         view_paths = defaultdict(list)
         view_cls = {}
         for path, method, callback in endpoints:
             view = self.create_view(callback, method, request)
-            path = self.coerce_path(path, view)
+            path = self.coerce_path(path, method, view)
             view_paths[path].append((method, view))
             view_cls[path] = callback.cls
         return {path: (view_cls[path], methods) for path, methods in view_paths.items()}
-
-    def get_operation_keys(self, subpath, method, view):
-        """Return a list of keys that should be used to group an operation within the specification. ::
-
-          /users/                   ("users", "list"), ("users", "create")
-          /users/{pk}/              ("users", "read"), ("users", "update"), ("users", "delete")
-          /users/enabled/           ("users", "enabled")  # custom viewset list action
-          /users/{pk}/star/         ("users", "star")     # custom viewset detail action
-          /users/{pk}/groups/       ("users", "groups", "list"), ("users", "groups", "create")
-          /users/{pk}/groups/{pk}/  ("users", "groups", "read"), ("users", "groups", "update")
-
-        :param str subpath: path to the operation with any common prefix/base path removed
-        :param str method: HTTP method
-        :param view: the view associated with the operation
-        :rtype: list[str]
-        """
-        return self._gen.get_keys(subpath, method, view)
-
-    def determine_path_prefix(self, paths):
-        """
-        Given a list of all paths, return the common prefix which should be
-        discounted when generating a schema structure.
-
-        This will be the longest common string that does not include that last
-        component of the URL, or the last component before a path parameter.
-
-        For example: ::
-
-            /api/v1/users/
-            /api/v1/users/{pk}/
-
-        The path prefix is ``/api/v1/``.
-
-        :param list[str] paths: list of paths
-        :rtype: str
-        """
-        return self._gen.determine_path_prefix(paths)
 
     def should_include_endpoint(self, path, method, view, public):
         """Check if a given endpoint should be included in the resulting schema.
@@ -375,7 +317,7 @@ class OpenAPISchemaGenerator(object):
         :returns: true if the view should be excluded
         :rtype: bool
         """
-        return public or self._gen.has_view_permissions(path, method, view)
+        return public or self.has_view_permissions(path, method, view)
 
     def get_paths_object(self, paths):
         """Construct the Swagger Paths object.
@@ -436,7 +378,7 @@ class OpenAPISchemaGenerator(object):
         :param Request request: the request made against the schema view; can be None
         :rtype: openapi.Operation
         """
-        operation_keys = self.get_operation_keys(path[len(prefix):], method, view)
+        operation_keys = self.get_keys(path[len(prefix):], method, view)
         overrides = self.get_overrides(view, method)
 
         # the inspector class can be specified, in decreasing order of priorty,

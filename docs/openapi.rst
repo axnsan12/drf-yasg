@@ -146,7 +146,7 @@ This section describes where information is sourced from when using the default 
          The Django `FORCE_SCRIPT_NAME`_ setting can be used to override the `SCRIPT_NAME`_ or set it when it's
          missing from the environment.
 
-   #. the longest common path prefix of all the urls in your API - see :meth:`.determine_path_prefix`
+   #. the longest common path prefix of all the urls in your API
 
 * When using API versioning with ``NamespaceVersioning`` or ``URLPathVersioning``, versioned endpoints that do not
   match the version used to access the ``SchemaView`` will be excluded from the endpoint list - for example,
