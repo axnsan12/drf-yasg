@@ -612,6 +612,8 @@ class SerializerMethodFieldInspector(FieldInspector):
 
             if not inspect.isclass(hint_class) and hasattr(hint_class, '__args__'):
                 hint_class = hint_class.__args__[0]
+            if hasattr(hint_class, '__union_params__'):
+                hint_class = hint_class.__union_params__[0]
             if inspect.isclass(hint_class) and not issubclass(hint_class, inspect._empty):
                 type_info = get_basic_type_info_from_hint(hint_class)
 
