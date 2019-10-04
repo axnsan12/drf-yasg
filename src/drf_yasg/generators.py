@@ -74,7 +74,7 @@ class EndpointEnumerator(_EndpointEnumerator):
 
         return path
 
-    def get_api_endpoints(self, patterns=None, prefix='', app_name=None, namespace=None, ignored_endpoints=None):
+    def get_api_endpoints(self, patterns=None, prefix='', app_name=None, namespace=None):
         """
         Return a list of all available API endpoints by inspecting the URL conf.
 
@@ -84,8 +84,6 @@ class EndpointEnumerator(_EndpointEnumerator):
             patterns = self.patterns
 
         api_endpoints = []
-        if ignored_endpoints is None:
-            ignored_endpoints = set()
 
         for pattern in patterns:
             path_regex = prefix + get_original_route(pattern)
@@ -99,9 +97,8 @@ class EndpointEnumerator(_EndpointEnumerator):
 
                         # avoid adding endpoints that have already been seen,
                         # as Django resolves urls in top-down order
-                        if path in ignored_endpoints:
+                        if path in (path_ for (path_, _, _) in api_endpoints):
                             continue
-                        ignored_endpoints.add(path)
 
                         for method in self.get_allowed_methods(callback):
                             endpoint = (path, method, callback)
@@ -114,16 +111,13 @@ class EndpointEnumerator(_EndpointEnumerator):
                     patterns=pattern.url_patterns,
                     prefix=path_regex,
                     app_name="%s:%s" % (app_name, pattern.app_name) if app_name else pattern.app_name,
-                    namespace="%s:%s" % (namespace, pattern.namespace) if namespace else pattern.namespace,
-                    ignored_endpoints=ignored_endpoints
+                    namespace="%s:%s" % (namespace, pattern.namespace) if namespace else pattern.namespace
                 )
                 api_endpoints.extend(nested_endpoints)
             else:
                 logger.warning("unknown pattern type {}".format(type(pattern)))
 
-        api_endpoints = sorted(api_endpoints, key=endpoint_ordering)
-
-        return api_endpoints
+        return sorted(api_endpoints, key=endpoint_ordering)
 
 
 class OpenAPISchemaGenerator(SchemaGenerator):
