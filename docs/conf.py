@@ -192,6 +192,7 @@ nitpick_ignore = [
     ('py:class', 'rest_framework.renderers.JSONOpenAPIRenderer'),
     ('py:class', 'rest_framework.renderers.OpenAPIRenderer'),
     ('py:class', 'rest_framework.parsers.BaseParser'),
+    ('py:class', 'rest_framework.schemas.coreapi.SchemaGenerator'),
     ('py:class', 'rest_framework.schemas.generators.EndpointEnumerator'),
     ('py:class', 'rest_framework.schemas.views.SchemaView'),
     ('py:class', 'rest_framework.views.APIView'),
