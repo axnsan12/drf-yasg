@@ -191,6 +191,7 @@ class OpenAPISchemaGenerator(SchemaGenerator):
         super(OpenAPISchemaGenerator, self).__init__(info.title, url, info.get('description', ''), patterns, urlconf)
 
         self.info = info
+        self.version = version
         self.consumes = []
         self.produces = []
 
