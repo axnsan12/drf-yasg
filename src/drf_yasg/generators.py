@@ -287,24 +287,6 @@ class OpenAPISchemaGenerator(SchemaGenerator):
         setattr(view, 'swagger_fake_view', True)
         return view
 
-    def coerce_path(self, path, view):
-        """Coerce {pk} path arguments into the name of the model field, where possible. This is cleaner for an
-        external representation (i.e. "this is an identifier", not "this is a database primary key").
-
-        :param str path: the path
-        :param rest_framework.views.APIView view: associated view
-        :rtype: str
-        """
-        if '{pk}' not in path:
-            return path
-
-        model = getattr(get_queryset_from_view(view), 'model', None)
-        if model:
-            field_name = get_pk_name(model)
-        else:
-            field_name = 'id'
-        return path.replace('{pk}', '{%s}' % field_name)
-
     def get_endpoints(self, request):
         """Iterate over all the registered endpoints in the API and return a fake view with the right parameters.
 
@@ -320,7 +302,7 @@ class OpenAPISchemaGenerator(SchemaGenerator):
         view_cls = {}
         for path, method, callback in endpoints:
             view = self.create_view(callback, method, request)
-            path = self.coerce_path(path, view)
+            path = self.coerce_path(path, method, view)
             view_paths[path].append((method, view))
             view_cls[path] = callback.cls
         return {path: (view_cls[path], methods) for path, methods in view_paths.items()}
