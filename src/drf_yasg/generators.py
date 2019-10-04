@@ -38,11 +38,6 @@ class EndpointEnumerator(_EndpointEnumerator):
         super(EndpointEnumerator, self).__init__(patterns, urlconf)
         self.request = request
 
-    def get_path_from_regex(self, path_regex):
-        if path_regex.endswith(')'):
-            logger.warning("url pattern does not end in $ ('%s') - unexpected things might happen", path_regex)
-        return self.unescape_path(super(EndpointEnumerator, self).get_path_from_regex(path_regex))
-
     def should_include_endpoint(self, path, callback, app_name='', namespace='', url_name=None):
         if not super(EndpointEnumerator, self).should_include_endpoint(path, callback):
             return False
@@ -129,38 +124,6 @@ class EndpointEnumerator(_EndpointEnumerator):
         api_endpoints = sorted(api_endpoints, key=endpoint_ordering)
 
         return api_endpoints
-
-    def unescape(self, s):
-        """Unescape all backslash escapes from `s`.
-
-        :param str s: string with backslash escapes
-        :rtype: str
-        """
-        # unlike .replace('\\', ''), this corectly transforms a double backslash into a single backslash
-        return re.sub(r'\\(.)', r'\1', s)
-
-    def unescape_path(self, path):
-        """Remove backslashe escapes from all path components outside {parameters}. This is needed because
-        ``simplify_regex`` does not handle this correctly.
-
-        **NOTE:** this might destructively affect some url regex patterns that contain metacharacters (e.g. \\w, \\d)
-        outside path parameter groups; if you are in this category, God help you
-
-        :param str path: path possibly containing
-        :return: the unescaped path
-        :rtype: str
-        """
-        clean_path = ''
-        while path:
-            match = PATH_PARAMETER_RE.search(path)
-            if not match:
-                clean_path += self.unescape(path)
-                break
-            clean_path += self.unescape(path[:match.start()])
-            clean_path += match.group()
-            path = path[match.end():]
-
-        return clean_path
 
 
 class OpenAPISchemaGenerator(object):
