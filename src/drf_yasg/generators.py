@@ -188,10 +188,9 @@ class OpenAPISchemaGenerator(SchemaGenerator):
         :param urlconf: if patterns is not given, use this urlconf to enumerate patterns;
             if not given, the default urlconf is used
         """
-        super().__init__(info.title, url, info.get('description', ''), patterns, urlconf)
+        super(OpenAPISchemaGenerator, self).__init__(info.title, url, info.get('description', ''), patterns, urlconf)
 
         self.info = info
-        self.version = version
         self.consumes = []
         self.produces = []
 
@@ -275,7 +274,7 @@ class OpenAPISchemaGenerator(SchemaGenerator):
         :type request: rest_framework.request.Request or None
         :return: the view instance
         """
-        view = super().create_view(callback, method, request)
+        view = super(OpenAPISchemaGenerator, self).create_view(callback, method, request)
         overrides = getattr(callback, '_swagger_auto_schema', None)
         if overrides is not None:
             # decorated function based view must have its decorator information passed on to the re-instantiated view
