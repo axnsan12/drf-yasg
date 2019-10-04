@@ -14,7 +14,10 @@ from .openapi import Swagger
 from .utils import filter_none
 
 if Version(rest_framework.__version__) >= Version('3.10'):
-    from rest_framework.renderers import JSONOpenAPIRenderer as _JSONOpenAPIRenderer, OpenAPIRenderer as _YAMLOpenAPIRenderer
+    from rest_framework.renderers import (
+        JSONOpenAPIRenderer as _JSONOpenAPIRenderer,
+        OpenAPIRenderer as _YAMLOpenAPIRenderer,
+    )
 else:
     from rest_framework.renderers import JSONRenderer
 

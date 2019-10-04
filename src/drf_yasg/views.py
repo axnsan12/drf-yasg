@@ -151,6 +151,10 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
             assert renderer in UI_RENDERERS, "supported default renderers are " + ", ".join(UI_RENDERERS)
             renderer_classes = UI_RENDERERS[renderer] + SPEC_RENDERERS
 
-            return cls.as_view(cache_timeout=cache_timeout, cache_kwargs=cache_kwargs, renderer_classes=renderer_classes)
+            return cls.as_view(
+                cache_timeout=cache_timeout,
+                cache_kwargs=cache_kwargs,
+                renderer_classes=renderer_classes
+            )
 
     return SchemaView

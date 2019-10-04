@@ -10,7 +10,7 @@ from packaging.version import Version
 from rest_framework import versioning
 from rest_framework.compat import URLPattern, URLResolver, get_original_route
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
-from rest_framework.schemas.generators import endpoint_ordering, get_pk_name
+from rest_framework.schemas.generators import endpoint_ordering
 from rest_framework.settings import api_settings
 
 from . import openapi
