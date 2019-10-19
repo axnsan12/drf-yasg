@@ -4,7 +4,7 @@ python:
   - '3.5'
   - '3.6'
   - '3.7'
-  - '3.8-dev'
+  - '3.8'
 
 dist: xenial
 
@@ -39,7 +39,6 @@ matrix:
   allow_failures:
     - env: TOXENV=lint
     - env: TOXENV=djmaster
-    - python: '3.8-dev'
 
   fast_finish: true
 
