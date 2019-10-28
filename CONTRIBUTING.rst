@@ -44,6 +44,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
    .. code:: console
 
       (venv) $ cd testproj
+      (venv) $ pip install -r requirements.txt
       (venv) $ python manage.py migrate
       (venv) $ python manage.py runserver
       (venv) $ firefox localhost:8000/swagger/

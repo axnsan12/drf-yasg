@@ -1,11 +1,14 @@
 swagger: '2.0'
 info:
   title: Snippets API
-  description: "This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg)\
-    \ Django Rest Framework library.\n\nThe `swagger-ui` view can be found [here](/cached/swagger).\
-    \nThe `ReDoc` view can be found [here](/cached/redoc).\nThe swagger YAML\
-    \ document can be found [here](/cached/swagger.yaml).\n\nYou can log in using\
-    \ the pre-existing `admin` user with password `passwordadmin`."
+  description: |-
+    This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg) Django Rest Framework library.
+
+    The `swagger-ui` view can be found [here](/cached/swagger).
+    The `ReDoc` view can be found [here](/cached/redoc).
+    The swagger YAML document can be found [here](/cached/swagger.yaml).
+
+    You can log in using the pre-existing `admin` user with password `passwordadmin`.
   termsOfService: https://www.google.com/policies/terms/
   contact:
     email: contact@snippets.local
@@ -381,7 +384,7 @@ paths:
       - name: person
         in: path
         required: true
-        type: string
+        type: integer
   /plain/:
     get:
       operationId: plain_list
@@ -1502,7 +1505,10 @@ definitions:
         readOnly: true
       help_text_example_3:
         title: Help text example 3
-        description: "\n        docstring is set so should appear in swagger as fallback\n\
-          \        :return:\n        "
+        description: |2-
+
+                  docstring is set so should appear in swagger as fallback
+                  :return:
+                  
         type: integer
         readOnly: true
