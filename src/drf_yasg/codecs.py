@@ -1,5 +1,3 @@
-from six import raise_from
-
 import copy
 import json
 import logging
@@ -7,6 +5,8 @@ from collections import OrderedDict
 
 from coreapi.compat import force_bytes
 from ruamel import yaml
+
+from six import binary_type, raise_from, text_type
 
 from . import openapi
 from .errors import SwaggerValidationError
@@ -176,7 +176,14 @@ class SaneYamlDumper(yaml.SafeDumper):
                 node.flow_style = best_style
         return node
 
+    def represent_text(self, text):
+        if "\n" in text:
+            return self.represent_scalar('tag:yaml.org,2002:str', text, style='|')
+        return self.represent_scalar('tag:yaml.org,2002:str', text)
 
+
+SaneYamlDumper.add_representer(binary_type, SaneYamlDumper.represent_text)
+SaneYamlDumper.add_representer(text_type, SaneYamlDumper.represent_text)
 SaneYamlDumper.add_representer(OrderedDict, SaneYamlDumper.represent_odict)
 SaneYamlDumper.add_multi_representer(OrderedDict, SaneYamlDumper.represent_odict)
 

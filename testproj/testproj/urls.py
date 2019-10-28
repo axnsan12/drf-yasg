@@ -13,9 +13,9 @@ swagger_info = openapi.Info(
     default_version='v1',
     description="""This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg) Django Rest Framework library.
 
-The `swagger-ui` view can be found [here](/cached/swagger).  
-The `ReDoc` view can be found [here](/cached/redoc).  
-The swagger YAML document can be found [here](/cached/swagger.yaml).  
+The `swagger-ui` view can be found [here](/cached/swagger).
+The `ReDoc` view can be found [here](/cached/redoc).
+The swagger YAML document can be found [here](/cached/swagger.yaml).
 
 You can log in using the pre-existing `admin` user with password `passwordadmin`.""",  # noqa
     terms_of_service="https://www.google.com/policies/terms/",
