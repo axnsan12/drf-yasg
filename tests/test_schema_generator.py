@@ -1,4 +1,5 @@
 import json
+import sys
 from collections import OrderedDict
 
 import pytest
@@ -16,6 +17,11 @@ from drf_yasg.codecs import yaml_sane_load
 from drf_yasg.errors import SwaggerGenerationError
 from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.utils import swagger_auto_schema
+
+try:
+    import typing
+except ImportError:
+    typing = None
 
 
 def test_schema_is_valid(swagger, codec_yaml):
@@ -293,3 +299,55 @@ def test_json_field():
     swagger = generator.get_schema(None, True)
     property_schema = swagger["definitions"]["TestJSONField"]["properties"]["json"]
     assert property_schema == openapi.Schema(title='Json', type=openapi.TYPE_OBJECT)
+
+
+@pytest.mark.parametrize('py_type, expected_type', [
+    (str, openapi.TYPE_STRING),
+    (int, openapi.TYPE_INTEGER),
+    (float, openapi.TYPE_NUMBER),
+    (bool, openapi.TYPE_BOOLEAN),
+])
+@pytest.mark.skipif(typing is None or sys.version_info.major < 3, reason="typing not supported")
+def test_optional_return_type(py_type, expected_type):
+
+    class OptionalMethodSerializer(serializers.Serializer):
+        x = serializers.SerializerMethodField()
+
+        def get_x(self, instance):
+            pass
+
+        # Add the type annotation here in order to avoid a SyntaxError in py27
+        get_x.__annotations__["return"] = typing.Optional[py_type]
+
+    class OptionalMethodViewSet(viewsets.ViewSet):
+        @swagger_auto_schema(responses={200: openapi.Response("OK", OptionalMethodSerializer)})
+        def retrieve(self, request, pk=None):
+            return Response({'optional': None})
+
+    router = routers.DefaultRouter()
+    router.register(r'optional', OptionalMethodViewSet, **_basename_or_base_name('optional'))
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title='Test optional parameter', default_version='v1'),
+        patterns=router.urls
+    )
+    swagger = generator.get_schema(None, True)
+    property_schema = swagger["definitions"]["OptionalMethod"]["properties"]["x"]
+    assert property_schema == openapi.Schema(title='X', type=expected_type, readOnly=True)
+
+
+EXPECTED_DESCRIPTION = """\
+  description: |-
+    This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg) Django Rest Framework library.
+
+    The `swagger-ui` view can be found [here](/cached/swagger).
+    The `ReDoc` view can be found [here](/cached/redoc).
+    The swagger YAML document can be found [here](/cached/swagger.yaml).
+
+    You can log in using the pre-existing `admin` user with password `passwordadmin`.
+"""
+
+def test_multiline_strings(call_generate_swagger):
+    output = call_generate_swagger(format='yaml')
+    print("|\n|".join(output.splitlines()[:20]))
+    assert EXPECTED_DESCRIPTION in output

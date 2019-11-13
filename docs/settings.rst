@@ -455,7 +455,7 @@ FETCH_SCHEMA_WITH_QUERY
 
 Fetch the OpenAPI document using the query parameters passed to the ReDoc page request.
 
-**Default**: :python:`'True` |br|
+**Default**: :python:`True` |br|
 *Maps to parameter*: -
 
 

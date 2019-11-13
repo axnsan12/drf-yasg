@@ -45,6 +45,8 @@ some properties of the generated :class:`.Operation`. For example, in a ``ViewSe
 
 .. code-block:: python
 
+   from drf_yasg.utils import swagger_auto_schema
+
    @swagger_auto_schema(operation_description="partial_update description override", responses={404: 'slug not found'})
    def partial_update(self, request, *args, **kwargs):
       """partial_update method docstring"""
@@ -432,7 +434,7 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
 
 
       class AnotherSerializer(serializers.ModelSerializer):
-         chilf = OneSerializer()
+         child = OneSerializer()
 
          class Meta:
             model = SomeParentModel

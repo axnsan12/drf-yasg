@@ -13,7 +13,6 @@ else:
     from django.core.validators import MaxLengthValidator, MinValueValidator
 
 
-
 class LanguageSerializer(serializers.Serializer):
     name = serializers.ChoiceField(
         choices=LANGUAGE_CHOICES, default='python', help_text='The name of the programming language')
