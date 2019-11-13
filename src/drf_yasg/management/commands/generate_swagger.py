@@ -131,7 +131,7 @@ class Command(BaseCommand):
         if user:
             # Only call get_user_model if --user was passed in order to
             # avoid crashing if auth is not configured in the project
-            user = get_user_model().objects.get(username=user)
+            user = get_user_model().objects.get(**{get_user_model().USERNAME_FIELD: user})
 
         mock = mock or private or (user is not None) or (api_version is not None)
         if mock and not api_url:
