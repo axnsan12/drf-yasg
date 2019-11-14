@@ -96,8 +96,8 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
         * a ``Serializer`` class or instance will be converted into a :class:`.Schema` and treated as above
         * a :class:`.Response` object will be used as-is; however if its ``schema`` attribute is a ``Serializer``,
           it will automatically be converted into a :class:`.Schema`
-    :type responses: dict[str,(drf_yasg.openapi.Schema or drf_yasg.openapi.SchemaRef or drf_yasg.openapi.Response or
-        str or rest_framework.serializers.Serializer)]
+    :type responses: dict[int or str, (drf_yasg.openapi.Schema or drf_yasg.openapi.SchemaRef or
+        drf_yasg.openapi.Response or str or rest_framework.serializers.Serializer)]
 
     :param list[type[drf_yasg.inspectors.FieldInspector]] field_inspectors: extra serializer and field inspectors; these
         will be tried before :attr:`.ViewInspector.field_inspectors` on the :class:`.inspectors.SwaggerAutoSchema`
