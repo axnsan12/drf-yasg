@@ -470,7 +470,7 @@ class Schema(SwaggerDict):
         :type properties: dict[str,Schema or SchemaRef]
         :param additional_properties: allow wildcard properties not listed in `properties`
         :type additional_properties: bool or Schema or SchemaRef
-        :param list[str] required: list of requried property names
+        :param list[str] required: list of required property names
         :param items: type of array items, only valid if `type` is ``array``
         :type items: Schema or SchemaRef
         :param default: only valid when insider another ``Schema``\\ 's ``properties``;
