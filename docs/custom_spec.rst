@@ -212,7 +212,8 @@ Schema generation of ``serializers.SerializerMethodField`` is supported in two w
 Serializer ``Meta`` nested class
 ********************************
 
-You can define some per-serializer options by adding a ``Meta`` class to your serializer, e.g.:
+You can define some per-serializer or per-field options by adding a ``Meta`` class to your ``Serializer`` or
+serializer ``Field``, e.g.:
 
 .. code-block:: python
 
