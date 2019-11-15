@@ -236,7 +236,7 @@ The available options are:
      which are converted to Swagger ``Schema`` attribute names according to :func:`.make_swagger_name`.
      Attribute names and values must conform to the `OpenAPI 2.0 specification <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#schemaObject>`_.
 
-Suppose you wanted model an Email this way, using a ``JSONField`` for performance reasons:
+Suppose you wanted to model an email using a `JSONField` to store the subject and body for performance reasons:
 
 .. code-block:: python
 
