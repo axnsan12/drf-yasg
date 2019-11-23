@@ -13,6 +13,7 @@ from rest_framework import serializers
 from rest_framework.settings import api_settings as rest_framework_settings
 
 from .. import openapi
+from ..app_settings import swagger_settings
 from ..errors import SwaggerGenerationError
 from ..utils import (
     decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
@@ -37,6 +38,8 @@ class InlineSerializerInspector(SerializerInspector):
 
     #: whether to output :class:`.Schema` definitions inline or into the ``definitions`` section
     use_definitions = False
+    #: which collectionFormat to use for ListFields & ListSerializers
+    collection_format = swagger_settings.COLLECTION_FORMAT
 
     def get_schema(self, serializer):
         return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
@@ -85,11 +88,17 @@ class InlineSerializerInspector(SerializerInspector):
         if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
             child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)
             limits = find_limits(field) or {}
-            return SwaggerType(
+            result = SwaggerType(
                 type=openapi.TYPE_ARRAY,
                 items=child_schema,
                 **limits
             )
+            if swagger_object_type == openapi.Parameter:
+                if result['in'] in (openapi.IN_FORM, openapi.IN_QUERY):
+                    if self.collection_format:
+                        result.collection_format = self.collection_format
+            return result
+
         elif isinstance(field, serializers.Serializer):
             if swagger_object_type != openapi.Schema:
                 raise SwaggerGenerationError("cannot instantiate nested serializer as " + swagger_object_type.__name__)

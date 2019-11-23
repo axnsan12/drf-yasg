@@ -69,6 +69,7 @@ SWAGGER_DEFAULTS = {
         'trace'
     ],
     'DISPLAY_OPERATION_ID': True,
+    'COLLECTION_FORMAT': None,
 }
 
 REDOC_DEFAULTS = {
