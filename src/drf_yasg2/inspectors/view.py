@@ -299,8 +299,14 @@ class SwaggerAutoSchema(ViewInspector):
                 response = openapi.Response(description="", schema=serializer,)
             else:
                 serializer = force_serializer_instance(serializer)
+                description = ''
+                if getattr(serializer, 'many', False):
+                    description = strip_doc_string(serializer.child.__doc__)
+                else:
+                    description = strip_doc_string(serializer.__doc__)
                 response = openapi.Response(
-                    description="", schema=self.serializer_to_schema(serializer),
+                    description=description,
+                    schema=self.serializer_to_schema(serializer),
                 )
 
             responses[str(sc)] = response

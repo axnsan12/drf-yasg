@@ -526,6 +526,16 @@ def force_real_str(s, encoding="utf-8", strings_only=False, errors="strict"):
     return s
 
 
+def strip_doc_string(doc):
+    """
+    Remove line breaks and excess space from the start and end of each line of
+    a docstring.
+    """
+    if not doc:
+        return ''
+    return ' '.join(l.strip() for l in doc.splitlines() if l.strip())
+
+
 def field_value_to_representation(field, value):
     """Convert a python value related to a field (default, choices, etc.) into its OpenAPI-compatible representation.
 
