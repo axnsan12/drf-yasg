@@ -93,9 +93,9 @@ class InlineSerializerInspector(SerializerInspector):
                 items=child_schema,
                 **limits
             )
-            if swagger_object_type == openapi.Parameter:
-                if result['in'] in (openapi.IN_FORM, openapi.IN_QUERY):
-                    if self.collection_format:
+            if self.collection_format:
+                if swagger_object_type == openapi.Parameter:
+                    if result['in'] in (openapi.IN_FORM, openapi.IN_QUERY):
                         result.collection_format = self.collection_format
             return result
 
