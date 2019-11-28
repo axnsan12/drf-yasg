@@ -39,7 +39,7 @@ class InlineSerializerInspector(SerializerInspector):
     #: whether to output :class:`.Schema` definitions inline or into the ``definitions`` section
     use_definitions = False
     #: which collectionFormat to use for ListFields & ListSerializers
-    collection_format = swagger_settings.COLLECTION_FORMAT
+    collection_format = swagger_settings.COLLECTION_FORMAT or None
 
     def get_schema(self, serializer):
         return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
