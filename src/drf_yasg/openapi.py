@@ -595,7 +595,7 @@ class Response(SwaggerDict):
         """Describes the structure of an operation's response.
 
         :param str description: response description
-        :param schema: sturcture of the response body
+        :param schema: structure of the response body
         :type schema: Schema or SchemaRef or rest_framework.serializers.Serializer
             or type[rest_framework.serializers.Serializer]
         :param dict examples: example bodies mapped by mime type
