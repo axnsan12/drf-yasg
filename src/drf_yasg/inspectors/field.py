@@ -15,7 +15,8 @@ from rest_framework.settings import api_settings as rest_framework_settings
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
-    decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
+    decimal_as_float, field_value_to_representation, filter_none,
+    get_serializer_class, get_serializer_ref_name, strip_doc_string
 )
 from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
 
@@ -81,12 +82,17 @@ class InlineSerializerInspector(SerializerInspector):
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
+        description = getattr(field, 'description', getattr(field, '__doc__', None))
+        if description is None and hasattr(field, 'Meta') and hasattr(field.Meta, 'model') and hasattr(field.Meta.model, '__doc__'):
+            description = field.Meta.model.__doc__
+        description = strip_doc_string(description)
 
         if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
             child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)
             limits = find_limits(field) or {}
             return SwaggerType(
                 type=openapi.TYPE_ARRAY,
+                description=description,
                 items=child_schema,
                 **limits
             )
@@ -115,13 +121,14 @@ class InlineSerializerInspector(SerializerInspector):
                         required.append(property_name)
 
                 result = SwaggerType(
+                    description=description,
                     type=openapi.TYPE_OBJECT,
                     properties=properties,
                     required=required or None,
                 )
                 if not ref_name and 'title' in result:
                     # on an inline model, the title is derived from the field name
-                    # but is visno coverually displayed like the model name, which is confusing
+                    # but is visually displayed like the model name, which is confusing
                     # it is better to just remove title from inline models
                     del result.title
 
