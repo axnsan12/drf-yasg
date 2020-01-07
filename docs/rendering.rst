@@ -29,7 +29,7 @@ Renderers and codecs
 
 If you need to modify how your Swagger spec is presented in views, you might want to override one of the renderers in
 :mod:`.renderers` or one of the codecs in :mod:`.codecs`. The codec is the last stage where the Swagger object
-arrives before being transformed into bytes, while the renderer is the stage responsible for tying toghether the
+arrives before being transformed into bytes, while the renderer is the stage responsible for tying together the
 codec and the view.
 
 You can use your custom renderer classes as kwargs to :meth:`.SchemaView.as_cached_view` or by subclassing
