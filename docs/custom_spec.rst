@@ -61,6 +61,10 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
   operations, you have to add the decorator multiple times if you want to override different operations:
 
    .. code-block:: python
+   
+      from drf_yasg import openapi
+      from drf_yasg.utils import swagger_auto_schema
+      from rest_framework.decorators import api_view
 
       test_param = openapi.Parameter('test', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_BOOLEAN)
       user_response = openapi.Response('response description', UserSerializer)
@@ -383,6 +387,8 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
 :class:`.Schema` objects:
 
 .. code-block:: python
+
+   from drf_yasg.inspectors.field import FieldInspector
 
    class NoSchemaTitleInspector(FieldInspector):
       def process_result(self, result, method_name, obj, **kwargs):
