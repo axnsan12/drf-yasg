@@ -388,7 +388,7 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
 
 .. code-block:: python
 
-   from drf_yasg.inspectors.field import FieldInspector
+   from drf_yasg.inspectors import FieldInspector
 
    class NoSchemaTitleInspector(FieldInspector):
       def process_result(self, result, method_name, obj, **kwargs):
