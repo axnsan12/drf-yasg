@@ -455,6 +455,12 @@ def get_basic_type_info(field):
 
     limits = find_limits(field)
 
+    if swagger_type == openapi.TYPE_INTEGER and format is None:
+        if int(limits.get('maximum', 0)) > 2147483647 or int(limits.get('minimum', 0)) > 2147483647:
+            format = openapi.FORMAT_INT64
+    elif swagger_type == openapi.TYPE_NUMBER and format is None:
+        format = openapi.FORMAT_DOUBLE
+
     result = OrderedDict([
         ('type', swagger_type),
         ('format', format),
