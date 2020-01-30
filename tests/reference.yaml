@@ -1214,6 +1214,7 @@ definitions:
         title: Difficulty factor
         description: this is here just to test FloatField
         type: number
+        format: double
         readOnly: true
         default: 6.9
       rateAsString:
@@ -1395,6 +1396,7 @@ definitions:
         title: Hinted float
         description: the type hint on the method should determine this to be a number
         type: number
+        format: double
         readOnly: true
       hinted_decimal:
         title: Hinted decimal
