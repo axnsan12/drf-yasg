@@ -7,11 +7,11 @@ from django.conf.urls import url
 from django.contrib.postgres import fields as postgres_fields
 from django.db import models
 from django.utils.inspect import get_func_args
+from django_fake_model import models as fake_models
 from rest_framework import routers, serializers, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from django_fake_model import models as fake_models
 from drf_yasg import codecs, openapi
 from drf_yasg.codecs import yaml_sane_load
 from drf_yasg.errors import SwaggerGenerationError
@@ -346,6 +346,7 @@ EXPECTED_DESCRIPTION = """\
 
     You can log in using the pre-existing `admin` user with password `passwordadmin`.
 """
+
 
 def test_multiline_strings(call_generate_swagger):
     output = call_generate_swagger(format='yaml')
