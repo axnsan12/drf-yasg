@@ -481,7 +481,10 @@ def get_field_default(field):
             try:
                 if hasattr(default, 'set_context'):
                     default.set_context(field)
-                default = default()
+                if getattr(default, 'requires_context', False):
+                    default = default(field)
+                else:
+                    default = default()
             except Exception:  # pragma: no cover
                 logger.warning("default for %s is callable but it raised an exception when "
                                "called; 'default' will not be set on schema", field, exc_info=True)

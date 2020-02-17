@@ -194,16 +194,6 @@ LOGGING = {
         },
         'django': {
             'handlers': ['console_log'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'django.db.backends': {
-            'handlers': ['console_log'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'django.template': {
-            'handlers': ['console_log'],
             'level': 'INFO',
             'propagate': False,
         },

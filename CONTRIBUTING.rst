@@ -57,7 +57,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
    .. code:: console
 
-      (venv) $ python testproj/manage.py generate_swagger ../tests/reference.yaml --overwrite --user admin --url http://test.local:8002/
+      (venv) $ python testproj/manage.py generate_swagger tests/reference.yaml --overwrite --user admin --url http://test.local:8002/
 
    After checking the git diff to verify that no unexpected changes appeared, you should commit the new
    ``reference.yaml`` together with your changes.
