@@ -95,7 +95,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
 #. **Your code must pass all the required travis jobs before it is merged**
 
-   As of now, this consists of running on Python 2.7, 3.5, 3.6 and 3.7, and building the docs succesfully.
+   As of now, this consists of running on Python 2.7, 3.5, 3.6 and 3.7, and building the docs successfully.
 
 ******************
 Maintainer's notes
@@ -107,7 +107,7 @@ Release checklist
 * update ``docs/changelog.rst`` with changes since the last tagged version
 * commit & tag the release - ``git tag x.x.x -m "Release version x.x.x"``
 * push using ``git push --follow-tags``
-* verify that `Travis`_ has built the tag and succesfully published the release to `PyPI`_
+* verify that `Travis`_ has built the tag and successfully published the release to `PyPI`_
 * publish release notes `on GitHub`_
 * start the `ReadTheDocs build`_ if it has not already started
 * deploy the live demo `on Heroku`_
