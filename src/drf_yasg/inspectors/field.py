@@ -1,5 +1,6 @@
 import datetime
 import inspect
+import itertools
 import logging
 import operator
 import sys
@@ -223,14 +224,22 @@ def get_related_model(model, source):
     :param str source: related field name
     :return: related model or ``None``
     """
+    descriptor = model
     try:
-        descriptor = getattr(model, source)
-        try:
-            return descriptor.rel.related_model
-        except Exception:
-            return descriptor.field.remote_field.model
-    except Exception:  # pragma: no cover
+        for attr in source.split('.'):
+            descriptor = getattr(descriptor, attr)
+    except AttributeError:  # pragma: no cover
         return None
+
+    try:
+        is_forward = descriptor.field in itertools.chain(model._meta.fields, model._meta.many_to_many)
+    except AttributeError:  # pragma: no cover
+        return None
+
+    if is_forward:
+        return descriptor.field.related_model
+    else:
+        return descriptor.field.model
 
 
 class RelatedFieldInspector(FieldInspector):
