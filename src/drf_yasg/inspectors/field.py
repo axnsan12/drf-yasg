@@ -142,7 +142,7 @@ class InlineSerializerInspector(SerializerInspector):
                 if not explicit_refs:
                     raise SwaggerGenerationError(
                         "Schema for %s would override distinct serializer %s because they implicitly share the same "
-                        "ref_name; explicitly set the ref_name atribute on both serializers' Meta classes"
+                        "ref_name; explicitly set the ref_name attribute on both serializers' Meta classes"
                         % (actual_serializer, this_serializer))
 
             return openapi.SchemaRef(definitions, ref_name)
