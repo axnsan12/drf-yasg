@@ -5,7 +5,12 @@ from collections import OrderedDict, defaultdict
 
 import rest_framework
 import uritemplate
-from coreapi.compat import urlparse
+
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    import urlparse
+
 from packaging.version import Version
 from rest_framework import versioning
 from rest_framework.compat import URLPattern, URLResolver, get_original_route

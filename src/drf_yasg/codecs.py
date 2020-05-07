@@ -1,17 +1,27 @@
-from six import binary_type, raise_from, text_type
+from six import binary_type, raise_from, text_type, PY3
 
 import copy
 import json
 import logging
 from collections import OrderedDict
 
-from coreapi.compat import force_bytes
 from ruamel import yaml
 
 from . import openapi
 from .errors import SwaggerValidationError
 
 logger = logging.getLogger(__name__)
+
+try:
+    string_types = (basestring,)
+except:
+    string_types = (str,)
+
+
+def force_bytes(string):
+    if isinstance(string, string_types):
+        return string.encode('utf-8')
+    return string
 
 
 def _validate_flex(spec):

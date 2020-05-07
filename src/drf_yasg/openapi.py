@@ -5,7 +5,11 @@ import logging
 import re
 from collections import OrderedDict
 
-from coreapi.compat import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    import urlparse
+
 from django.urls import get_script_prefix
 from django.utils.functional import Promise
 from inflection import camelize
