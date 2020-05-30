@@ -7,8 +7,9 @@ import rest_framework
 import uritemplate
 from coreapi.compat import urlparse
 from packaging.version import Version
+
+from django.urls import URLPattern, URLResolver
 from rest_framework import versioning
-from rest_framework.compat import URLPattern, URLResolver, get_original_route
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
 from rest_framework.schemas.generators import endpoint_ordering, get_pk_name
 from rest_framework.settings import api_settings
@@ -31,6 +32,19 @@ else:
 logger = logging.getLogger(__name__)
 
 PATH_PARAMETER_RE = re.compile(r'{(?P<parameter>\w+)}')
+
+# This function relocated here from rest_framework.compat, where it was removed.
+def get_original_route(urlpattern):
+    """
+    Get the original route/regex that was typed in by the user into the path(), re_path() or url() directive. This
+    is in contrast with get_regex_pattern below, which for RoutePattern returns the raw regex generated from the path().
+    """
+    if hasattr(urlpattern, 'pattern'):
+        # Django 2.0
+        return str(urlpattern.pattern)
+    else:
+        # Django < 2.0
+        return urlpattern.regex.patter
 
 
 class EndpointEnumerator(_EndpointEnumerator):
