@@ -47,7 +47,7 @@ def deferred_never_cache(view_func):
     return _wrapped_view_func
 
 
-def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=False, validators=None,
+def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=False, validators=None, schemes=None,
                     generator_class=None, authentication_classes=None, permission_classes=None):
     """Create a SchemaView class with default renderers and generators.
 
@@ -57,6 +57,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
     :param urlconf: same as :class:`.OpenAPISchemaGenerator`
     :param bool public: if False, includes only the endpoints that are accesible by the user viewing the schema
     :param list validators: a list of validator names to apply; the only allowed value is ``ssv``, for now
+    :param list schemes: a list of url scheme; the allowed value is ``http`` and ``https``, for now
     :param type generator_class: schema generator class to use; should be a subclass of :class:`.OpenAPISchemaGenerator`
     :param tuple authentication_classes: authentication classes for the schema view itself
     :param tuple permission_classes: permission classes for the schema view itself
@@ -94,6 +95,8 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
             schema = generator.get_schema(request, self.public)
             if schema is None:
                 raise exceptions.PermissionDenied()  # pragma: no cover
+            if schemes:
+                schema.schemes = schemes
             return Response(schema)
 
         @classmethod
