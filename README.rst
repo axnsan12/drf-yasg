@@ -356,37 +356,21 @@ Integration with `drf-extra-fields <https://github.com/Hipo/drf-extra-fields>`_ 
 
 .. code:: python
 
-  from drf_yasg import openapi
-  from drf_yasg.inspectors import FieldInspector, SwaggerAutoSchema
-  from drf_yasg.app_settings import swagger_settings
+class PDFBase64FileField(Base64FileField):
+    ALLOWED_TYPES = ['pdf']
 
+    class Meta:
+        swagger_schema_fields = {
+            'type': 'string',
+            'title': 'File Content',
+            'description': 'Content of the file base64 encoded',
+            'read_only': False  # <-- FIX
+        }
 
-  class Base64FileFieldInspector(FieldInspector):
-      BASE_64_FIELDS = ['Base64ImageField', 'Base64FileField', 'Base64FieldMixin']
-
-      def __classlookup(self, cls):
-          """List all base class of the given class"""
-          c = list(cls.__bases__)
-          for base in c:
-              c.extend(self.__classlookup(base))
-          return c
-
-      def process_result(self, result, method_name, obj, **kwargs):
-          if isinstance(result, openapi.Schema.OR_REF):
-              base_classes = [x.__name__ for x in self.__classlookup(obj.__class__)]
-              if any(item in Base64FileFieldInspector.BASE_64_FIELDS for item in base_classes):
-                  schema = openapi.resolve_ref(result, self.components)
-                  schema.pop('readOnly', None)
-                  schema.pop('format', None)  # Remove $url format from string
-
-          return result
-
-
-  class Base64FileAutoSchema(SwaggerAutoSchema):
-      field_inspectors = [Base64FileFieldInspector] + swagger_settings.DEFAULT_FIELD_INSPECTORS
-
-
-  class FormAttachmentViewSet(viewsets.ModelViewSet):
-      queryset = .......
-      serializer_class = ..........
-      swagger_schema = Base64FileAutoSchema
+    def get_file_extension(self, filename, decoded_file):
+        try:
+            PyPDF2.PdfFileReader(io.BytesIO(decoded_file))
+        except PyPDF2.utils.PdfReadError as e:
+            logger.warning(e)
+        else:
+            return 'pdf'
