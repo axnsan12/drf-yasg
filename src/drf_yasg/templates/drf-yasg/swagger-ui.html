@@ -32,6 +32,22 @@
 <div id="swagger-ui"></div>
 
 {% block footer %}
+    <section data-reactroot="" class="swagger-ui swagger-container">
+    <div class="rapi-pdf">
+        <div class="wrapper">
+            <div class="rapi-pdf-wrapper">
+                <rapi-pdf style="width:700px;
+                                 height:40px;
+                                 font-size:18px;"
+                          spec-url="{% url 'schema-json' format='.json' %}"
+                          button-bg="#b44646"
+                          hide-input="true"
+                          include-api-list="true">
+                </rapi-pdf>
+            </div>
+        </div>
+    </div>
+    </section>
     {# -- Add any footer markup here (rendered AFTER the swagger-ui/redoc element) -- #}
 {% endblock %}
 
@@ -45,6 +61,7 @@
     <script src="{% static 'drf-yasg/immutable.min.js' %}"></script>
     <script src="{% static 'drf-yasg/url-polyfill.min.js' %}"></script>
     <script src="{% static 'drf-yasg/swagger-ui-init.js' %}"></script>
+    <script src="{% static "rapi-pdf/rapipdf-min.js" %}"></script>
 {% endblock %}
 {% block extra_scripts %}
     {# -- Add any additional scripts here -- #}

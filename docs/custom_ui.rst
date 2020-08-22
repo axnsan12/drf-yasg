@@ -10,6 +10,9 @@ rendering. See the template source code (linked above) for a complete list of cu
 The ``swagger-ui`` view has some quite involed JavaScript hooks used for some functionality, which you might also
 want to review at `drf-yasg/swagger-ui-init.js`_.
 
+Button `GENERATE PDF` at the bottom of your Swagger page generates PDF document with your OpenAPI description by
+`spec-url`. Details can be found at https://mrin9.github.io/RapiPdf/
+
 .. _drf-yasg/swagger-ui.html: https://github.com/axnsan12/drf-yasg/blob/master/src/drf_yasg/templates/drf-yasg/swagger-ui.html
 .. _drf-yasg/swagger-ui-init.js: https://github.com/axnsan12/drf-yasg/blob/master/src/drf_yasg/static/drf-yasg/swagger-ui-init.js
 .. _drf-yasg/redoc.html: https://github.com/axnsan12/drf-yasg/blob/master/src/drf_yasg/templates/drf-yasg/redoc.html
