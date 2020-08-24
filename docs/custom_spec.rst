@@ -62,7 +62,7 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
 
    .. code-block:: python
 
-      from def_yasg import openapi
+      from drf_yasg import openapi
 
       test_param = openapi.Parameter('test', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_BOOLEAN)
       user_response = openapi.Response('response description', UserSerializer)
