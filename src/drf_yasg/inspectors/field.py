@@ -496,6 +496,11 @@ if sys.version_info < (3, 0):
 
 if typing:
     def inspect_collection_hint_class(hint_class):
+        if hint_class == list:
+            return OrderedDict([
+                ('type', openapi.TYPE_ARRAY),
+                ('format', None)
+            ])
         args = hint_class.__args__
         child_class = args[0] if args else str
         child_type_info = get_basic_type_info_from_hint(child_class) or {'type': openapi.TYPE_STRING}
@@ -506,6 +511,8 @@ if typing:
         ])
 
     hinting_type_info.append(((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class))
+else:
+    hinting_type_info.append((list, (openapi.TYPE_ARRAY, None)),)
 
 
 def _get_union_types(hint_class):

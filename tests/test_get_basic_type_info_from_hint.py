@@ -17,6 +17,7 @@ if typing:
         (str, {'type': openapi.TYPE_STRING, 'format': None}),
         (bool, {'type': openapi.TYPE_BOOLEAN, 'format': None}),
         (dict, {'type': openapi.TYPE_OBJECT, 'format': None}),
+        (list, {'type': openapi.TYPE_ARRAY, 'format': None}),
         (Dict[int, int], {'type': openapi.TYPE_OBJECT, 'format': None}),
         (uuid.UUID, {'type': openapi.TYPE_STRING, 'format': openapi.FORMAT_UUID}),
         (List[int], {'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER)}),
