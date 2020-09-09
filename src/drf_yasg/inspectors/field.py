@@ -592,11 +592,14 @@ class SerializerMethodFieldInspector(FieldInspector):
             if label is None:
                 label = getattr(serializer, 'label', None)
 
+            many = getattr(method, "_serialize_many", False)
+
             if inspect.isclass(serializer):
                 serializer_kwargs = {
                     "help_text": description,
                     "label": label,
                     "read_only": True,
+                    "many": many
                 }
 
                 serializer = method._swagger_serializer(**serializer_kwargs)
