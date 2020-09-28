@@ -6,9 +6,9 @@ from collections import OrderedDict, defaultdict
 import rest_framework
 import uritemplate
 from coreapi.compat import urlparse
+from django.urls import URLPattern, URLResolver
 from packaging.version import Version
 from rest_framework import versioning
-from rest_framework.compat import URLPattern, URLResolver, get_original_route
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
 from rest_framework.schemas.generators import endpoint_ordering, get_pk_name
 from rest_framework.settings import api_settings
@@ -93,7 +93,7 @@ class EndpointEnumerator(_EndpointEnumerator):
             ignored_endpoints = set()
 
         for pattern in patterns:
-            path_regex = prefix + get_original_route(pattern)
+            path_regex = prefix + str(pattern.pattern)
             if isinstance(pattern, URLPattern):
                 try:
                     path = self.get_path_from_regex(path_regex)
