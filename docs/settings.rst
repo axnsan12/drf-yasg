@@ -169,7 +169,7 @@ LOGOUT_URL
 
 URL for the Django Logout action when using `USE_SESSION_AUTH`_.
 
-**Default**: :python:`django.conf.settings.LOGOUT_URL`
+**Default**: :python:`'/accounts/logout/'`
 
 .. _security-definitions-settings:
 
