@@ -169,7 +169,7 @@ def test_url_order():
 
 
 try:
-    from rest_framework.decorators import action, MethodMapper
+    from rest_framework.decorators import MethodMapper, action
 except ImportError:
     action = MethodMapper = None
 
