@@ -6,9 +6,11 @@ import os
 from collections import OrderedDict
 
 import pytest
+import rest_framework
 from datadiff.tools import assert_equal
 from django.contrib.auth.models import User
 from django.core.management import call_command
+from packaging.version import Version
 from rest_framework.test import APIRequestFactory
 from rest_framework.views import APIView
 
@@ -120,3 +122,8 @@ def redoc_settings(settings):
 def reference_schema():
     with open(os.path.join(os.path.dirname(__file__), 'reference.yaml')) as reference:
         return yaml_sane_load(reference)
+
+
+collect_ignore = []
+if Version(rest_framework.__version__) > Version('3.11'):
+    collect_ignore.append('test_form_parameters.py')
