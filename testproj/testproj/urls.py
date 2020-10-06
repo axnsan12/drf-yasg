@@ -11,7 +11,7 @@ from drf_yasg.views import get_schema_view
 swagger_info = openapi.Info(
     title="Snippets API",
     default_version='v1',
-    description="""This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg) Django Rest Framework library.
+    description="""This is a demo project for the [drf-yasg2](https://github.com/axnsan12/drf-yasg2) Django Rest Framework library.
 
 The `swagger-ui` view can be found [here](/cached/swagger).
 The `ReDoc` view can be found [here](/cached/redoc).

@@ -113,8 +113,8 @@ Release checklist
 * deploy the live demo `on Heroku`_
 
 
-.. _Travis: https://travis-ci.org/axnsan12/drf-yasg/builds
-.. _PyPI: https://pypi.org/project/drf-yasg/
-.. _on GitHub: https://github.com/axnsan12/drf-yasg/releases
-.. _ReadTheDocs build: https://readthedocs.org/projects/drf-yasg/builds/
+.. _Travis: https://travis-ci.org/axnsan12/drf-yasg2/builds
+.. _PyPI: https://pypi.org/project/drf-yasg2/
+.. _on GitHub: https://github.com/axnsan12/drf-yasg2/releases
+.. _ReadTheDocs build: https://readthedocs.org/projects/drf-yasg2/builds/
 .. _on Heroku: https://dashboard.heroku.com/pipelines/412d1cae-6a95-4f5e-810b-94869133f36a

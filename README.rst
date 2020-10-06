@@ -1,13 +1,23 @@
 .. role:: python(code)
    :language: python
 
-########################################
-drf-yasg - Yet another Swagger generator
-########################################
+#########################################
+drf-yasg2 - Yet another Swagger generator
+#########################################
 
 |travis| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
 
-|bmac-button|
+***********
+Fork notice
+***********
+
+Please note this is a fork of `drf-yasg <https://github.com/axnsan12/drf-yasg>`_.
+
+All credit goes to `axnsan12 <https://github.com/axnsan12>`_ and the original contributors.
+
+**********
+Motivation
+**********
 
 Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
 
@@ -19,19 +29,18 @@ Compatible with
 
 Only the latest patch version of each ``major.minor`` series of Python, Django and Django REST Framework is supported.
 
-**Only the latest version of drf-yasg is supported.** Support of old versions is dropped immediately with the release
+**Only the latest version of drf-yasg2 is supported.** Support of old versions is dropped immediately with the release
 of a new version. Please do not create issues before upgrading to the latest release available at the time. Regression
 reports are accepted and will be resolved with a new release as quickly as possible. Removed features will usually go
 through a deprecation cycle of a few minor releases.
 
 Resources:
 
-* **Source**: https://github.com/axnsan12/drf-yasg/
-* **Documentation**: https://drf-yasg.readthedocs.io/
-* **Changelog**: https://drf-yasg.readthedocs.io/en/stable/changelog.html
-* **Live demo**: https://drf-yasg-demo.herokuapp.com/
+* **Source**: https://github.com/axnsan12/drf-yasg2/
+* **Documentation**: https://drf-yasg2.readthedocs.io/
+* **Changelog**: https://drf-yasg2.readthedocs.io/en/stable/changelog.html
+* **Live demo**: https://drf-yasg2-demo.herokuapp.com/
 
-|heroku-button|
 
 ********
 Features
@@ -51,21 +60,21 @@ Features
 - supports Django REST Framework API versioning with ``URLPathVersioning`` and ``NamespaceVersioning``; other DRF
   or custom versioning schemes are not currently supported
 
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.2/screenshots/redoc-nested-response.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg2/1.0.2/screenshots/redoc-nested-response.png
    :width: 100%
    :figwidth: image
    :alt: redoc screenshot
 
    **Fully nested request and response schemas.**
 
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.2/screenshots/swagger-ui-list.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg2/1.0.2/screenshots/swagger-ui-list.png
    :width: 100%
    :figwidth: image
    :alt: swagger-ui screenshot
 
    **Choose between redoc and swagger-ui.**
 
-.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg/1.0.2/screenshots/swagger-ui-models.png
+.. figure:: https://raw.githubusercontent.com/axnsan12/drf-yasg2/1.0.2/screenshots/swagger-ui-models.png
    :width: 100%
    :figwidth: image
    :alt: model definitions screenshot
@@ -91,14 +100,14 @@ The preferred instalation method is directly from pypi:
 
 .. code:: console
 
-   pip install -U drf-yasg
+   pip install -U drf-yasg2
 
 Additionally, if you want to use the built-in validation mechanisms (see `4. Validation`_), you need to install
 some extra requirements:
 
 .. code:: console
 
-   pip install -U drf-yasg[validation]
+   pip install -U drf-yasg2[validation]
 
 .. _readme-quickstart:
 
@@ -191,7 +200,7 @@ c. ``SWAGGER_SETTINGS`` and ``REDOC_SETTINGS``
 ----------------------------------------------
 
 Additionally, you can include some more settings in your ``settings.py`` file.
-See https://drf-yasg.readthedocs.io/en/stable/settings.html for details.
+See https://drf-yasg2.readthedocs.io/en/stable/settings.html for details.
 
 
 3. Caching
@@ -295,8 +304,8 @@ For additional usage examples, you can take a look at the test project in the ``
 
 .. code:: console
 
-   $ git clone https://github.com/axnsan12/drf-yasg.git
-   $ cd drf-yasg
+   $ git clone https://github.com/axnsan12/drf-yasg2.git
+   $ cd drf-yasg2
    $ virtualenv venv
    $ source venv/bin/activate
    (venv) $ cd testproj
@@ -323,20 +332,20 @@ djangorestframework-recursive
 Integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_ is
 provided out of the box - if you have ``djangorestframework-recursive`` installed.
 
-.. |travis| image:: https://img.shields.io/travis/axnsan12/drf-yasg/master.svg
-   :target: https://travis-ci.org/axnsan12/drf-yasg
+.. |travis| image:: https://img.shields.io/travis/axnsan12/drf-yasg2/master.svg
+   :target: https://travis-ci.org/axnsan12/drf-yasg2
    :alt: Travis CI
 
-.. |codecov| image:: https://img.shields.io/codecov/c/github/axnsan12/drf-yasg/master.svg
-   :target: https://codecov.io/gh/axnsan12/drf-yasg
+.. |codecov| image:: https://img.shields.io/codecov/c/github/axnsan12/drf-yasg2/master.svg
+   :target: https://codecov.io/gh/axnsan12/drf-yasg2
    :alt: Codecov
 
-.. |pypi-version| image:: https://img.shields.io/pypi/v/drf-yasg.svg
-   :target: https://pypi.org/project/drf-yasg/
+.. |pypi-version| image:: https://img.shields.io/pypi/v/drf-yasg2.svg
+   :target: https://pypi.org/project/drf-yasg2/
    :alt: PyPI
 
-.. |rtd-badge| image:: https://img.shields.io/readthedocs/drf-yasg.svg
-   :target: https://drf-yasg.readthedocs.io/
+.. |rtd-badge| image:: https://img.shields.io/readthedocs/drf-yasg2.svg
+   :target: https://drf-yasg2.readthedocs.io/
    :alt: ReadTheDocs
 
 .. |bmac-button| image:: https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png
@@ -344,8 +353,9 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
    :alt: Buy Me A Coffee
 
 .. |heroku-button| image:: https://www.herokucdn.com/deploy/button.svg
-   :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg
+   :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg2
    :alt: Heroku deploy button
 
 .. |nbsp| unicode:: 0xA0
    :trim:
+ fork

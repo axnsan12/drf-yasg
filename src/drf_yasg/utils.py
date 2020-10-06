@@ -438,7 +438,7 @@ def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     Force `s` into a ``str`` instance.
 
-    Fix for https://github.com/axnsan12/drf-yasg/issues/159
+    Fix for https://github.com/axnsan12/drf-yasg2/issues/159
     """
     if s is not None:
         s = force_str(s, encoding, strings_only, errors)

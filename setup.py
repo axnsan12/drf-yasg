@@ -34,7 +34,7 @@ python_classifiers = [
 
 def drf_yasg_setup(**kwargs):
     setup(
-        name='drf-yasg',
+        name='drf-yasg2',
         packages=find_packages('src'),
         package_dir={'': 'src'},
         include_package_data=True,
@@ -45,11 +45,11 @@ def drf_yasg_setup(**kwargs):
         license='BSD License',
         description='Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code.',
         long_description=description,
-        url='https://github.com/axnsan12/drf-yasg',
+        url='https://github.com/axnsan12/drf-yasg2',
         author='Cristi V.',
         author_email='cristi@cvjd.me',
         keywords='drf django django-rest-framework schema swagger openapi codegen swagger-codegen '
-                 'documentation drf-yasg django-rest-swagger drf-openapi',
+                 'documentation drf-yasg2 django-rest-swagger drf-openapi',
         python_requires=python_requires,
         classifiers=[
             'Intended Audience :: Developers',

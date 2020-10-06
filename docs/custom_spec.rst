@@ -6,7 +6,7 @@
 Custom schema generation
 ########################
 
-If the default spec generation does not quite match what you were hoping to achieve, ``drf-yasg`` provides some
+If the default spec generation does not quite match what you were hoping to achieve, ``drf-yasg2`` provides some
 custom behavior hooks by default.
 
 .. _custom-spec-excluding-endpoints:
@@ -253,7 +253,7 @@ Suppose you wanted to model an email using a `JSONField` to store the subject an
        # }
        message = JSONField()
 
-To instruct ``drf-yasg`` to output an OpenAPI schema that matches this, create a custom ``JSONField``:
+To instruct ``drf-yasg2`` to output an OpenAPI schema that matches this, create a custom ``JSONField``:
 
 .. code-block:: python
 

@@ -50,5 +50,5 @@ def test_noop_inspectors(swagger_settings, mock_schema_request, codec_json, refe
 
 def test_no_nested_model(swagger_dict):
     # ForeignKey models in deep ModelViewSets might wrongly be labeled as 'Nested' in the definitions section
-    # see https://github.com/axnsan12/drf-yasg/issues/59
+    # see https://github.com/axnsan12/drf-yasg2/issues/59
     assert 'Nested' not in swagger_dict['definitions']

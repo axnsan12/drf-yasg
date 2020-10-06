@@ -11,7 +11,7 @@ function slugify(text) {
         .replace(/-+$/, '');            // Trim - from end of text
 }
 
-var KEY_AUTH = slugify(window.location.pathname) + "-drf-yasg-auth";
+var KEY_AUTH = slugify(window.location.pathname) + "-drf-yasg2-auth";
 
 // load the saved authorization state from localStorage; ImmutableJS is used for consistency with swagger-ui state
 var savedAuth = Immutable.fromJS({});

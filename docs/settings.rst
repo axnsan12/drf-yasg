@@ -342,7 +342,7 @@ OAUTH2_REDIRECT_URL
 -------------------
 
 Used when OAuth2 authentication of API requests via swagger-ui is desired. If ``None`` is passed, the
-``oauth2RedirectUrl`` parameter will be set to ``{% static 'drf-yasg/swagger-ui-dist/oauth2-redirect.html' %}``. This
+``oauth2RedirectUrl`` parameter will be set to ``{% static 'drf-yasg2/swagger-ui-dist/oauth2-redirect.html' %}``. This
 is the default `https://github.com/swagger-api/swagger-ui/blob/master/dist/oauth2-redirect.html <oauth2-redirect>`_
 file provided by ``swagger-ui``.
 

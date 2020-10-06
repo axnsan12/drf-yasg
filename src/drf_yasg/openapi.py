@@ -632,9 +632,9 @@ class ReferenceResolver(object):
         if not force_init:
             raise AssertionError(
                 "Creating an instance of ReferenceResolver almost certainly won't do what you want it to do.\n"
-                "See https://github.com/axnsan12/drf-yasg/issues/211, "
-                "https://github.com/axnsan12/drf-yasg/issues/271, "
-                "https://github.com/axnsan12/drf-yasg/issues/325.\n"
+                "See https://github.com/axnsan12/drf-yasg2/issues/211, "
+                "https://github.com/axnsan12/drf-yasg2/issues/271, "
+                "https://github.com/axnsan12/drf-yasg2/issues/325.\n"
                 "Pass `force_init=True` to override this."
             )
 

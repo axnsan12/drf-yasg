@@ -1,7 +1,7 @@
 {
-  "name": "drf-yasg Demo app",
-  "description": "A demonstrative app using https://github.com/axnsan12/drf-yasg",
-  "repository": "https://github.com/axnsan12/drf-yasg",
+  "name": "drf-yasg2 Demo app",
+  "description": "A demonstrative app using https://github.com/axnsan12/drf-yasg2",
+  "repository": "https://github.com/axnsan12/drf-yasg2",
   "logo": "https://swaggerhub.com/wp-content/uploads/2017/10/Swagger-Icon.svg",
   "keywords": [
     "django",

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# drf-yasg documentation build configuration file, created by
+# drf-yasg2 documentation build configuration file, created by
 # sphinx-quickstart on Sun Dec 10 15:20:34 2017.
 import inspect
 import os
@@ -38,7 +38,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'drf-yasg'
+project = 'drf-yasg2'
 copyright = '2018, Cristi V.'
 author = 'Cristi V.'
 
@@ -110,7 +110,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'drf-yasgdoc'
+htmlhelp_basename = 'drf-yasg2doc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -136,7 +136,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'drf-yasg.tex', 'drf-yasg Documentation',
+    (master_doc, 'drf-yasg2.tex', 'drf-yasg2 Documentation',
      'Cristi V.', 'manual'),
 ]
 
@@ -145,7 +145,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'drf-yasg', 'drf-yasg Documentation',
+    (master_doc, 'drf-yasg2', 'drf-yasg2 Documentation',
      [author], 1)
 ]
 
@@ -155,8 +155,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'drf-yasg', 'drf-yasg Documentation',
-     author, 'drf-yasg', 'One line description of project.',
+    (master_doc, 'drf-yasg2', 'drf-yasg2 Documentation',
+     author, 'drf-yasg2', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -262,8 +262,8 @@ for cls_name in drf_yasg.inspectors.__all__:
 
 # custom interpreted role for linking to GitHub issues and pull requests
 # use as :issue:`14` or :pr:`17`
-gh_issue_uri = "https://github.com/axnsan12/drf-yasg/issues/{}"
-gh_pr_uri = "https://github.com/axnsan12/drf-yasg/pull/{}"
+gh_issue_uri = "https://github.com/axnsan12/drf-yasg2/issues/{}"
+gh_pr_uri = "https://github.com/axnsan12/drf-yasg2/pull/{}"
 gh_user_uri = "https://github.com/{}"
 
 

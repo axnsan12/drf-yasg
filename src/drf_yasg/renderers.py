@@ -31,7 +31,7 @@ class _SpecRenderer(BaseRenderer):
         if not isinstance(data, Swagger):  # pragma: no cover
             # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
             # in that case, it's probably better to let the default ``JSONRenderer`` render it
-            # see https://github.com/axnsan12/drf-yasg/issues/58
+            # see https://github.com/axnsan12/drf-yasg2/issues/58
             return JSONRenderer().render(data, media_type, renderer_context)
 
         return codec.encode(data)
@@ -68,7 +68,7 @@ class _UIRenderer(BaseRenderer):
         if not isinstance(swagger, Swagger):  # pragma: no cover
             # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
             # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
-            # see https://github.com/axnsan12/drf-yasg/issues/58
+            # see https://github.com/axnsan12/drf-yasg2/issues/58
             return TemplateHTMLRenderer().render(swagger, accepted_media_type, renderer_context)
 
         self.set_context(renderer_context, swagger)
@@ -116,7 +116,7 @@ class _UIRenderer(BaseRenderer):
 
 class SwaggerUIRenderer(_UIRenderer):
     """Renders a swagger-ui web interface for schema browisng."""
-    template = 'drf-yasg/swagger-ui.html'
+    template = 'drf-yasg2/swagger-ui.html'
     format = 'swagger'
 
     def set_context(self, renderer_context, swagger=None):
@@ -160,7 +160,7 @@ class SwaggerUIRenderer(_UIRenderer):
 
 class ReDocRenderer(_UIRenderer):
     """Renders a ReDoc web interface for schema browisng."""
-    template = 'drf-yasg/redoc.html'
+    template = 'drf-yasg2/redoc.html'
     format = 'redoc'
 
     def set_context(self, renderer_context, swagger=None):
@@ -184,4 +184,4 @@ class ReDocRenderer(_UIRenderer):
 
 class ReDocOldRenderer(ReDocRenderer):
     """Renders a ReDoc 1.x.x web interface for schema browisng."""
-    template = 'drf-yasg/redoc-old.html'
+    template = 'drf-yasg2/redoc-old.html'

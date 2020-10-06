@@ -1,9 +1,9 @@
-.. drf-yasg documentation master file, created by
+.. drf-yasg2 documentation master file, created by
    sphinx-quickstart on Sun Dec 10 15:20:34 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-drf-yasg
+drf-yasg2
 ===========
 
 .. toctree::

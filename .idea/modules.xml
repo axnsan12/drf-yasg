@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/drf-yasg.iml" filepath="$PROJECT_DIR$/.idea/drf-yasg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/drf-yasg2.iml" filepath="$PROJECT_DIR$/.idea/drf-yasg2.iml" />
     </modules>
   </component>
 </project>

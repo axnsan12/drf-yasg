@@ -95,13 +95,13 @@ REST_FRAMEWORK = {
 OAUTH2_CLIENT_ID = '12ee6bgxtpSEgP8TioWcHSXOiDBOUrVav4mRbVEs'
 OAUTH2_CLIENT_SECRET = '5FvYALo7W4uNnWE2ySw7Yzpkxh9PSf5GuY37RvOys00ydEyph64dbl1ECOKI9ceQ' \
                        'AKoz0JpiVQtq0DUnsxNhU3ubrJgZ9YbtiXymbLGJq8L7n4fiER7gXbXaNSbze3BN'
-OAUTH2_APP_NAME = 'drf-yasg OAuth2 provider'
+OAUTH2_APP_NAME = 'drf-yasg2 OAuth2 provider'
 
-OAUTH2_REDIRECT_URL = static_lazy('drf-yasg/swagger-ui-dist/oauth2-redirect.html')
+OAUTH2_REDIRECT_URL = static_lazy('drf-yasg2/swagger-ui-dist/oauth2-redirect.html')
 OAUTH2_AUTHORIZE_URL = reverse_lazy('oauth2_provider:authorize')
 OAUTH2_TOKEN_URL = reverse_lazy('oauth2_provider:token')
 
-# drf-yasg
+# drf-yasg2
 SWAGGER_SETTINGS = {
     'LOGIN_URL': reverse_lazy('admin:login'),
     'LOGOUT_URL': '/admin/logout',

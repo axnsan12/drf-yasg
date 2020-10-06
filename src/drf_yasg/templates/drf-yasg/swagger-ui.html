@@ -11,12 +11,12 @@
 
     {% block favicon %}
         {# -- Maybe replace the favicon -- #}
-        <link rel="icon" type="image/png" href="{% static 'drf-yasg/swagger-ui-dist/favicon-32x32.png' %}"/>
+        <link rel="icon" type="image/png" href="{% static 'drf-yasg2/swagger-ui-dist/favicon-32x32.png' %}"/>
     {% endblock %}
 
     {% block main_styles %}
-        <link rel="stylesheet" type="text/css" href="{% static 'drf-yasg/style.css' %}"/>
-        <link rel="stylesheet" type="text/css" href="{% static 'drf-yasg/swagger-ui-dist/swagger-ui.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'drf-yasg2/style.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'drf-yasg2/swagger-ui-dist/swagger-ui.css' %}">
     {% endblock %}
     {% block extra_styles %}
         {# -- Add any additional CSS scripts here -- #}
@@ -39,18 +39,18 @@
 <script id="oauth2-config" type="application/json">{{ oauth2_config | safe }}</script>
 
 {% block main_scripts %}
-    <script src="{% static 'drf-yasg/swagger-ui-dist/swagger-ui-bundle.js' %}"></script>
-    <script src="{% static 'drf-yasg/swagger-ui-dist/swagger-ui-standalone-preset.js' %}"></script>
-    <script src="{% static 'drf-yasg/insQ.min.js' %}"></script>
-    <script src="{% static 'drf-yasg/immutable.min.js' %}"></script>
-    <script src="{% static 'drf-yasg/url-polyfill.min.js' %}"></script>
-    <script src="{% static 'drf-yasg/swagger-ui-init.js' %}"></script>
+    <script src="{% static 'drf-yasg2/swagger-ui-dist/swagger-ui-bundle.js' %}"></script>
+    <script src="{% static 'drf-yasg2/swagger-ui-dist/swagger-ui-standalone-preset.js' %}"></script>
+    <script src="{% static 'drf-yasg2/insQ.min.js' %}"></script>
+    <script src="{% static 'drf-yasg2/immutable.min.js' %}"></script>
+    <script src="{% static 'drf-yasg2/url-polyfill.min.js' %}"></script>
+    <script src="{% static 'drf-yasg2/swagger-ui-init.js' %}"></script>
 {% endblock %}
 {% block extra_scripts %}
     {# -- Add any additional scripts here -- #}
 {% endblock %}
 
-<a id="oauth2-redirect-url" href="{% static 'drf-yasg/swagger-ui-dist/oauth2-redirect.html' %}" class="hidden"></a>
+<a id="oauth2-redirect-url" href="{% static 'drf-yasg2/swagger-ui-dist/oauth2-redirect.html' %}" class="hidden"></a>
 
 {% if USE_SESSION_AUTH %}
     <div id="django-session-auth" class="hidden">
