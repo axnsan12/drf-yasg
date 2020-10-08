@@ -8,7 +8,6 @@ import uritemplate
 from coreapi.compat import urlparse
 from packaging.version import Version
 from rest_framework import versioning
-from rest_framework.compat import URLPattern, URLResolver, get_original_route
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
 from rest_framework.schemas.generators import endpoint_ordering, get_pk_name
 from rest_framework.settings import api_settings
@@ -20,6 +19,15 @@ from .inspectors.field import get_basic_type_info, get_queryset_field, get_query
 from .openapi import ReferenceResolver, SwaggerDict
 from .utils import force_real_str, get_consumes, get_produces
 
+try:
+    from django.urls import URLPattern, URLResolver
+except ImportError:
+    # Will be removed in Django 2.0
+    from django.urls import (
+        RegexURLPattern as URLPattern,
+        RegexURLResolver as URLResolver,
+    )
+
 if Version(rest_framework.__version__) < Version('3.10'):
     from rest_framework.schemas.generators import SchemaGenerator
     from rest_framework.schemas.inspectors import get_pk_description
@@ -27,10 +35,21 @@ else:
     from rest_framework.schemas import SchemaGenerator
     from rest_framework.schemas.utils import get_pk_description
 
-
 logger = logging.getLogger(__name__)
 
 PATH_PARAMETER_RE = re.compile(r'{(?P<parameter>\w+)}')
+
+
+def get_original_route(urlpattern):
+    """
+    Get the original route/regex that was typed in by the user into the path(), re_path() or url() directive.
+    """
+    if hasattr(urlpattern, 'pattern'):
+        # Django 2.0
+        return str(urlpattern.pattern)
+    else:
+        # Django < 2.0
+        return urlpattern.regex.pattern
 
 
 class EndpointEnumerator(_EndpointEnumerator):
