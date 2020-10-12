@@ -2,11 +2,15 @@
 # -*- coding: utf-8 -*-
 
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 if __name__ == "__main__":
     setup(
+        packages=find_packages('src'),
+        package_dir={'': 'src'},
+        include_package_data=True,
         install_requires=[
+            "setuptools"
             "coreapi>=2.3.3",
             "coreschema>=0.0.4",
             "django>=1.1.0",
