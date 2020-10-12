@@ -1,0 +1,18 @@
+.versionadded, .versionchanged, .deprecated {
+    font-family: "Roboto", Corbel, Avenir, "Lucida Grande", "Lucida Sans", sans-serif;
+    padding: 10px 13px;
+    border: 1px solid rgb(137, 191, 4);
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.versionmodified {
+    font-weight: bold;
+    display: block;
+}
+
+.versionadded p, .versionchanged p, .deprecated p,
+/*override fucking !important by being more specific */
+.rst-content dl .versionadded p, .rst-content dl .versionchanged p {
+    margin: 0 !important;
+}

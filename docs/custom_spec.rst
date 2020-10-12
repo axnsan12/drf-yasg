@@ -6,7 +6,7 @@
 Custom schema generation
 ########################
 
-If the default spec generation does not quite match what you were hoping to achieve, ``drf-yasg2`` provides some
+If the default spec generation does not quite match what you were hoping to achieve, ``drf_yasg2`` provides some
 custom behavior hooks by default.
 
 .. _custom-spec-excluding-endpoints:
@@ -45,7 +45,7 @@ some properties of the generated :class:`.Operation`. For example, in a ``ViewSe
 
 .. code-block:: python
 
-   from drf_yasg.utils import swagger_auto_schema
+   from drf_yasg2.utils import swagger_auto_schema
 
    @swagger_auto_schema(operation_description="partial_update description override", responses={404: 'slug not found'})
    def partial_update(self, request, *args, **kwargs):
@@ -168,7 +168,7 @@ Schema generation of ``serializers.SerializerMethodField`` is supported in two w
 
    .. code-block:: python
 
-      from drf_yasg.utils import swagger_serializer_method
+      from drf_yasg2.utils import swagger_serializer_method
 
       class OtherStuffSerializer(serializers.Serializer):
           foo = serializers.CharField()
@@ -253,7 +253,7 @@ Suppose you wanted to model an email using a `JSONField` to store the subject an
        # }
        message = JSONField()
 
-To instruct ``drf-yasg2`` to output an OpenAPI schema that matches this, create a custom ``JSONField``:
+To instruct ``drf_yasg2`` to output an OpenAPI schema that matches this, create a custom ``JSONField``:
 
 .. code-block:: python
 

@@ -60,7 +60,7 @@ DEFAULT_GENERATOR_CLASS
 :class:`~.generators.OpenAPISchemaGenerator` subclass that will be used by default for generating the final
 :class:`.Schema` object. Can be overriden by the ``generator_class`` argument to :func:`.get_schema_view`.
 
-**Default**: :class:`drf_yasg.generators.OpenAPISchemaGenerator`
+**Default**: :class:`drf_yasg2.generators.OpenAPISchemaGenerator`
 
 DEFAULT_AUTO_SCHEMA_CLASS
 -------------------------
@@ -69,7 +69,7 @@ DEFAULT_AUTO_SCHEMA_CLASS
 objects when iterating over endpoints. Can be overriden by using the `auto_schema` argument of
 :func:`@swagger_auto_schema <.swagger_auto_schema>` or by a ``swagger_schema`` attribute on the view class.
 
-**Default**: :class:`drf_yasg.inspectors.SwaggerAutoSchema`
+**Default**: :class:`drf_yasg2.inspectors.SwaggerAutoSchema`
 
 DEFAULT_FIELD_INSPECTORS
 ------------------------
@@ -79,18 +79,18 @@ serializer fields. Field inspectors given to :func:`@swagger_auto_schema <.swagg
 to this list.
 
 **Default**: ``[``  |br| \
-:class:`'drf_yasg.inspectors.CamelCaseJSONFilter' <.inspectors.CamelCaseJSONFilter>`, |br| \
-:class:`'drf_yasg.inspectors.ReferencingSerializerInspector' <.inspectors.ReferencingSerializerInspector>`, |br| \
-:class:`'drf_yasg.inspectors.RelatedFieldInspector' <.inspectors.RelatedFieldInspector>`, |br| \
-:class:`'drf_yasg.inspectors.ChoiceFieldInspector' <.inspectors.ChoiceFieldInspector>`, |br| \
-:class:`'drf_yasg.inspectors.FileFieldInspector' <.inspectors.FileFieldInspector>`, |br| \
-:class:`'drf_yasg.inspectors.DictFieldInspector' <.inspectors.DictFieldInspector>`, |br| \
-:class:`'drf_yasg.inspectors.JSONFieldInspector' <.inspectors.JSONFieldInspector>`, |br| \
-:class:`'drf_yasg.inspectors.HiddenFieldInspector' <.inspectors.HiddenFieldInspector>`, |br| \
-:class:`'drf_yasg.inspectors.RecursiveFieldInspector' <.inspectors.RecursiveFieldInspector>`, |br| \
-:class:`'drf_yasg.inspectors.SerializerMethodFieldInspector' <.inspectors.SerializerMethodFieldInspector>`, |br| \
-:class:`'drf_yasg.inspectors.SimpleFieldInspector' <.inspectors.SimpleFieldInspector>`, |br| \
-:class:`'drf_yasg.inspectors.StringDefaultFieldInspector' <.inspectors.StringDefaultFieldInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.CamelCaseJSONFilter' <.inspectors.CamelCaseJSONFilter>`, |br| \
+:class:`'drf_yasg2.inspectors.ReferencingSerializerInspector' <.inspectors.ReferencingSerializerInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.RelatedFieldInspector' <.inspectors.RelatedFieldInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.ChoiceFieldInspector' <.inspectors.ChoiceFieldInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.FileFieldInspector' <.inspectors.FileFieldInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.DictFieldInspector' <.inspectors.DictFieldInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.JSONFieldInspector' <.inspectors.JSONFieldInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.HiddenFieldInspector' <.inspectors.HiddenFieldInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.RecursiveFieldInspector' <.inspectors.RecursiveFieldInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.SerializerMethodFieldInspector' <.inspectors.SerializerMethodFieldInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.SimpleFieldInspector' <.inspectors.SimpleFieldInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.StringDefaultFieldInspector' <.inspectors.StringDefaultFieldInspector>`, |br| \
 ``]``
 
 DEFAULT_FILTER_INSPECTORS
@@ -100,7 +100,7 @@ List of :class:`~.inspectors.FilterInspector` subclasses that will be used by de
 Filter inspectors given to :func:`@swagger_auto_schema <.swagger_auto_schema>` will be prepended to this list.
 
 **Default**: ``[``  |br| \
-:class:`'drf_yasg.inspectors.CoreAPICompatInspector' <.inspectors.CoreAPICompatInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.CoreAPICompatInspector' <.inspectors.CoreAPICompatInspector>`, |br| \
 ``]``
 
 DEFAULT_PAGINATOR_INSPECTORS
@@ -110,8 +110,8 @@ List of :class:`~.inspectors.PaginatorInspector` subclasses that will be used by
 Paginator inspectors given to :func:`@swagger_auto_schema <.swagger_auto_schema>` will be prepended to this list.
 
 **Default**: ``[``  |br| \
-:class:`'drf_yasg.inspectors.DjangoRestResponsePagination' <.inspectors.DjangoRestResponsePagination>`, |br| \
-:class:`'drf_yasg.inspectors.CoreAPICompatInspector' <.inspectors.CoreAPICompatInspector>`, |br| \
+:class:`'drf_yasg2.inspectors.DjangoRestResponsePagination' <.inspectors.DjangoRestResponsePagination>`, |br| \
+:class:`'drf_yasg2.inspectors.CoreAPICompatInspector' <.inspectors.CoreAPICompatInspector>`, |br| \
 ``]``
 
 Swagger document attributes
@@ -342,7 +342,7 @@ OAUTH2_REDIRECT_URL
 -------------------
 
 Used when OAuth2 authentication of API requests via swagger-ui is desired. If ``None`` is passed, the
-``oauth2RedirectUrl`` parameter will be set to ``{% static 'drf-yasg2/swagger-ui-dist/oauth2-redirect.html' %}``. This
+``oauth2RedirectUrl`` parameter will be set to ``{% static 'drf_yasg2/swagger-ui-dist/oauth2-redirect.html' %}``. This
 is the default `https://github.com/swagger-api/swagger-ui/blob/master/dist/oauth2-redirect.html <oauth2-redirect>`_
 file provided by ``swagger-ui``.
 

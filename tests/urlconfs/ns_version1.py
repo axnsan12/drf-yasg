@@ -8,6 +8,7 @@ from testproj.urls import required_urlpatterns
 
 class SnippetList(generics.ListCreateAPIView):
     """SnippetList classdoc"""
+
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
     versioning_class = versioning.NamespaceVersioning
@@ -20,8 +21,6 @@ class SnippetList(generics.ListCreateAPIView):
         return super(SnippetList, self).post(request, *args, **kwargs)
 
 
-app_name = 'test_ns_versioning'
+app_name = "test_ns_versioning"
 
-urlpatterns = required_urlpatterns + [
-    url(r"^$", SnippetList.as_view())
-]
+urlpatterns = required_urlpatterns + [url(r"^$", SnippetList.as_view())]

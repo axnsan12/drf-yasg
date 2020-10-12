@@ -1,9 +1,0 @@
-# used by the 'docs' tox env for building the documentation
-Sphinx>=1.7.0
-sphinx_rtd_theme>=0.2.4
-Pillow>=4.3.0
-readme_renderer[md]>=24.0
-twine>=1.12.1
-
-Django>=2.0
-djangorestframework_camel_case>=0.2.0

@@ -1,96 +1,45 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-
-import io
-import os
-import sys
-from setuptools import find_packages, setup
 
 
-def read_req(req_file):
-    with open(os.path.join('requirements', req_file)) as req:
-        return [line.strip() for line in req.readlines() if line.strip() and not line.strip().startswith('#')]
+from setuptools import setup
 
-
-with io.open('README.rst', encoding='utf-8') as readme:
-    description = readme.read()
-
-requirements = read_req('base.txt')
-requirements_validation = read_req('validation.txt')
-
-py3_supported_range = (5, 8)
-
-# convert inclusive range to exclusive range
-py3_supported_range = (py3_supported_range[0], py3_supported_range[1] + 1)
-python_requires = ", ".join([">=2.7"] + ["!=3.{}.*".format(v) for v in range(0, py3_supported_range[0])])
-python_classifiers = [
-    'Programming Language :: Python',
-    'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3',
-] + ['Programming Language :: Python :: 3.{}'.format(v) for v in range(*py3_supported_range)]
-
-
-def drf_yasg_setup(**kwargs):
+if __name__ == "__main__":
     setup(
-        name='drf-yasg2',
-        packages=find_packages('src'),
-        package_dir={'': 'src'},
-        include_package_data=True,
-        install_requires=requirements,
+        install_requires=[
+            "coreapi>=2.3.3",
+            "coreschema>=0.0.4",
+            "django>=1.1.0",
+            "djangorestframework>=3.8.0",
+            "inflection>=0.3.1",
+            "ruamel.yaml>=0.16.12",
+            "six>=1.15.0",
+            "uritemplate>=3.0.1",
+        ],
         extras_require={
-            'validation': requirements_validation,
+            "lint": ["flake8>=3.5.0"],
+            "format": ["autoflake>=1.4.0", "black>=20.8.0", "isort>=4.2.0"],
+            "docs": [
+                "djangorestframework_camel_case>=0.2.0",
+                "Pillow>=4.3.0",
+                "readme_renderer[md]>=24.0",
+                "sphinx_rtd_theme>=0.2.4",
+                "Sphinx>=1.7.0",
+                "twine>=1.12.1",
+            ],
+            "tests": [
+                "dj-database-url>=0.4.2",
+                "django-cors-headers>=3.0.2",
+                "django-filter>=1.1.0",
+                "django-oauth-toolkit>=1.3.2",
+                "djangorestframework-camel-case>=1.0.3",
+                "djangorestframework-recursive>=0.1.2",
+                "Pillow>=4.3.0",
+                "pytest>=4.6.11",
+                "pytest-django>=3.10.0",
+                "tox>=3.3.0",
+                "user_agents>=1.1.0",
+            ],
+            "heroku": ["dj-database-url>=0.4.2", "gunicorn>=19.7.1", "psycopg2>=2.7.3", "whitenoise>=3.3.1",],
         },
-        license='BSD License',
-        description='Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code.',
-        long_description=description,
-        url='https://github.com/axnsan12/drf-yasg2',
-        author='Cristi V.',
-        author_email='cristi@cvjd.me',
-        keywords='drf django django-rest-framework schema swagger openapi codegen swagger-codegen '
-                 'documentation drf-yasg2 django-rest-swagger drf-openapi',
-        python_requires=python_requires,
-        classifiers=[
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: BSD License',
-            'Development Status :: 5 - Production/Stable',
-            'Operating System :: OS Independent',
-            'Environment :: Web Environment',
-            'Framework :: Django',
-            'Framework :: Django :: 1.11',
-            'Framework :: Django :: 2.0',
-            'Framework :: Django :: 2.1',
-            'Framework :: Django :: 2.2',
-            'Topic :: Documentation',
-            'Topic :: Software Development :: Code Generators',
-        ] + python_classifiers,
-        **kwargs
     )
-
-
-try:
-    # noinspection PyUnresolvedReferences
-    import setuptools_scm  # noqa: F401
-
-    drf_yasg_setup(use_scm_version=True)
-except (ImportError, LookupError) as e:
-    if os.getenv('CI', 'false') == 'true' or os.getenv('TRAVIS', 'false') == 'true':
-        # don't silently fail on travis - we don't want to accidentally push a dummy version to PyPI
-        raise
-
-    err_msg = str(e)
-    if 'setuptools-scm' in err_msg or 'setuptools_scm' in err_msg:
-        import time
-        import traceback
-
-        timestamp_ms = int(time.time() * 1000)
-        timestamp_str = hex(timestamp_ms)[2:].zfill(16)
-        dummy_version = '1!0.0.0.dev0+noscm.' + timestamp_str
-
-        drf_yasg_setup(version=dummy_version)
-
-        traceback.print_exc(file=sys.stderr)
-        print("failed to detect version, package was built with dummy version " + dummy_version, file=sys.stderr)
-    else:
-        raise

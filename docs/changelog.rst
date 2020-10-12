@@ -138,7 +138,7 @@ install the build requirements yourself (just ``setuptools`` and ``setuptools-sc
 
 Additionally, for correct package version detection, a full git checkout is required when building (this was always the
 case). Building without ``.git`` or without ``setuptools-scm`` will result in a distribution with a version like
-``drf-yasg2-1!0.0.0.dev0+noscm.00000167d19bd859``.
+``drf_yasg2-1!0.0.0.dev0+noscm.00000167d19bd859``.
 
 **********
 **1.11.1**
@@ -215,7 +215,7 @@ case). Building without ``.git`` or without ``setuptools-scm`` will result in a 
   method field, and support for Python 3.5 style type hinting of the method field return type
   (:issue:`137`, :pr:`175`, :pr:`179`)
 
-  *NOTE:* in order for this to work, you will have to add the new ``drf_yasg.inspectors.SerializerMethodFieldInspector``
+  *NOTE:* in order for this to work, you will have to add the new ``drf_yasg2.inspectors.SerializerMethodFieldInspector``
   to your ``DEFAULT_FIELD_INSPECTORS`` array if you changed it from the default value
 
 - **IMPROVED:** updated ``swagger-ui`` to version 3.18.0
@@ -326,7 +326,7 @@ case). Building without ``.git`` or without ``setuptools-scm`` will result in a 
 - **ADDED:** added integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_
   (:issue:`109`, :pr:`110`, thanks to :ghuser:`rsichny`)
 
-  *NOTE:* in order for this to work, you will have to add the new ``drf_yasg.inspectors.RecursiveFieldInspector`` to
+  *NOTE:* in order for this to work, you will have to add the new ``drf_yasg2.inspectors.RecursiveFieldInspector`` to
   your ``DEFAULT_FIELD_INSPECTORS`` array if you changed it from the default value
 
 - **FIXED:** ``SchemaRef`` now supports cyclical references via the ``ignore_unresolved`` argument
@@ -375,7 +375,7 @@ case). Building without ``.git`` or without ``setuptools-scm`` will result in a 
 
 - **IMPROVED:** ``serializers.HiddenField`` are now hidden (:issue:`78`, :pr:`79`, thanks to :ghuser:`therefromhere`)
 
-  *NOTE:* in order for this to work, you will have to add the new ``drf_yasg.inspectors.HiddenFieldInspector`` to your
+  *NOTE:* in order for this to work, you will have to add the new ``drf_yasg2.inspectors.HiddenFieldInspector`` to your
   ``DEFAULT_FIELD_INSPECTORS`` array if you changed it from the default value
 
 - **IMPROVED:** type of model field is now detected for ``serializers.SlugRelatedField`` with ``read_only=True``

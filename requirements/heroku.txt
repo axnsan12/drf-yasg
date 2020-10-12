@@ -1,5 +1,0 @@
-# requirements necessary when deploying the test project to heroku
--r testproj.txt
-psycopg2>=2.7.3
-gunicorn>=19.7.1
-whitenoise>=3.3.1
