@@ -10,7 +10,7 @@ if __name__ == "__main__":
         package_dir={'': 'src'},
         include_package_data=True,
         install_requires=[
-            "setuptools"
+            "setuptools",
             "coreapi>=2.3.3",
             "coreschema>=0.0.4",
             "django>=1.1.0",
