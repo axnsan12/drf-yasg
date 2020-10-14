@@ -55,7 +55,14 @@ supported
 Installing the package from pypi:
 
 ```bash
-pip install drf_yasg2
+pip install drf-yasg2
+```
+
+Additionally, if you want to use the built-in validation mechanisms
+you need to install some extra requirements:
+
+```bash
+pip install drf-yasg2[validation]
 ```
 
 ### Usage
