@@ -149,7 +149,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 This project forked from [drf-yasg](https://github.com/joellefkowitz/drf-yasg).
 Credit is given to [Cristi Vîjdea](https://github.com/axnsan12) and the original contributors.
 
-* **Cristi Vîjdea** - _Initial work_ - [Joel Lefkowitz](https://github.com/JoelLefkowitz)
+* **Cristi Vîjdea** - _Initial work_ - [Joel Lefkowitz](https://github.com/axnsan12)
 
 * **Joel Lefkowitz** - _This fork's maintainer_ - [Joel Lefkowitz](https://github.com/JoelLefkowitz)
 
