@@ -4,6 +4,23 @@ Changelog
 
 
 **********
+**1.18.6**
+**********
+
+*Release date: Oct 17, 2020*
+
+- **FIXED:** Dependency issues with packaging and validation
+
+**********
+**1.18.5**
+**********
+
+*Release date: Oct 12, 2020*
+
+**Final support was provided for python 2.7**
+- **FIXED:** Fixed compatibility with Django Rest Framework 3.12+
+
+**********
 **1.17.1**
 **********
 
