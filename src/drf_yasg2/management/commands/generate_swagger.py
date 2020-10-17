@@ -185,5 +185,5 @@ class Command(BaseCommand):
         if output_file == "-":
             self.write_schema(schema, self.stdout, format)
         else:
-            with os.open(output_file, "w") as stream:
+            with open(output_file, "w") as stream:
                 self.write_schema(schema, stream, format)
