@@ -30,11 +30,19 @@ jobs:
       python: 3.8
       script: scripts/tox-filter.sh py38
 
-    # This ensures that readthedocs will be able to build the docs
+    # This tests readthedocs will be able to build
     - stage: test-docs
       script: scripts/docs.sh
       install:
         - pip install .[docs]
+
+    # This tests the package is packaged correctly
+    # Don't install any other dependencies preemtively
+    - stage: test-publish
+      python: 3.8
+      script: scripts/test-packaging.sh
+      install:
+        - pip install tox
 
 deploy:
   provider: pypi
@@ -43,5 +51,4 @@ deploy:
   password:
     secure: fbaBrbBl6mJf54iV2LR/wskFZRGn1ftlgt+BCCGsdF2eDrASnQaszS/IM4PXd4bsUalAPcxcbGC0lEAqiDgZneKlSYvHps1oy6ypymq7JLHKW/iQ3bBeXvT2QEaUgg5LqjX2CIlhSgiY2mVa6gQt1BwlutJatM3sJ6yvBQu+3vVWpwWohfTqjPmt1FdR9WWz5/sviDFyHYnGSRmgQUkcyfnKHZ4/UtEiLynVC1RVNzb+aAOCp2M2lW+A2SBiKMISzbkvgL/pO9f8ceHInUhY+oZJ/wzMa1hyF+Dlo7ut3LywFNrFdheP5r/1lTusR5UYXKncsiCLCyRujal8hOAnUaHkP+XGm+QLULKOGG2qkxmasO7lRXSbYgQGEGoKQNsiwjqJN3AbofIL1FIw/2IYFia/bkvhZCyBLUAHoCJ0BgNF/kvYBDzBDR2b6r8GjG2OREL+tkgAAsHauRgYKfkP738Qqj8UEnQ+Xrtnm+zOw86AuYD4xx3DHS2qAzsnhEs4nVp6WvLSB4PqOzzLZmG73zQZgKTTGIs7kgtnIZBR+3gIQCFIUAaeV9rzNmED0eKt8qLtC4gXFLx5aqzM2hOnuuKII+Ueiz8ZPbjFXrE7VmpCr0KfJaxu4UcqgSjJY5OI9f3EGJsJIC7O1fkrNCNPH0UUTZM0fM9OlxUNPs8qp1I=
   on:
-    branch: master
     tags: true

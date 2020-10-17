@@ -7,7 +7,6 @@ from django.urls import reverse_lazy
 from testproj.util import static_lazy
 
 sys.path.append(os.path.join(os.getcwd(), "src"))
-print(sys.path)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
