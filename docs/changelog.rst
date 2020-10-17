@@ -4,6 +4,13 @@ Changelog
 
 
 **********
+**1.19.0**
+**********
+
+*Release date: Oct 17, 2020*
+- **ADDED:** Dropped support for Python 2.7
+
+**********
 **1.18.6**
 **********
 

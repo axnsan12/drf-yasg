@@ -2,7 +2,7 @@ import inspect
 import logging
 
 from rest_framework import serializers
-
+from inspect import getattr_static
 from .. import openapi
 from ..utils import force_real_str, get_field_default, get_object_classes, is_list_view
 
@@ -14,25 +14,19 @@ logger = logging.getLogger(__name__)
 
 def is_callable_method(cls_or_instance, method_name):
     method = getattr(cls_or_instance, method_name)
+
+    # bound classmethod or instance method
     if inspect.ismethod(method) and getattr(method, "__self__", None):
-        # bound classmethod or instance method
         return method, True
 
-    try:
-        # inspect.getattr_static was added in python 3.2
-        from inspect import getattr_static
-
-        # on python 3, both unbound instance methods (i.e. getattr(cls, mth)) and static methods are plain functions
-        # getattr_static allows us to check the type of the method descriptor; for `@staticmethod` this is staticmethod
-        return (
-            method,
-            isinstance(
-                getattr_static(cls_or_instance, method_name, None), staticmethod
-            ),
-        )
-    except ImportError:
-        # python 2 still has unbound methods, so ismethod <=> !staticmethod TODO: remove when dropping python 2.7
-        return method, not inspect.ismethod(method)
+    # on python 3, both unbound instance methods (i.e. getattr(cls, mth)) and static methods are plain functions
+    # getattr_static allows us to check the type of the method descriptor; for `@staticmethod` this is staticmethod
+    return (
+        method,
+        isinstance(
+            getattr_static(cls_or_instance, method_name, None), staticmethod
+        ),
+    )
 
 
 def call_view_method(view, method_name, fallback_attr=None, default=None):

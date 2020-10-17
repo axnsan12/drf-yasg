@@ -13,14 +13,10 @@ jobs:
     # Use aliases to specify matrix style parallelism in this stage only
     - &unittest
       stage: unittest
-      python: 2.7
-      script: scripts/tox-filter.sh py27
-      install:
-        - pip install .[tests]
-
-    - <<: *unittest
       python: 3.6
       script: scripts/tox-filter.sh py36
+      install:
+        - pip install .[tests]
 
     - <<: *unittest
       python: 3.7
@@ -29,6 +25,10 @@ jobs:
     - <<: *unittest
       python: 3.8
       script: scripts/tox-filter.sh py38
+
+    - <<: *unittest
+      python: 3.9-dev
+      script: scripts/tox-filter.sh py39
 
     # This tests readthedocs will be able to build
     - stage: test-docs

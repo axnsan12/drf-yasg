@@ -13,7 +13,7 @@ if __name__ == "__main__":
             "packaging>=18.0",
             "coreapi>=2.3.3",
             "coreschema>=0.0.4",
-            "django>=1.1.0",
+            "django>=2.2.0",
             "djangorestframework>=3.8.0",
             "inflection>=0.3.1",
             "ruamel.yaml>=0.16.12",
