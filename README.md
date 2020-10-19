@@ -68,7 +68,7 @@ pip install drf-yasg2[validation]
 
 ### Usage
 
-Checkout the [live demo!](https://drf-yasg2-demo.herokuapp.com/)
+Checkout the [live demo!](https://drf-yasg2.herokuapp.com/)
 
 Add the package to INSTALLED_APPS:
 
