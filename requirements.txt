@@ -1,3 +1,5 @@
 # This file is only used when deploying to heroku
 # Heroku insists on having a root-level requirements.txt
 .[heroku]
+.[validation]
+.[tests]
