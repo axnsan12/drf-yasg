@@ -5,12 +5,12 @@ Framework code.
 
 ## Status
 
-| Source     | Shields                                                        |
-| ---------- | -------------------------------------------------------------- |
-| Project    | ![release][release] ![build][build]        |
-| Publishers | [![pypi][pypi]][pypi_link]                                     |
-| Downloads  | ![pypi_downloads][pypi_downloads]                              |
-| Raised     | [![issues][issues]][issues_link] [![pulls][pulls]][pulls_link] |
+| Source     | Shields                                                           |
+| ---------- | ----------------------------------------------------------------- |
+| Project    | [![release][release]][release_link] [![build][build]][build_link] |
+| Publishers | [![pypi][pypi]][pypi_link]                                        |
+| Downloads  | [![pypi_downloads][pypi_downloads]][pypi_downloads_link]          |
+| Raised     | [![issues][issues]][issues_link] [![pulls][pulls]][pulls_link]    |
 
 ## Compatibility
 
@@ -163,12 +163,15 @@ This project is licensed under the BSD 3-Clause License - see the [LICENSE.md](L
 <!--- Table links --->
 
 [release]: https://img.shields.io/github/v/tag/joellefkowitz/drf-yasg
+[release_link]: https://github.com/JoelLefkowitz/drf-yasg/releases
 [build]:  https://travis-ci.org/JoelLefkowitz/drf-yasg.svg?branch=master
+[build_link]: https://travis-ci.com/github/JoelLefkowitz/drf-yasg
 
-[pypi_downloads]: https://img.shields.io/pypi/dw/drf_yasg2
+[pypi_downloads]: https://img.shields.io/pypi/dw/drf-yasg2
+[pypi_downloads_link]: https://pypistats.org/packages/drf-yasg2
 
-[pypi]: https://img.shields.io/pypi/v/drf_yasg2 "PyPi"
-[pypi_link]: https://pypi.org/project/drf_yasg2
+[pypi]: https://img.shields.io/pypi/v/drf-yasg2 "PyPi"
+[pypi_link]: https://pypi.org/project/drf-yasg2
 
 [issues]: https://img.shields.io/github/issues/JoelLefkowitz/drf-yasg "Issues"
 [issues_link]: https://github.com/JoelLefkowitz/drf-yasg/issues
