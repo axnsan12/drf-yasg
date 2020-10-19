@@ -2,6 +2,14 @@
 Changelog
 #########
 
+**********
+**1.19.2**
+**********
+
+*Release date: Oct 19, 2020*
+- **FIXED:** Fixed heroku dependencies
+- **FIXED:** Fixed readthedocs build configuraion
+
 
 **********
 **1.19.0**

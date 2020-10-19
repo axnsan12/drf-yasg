@@ -23,7 +23,7 @@ from pkg_resources import get_distribution
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
-version = "1.19.1"
+version = "1.19.2"
 
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
 
