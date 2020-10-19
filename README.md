@@ -58,7 +58,7 @@ Installing the package from pypi:
 pip install drf-yasg2
 ```
 
-Given the numerous methods to manually customize the generated schema, it makes sense to validate the result to ensure it still conforms to OpenAPI 2.0. To this end, validation is provided at the generation point using python swagger libraries, and can be activated by passing validators=['ssv'] to get_schema_view; if the generated schema is not valid, a SwaggerValidationError is raised by the handling codec. 
+Given the numerous methods to manually customize the generated schema, it makes sense to validate the result to ensure it still conforms to OpenAPI 2.0. To this end, validation is provided at the generation point using Python Swagger libraries, and can be activated by passing `validators=['ssv']` to `get_schema_view`; if the generated schema is not valid, a `SwaggerValidationError` is raised by the handling codec. 
 
 To provide the built-in validation mechanisms you can install the extra requirements:
 
