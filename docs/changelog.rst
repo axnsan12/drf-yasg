@@ -3,6 +3,14 @@ Changelog
 #########
 
 **********
+**1.19.3**
+**********
+
+*Release date: Oct 20, 2020*
+
+- **IMPROVED:** Updated bundled swagger-ui and redoc Javascript dependencies
+
+**********
 **1.19.2**
 **********
 
