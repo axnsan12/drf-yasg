@@ -253,7 +253,7 @@ Suppose you wanted to model an email using a `JSONField` to store the subject an
        # }
        message = JSONField()
 
-To instruct ``drf_yasg2`` to output an OpenAPI schema that matches this, create a custom ``JSONField``:
+To instruct ``drf-yasg2`` to output an OpenAPI schema that matches this, create a custom ``JSONField``:
 
 .. code-block:: python
 

@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-drf_yasg2
-===========
+drf-yasg2
+=========
 
 .. toctree::
    :maxdepth: 2

@@ -1,7 +1,7 @@
-drf\_yasg package
+drf\_yasg2 package
 ====================
 
-drf\_yasg\.codecs
+drf\_yasg2\.codecs
 ---------------------------
 
 .. automodule:: drf_yasg2.codecs
@@ -10,7 +10,7 @@ drf\_yasg\.codecs
     :show-inheritance:
     :exclude-members: SaneYamlDumper,SaneYamlLoader
 
-drf\_yasg\.errors
+drf\_yasg2\.errors
 ---------------------------
 
 .. automodule:: drf_yasg2.errors
@@ -18,7 +18,7 @@ drf\_yasg\.errors
     :undoc-members:
     :show-inheritance:
 
-drf\_yasg\.generators
+drf\_yasg2\.generators
 -------------------------------
 
 .. automodule:: drf_yasg2.generators
@@ -26,7 +26,7 @@ drf\_yasg\.generators
     :undoc-members:
     :show-inheritance:
 
-drf\_yasg\.inspectors
+drf\_yasg2\.inspectors
 -------------------------------
 
 .. autodata:: drf_yasg2.inspectors.NotHandled
@@ -36,7 +36,7 @@ drf\_yasg\.inspectors
     :undoc-members:
     :show-inheritance:
 
-drf\_yasg\.middleware
+drf\_yasg2\.middleware
 -------------------------------
 
 .. automodule:: drf_yasg2.middleware
@@ -44,7 +44,7 @@ drf\_yasg\.middleware
     :undoc-members:
     :show-inheritance:
 
-drf\_yasg\.openapi
+drf\_yasg2\.openapi
 ----------------------------
 
 .. automodule:: drf_yasg2.openapi
@@ -53,7 +53,7 @@ drf\_yasg\.openapi
     :show-inheritance:
     :exclude-members: _bare_SwaggerDict
 
-drf\_yasg\.renderers
+drf\_yasg2\.renderers
 ------------------------------
 
 .. automodule:: drf_yasg2.renderers
@@ -61,7 +61,7 @@ drf\_yasg\.renderers
     :undoc-members:
     :show-inheritance:
 
-drf\_yasg\.utils
+drf\_yasg2\.utils
 --------------------------
 
 .. automodule:: drf_yasg2.utils
@@ -69,7 +69,7 @@ drf\_yasg\.utils
     :undoc-members:
     :show-inheritance:
 
-drf\_yasg\.views
+drf\_yasg2\.views
 --------------------------
 
 .. automodule:: drf_yasg2.views
