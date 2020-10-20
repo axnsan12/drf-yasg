@@ -7,6 +7,7 @@ Changelog
 **********
 
 *Release date: Oct 19, 2020*
+
 - **FIXED:** Fixed heroku dependencies
 - **FIXED:** Fixed readthedocs build configuraion
 
@@ -16,6 +17,7 @@ Changelog
 **********
 
 *Release date: Oct 17, 2020*
+
 - **ADDED:** Dropped support for Python 2.7
 
 **********
