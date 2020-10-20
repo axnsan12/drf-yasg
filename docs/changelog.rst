@@ -35,6 +35,7 @@ Changelog
 *Release date: Oct 12, 2020*
 
 **Final support was provided for python 2.7**
+
 - **FIXED:** Fixed compatibility with Django Rest Framework 3.12+
 
 **********
