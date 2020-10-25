@@ -5,7 +5,7 @@ python:
   - '3.8'
   - '3.9'
 
-dist: xenial
+dist: focal
 
 cache: pip
 
