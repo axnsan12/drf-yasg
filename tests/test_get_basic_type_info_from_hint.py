@@ -1,8 +1,8 @@
 import sys
-
-import pytest
 import uuid
 from typing import Dict, List, Optional, Set, Union
+
+import pytest
 
 from drf_yasg import openapi
 from drf_yasg.inspectors.field import get_basic_type_info_from_hint

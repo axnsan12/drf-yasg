@@ -1,12 +1,13 @@
+import datetime
 import inspect
 import logging
 import operator
-from collections import OrderedDict
-
-import datetime
 import typing
 import uuid
+from collections import OrderedDict
 from decimal import Decimal
+from inspect import signature as inspect_signature
+
 from django.core import validators
 from django.db import models
 from rest_framework import serializers
@@ -18,11 +19,6 @@ from ..utils import (
     decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
 )
 from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
-
-try:
-    from inspect import signature as inspect_signature
-except ImportError:
-    inspect_signature = None
 
 logger = logging.getLogger(__name__)
 
@@ -597,7 +593,7 @@ class SerializerMethodFieldInspector(FieldInspector):
                 serializer.read_only = True
 
             return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
-        elif inspect_signature:
+        else:
             # look for Python 3.5+ style type hinting of the return value
             hint_class = inspect_signature(method).return_annotation
 

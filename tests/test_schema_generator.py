@@ -1,8 +1,8 @@
 import json
+import typing
 from collections import OrderedDict
 
 import pytest
-import typing
 from django.contrib.postgres import fields as postgres_fields
 from django.db import models
 from django.urls import path

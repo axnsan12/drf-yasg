@@ -1,10 +1,10 @@
 import inspect
 import logging
 import sys
-from collections import OrderedDict
-
 import textwrap
+from collections import OrderedDict
 from decimal import Decimal
+
 from django.db import models
 from django.utils.encoding import force_str
 from rest_framework import serializers, status

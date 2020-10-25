@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxLengthValidator, MinValueValidator
 from rest_framework import serializers
