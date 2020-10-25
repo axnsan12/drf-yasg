@@ -19,17 +19,30 @@ with io.open('README.rst', encoding='utf-8') as readme:
 requirements = read_req('base.txt')
 requirements_validation = read_req('validation.txt')
 
-py3_supported_range = (5, 8)
 
-# convert inclusive range to exclusive range
-py3_supported_range = (py3_supported_range[0], py3_supported_range[1] + 1)
-python_requires = ", ".join([">=2.7"] + ["!=3.{}.*".format(v) for v in range(0, py3_supported_range[0])])
+def find_versions_from_readme(prefix):
+    for line in description.splitlines():
+        line = line.strip()
+        if line.startswith(prefix):
+            versions = [v.strip() for v in line[len(prefix):].split(',')]
+            if versions:
+                return versions
+
+    raise RuntimeError("failed to find supported versions list for '{}'".format(prefix))
+
+
+python_versions = find_versions_from_readme("- **Python**: ")
+django_versions = find_versions_from_readme("- **Django**: ")
+
+python_requires = ">=" + python_versions[0]
+
 python_classifiers = [
     'Programming Language :: Python',
-    'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
-] + ['Programming Language :: Python :: 3.{}'.format(v) for v in range(*py3_supported_range)]
+] + ['Programming Language :: Python :: {}'.format(v) for v in python_versions]
+django_classifiers = [
+    'Framework :: Django',
+] + ['Framework :: Django :: {}'.format(v) for v in django_versions]
 
 
 def drf_yasg_setup(**kwargs):
@@ -57,14 +70,9 @@ def drf_yasg_setup(**kwargs):
             'Development Status :: 5 - Production/Stable',
             'Operating System :: OS Independent',
             'Environment :: Web Environment',
-            'Framework :: Django',
-            'Framework :: Django :: 1.11',
-            'Framework :: Django :: 2.0',
-            'Framework :: Django :: 2.1',
-            'Framework :: Django :: 2.2',
             'Topic :: Documentation',
             'Topic :: Software Development :: Code Generators',
-        ] + python_classifiers,
+        ] + python_classifiers + django_classifiers,
         **kwargs
     )
 
