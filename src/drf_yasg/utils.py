@@ -39,7 +39,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
     `method` and `methods` are mutually exclusive and must only be present when decorating a view method that accepts
     more than one HTTP request method.
 
-    The `auto_schema` and `operation_description` arguments take precendence over view- or method-level values.
+    The `auto_schema` and `operation_description` arguments take precedence over view- or method-level values.
 
     :param str method: for multi-method views, the http method the options should apply to
     :param list[str] methods: for multi-method views, the http methods the options should apply to
@@ -75,12 +75,12 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
         It is an error to supply ``form`` parameters when the request does not consume form-data.
 
-    :param str operation_id: operation ID override; the operation ID must be unique accross the whole API
+    :param str operation_id: operation ID override; the operation ID must be unique across the whole API
     :param str operation_description: operation description override
     :param str operation_summary: operation summary string
-    :param list[dict] security: security requirements override; used to specify which authetication mechanism
-        is requried to call this API; an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
-        authentication schemes), and ``None`` will inherit the top-level secuirty requirements
+    :param list[dict] security: security requirements override; used to specify which authentication mechanism
+        is required to call this API; an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
+        authentication schemes), and ``None`` will inherit the top-level security requirements
     :param bool deprecated: deprecation status for operation
     :param responses: a dict of documented manual responses
         keyed on response status code. If no success (``2xx``) response is given, one will automatically be
