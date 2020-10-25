@@ -21,6 +21,6 @@ urlpatterns = (
     path('', person_list, name='people-list'),
     path('<int:pk>', person_detail, name='person-detail'),
 
-    path('<int:person>/identity$', identity_detail,
+    path('<int:person>/identity', identity_detail,
          name='person-identity'),
 )

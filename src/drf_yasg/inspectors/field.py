@@ -1,10 +1,10 @@
 import inspect
 import logging
 import operator
-import sys
 from collections import OrderedDict
 
 import datetime
+import typing
 import uuid
 from decimal import Decimal
 from django.core import validators
@@ -18,11 +18,6 @@ from ..utils import (
     decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
 )
 from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
-
-try:
-    import typing
-except ImportError:
-    typing = None
 
 try:
     from inspect import signature as inspect_signature
@@ -490,42 +485,34 @@ hinting_type_info = [
     (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
 ]
 
-if sys.version_info < (3, 0):
-    # noinspection PyUnresolvedReferences
-    hinting_type_info.append((unicode, (openapi.TYPE_STRING, None)))  # noqa: F821
 
-if typing:
-    if hasattr(typing, 'get_args'):
-        typing_get_args = typing.get_args
-    else:
-        def typing_get_args(tp):
-            return getattr(tp, '__args__', ())
+if hasattr(typing, 'get_args'):
+    # python >=3.8
+    typing_get_args = typing.get_args
+else:
+    # python <3.8
+    def typing_get_args(tp):
+        return getattr(tp, '__args__', ())
 
-    def inspect_collection_hint_class(hint_class):
-        args = typing_get_args(hint_class)
-        child_class = args[0] if args else str
-        child_type_info = get_basic_type_info_from_hint(child_class) or {'type': openapi.TYPE_STRING}
 
-        return OrderedDict([
-            ('type', openapi.TYPE_ARRAY),
-            ('items', openapi.Items(**child_type_info)),
-        ])
+def inspect_collection_hint_class(hint_class):
+    args = typing_get_args(hint_class)
+    child_class = args[0] if args else str
+    child_type_info = get_basic_type_info_from_hint(child_class) or {'type': openapi.TYPE_STRING}
 
-    hinting_type_info.append(((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class))
+    return OrderedDict([
+        ('type', openapi.TYPE_ARRAY),
+        ('items', openapi.Items(**child_type_info)),
+    ])
+
+
+hinting_type_info.append(((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class))
 
 
 def _get_union_types(hint_class):
-    if typing:
-        origin_type = get_origin_type(hint_class)
-        if origin_type is typing.Union:
-            return hint_class.__args__
-        try:
-            # python 3.5.2 and lower compatibility
-            if issubclass(origin_type, typing.Union):
-                return hint_class.__union_params__
-        except TypeError:
-            pass
-    return None
+    origin_type = get_origin_type(hint_class)
+    if origin_type is typing.Union:
+        return hint_class.__args__
 
 
 def get_basic_type_info_from_hint(hint_class):
@@ -539,7 +526,7 @@ def get_basic_type_info_from_hint(hint_class):
     """
     union_types = _get_union_types(hint_class)
 
-    if typing and union_types:
+    if union_types:
         # Optional is implemented as Union[T, None]
         if len(union_types) == 2 and isinstance(None, union_types[1]):
             result = get_basic_type_info_from_hint(union_types[0])
@@ -612,7 +599,7 @@ class SerializerMethodFieldInspector(FieldInspector):
                 serializer.read_only = True
 
             return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
-        elif typing and inspect_signature:
+        elif inspect_signature:
             # look for Python 3.5+ style type hinting of the return value
             hint_class = inspect_signature(method).return_annotation
 

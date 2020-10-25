@@ -14,6 +14,6 @@ router.register(r'harvest', views.HarvestViewSet)
 urlpatterns = router.urls
 
 urlpatterns += [
-    path(r'<int:todo_id>/yetanothers/<int:yetanother_id>/$',
+    path(r'<int:todo_id>/yetanothers/<int:yetanother_id>/',
          views.NestedTodoView.as_view(), ),
 ]

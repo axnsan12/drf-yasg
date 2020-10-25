@@ -1,8 +1,8 @@
 import json
-import sys
 from collections import OrderedDict
 
 import pytest
+import typing
 from django.contrib.postgres import fields as postgres_fields
 from django.db import models
 from django.urls import path
@@ -17,11 +17,6 @@ from drf_yasg.codecs import yaml_sane_load
 from drf_yasg.errors import SwaggerGenerationError
 from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.utils import swagger_auto_schema
-
-try:
-    import typing
-except ImportError:
-    typing = None
 
 
 def test_schema_is_valid(swagger, codec_yaml):
@@ -307,7 +302,6 @@ def test_json_field():
     (float, openapi.TYPE_NUMBER),
     (bool, openapi.TYPE_BOOLEAN),
 ])
-@pytest.mark.skipif(typing is None or sys.version_info.major < 3, reason="typing not supported")
 def test_optional_return_type(py_type, expected_type):
 
     class OptionalMethodSerializer(serializers.Serializer):

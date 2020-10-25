@@ -1,15 +1,9 @@
-import rest_framework
 from decimal import Decimal
 from django.contrib.auth import get_user_model
-from packaging.version import Version
+from django.core.validators import MaxLengthValidator, MinValueValidator
 from rest_framework import serializers
 
 from snippets.models import LANGUAGE_CHOICES, STYLE_CHOICES, Snippet, SnippetViewer
-
-if Version(rest_framework.__version__) < Version('3.10'):
-    from rest_framework.compat import MaxLengthValidator, MinValueValidator
-else:
-    from django.core.validators import MaxLengthValidator, MinValueValidator
 
 
 class LanguageSerializer(serializers.Serializer):

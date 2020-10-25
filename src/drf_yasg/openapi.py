@@ -1,5 +1,3 @@
-import six
-
 import collections
 import logging
 import re
@@ -150,7 +148,7 @@ class SwaggerDict(OrderedDict):
             for attr, val in items:
                 result[attr] = SwaggerDict._as_odict(val, memo)
             return result
-        elif isinstance(obj, six.string_types):
+        elif isinstance(obj, str):
             return force_real_str(obj)
         elif isinstance(obj, collections_abc.Iterable) and not isinstance(obj, collections_abc.Iterator):
             return type(obj)(SwaggerDict._as_odict(elem, memo) for elem in obj)

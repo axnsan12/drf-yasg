@@ -1,19 +1,11 @@
-import sys
-
+import typing  # noqa: F401
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from drf_yasg.utils import swagger_serializer_method
 from snippets.models import Snippet
 
-try:
-    import typing  # noqa: F401
-    if sys.version_info >= (3, 4):
-        from .method_serializers_with_typing import MethodFieldExampleSerializer
-    else:
-        from .method_serializers_without_typing import MethodFieldExampleSerializer
-except ImportError:
-    from .method_serializers_without_typing import MethodFieldExampleSerializer
+from .method_serializers import MethodFieldExampleSerializer
 
 
 class OtherStuffSerializer(serializers.Serializer):
