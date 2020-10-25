@@ -2,6 +2,18 @@
 Changelog
 #########
 
+
+**********
+**1.17.1**
+**********
+
+*Release date: Feb 17, 2020*
+
+- **FIXED:** fixed compatibility issue with CurrentUserDefault in Django Rest Framework 3.11
+- **FIXED:** respect `USERNAME_FIELD` in `generate_swagger` command (:pr:`486`)
+
+**Support was dropped for Python 3.5, Django 2.0, Django 2.1, DRF 3.7**
+
 **********
 **1.17.0**
 **********

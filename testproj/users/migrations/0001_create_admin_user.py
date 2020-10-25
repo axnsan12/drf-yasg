@@ -3,7 +3,7 @@ import sys
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-from django.db import migrations, IntegrityError
+from django.db import migrations, IntegrityError, transaction
 
 
 def add_default_user(apps, schema_editor):
@@ -13,14 +13,15 @@ def add_default_user(apps, schema_editor):
     User = apps.get_model(settings.AUTH_USER_MODEL)
 
     try:
-        admin = User(
-            username=username,
-            email=email,
-            password=make_password(password),
-            is_superuser=True,
-            is_staff=True
-        )
-        admin.save()
+        with transaction.atomic():
+            admin = User(
+                username=username,
+                email=email,
+                password=make_password(password),
+                is_superuser=True,
+                is_staff=True
+            )
+            admin.save()
     except IntegrityError:
         sys.stdout.write(" User '%s <%s>' already exists..." % (username, email))
     else:

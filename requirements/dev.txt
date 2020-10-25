@@ -4,3 +4,4 @@
 -r lint.txt
 
 tox-battery>=0.5
+django-oauth-toolkit
