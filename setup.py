@@ -59,7 +59,7 @@ def drf_yasg_setup(**kwargs):
         license='BSD License',
         description='Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code.',
         long_description=description,
-        long_description_content_type='test/x-rst',
+        long_description_content_type='text/x-rst',
         url='https://github.com/axnsan12/drf-yasg',
         author='Cristi V.',
         author_email='cristi@cvjd.me',
