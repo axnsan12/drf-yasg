@@ -33,7 +33,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
    .. code:: console
 
-      $ virtualenv venv
+      $ python -m venv venv
       $ source venv/bin/activate
       (venv) $ python -m pip install -U pip setuptools
       (venv) $ pip install -U -e .[validation]

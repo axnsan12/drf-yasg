@@ -31,6 +31,19 @@ Resources:
 
 |heroku-button|
 
+
+****************
+OpenAPI 3.0 note
+****************
+
+If you are looking to add Swagger/OpenAPI support to a new project you might want to take a look at
+`drf-spectacular <https://github.com/tfranzel/drf-spectacular>`_, which is an actively maintained new library that
+shares most of the goals of this project, while working with OpenAPI 3.0 schemas.
+
+OpenAPI 3.0 provides a lot more flexibility than 2.0 in the types of API that can be described.
+``drf-yasg`` is unlikely to soon, if ever, get support for OpenAPI 3.0.
+
+
 ********
 Features
 ********
