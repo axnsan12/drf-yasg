@@ -4,6 +4,25 @@ Changelog
 
 
 **********
+**1.20.0**
+**********
+
+*Release date: Oct 25, 2020*
+
+- **IMPROVED:** updated ``swagger-ui`` to version 3.36.0
+- **IMPROVED:** updated ``ReDoc`` to version 2.0.0-rc.40
+- **FIXED:** fixed compatibility with Django Rest Framework 3.12
+- **FIXED:** fixed compatibility with Python 3.9 typing generics
+- **FIXED:** dropped support for obsolete ``django.conf.settings.LOGOUT_URL`` (:pr:`646`)
+
+| **Support was dropped for Python 2.7, DRF 3.8, DRF 3.9.**
+| **Requirements are now: Python>=3.6, Django>=2.2, DRF>=3.10**
+
+The 1.18 and 1.19 series was skipped to avoid confusion with the drf-yasg2 fork. I would also like to take this
+opportunity to extend my apologies to the community at large for the large gap in the maintenance of drf-yasg
+and the problems it has caused.
+
+**********
 **1.17.1**
 **********
 
