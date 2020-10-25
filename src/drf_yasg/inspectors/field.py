@@ -1,12 +1,12 @@
-import datetime
 import inspect
 import logging
 import operator
 import sys
-import uuid
 from collections import OrderedDict
-from decimal import Decimal
 
+import datetime
+import uuid
+from decimal import Decimal
 from django.core import validators
 from django.db import models
 from rest_framework import serializers
@@ -770,8 +770,7 @@ class StringDefaultFieldInspector(FieldInspector):
 
 try:
     from djangorestframework_camel_case.parser import CamelCaseJSONParser
-    from djangorestframework_camel_case.render import CamelCaseJSONRenderer
-    from djangorestframework_camel_case.render import camelize
+    from djangorestframework_camel_case.render import CamelCaseJSONRenderer, camelize
 except ImportError:  # pragma: no cover
     CamelCaseJSONParser = CamelCaseJSONRenderer = None
 

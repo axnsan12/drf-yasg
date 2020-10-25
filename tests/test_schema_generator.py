@@ -3,9 +3,9 @@ import sys
 from collections import OrderedDict
 
 import pytest
-from django.conf.urls import url
 from django.contrib.postgres import fields as postgres_fields
 from django.db import models
+from django.urls import path
 from django.utils.inspect import get_func_args
 from django_fake_model import models as fake_models
 from rest_framework import routers, serializers, viewsets
@@ -148,8 +148,8 @@ def test_url_order():
         return Response({"message": "Hello, world!"})
 
     patterns = [
-        url(r'^/test/$', test_override),
-        url(r'^/test/$', test_view),
+        path('test/', test_override),
+        path('test/', test_view),
     ]
 
     generator = OpenAPISchemaGenerator(
@@ -169,7 +169,7 @@ def test_url_order():
 
 
 try:
-    from rest_framework.decorators import action, MethodMapper
+    from rest_framework.decorators import MethodMapper, action
 except ImportError:
     action = MethodMapper = None
 

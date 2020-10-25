@@ -1,13 +1,12 @@
-import uuid
-
 import pytest
+import uuid
 
 from drf_yasg import openapi
 from drf_yasg.inspectors.field import get_basic_type_info_from_hint
 
 try:
     import typing
-    from typing import Dict, List, Union, Optional, Set
+    from typing import Dict, List, Optional, Set, Union
 except ImportError:
     typing = None
 

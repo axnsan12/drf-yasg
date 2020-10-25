@@ -1,6 +1,5 @@
-from decimal import Decimal
-
 import rest_framework
+from decimal import Decimal
 from django.contrib.auth import get_user_model
 from packaging.version import Version
 from rest_framework import serializers

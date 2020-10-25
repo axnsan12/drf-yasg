@@ -28,8 +28,8 @@ def _validate_flex(spec):
 
 
 def _validate_swagger_spec_validator(spec):
-    from swagger_spec_validator.validator20 import validate_spec as validate_ssv
     from swagger_spec_validator.common import SwaggerValidationError as SSVErr
+    from swagger_spec_validator.validator20 import validate_spec as validate_ssv
     try:
         validate_ssv(spec)
     except SSVErr as ex:

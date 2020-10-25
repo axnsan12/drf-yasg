@@ -1,7 +1,7 @@
 import user_agents
-from django.conf.urls import include, url
 from django.contrib import admin
 from django.shortcuts import redirect
+from django.urls import include, path, re_path
 from rest_framework import permissions
 from rest_framework.decorators import api_view
 
@@ -49,26 +49,28 @@ def root_redirect(request):
 
 # urlpatterns required for settings values
 required_urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('admin/', admin.site.urls),
+    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 ]
 
 urlpatterns = [
-    url(r'^swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=0), name='schema-json'),
-    url(r'^swagger/$', SchemaView.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    url(r'^redoc/$', SchemaView.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    url(r'^redoc-old/$', SchemaView.with_ui('redoc-old', cache_timeout=0), name='schema-redoc-old'),
+    re_path(r'^swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=0),
+            name='schema-json'),
+    path('swagger/', SchemaView.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', SchemaView.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('redoc-old/', SchemaView.with_ui('redoc-old', cache_timeout=0), name='schema-redoc-old'),
 
-    url(r'^cached/swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=None), name='cschema-json'),
-    url(r'^cached/swagger/$', SchemaView.with_ui('swagger', cache_timeout=None), name='cschema-swagger-ui'),
-    url(r'^cached/redoc/$', SchemaView.with_ui('redoc', cache_timeout=None), name='cschema-redoc'),
+    re_path(r'^cached/swagger(?P<format>.json|.yaml)$', SchemaView.without_ui(cache_timeout=None),
+            name='cschema-json'),
+    path('cached/swagger/', SchemaView.with_ui('swagger', cache_timeout=None), name='cschema-swagger-ui'),
+    path('cached/redoc/', SchemaView.with_ui('redoc', cache_timeout=None), name='cschema-redoc'),
 
-    url(r'^$', root_redirect),
+    path('', root_redirect),
 
-    url(r'^snippets/', include('snippets.urls')),
-    url(r'^articles/', include('articles.urls')),
-    url(r'^users/', include('users.urls')),
-    url(r'^todo/', include('todo.urls')),
-    url(r'^people/', include('people.urls')),
-    url(r'^plain/', plain_view),
+    path('snippets/', include('snippets.urls')),
+    path('articles/', include('articles.urls')),
+    path('users/', include('users.urls')),
+    path('todo/', include('todo.urls')),
+    path('people/', include('people.urls')),
+    path('plain/', plain_view),
 ] + required_urlpatterns
