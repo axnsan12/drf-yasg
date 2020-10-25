@@ -110,15 +110,13 @@ class InlineSerializerInspector(SerializerInspector):
                         required.append(property_name)
 
                 result = SwaggerType(
+                    # the title is derived from the field name and is better to
+                    # be omitted from models
+                    use_field_title=False,
                     type=openapi.TYPE_OBJECT,
                     properties=properties,
                     required=required or None,
                 )
-                if not ref_name and 'title' in result:
-                    # on an inline model, the title is derived from the field name
-                    # but is visno coverually displayed like the model name, which is confusing
-                    # it is better to just remove title from inline models
-                    del result.title
 
                 setattr(result, '_NP_serializer', get_serializer_class(serializer))
                 return result

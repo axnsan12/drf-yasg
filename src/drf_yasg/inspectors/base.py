@@ -268,7 +268,7 @@ class FieldInspector(BaseInspector):
         description = force_real_str(help_text) if help_text else None
         description = description if swagger_object_type != openapi.Items else None  # Items has no description either
 
-        def SwaggerType(existing_object=None, **instance_kwargs):
+        def SwaggerType(existing_object=None, use_field_title=True, **instance_kwargs):
             if 'required' not in instance_kwargs and swagger_object_type == openapi.Parameter:
                 instance_kwargs['required'] = field.required
 
@@ -277,7 +277,7 @@ class FieldInspector(BaseInspector):
                 if default not in (None, serializers.empty):
                     instance_kwargs['default'] = default
 
-            if instance_kwargs.get('type', None) != openapi.TYPE_ARRAY:
+            if use_field_title and instance_kwargs.get('type', None) != openapi.TYPE_ARRAY:
                 instance_kwargs.setdefault('title', title)
             if description is not None:
                 instance_kwargs.setdefault('description', description)
