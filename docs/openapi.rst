@@ -107,7 +107,7 @@ This section describes where information is sourced from when using the default 
      is used as described in the :func:`@swagger_auto_schema documentation <.swagger_auto_schema>`
    + otherwise, an attempt is made to generate a default response:
 
-      - the success status code is assumed to be ``204` for ``DELETE`` requests, ``201`` for ``POST`` requests, and
+      - the success status code is assumed to be ``204`` for ``DELETE`` requests, ``201`` for ``POST`` requests, and
         ``200`` for all other request methods
       - if the view has a request body, the same ``Serializer`` or :class:`.Schema` as in the request body is used
         in generating the :class:`.Response` schema; this is inline with the default ``GenericAPIView`` and
