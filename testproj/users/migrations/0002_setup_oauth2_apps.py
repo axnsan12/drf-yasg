@@ -30,7 +30,7 @@ def add_oauth_apps(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('oauth2_provider', '0006_auto_20171214_2232'),
+        ('oauth2_provider', '0002_auto_20190406_1805'),
         ('users', '0001_create_admin_user'),
     ]
 
