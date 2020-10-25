@@ -79,6 +79,8 @@ class SnippetSerializer(serializers.Serializer):
     rate = serializers.DecimalField(max_digits=6, decimal_places=3, default=Decimal('0.0'), coerce_to_string=False,
                                     validators=[MinValueValidator(Decimal('0.0'))])
 
+    nullable_secondary_language = LanguageSerializer(allow_null=True)
+
     def create(self, validated_data):
         """
         Create and return a new `Snippet` instance, given the validated data.

@@ -1130,6 +1130,7 @@ definitions:
       - code
       - tags
       - language
+      - nullableSecondaryLanguage
     type: object
     properties:
       id:
@@ -1230,6 +1231,25 @@ definitions:
         format: decimal
         default: 0.0
         minimum: 0.0
+      nullableSecondaryLanguage:
+        type: object
+        properties:
+          name:
+            title: Name
+            description: The name of the programming language
+            type: string
+            enum:
+              - cpp
+              - js
+              - python
+            default: python
+          readOnlyNullable:
+            title: Read only nullable
+            type: string
+            readOnly: true
+            minLength: 1
+            x-nullable: true
+        x-nullable: true
   SnippetViewer:
     required:
       - snippet
