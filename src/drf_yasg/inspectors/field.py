@@ -495,8 +495,14 @@ if sys.version_info < (3, 0):
     hinting_type_info.append((unicode, (openapi.TYPE_STRING, None)))  # noqa: F821
 
 if typing:
+    if hasattr(typing, 'get_args'):
+        typing_get_args = typing.get_args
+    else:
+        def typing_get_args(tp):
+            return getattr(tp, '__args__', ())
+
     def inspect_collection_hint_class(hint_class):
-        args = hint_class.__args__
+        args = typing_get_args(hint_class)
         child_class = args[0] if args else str
         child_type_info = get_basic_type_info_from_hint(child_class) or {'type': openapi.TYPE_STRING}
 
