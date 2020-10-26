@@ -557,7 +557,7 @@ class SerializerMethodFieldInspector(FieldInspector):
         if not isinstance(field, serializers.SerializerMethodField):
             return NotHandled
 
-        method = getattr(field.parent, field.method_name)
+        method = getattr(field.parent, field.method_name, None)
         if method is None:
             return NotHandled
 
