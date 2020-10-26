@@ -2,9 +2,9 @@ import copy
 import logging
 import re
 from collections import OrderedDict, defaultdict
+import urllib.parse as urlparse
 
 import uritemplate
-from coreapi.compat import urlparse
 from django.urls import URLPattern, URLResolver
 from rest_framework import versioning
 from rest_framework.schemas import SchemaGenerator
