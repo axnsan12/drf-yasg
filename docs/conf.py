@@ -22,7 +22,7 @@ from docutils.parsers.rst.roles import set_classes
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
-version = "1.19.3"
+version = "1.19.4"
 
 extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
 
