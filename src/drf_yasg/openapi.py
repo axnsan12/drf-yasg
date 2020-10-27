@@ -1,9 +1,9 @@
 import collections
 import logging
 import re
+import urllib.parse as urlparse
 from collections import OrderedDict
 
-from coreapi.compat import urlparse
 from django.urls import get_script_prefix
 from django.utils.functional import Promise
 from inflection import camelize

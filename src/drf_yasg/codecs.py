@@ -3,7 +3,7 @@ import json
 import logging
 from collections import OrderedDict
 
-from coreapi.compat import force_bytes
+from django.utils.encoding import force_bytes
 from ruamel import yaml
 
 from . import openapi
