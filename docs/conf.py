@@ -12,7 +12,6 @@ import sphinx_rtd_theme
 from docutils import nodes, utils
 from docutils.parsers.rst import roles
 from docutils.parsers.rst.roles import set_classes
-from pkg_resources import get_distribution
 
 # -- General configuration ------------------------------------------------
 
@@ -212,7 +211,7 @@ import drf_yasg2.views  # noqa: E402
 drf_yasg2.views.SchemaView = drf_yasg2.views.get_schema_view(None)
 
 # monkey patch to stop sphinx from trying to find classes by their real location instead of the
-# top-level __init__ alias; this allows us to document only `drf_yasg2.inspectors` and avoid 
+# top-level __init__ alias; this allows us to document only `drf_yasg2.inspectors` and avoid
 # broken references or double documenting
 
 import drf_yasg2.inspectors  # noqa: E402

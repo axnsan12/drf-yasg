@@ -17,6 +17,7 @@ from ..utils import (
     merge_params,
     no_body,
     param_list_to_odict,
+    strip_doc_string,
 )
 from .base import ViewInspector, call_view_method
 
@@ -299,8 +300,14 @@ class SwaggerAutoSchema(ViewInspector):
                 response = openapi.Response(description="", schema=serializer,)
             else:
                 serializer = force_serializer_instance(serializer)
+                description = ''
+                if getattr(serializer, 'many', False):
+                    description = strip_doc_string(serializer.child.__doc__)
+                else:
+                    description = strip_doc_string(serializer.__doc__)
                 response = openapi.Response(
-                    description="", schema=self.serializer_to_schema(serializer),
+                    description=description,
+                    schema=self.serializer_to_schema(serializer),
                 )
 
             responses[str(sc)] = response
@@ -380,8 +387,7 @@ class SwaggerAutoSchema(ViewInspector):
         if len(sections) == 2:
             sections[0] = sections[0].strip()
             if len(sections[0]) < summary_max_len:
-                summary, description = sections
-                description = description.strip()
+                summary, description = map(strip_doc_string, sections)
 
         return summary, description
 
