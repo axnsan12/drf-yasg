@@ -1,8 +1,8 @@
 import copy
 import logging
 import re
-from collections import OrderedDict, defaultdict
 import urllib.parse as urlparse
+from collections import OrderedDict, defaultdict
 
 import uritemplate
 from django.urls import URLPattern, URLResolver
