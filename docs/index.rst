@@ -17,6 +17,7 @@ drf-yasg2
    custom_spec.rst
    custom_ui.rst
    settings.rst
+   third_party_integrations.rst
    contributing.rst
    license.rst
    changelog.rst
