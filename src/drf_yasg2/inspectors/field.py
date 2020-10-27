@@ -52,7 +52,7 @@ class InlineSerializerInspector(SerializerInspector):
         is called only when the serializer is converted into a list of parameters for use in a form data request.
 
         :param serializer: serializer instance
-        :param list[openapi.Parameter] parameters: genereated parameters
+        :param list[openapi.Parameter] parameters: generated parameters
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
@@ -157,7 +157,7 @@ class InlineSerializerInspector(SerializerInspector):
                 if not explicit_refs:
                     raise SwaggerGenerationError(
                         "Schema for %s would override distinct serializer %s because they implicitly share the same "
-                        "ref_name; explicitly set the ref_name atribute on both serializers' Meta classes"
+                        "ref_name; explicitly set the ref_name attribute on both serializers' Meta classes"
                         % (actual_serializer, this_serializer)
                     )
 
