@@ -3,7 +3,7 @@ python:
   - '3.6'
   - '3.7'
   - '3.8'
-  - '3.9-dev'
+  - '3.9'
 
 dist: focal
 
@@ -13,7 +13,7 @@ matrix:
   include:
     - python: '3.8'
       env: TOXENV=docs
-    - python: '3.9-dev'
+    - python: '3.9'
       env: TOXENV=djmaster
     - python: '3.8'
       env: TOXENV=lint
