@@ -26,7 +26,7 @@ You can log in using the pre-existing `admin` user with password `passwordadmin`
 SchemaView = get_schema_view(
     validators=['ssv', 'flex'],
     public=True,
-    permission_classes=(permissions.AllowAny,),
+    permission_classes=[permissions.AllowAny],
 )
 
 

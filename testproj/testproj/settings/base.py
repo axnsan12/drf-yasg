@@ -88,9 +88,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Django Rest Framework
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
+    'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ]
 }
 
 OAUTH2_CLIENT_ID = '12ee6bgxtpSEgP8TioWcHSXOiDBOUrVav4mRbVEs'
