@@ -543,6 +543,9 @@ class OpenAPISchemaGenerator(object):
         if method in overrides:
             overrides = overrides[method]
 
+        if hasattr(view, "schema_tags"):
+            overrides["tags"] += view.schema_tags
+
         return copy.deepcopy(overrides)
 
     def get_path_parameters(self, path, view_cls):
