@@ -181,14 +181,20 @@ Schema generation of ``serializers.SerializerMethodField`` is supported in two w
 
       class ParentSerializer(serializers.Serializer):
           other_stuff = serializers.SerializerMethodField()
-
+          many_other_stuff = serializers.SerializerMethodField()
+          
           @swagger_serializer_method(serializer_or_field=OtherStuffSerializer)
           def get_other_stuff(self, obj):
+              return OtherStuffSerializer().data
+          
+          @swagger_serializer_method(serializer_or_field=OtherStuffSerializer(many=True))
+          def get_many_other_stuff(self, obj):
               return OtherStuffSerializer().data
 
 
    Note that the ``serializer_or_field`` parameter can accept either a subclass or an instance of ``serializers.Field``.
-
+   
+   
 
 2) For simple cases where the method is returning one of the supported types, `Python 3 type hinting`_ of the
    serializer method return value can be used. e.g.:
