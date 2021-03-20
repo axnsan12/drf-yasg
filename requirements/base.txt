@@ -3,7 +3,6 @@ coreschema>=0.0.4
 ruamel.yaml>=0.15.34
 inflection>=0.3.1
 uritemplate>=3.0.0
-packaging
 
 djangorestframework>=3.10.3
 Django>=2.2.16
