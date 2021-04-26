@@ -98,7 +98,7 @@ Usage
 0. Installation
 ===============
 
-The preferred instalation method is directly from pypi:
+The preferred installation method is directly from pypi:
 
 .. code:: console
 
