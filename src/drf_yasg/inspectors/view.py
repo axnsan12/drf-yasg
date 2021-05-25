@@ -264,9 +264,18 @@ class SwaggerAutoSchema(ViewInspector):
                 )
             else:
                 serializer = force_serializer_instance(serializer)
+
+                schema = self.serializer_to_schema(serializer)
+
+                if self.has_list_response():
+                    schema = openapi.Schema(type=openapi.TYPE_ARRAY,
+                                            items=schema)
+                if self.should_page():
+                    schema = self.get_paginated_response(schema) or schema
+
                 response = openapi.Response(
                     description='',
-                    schema=self.serializer_to_schema(serializer),
+                    schema=schema,
                 )
 
             responses[str(sc)] = response
