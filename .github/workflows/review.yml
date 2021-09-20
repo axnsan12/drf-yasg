@@ -9,15 +9,6 @@ jobs:
     strategy:
       matrix:
         python: [3.6, 3.7, 3.8, 3.9]
-        include:
-          - python: '3.8'
-            toxenv: 'lint'
-          
-          - python: '3.8'
-            toxenv: 'docs'
-
-          - python: '3.9'
-            toxenv: 'djmaster'
 
     steps:
       - name: Set up pip package caching
