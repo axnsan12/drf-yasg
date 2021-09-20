@@ -31,11 +31,3 @@ jobs:
 
       - name: Run unit tests
         run: tox
-
-      - name: Run linters and docs tests 
-        run: tox -e docs,lint
-        if: ${{ matrix.python == 3.8 }}
-
-      - name: Run tests against Django's master branch
-        run: tox -e djmaster
-        if: ${{ matrix.python == 3.9 }}
