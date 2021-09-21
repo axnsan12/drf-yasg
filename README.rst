@@ -336,11 +336,11 @@ Integration with `djangorestframework-recursive <https://github.com/heywbj/djang
 provided out of the box - if you have ``djangorestframework-recursive`` installed.
 
 .. |actions| image:: https://img.shields.io/github/workflow/status/axnsan12/drf-yasg/Review
-   :target: https://codecov.io/gh/axnsan12/drf-yasg
+   :target: https://github.com/axnsan12/drf-yasg/actions
    :alt: GitHub Workflow Status
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/axnsan12/drf-yasg/master.svg
-   :target: https://github.com/axnsan12/drf-yasg/actions
+   :target: https://codecov.io/gh/axnsan12/drf-yasg
    :alt: Codecov
 
 .. |pypi-version| image:: https://img.shields.io/pypi/v/drf-yasg.svg
