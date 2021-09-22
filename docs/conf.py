@@ -321,4 +321,4 @@ roles.register_local_role('ghuser', role_github_user)
 
 
 def setup(app):
-    app.add_stylesheet('css/style.css')
+    app.add_css_file('css/style.css')
