@@ -5,7 +5,7 @@
 drf-yasg - Yet another Swagger generator
 ########################################
 
-|travis| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
+|actions| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
 
 Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
 
@@ -98,7 +98,7 @@ Usage
 0. Installation
 ===============
 
-The preferred instalation method is directly from pypi:
+The preferred installation method is directly from pypi:
 
 .. code:: console
 
@@ -335,9 +335,9 @@ djangorestframework-recursive
 Integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_ is
 provided out of the box - if you have ``djangorestframework-recursive`` installed.
 
-.. |travis| image:: https://img.shields.io/travis/axnsan12/drf-yasg/master.svg
-   :target: https://travis-ci.org/axnsan12/drf-yasg
-   :alt: Travis CI
+.. |actions| image:: https://img.shields.io/github/workflow/status/axnsan12/drf-yasg/Review
+   :target: https://github.com/axnsan12/drf-yasg/actions
+   :alt: GitHub Workflow Status
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/axnsan12/drf-yasg/master.svg
    :target: https://codecov.io/gh/axnsan12/drf-yasg
