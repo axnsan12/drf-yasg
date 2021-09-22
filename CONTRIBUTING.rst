@@ -93,7 +93,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
    Incomplete/Work In Progress pull requests are encouraged, because they allow you to get feedback and help more
    easily.
 
-#. **Your code must pass all the required travis jobs before it is merged**
+#. **Your code must pass all the required CI jobs before it is merged**
 
    As of now, this consists of running on the supported Python, Django, DRF version matrix (see README),
    and building the docs succesfully.
@@ -108,13 +108,13 @@ Release checklist
 * update ``docs/changelog.rst`` with changes since the last tagged version
 * commit & tag the release - ``git tag x.x.x -m "Release version x.x.x"``
 * push using ``git push --follow-tags``
-* verify that `Travis`_ has built the tag and succesfully published the release to `PyPI`_
+* verify that `Actions`_ has built the tag and successfully published the release to `PyPI`_
 * publish release notes `on GitHub`_
 * start the `ReadTheDocs build`_ if it has not already started
 * deploy the live demo `on Heroku`_
 
 
-.. _Travis: https://travis-ci.org/axnsan12/drf-yasg/builds
+.. _Actions: https://github.com/axnsan12/drf-yasg/actions
 .. _PyPI: https://pypi.org/project/drf-yasg/
 .. _on GitHub: https://github.com/axnsan12/drf-yasg/releases
 .. _ReadTheDocs build: https://readthedocs.org/projects/drf-yasg/builds/
