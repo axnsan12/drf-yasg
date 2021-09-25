@@ -45,14 +45,14 @@ class OpenAPIRenderer(_SpecRenderer):
 class SwaggerJSONRenderer(_SpecRenderer):
     """Renders the schema as a JSON document with the generic ``application/json`` mime type."""
     media_type = 'application/json'
-    format = '.json'
+    format = 'json'
     codec_class = OpenAPICodecJson
 
 
 class SwaggerYAMLRenderer(_SpecRenderer):
     """Renders the schema as a YAML document."""
     media_type = 'application/yaml'
-    format = '.yaml'
+    format = 'yaml'
     codec_class = OpenAPICodecYaml
 
 

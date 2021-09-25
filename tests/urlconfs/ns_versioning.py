@@ -13,7 +13,7 @@ class VersionedSchemaView(SchemaView):
 
 
 schema_patterns = [
-    re_path(r'swagger(?P<format>.json|.yaml)$', VersionedSchemaView.without_ui(), name='ns-schema')
+    re_path(r'swagger\.(?P<format>json|yaml)$', VersionedSchemaView.without_ui(), name='ns-schema')
 ]
 
 
