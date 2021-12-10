@@ -502,10 +502,16 @@ def inspect_collection_hint_class(hint_class):
 
 hinting_type_info.append(((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class))
 
+# typing.UnionType was added in Python 3.10 for new PEP 604 pipe union syntax
+try:
+    from types import UnionType
+except ImportError:
+    UnionType = None
+
 
 def _get_union_types(hint_class):
     origin_type = get_origin_type(hint_class)
-    if origin_type is typing.Union:
+    if origin_type is typing.Union or (UnionType is not None and origin_type is UnionType):
         return hint_class.__args__
 
 

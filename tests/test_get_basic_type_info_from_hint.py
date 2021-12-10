@@ -15,6 +15,19 @@ if sys.version_info >= (3, 9):
     ]
 
 
+python310_union_tests = []
+if sys.version_info >= (3, 10):
+    # # New PEP 604 union syntax in Python 3.10+
+    python310_union_tests = [
+        (bool | None, {'type': openapi.TYPE_BOOLEAN, 'format': None, 'x-nullable': True}),
+        (list[int] | None, {
+            'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER), 'x-nullable': True
+        }),
+        # Following cases are not 100% correct, but it should work somehow and not crash.
+        (int | float, None),
+    ]
+
+
 @pytest.mark.parametrize('hint_class, expected_swagger_type_info', [
     (int, {'type': openapi.TYPE_INTEGER, 'format': None}),
     (str, {'type': openapi.TYPE_STRING, 'format': None}),
@@ -41,7 +54,7 @@ if sys.version_info >= (3, 9):
     (type('SomeType', (object,), {}), None),
     (None, None),
     (6, None),
-] + python39_generics_tests)
+] + python39_generics_tests + python310_union_tests)
 def test_get_basic_type_info_from_hint(hint_class, expected_swagger_type_info):
     type_info = get_basic_type_info_from_hint(hint_class)
     assert type_info == expected_swagger_type_info
