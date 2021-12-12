@@ -16,9 +16,3 @@ Files: immutable.js
 License: MIT
 Copyright: 2014-present, Facebook, Inc
 Source: https://github.com/immutable-js/immutable-js/releases/tag/v3.8.2
-
-Files: url-polyfill.js
- url-polyfill.min.js
-License: MIT
-Copyright: Valentin Richard
-Source: https://github.com/lifaon74/url-polyfill/commit/369f4f0daa708d1910d7dde42bbe2f4414d5bbe1
