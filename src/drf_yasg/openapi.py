@@ -24,6 +24,7 @@ TYPE_INTEGER = "integer"  #:
 TYPE_BOOLEAN = "boolean"  #:
 TYPE_ARRAY = "array"  #:
 TYPE_FILE = "file"  #:
+TYPE_NONE = "null"  #:
 
 # officially supported by Swagger 2.0 spec
 FORMAT_DATE = "date"  #:
