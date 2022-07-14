@@ -199,13 +199,13 @@ def yaml_sane_dump(data, binary):
     :return: the serialized YAML
     :rtype: str or bytes
     """
-    encoding = None
-    allow_unicode = None
-    if binary:
-        encoding = 'utf-8'
-        allow_unicode = True
     return yaml.dump(
-        data, Dumper=SaneYamlDumper, default_flow_style=False, encoding=encoding, allow_unicode=allow_unicode)
+        data,
+        Dumper=SaneYamlDumper,
+        default_flow_style=False,
+        encoding='utf-8' if binary else None,
+        allow_unicode=binary
+    )
 
 
 class SaneYamlLoader(yaml.SafeLoader):
