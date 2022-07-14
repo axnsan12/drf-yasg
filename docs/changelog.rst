@@ -4,6 +4,23 @@ Changelog
 
 
 **********
+**1.21.0**
+**********
+
+*Release date: Jul 14, 2022*
+
+- **IMPROVED:** Add utf-8 support to yaml loaders (:pr:`692`)
+
+**********
+**1.20.3**
+**********
+
+*Release date: Jul 14, 2022*
+
+- **FIXED:** Source mapping in ``redoc.min.js`` (:pr:`778`)
+- **FIXED:** Publish action tag pattern in``publish.yml`` (:pr:`794`)
+
+**********
 **1.20.0**
 **********
 
