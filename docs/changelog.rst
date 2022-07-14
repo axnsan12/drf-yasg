@@ -18,7 +18,7 @@ Changelog
 *Release date: Jul 14, 2022*
 
 - **FIXED:** Source mapping in ``redoc.min.js`` (:pr:`778`)
-- **FIXED:** Publish action tag pattern in``publish.yml`` (:pr:`794`)
+- **FIXED:** Publish action tag pattern in ``publish.yml`` (:pr:`794`)
 
 **********
 **1.20.0**
