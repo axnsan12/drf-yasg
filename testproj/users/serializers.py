@@ -13,7 +13,7 @@ class OtherStuffSerializer(serializers.Serializer):
     foo = serializers.CharField()
 
 
-class UserSerializerrr(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all())
     article_slugs = serializers.SlugRelatedField(read_only=True, slug_field='slug', many=True, source='articles')
     last_connected_ip = serializers.IPAddressField(help_text="i'm out of ideas", protocol='ipv4', read_only=True)
