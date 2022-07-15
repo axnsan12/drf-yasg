@@ -75,6 +75,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'last_connected_ip', 'last_connected_at', 'article_slugs', 'other_stuff', 'hint_example',
                   'help_text_example_1', 'help_text_example_2', 'help_text_example_3')
 
+        ref_name = "UserSerializer"
 
 class UserListQuerySerializer(serializers.Serializer):
     username = serializers.CharField(help_text="this field is generated from a query_serializer", required=False)
