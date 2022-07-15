@@ -73,16 +73,18 @@ class InlineSerializerInspector(SerializerInspector):
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
         description = getattr(field, 'description', getattr(field, '__doc__'))
+        
         if description is None and hasattr(field, 'Meta') and hasattr(field.Meta, 'model') and hasattr(field.Meta.model, '__doc__'):
             description = field.Meta.model.__doc__
-        description = strip_doc_string(description)
+        
+        stripped_description = strip_doc_string(description)
 
         if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
             child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)
             limits = find_limits(field) or {}
             return SwaggerType(
                 type=openapi.TYPE_ARRAY,
-                description=description,
+                description=stripped_description,
                 items=child_schema,
                 **limits
             )
@@ -114,7 +116,7 @@ class InlineSerializerInspector(SerializerInspector):
                     # the title is derived from the field name and is better to
                     # be omitted from models
                     use_field_title=False,
-                    description=description,
+                    description=stripped_description,
                     type=openapi.TYPE_OBJECT,
                     properties=properties,
                     required=required or None,
