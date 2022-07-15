@@ -16,7 +16,12 @@ from rest_framework.settings import api_settings as rest_framework_settings
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
-    decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
+    decimal_as_float,
+    field_value_to_representation,
+    filter_none,
+    get_serializer_class,
+    get_serializer_ref_name,
+    strip_doc_string
 )
 from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
 
