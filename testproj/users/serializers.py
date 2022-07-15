@@ -12,6 +12,11 @@ from .method_serializers import MethodFieldExampleSerializer
 class OtherStuffSerializer(serializers.Serializer):
     foo = serializers.CharField()
 
+    class Meta:
+        swagger_schema_examples = {
+            'foo': 'bar'
+        }
+
 
 class UserSerializerrr(serializers.ModelSerializer):
     snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all())

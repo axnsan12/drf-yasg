@@ -190,8 +190,9 @@ class FieldInspector(BaseInspector):
         self.field_inspectors = field_inspectors
 
     def add_manual_fields(self, serializer_or_field, schema):
-        """Set fields from the ``swagger_schem_fields`` attribute on the Meta class. This method is called
-        only for serializers or fields that are converted into ``openapi.Schema`` objects.
+        """Set fields from the ``swagger_schema_fields`` and ``swagger_schema_examples`` attribute on 
+        the Meta class. This method is called only for serializers or fields that are converted into 
+        ``openapi.Schema`` objects.
 
         :param serializer_or_field: serializer or field instance
         :param openapi.Schema schema: the schema object to be modified in-place
@@ -201,6 +202,15 @@ class FieldInspector(BaseInspector):
         if swagger_schema_fields:
             for attr, val in swagger_schema_fields.items():
                 setattr(schema, attr, val)
+                
+        
+        swagger_schema_examples = getattr(meta, 'swagger_schema_examples', {})
+        if not swagger_schema_examples or 'properties' not in schema:
+            return
+        for attr, val in swagger_schema_examples.items():
+            if attr not in schema['properties']:
+                continue
+            schema['properties'][attr]['example'] = val
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         """Convert a drf Serializer or Field instance into a Swagger object.

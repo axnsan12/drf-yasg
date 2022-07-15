@@ -1398,6 +1398,7 @@ definitions:
         title: Foo
         type: string
         minLength: 1
+        example: bar
   MethodFieldExample:
     type: object
     properties:
