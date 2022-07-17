@@ -1,16 +1,16 @@
 import copy
 import logging
 import re
+import urllib.parse as urlparse
 from collections import OrderedDict, defaultdict
 
-import rest_framework
 import uritemplate
-from coreapi.compat import urlparse
-from packaging.version import Version
+from django.urls import URLPattern, URLResolver
 from rest_framework import versioning
-from rest_framework.compat import URLPattern, URLResolver, get_original_route
+from rest_framework.schemas import SchemaGenerator
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
 from rest_framework.schemas.generators import endpoint_ordering, get_pk_name
+from rest_framework.schemas.utils import get_pk_description
 from rest_framework.settings import api_settings
 
 from . import openapi
@@ -19,14 +19,6 @@ from .errors import SwaggerGenerationError
 from .inspectors.field import get_basic_type_info, get_queryset_field, get_queryset_from_view
 from .openapi import ReferenceResolver, SwaggerDict
 from .utils import force_real_str, get_consumes, get_produces
-
-if Version(rest_framework.__version__) < Version('3.10'):
-    from rest_framework.schemas.generators import SchemaGenerator
-    from rest_framework.schemas.inspectors import get_pk_description
-else:
-    from rest_framework.schemas import SchemaGenerator
-    from rest_framework.schemas.utils import get_pk_description
-
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +80,7 @@ class EndpointEnumerator(_EndpointEnumerator):
             ignored_endpoints = set()
 
         for pattern in patterns:
-            path_regex = prefix + get_original_route(pattern)
+            path_regex = prefix + str(pattern.pattern)
             if isinstance(pattern, URLPattern):
                 try:
                     path = self.get_path_from_regex(path_regex)
@@ -124,6 +116,38 @@ class EndpointEnumerator(_EndpointEnumerator):
         api_endpoints = sorted(api_endpoints, key=endpoint_ordering)
 
         return api_endpoints
+
+    def unescape(self, s):
+        """Unescape all backslash escapes from `s`.
+
+        :param str s: string with backslash escapes
+        :rtype: str
+        """
+        # unlike .replace('\\', ''), this correctly transforms a double backslash into a single backslash
+        return re.sub(r'\\(.)', r'\1', s)
+
+    def unescape_path(self, path):
+        """Remove backslashes escapes from all path components outside {parameters}. This is needed because
+        ``simplify_regex`` does not handle this correctly.
+
+        **NOTE:** this might destructively affect some url regex patterns that contain metacharacters (e.g. \\w, \\d)
+        outside path parameter groups; if you are in this category, God help you
+
+        :param str path: path possibly containing
+        :return: the unescaped path
+        :rtype: str
+        """
+        clean_path = ''
+        while path:
+            match = PATH_PARAMETER_RE.search(path)
+            if not match:
+                clean_path += self.unescape(path)
+                break
+            clean_path += self.unescape(path[:match.start()])
+            clean_path += match.group()
+            path = path[match.end():]
+
+        return clean_path
 
 
 class OpenAPISchemaGenerator(object):
@@ -402,8 +426,8 @@ class OpenAPISchemaGenerator(object):
         operation_keys = self.get_operation_keys(path[len(prefix):], method, view)
         overrides = self.get_overrides(view, method)
 
-        # the inspector class can be specified, in decreasing order of priorty,
-        #   1. globaly via DEFAULT_AUTO_SCHEMA_CLASS
+        # the inspector class can be specified, in decreasing order of priority,
+        #   1. globally via DEFAULT_AUTO_SCHEMA_CLASS
         view_inspector_cls = swagger_settings.DEFAULT_AUTO_SCHEMA_CLASS
         #   2. on the view/viewset class
         view_inspector_cls = getattr(view, 'swagger_schema', view_inspector_cls)

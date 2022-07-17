@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 from rest_framework import fields
 
 from snippets.serializers import SnippetSerializer
@@ -21,5 +21,5 @@ class SnippetListV2(SnippetListV1):
 app_name = '2.0'
 
 urlpatterns = required_urlpatterns + [
-    url(r"^$", SnippetListV2.as_view())
+    path("", SnippetListV2.as_view())
 ]

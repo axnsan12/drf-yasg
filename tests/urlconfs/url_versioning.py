@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 from rest_framework import fields, generics, versioning
 
 from snippets.models import Snippet
@@ -43,6 +43,7 @@ class VersionedSchemaView(SchemaView):
 
 
 urlpatterns = required_urlpatterns + [
-    url(VERSION_PREFIX_URL + r"snippets/$", SnippetList.as_view()),
-    url(VERSION_PREFIX_URL + r'swagger(?P<format>.json|.yaml)$', VersionedSchemaView.without_ui(), name='vschema-json'),
+    re_path(VERSION_PREFIX_URL + r"snippets/$", SnippetList.as_view()),
+    re_path(VERSION_PREFIX_URL + r'swagger(?P<format>.json|.yaml)$', VersionedSchemaView.without_ui(),
+            name='vschema-json'),
 ]
