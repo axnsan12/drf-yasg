@@ -16,6 +16,10 @@ class Snippet(models.Model):
     class Meta:
         ordering = ('created',)
 
+    @property
+    def nullable_secondary_language(self):
+        return None
+
 
 class SnippetViewer(models.Model):
     snippet = models.ForeignKey(Snippet, on_delete=models.CASCADE, related_name='viewers')

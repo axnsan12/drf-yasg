@@ -18,16 +18,8 @@ def is_callable_method(cls_or_instance, method_name):
         # bound classmethod or instance method
         return method, True
 
-    try:
-        # inspect.getattr_static was added in python 3.2
-        from inspect import getattr_static
-
-        # on python 3, both unbound instance methods (i.e. getattr(cls, mth)) and static methods are plain functions
-        # getattr_static allows us to check the type of the method descriptor; for `@staticmethod` this is staticmethod
-        return method, isinstance(getattr_static(cls_or_instance, method_name, None), staticmethod)
-    except ImportError:
-        # python 2 still has unbound methods, so ismethod <=> !staticmethod TODO: remove when dropping python 2.7
-        return method, not inspect.ismethod(method)
+    from inspect import getattr_static
+    return method, isinstance(getattr_static(cls_or_instance, method_name, None), staticmethod)
 
 
 def call_view_method(view, method_name, fallback_attr=None, default=None):
@@ -79,7 +71,7 @@ class BaseInspector(object):
         that were probed get the chance to alter the result, in reverse order. The inspector that handled the object
         is the first to receive a ``process_result`` call with the object it just returned.
 
-        This behaviour is similar to the Django request/response middleware processing.
+        This behavior is similar to the Django request/response middleware processing.
 
         If this inspector has no post-processing to do, it should just ``return result`` (the default implementation).
 
@@ -148,7 +140,7 @@ class BaseInspector(object):
 class PaginatorInspector(BaseInspector):
     """Base inspector for paginators.
 
-    Responisble for determining extra query parameters and response structure added by given paginators.
+    Responsible for determining extra query parameters and response structure added by given paginators.
     """
 
     def get_paginator_parameters(self, paginator):
@@ -198,7 +190,7 @@ class FieldInspector(BaseInspector):
         self.field_inspectors = field_inspectors
 
     def add_manual_fields(self, serializer_or_field, schema):
-        """Set fields from the ``swagger_schem_fields`` attribute on the Meta class. This method is called
+        """Set fields from the ``swagger_schema_fields`` attribute on the Meta class. This method is called
         only for serializers or fields that are converted into ``openapi.Schema`` objects.
 
         :param serializer_or_field: serializer or field instance
@@ -276,7 +268,7 @@ class FieldInspector(BaseInspector):
         description = force_real_str(help_text) if help_text else None
         description = description if swagger_object_type != openapi.Items else None  # Items has no description either
 
-        def SwaggerType(existing_object=None, **instance_kwargs):
+        def SwaggerType(existing_object=None, use_field_title=True, **instance_kwargs):
             if 'required' not in instance_kwargs and swagger_object_type == openapi.Parameter:
                 instance_kwargs['required'] = field.required
 
@@ -285,11 +277,11 @@ class FieldInspector(BaseInspector):
                 if default not in (None, serializers.empty):
                     instance_kwargs['default'] = default
 
-            if instance_kwargs.get('type', None) != openapi.TYPE_ARRAY:
+            if use_field_title and instance_kwargs.get('type', None) != openapi.TYPE_ARRAY:
                 instance_kwargs.setdefault('title', title)
             if description is not None:
                 instance_kwargs.setdefault('description', description)
-            if field.allow_null and not instance_kwargs.get('required', False) and not field.required:
+            if field.allow_null:
                 instance_kwargs['x_nullable'] = True
 
             instance_kwargs.update(kwargs)
@@ -302,7 +294,7 @@ class FieldInspector(BaseInspector):
             else:
                 result = swagger_object_type(**instance_kwargs)
 
-            # Provide an option to add manual paremeters to a schema
+            # Provide an option to add manual parameters to a schema
             # for example, to add examples
             if swagger_object_type == openapi.Schema:
                 self.add_manual_fields(field, result)
@@ -381,7 +373,7 @@ class ViewInspector(BaseInspector):
     def is_list_view(self):
         """Determine whether this view is a list or a detail view. The difference between the two is that
         detail views depend on a pk/id path parameter. Note that a non-detail view does not necessarily imply a list
-        reponse (:meth:`.has_list_response`), nor are list responses limited to non-detail views.
+        response (:meth:`.has_list_response`), nor are list responses limited to non-detail views.
 
         For example, one might have a `/topic/<pk>/posts` endpoint which is a detail view that has a list response.
 

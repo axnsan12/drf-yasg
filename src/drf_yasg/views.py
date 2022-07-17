@@ -1,8 +1,7 @@
 import warnings
-from functools import wraps
+from functools import WRAPPER_ASSIGNMENTS, wraps
 
 from django.utils.cache import add_never_cache_headers
-from django.utils.decorators import available_attrs
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
 from rest_framework import exceptions
@@ -30,7 +29,7 @@ def deferred_never_cache(view_func):
     never be cached.
     """
 
-    @wraps(view_func, assigned=available_attrs(view_func))
+    @wraps(view_func, assigned=WRAPPER_ASSIGNMENTS)
     def _wrapped_view_func(request, *args, **kwargs):
         response = view_func(request, *args, **kwargs)
 
@@ -56,11 +55,11 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
     :param str url: same as :class:`.OpenAPISchemaGenerator`
     :param patterns: same as :class:`.OpenAPISchemaGenerator`
     :param urlconf: same as :class:`.OpenAPISchemaGenerator`
-    :param bool public: if False, includes only the endpoints that are accesible by the user viewing the schema
+    :param bool public: if False, includes only the endpoints that are accessible by the user viewing the schema
     :param list validators: a list of validator names to apply; the only allowed value is ``ssv``, for now
     :param type generator_class: schema generator class to use; should be a subclass of :class:`.OpenAPISchemaGenerator`
-    :param tuple authentication_classes: authentication classes for the schema view itself
-    :param tuple permission_classes: permission classes for the schema view itself
+    :param list authentication_classes: authentication classes for the schema view itself
+    :param list permission_classes: permission classes for the schema view itself
     :return: SchemaView class
     :rtype: type[drf_yasg.views.SchemaView]
     """
