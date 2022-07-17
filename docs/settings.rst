@@ -58,7 +58,7 @@ DEFAULT_GENERATOR_CLASS
 -------------------------
 
 :class:`~.generators.OpenAPISchemaGenerator` subclass that will be used by default for generating the final
-:class:`.Schema` object. Can be overriden by the ``generator_class`` argument to :func:`.get_schema_view`.
+:class:`.Schema` object. Can be overridden by the ``generator_class`` argument to :func:`.get_schema_view`.
 
 **Default**: :class:`drf_yasg.generators.OpenAPISchemaGenerator`
 
@@ -66,7 +66,7 @@ DEFAULT_AUTO_SCHEMA_CLASS
 -------------------------
 
 :class:`~.inspectors.ViewInspector` subclass that will be used by default for generating :class:`.Operation`
-objects when iterating over endpoints. Can be overriden by using the `auto_schema` argument of
+objects when iterating over endpoints. Can be overridden by using the `auto_schema` argument of
 :func:`@swagger_auto_schema <.swagger_auto_schema>` or by a ``swagger_schema`` attribute on the view class.
 
 **Default**: :class:`drf_yasg.inspectors.SwaggerAutoSchema`
@@ -85,6 +85,7 @@ to this list.
 :class:`'drf_yasg.inspectors.ChoiceFieldInspector' <.inspectors.ChoiceFieldInspector>`, |br| \
 :class:`'drf_yasg.inspectors.FileFieldInspector' <.inspectors.FileFieldInspector>`, |br| \
 :class:`'drf_yasg.inspectors.DictFieldInspector' <.inspectors.DictFieldInspector>`, |br| \
+:class:`'drf_yasg.inspectors.JSONFieldInspector' <.inspectors.JSONFieldInspector>`, |br| \
 :class:`'drf_yasg.inspectors.HiddenFieldInspector' <.inspectors.HiddenFieldInspector>`, |br| \
 :class:`'drf_yasg.inspectors.RecursiveFieldInspector' <.inspectors.RecursiveFieldInspector>`, |br| \
 :class:`'drf_yasg.inspectors.SerializerMethodFieldInspector' <.inspectors.SerializerMethodFieldInspector>`, |br| \
@@ -168,7 +169,7 @@ LOGOUT_URL
 
 URL for the Django Logout action when using `USE_SESSION_AUTH`_.
 
-**Default**: :python:`django.conf.settings.LOGOUT_URL`
+**Default**: :python:`'/accounts/logout/'`
 
 .. _security-definitions-settings:
 
@@ -206,7 +207,7 @@ See https://github.com/swagger-api/swagger-ui/blob/112bca906553a937ac67adc2e500b
 SPEC_URL
 --------
 
-URL pointing to a swagger document for use by swagger-ui. The default behaviour is to append ``?format=openapi`` to the
+URL pointing to a swagger document for use by swagger-ui. The default behavior is to append ``?format=openapi`` to the
 URL which serves the UI; see :ref:`note on URL settings <url-settings>` above.
 
 **Default**: :python:`None` |br|
@@ -321,7 +322,7 @@ Controls whether operations show the model structure or the example value by def
 DEFAULT_MODEL_DEPTH
 -------------------
 
-Controls how many levels are expaned by default when showing nested models.
+Controls how many levels are expanded by default when showing nested models.
 
 **Default**: :python:`3` |br|
 *Maps to parameter*: ``defaultModelExpandDepth``
@@ -389,7 +390,7 @@ See https://github.com/Rebilly/ReDoc#configuration.
 SPEC_URL
 --------
 
-URL pointing to a swagger document for use by ReDoc. The default behaviour is to append ``?format=openapi`` to the
+URL pointing to a swagger document for use by ReDoc. The default behavior is to append ``?format=openapi`` to the
 URL which serves the UI; see :ref:`note on URL settings <url-settings>` above.
 
 **Default**: :python:`None` |br|
@@ -454,7 +455,7 @@ FETCH_SCHEMA_WITH_QUERY
 
 Fetch the OpenAPI document using the query parameters passed to the ReDoc page request.
 
-**Default**: :python:`'True` |br|
+**Default**: :python:`True` |br|
 *Maps to parameter*: -
 
 

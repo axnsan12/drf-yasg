@@ -4,8 +4,8 @@ from .base import (
 )
 from .field import (
     CamelCaseJSONFilter, ChoiceFieldInspector, DictFieldInspector, FileFieldInspector, HiddenFieldInspector,
-    InlineSerializerInspector, RecursiveFieldInspector, ReferencingSerializerInspector, RelatedFieldInspector,
-    SerializerMethodFieldInspector, SimpleFieldInspector, StringDefaultFieldInspector
+    InlineSerializerInspector, JSONFieldInspector, RecursiveFieldInspector, ReferencingSerializerInspector,
+    RelatedFieldInspector, SerializerMethodFieldInspector, SimpleFieldInspector, StringDefaultFieldInspector
 )
 from .query import CoreAPICompatInspector, DjangoRestResponsePagination
 from .view import SwaggerAutoSchema
@@ -24,7 +24,7 @@ __all__ = [
 
     # field inspectors
     'InlineSerializerInspector', 'RecursiveFieldInspector', 'ReferencingSerializerInspector', 'RelatedFieldInspector',
-    'SimpleFieldInspector', 'FileFieldInspector', 'ChoiceFieldInspector', 'DictFieldInspector',
+    'SimpleFieldInspector', 'FileFieldInspector', 'ChoiceFieldInspector', 'DictFieldInspector', 'JSONFieldInspector',
     'StringDefaultFieldInspector', 'CamelCaseJSONFilter', 'HiddenFieldInspector', 'SerializerMethodFieldInspector',
 
     # view inspectors

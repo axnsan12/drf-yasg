@@ -1,8 +1,8 @@
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxLengthValidator, MinValueValidator
 from rest_framework import serializers
-from rest_framework.compat import MaxLengthValidator, MinValueValidator
 
 from snippets.models import LANGUAGE_CHOICES, STYLE_CHOICES, Snippet, SnippetViewer
 
@@ -79,6 +79,8 @@ class SnippetSerializer(serializers.Serializer):
                                               validators=[MinValueValidator(Decimal('0.0'))])
     rate = serializers.DecimalField(max_digits=6, decimal_places=3, default=Decimal('0.0'), coerce_to_string=False,
                                     validators=[MinValueValidator(Decimal('0.0'))])
+
+    nullable_secondary_language = LanguageSerializer(allow_null=True)
 
     def create(self, validated_data):
         """

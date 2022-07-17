@@ -1,8 +1,6 @@
-import six
-
 from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import Promise
 from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer
 from rest_framework.utils import encoders, json
@@ -89,7 +87,7 @@ class _UIRenderer(BaseRenderer):
             return None
 
         args, kwargs = None, None
-        if not isinstance(to, six.string_types):
+        if not isinstance(to, str):
             if len(to) > 2:
                 to, args, kwargs = to
             elif len(to) == 2:
@@ -115,7 +113,7 @@ class _UIRenderer(BaseRenderer):
 
 
 class SwaggerUIRenderer(_UIRenderer):
-    """Renders a swagger-ui web interface for schema browisng."""
+    """Renders a swagger-ui web interface for schema browsing."""
     template = 'drf-yasg/swagger-ui.html'
     format = 'swagger'
 
@@ -124,7 +122,7 @@ class SwaggerUIRenderer(_UIRenderer):
         swagger_ui_settings = self.get_swagger_ui_settings()
 
         request = renderer_context.get('request', None)
-        oauth_redirect_url = force_text(swagger_ui_settings.get('oauth2RedirectUrl', ''))
+        oauth_redirect_url = force_str(swagger_ui_settings.get('oauth2RedirectUrl', ''))
         if request and oauth_redirect_url:
             swagger_ui_settings['oauth2RedirectUrl'] = request.build_absolute_uri(oauth_redirect_url)
 
@@ -159,7 +157,7 @@ class SwaggerUIRenderer(_UIRenderer):
 
 
 class ReDocRenderer(_UIRenderer):
-    """Renders a ReDoc web interface for schema browisng."""
+    """Renders a ReDoc web interface for schema browsing."""
     template = 'drf-yasg/redoc.html'
     format = 'redoc'
 
@@ -183,5 +181,5 @@ class ReDocRenderer(_UIRenderer):
 
 
 class ReDocOldRenderer(ReDocRenderer):
-    """Renders a ReDoc 1.x.x web interface for schema browisng."""
+    """Renders a ReDoc 1.x.x web interface for schema browsing."""
     template = 'drf-yasg/redoc-old.html'
