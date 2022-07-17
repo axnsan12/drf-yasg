@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'oauth2_provider',
     'corsheaders',
 
@@ -86,9 +87,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Django Rest Framework
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
+    'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ]
 }
 
 OAUTH2_CLIENT_ID = '12ee6bgxtpSEgP8TioWcHSXOiDBOUrVav4mRbVEs'
@@ -192,16 +193,6 @@ LOGGING = {
             'propagate': False,
         },
         'django': {
-            'handlers': ['console_log'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'django.db.backends': {
-            'handlers': ['console_log'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'django.template': {
             'handlers': ['console_log'],
             'level': 'INFO',
             'propagate': False,

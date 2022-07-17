@@ -1,6 +1,3 @@
-import six
-
-import rest_framework
 from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
@@ -82,7 +79,7 @@ class _UIRenderer(BaseRenderer):
             return None
 
         args, kwargs = None, None
-        if not isinstance(to, six.string_types):
+        if not isinstance(to, str):
             if len(to) > 2:
                 to, args, kwargs = to
             elif len(to) == 2:
@@ -108,7 +105,7 @@ class _UIRenderer(BaseRenderer):
 
 
 class SwaggerUIRenderer(_UIRenderer):
-    """Renders a swagger-ui web interface for schema browisng."""
+    """Renders a swagger-ui web interface for schema browsing."""
     template = 'drf-yasg/swagger-ui.html'
     format = 'swagger'
 
@@ -152,7 +149,7 @@ class SwaggerUIRenderer(_UIRenderer):
 
 
 class ReDocRenderer(_UIRenderer):
-    """Renders a ReDoc web interface for schema browisng."""
+    """Renders a ReDoc web interface for schema browsing."""
     template = 'drf-yasg/redoc.html'
     format = 'redoc'
 
@@ -176,5 +173,5 @@ class ReDocRenderer(_UIRenderer):
 
 
 class ReDocOldRenderer(ReDocRenderer):
-    """Renders a ReDoc 1.x.x web interface for schema browisng."""
+    """Renders a ReDoc 1.x.x web interface for schema browsing."""
     template = 'drf-yasg/redoc-old.html'

@@ -1,11 +1,11 @@
 import json
-import sys
+import typing
 from collections import OrderedDict
 
 import pytest
-from django.conf.urls import url
 from django.contrib.postgres import fields as postgres_fields
 from django.db import models
+from django.urls import path
 from django.utils.inspect import get_func_args
 from django_fake_model import models as fake_models
 from rest_framework import routers, serializers, viewsets
@@ -17,11 +17,6 @@ from drf_yasg.codecs import yaml_sane_dump, yaml_sane_load
 from drf_yasg.errors import SwaggerGenerationError
 from drf_yasg.generators import OpenAPISchemaGenerator
 from drf_yasg.utils import run_validators, swagger_auto_schema
-
-try:
-    import typing
-except ImportError:
-    typing = None
 
 
 def test_schema_is_valid(swagger):
@@ -83,7 +78,7 @@ def test_no_netloc(mock_schema_request):
     assert swagger['info']['version'] == 'v2'
 
 
-def test_securiy_requirements(swagger_settings, mock_schema_request):
+def test_security_requirements(swagger_settings, mock_schema_request):
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),
         version="v2",
@@ -147,8 +142,8 @@ def test_url_order():
         return Response({"message": "Hello, world!"})
 
     patterns = [
-        url(r'^/test/$', test_override),
-        url(r'^/test/$', test_view),
+        path('test/', test_override),
+        path('test/', test_view),
     ]
 
     generator = OpenAPISchemaGenerator(
@@ -168,7 +163,7 @@ def test_url_order():
 
 
 try:
-    from rest_framework.decorators import action, MethodMapper
+    from rest_framework.decorators import MethodMapper, action
 except ImportError:
     action = MethodMapper = None
 
@@ -306,7 +301,6 @@ def test_json_field():
     (float, openapi.TYPE_NUMBER),
     (bool, openapi.TYPE_BOOLEAN),
 ])
-@pytest.mark.skipif(typing is None or sys.version_info.major < 3, reason="typing not supported")
 def test_optional_return_type(py_type, expected_type):
 
     class OptionalMethodSerializer(serializers.Serializer):

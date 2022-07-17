@@ -1,15 +1,19 @@
-requirements_file: requirements/docs.txt
+version: 2
+
+sphinx:
+  configuration: docs/conf.py
+
+formats:
+  - pdf
 
 build:
   image: latest
 
 python:
-  version: 3.6
-  setup_py_install: false
-  pip_install: true  # need this for correct pyproject.toml handling
-  extra_requirements:
-    - validation
-
-# extra formats in addition to the default HTML web docs
-formats:
-    - pdf
+  version: 3.8
+  install:
+    - requirements: requirements/docs.txt
+    - method: pip
+      path: .
+      extra_requirements:
+        - validation

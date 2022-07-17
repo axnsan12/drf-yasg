@@ -1,11 +1,14 @@
 swagger: '2.0'
 info:
   title: Snippets API
-  description: "This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg)\
-    \ Django Rest Framework library.\n\nThe `swagger-ui` view can be found [here](/cached/swagger).\
-    \nThe `ReDoc` view can be found [here](/cached/redoc).\nThe swagger YAML\
-    \ document can be found [here](/cached/swagger.yaml).\n\nYou can log in using\
-    \ the pre-existing `admin` user with password `passwordadmin`."
+  description: |-
+    This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg) Django Rest Framework library.
+
+    The `swagger-ui` view can be found [here](/cached/swagger).
+    The `ReDoc` view can be found [here](/cached/redoc).
+    The swagger YAML document can be found [here](/cached/swagger.yaml).
+
+    You can log in using the pre-existing `admin` user with password `passwordadmin`.
   termsOfService: https://www.google.com/policies/terms/
   contact:
     email: contact@snippets.local
@@ -877,7 +880,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/UserSerializerrr'
+              $ref: '#/definitions/UserSerializer'
       tags:
         - Users
     post:
@@ -938,7 +941,7 @@ paths:
         '200':
           description: response description
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       tags:
         - Users
     put:
@@ -949,12 +952,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       tags:
         - Users
     parameters:
@@ -1075,7 +1078,6 @@ definitions:
         readOnly: true
         format: uri
   Identity:
-    title: Identity
     type: object
     properties:
       id:
@@ -1127,6 +1129,7 @@ definitions:
       - code
       - tags
       - language
+      - nullableSecondaryLanguage
     type: object
     properties:
       id:
@@ -1227,6 +1230,25 @@ definitions:
         format: decimal
         default: 0.0
         minimum: 0.0
+      nullableSecondaryLanguage:
+        type: object
+        properties:
+          name:
+            title: Name
+            description: The name of the programming language
+            type: string
+            enum:
+              - cpp
+              - js
+              - python
+            default: python
+          readOnlyNullable:
+            title: Read only nullable
+            type: string
+            readOnly: true
+            minLength: 1
+            x-nullable: true
+        x-nullable: true
   SnippetViewer:
     required:
       - snippet
@@ -1367,7 +1389,6 @@ definitions:
         title: child
         todo: null
   OtherStuff:
-    title: Other stuff
     description: the decorator should determine the serializer class for this
     required:
       - foo
@@ -1378,7 +1399,6 @@ definitions:
         type: string
         minLength: 1
   MethodFieldExample:
-    title: Hint example
     type: object
     properties:
       hinted_bool:
@@ -1430,7 +1450,7 @@ definitions:
         description: No hint on the method, so this is expected to fallback to string
         type: string
         readOnly: true
-  UserSerializerrr:
+  UserSerializer:
     required:
       - username
       - articles
@@ -1502,7 +1522,9 @@ definitions:
         readOnly: true
       help_text_example_3:
         title: Help text example 3
-        description: "\n        docstring is set so should appear in swagger as fallback\n\
-          \        :return:\n        "
+        description: |2
+
+          docstring is set so should appear in swagger as fallback
+          :return:
         type: integer
         readOnly: true

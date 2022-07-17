@@ -40,7 +40,7 @@ SWAGGER_DEFAULTS = {
     },
     'SECURITY_REQUIREMENTS': None,
     'LOGIN_URL': getattr(settings, 'LOGIN_URL', None),
-    'LOGOUT_URL': getattr(settings, 'LOGOUT_URL', None),
+    'LOGOUT_URL': '/accounts/logout/',
     'SPEC_URL': None,
     'VALIDATOR_URL': '',
     'PERSIST_AUTH': False,
