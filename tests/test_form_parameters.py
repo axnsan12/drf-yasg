@@ -1,5 +1,5 @@
 import pytest
-from django.conf.urls import url
+from django.urls import path
 from django.utils.decorators import method_decorator
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
@@ -32,7 +32,7 @@ def test_no_form_parameters_with_non_form_parsers():
         throttle_classes = api_settings.DEFAULT_THROTTLE_CLASSES
 
     urlpatterns = [
-        url(r'token/$', CustomObtainAuthToken.as_view()),
+        path('token/', CustomObtainAuthToken.as_view()),
     ]
 
     generator = OpenAPISchemaGenerator(

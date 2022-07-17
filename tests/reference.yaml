@@ -880,7 +880,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/UserSerializerrr'
+              $ref: '#/definitions/UserSerializer'
       tags:
         - Users
     post:
@@ -941,7 +941,7 @@ paths:
         '200':
           description: response description
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       tags:
         - Users
     put:
@@ -952,12 +952,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       tags:
         - Users
     parameters:
@@ -1078,7 +1078,6 @@ definitions:
         readOnly: true
         format: uri
   Identity:
-    title: Identity
     type: object
     properties:
       id:
@@ -1130,6 +1129,7 @@ definitions:
       - code
       - tags
       - language
+      - nullableSecondaryLanguage
     type: object
     properties:
       id:
@@ -1230,6 +1230,25 @@ definitions:
         format: decimal
         default: 0.0
         minimum: 0.0
+      nullableSecondaryLanguage:
+        type: object
+        properties:
+          name:
+            title: Name
+            description: The name of the programming language
+            type: string
+            enum:
+              - cpp
+              - js
+              - python
+            default: python
+          readOnlyNullable:
+            title: Read only nullable
+            type: string
+            readOnly: true
+            minLength: 1
+            x-nullable: true
+        x-nullable: true
   SnippetViewer:
     required:
       - snippet
@@ -1370,7 +1389,6 @@ definitions:
         title: child
         todo: null
   OtherStuff:
-    title: Other stuff
     description: the decorator should determine the serializer class for this
     required:
       - foo
@@ -1381,7 +1399,6 @@ definitions:
         type: string
         minLength: 1
   MethodFieldExample:
-    title: Hint example
     type: object
     properties:
       hinted_bool:
@@ -1433,7 +1450,7 @@ definitions:
         description: No hint on the method, so this is expected to fallback to string
         type: string
         readOnly: true
-  UserSerializerrr:
+  UserSerializer:
     required:
       - username
       - articles

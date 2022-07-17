@@ -55,12 +55,12 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
     :param str url: same as :class:`.OpenAPISchemaGenerator`
     :param patterns: same as :class:`.OpenAPISchemaGenerator`
     :param urlconf: same as :class:`.OpenAPISchemaGenerator`
-    :param bool public: if False, includes only the endpoints that are accesible by the user viewing the schema
+    :param bool public: if False, includes only the endpoints that are accessible by the user viewing the schema
     :param list validators: a list of validator names to apply; the only allowed value is ``ssv``, for now
     :param list schemes: a list of url scheme; the allowed value is ``http`` and ``https``, for now
     :param type generator_class: schema generator class to use; should be a subclass of :class:`.OpenAPISchemaGenerator`
-    :param tuple authentication_classes: authentication classes for the schema view itself
-    :param tuple permission_classes: permission classes for the schema view itself
+    :param list authentication_classes: authentication classes for the schema view itself
+    :param list permission_classes: permission classes for the schema view itself
     :return: SchemaView class
     :rtype: type[drf_yasg.views.SchemaView]
     """

@@ -40,7 +40,7 @@ The second step is specifying, for each endpoint, which authentication mechanism
 See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#security-requirement-object for details.
 
 By default, a top-level `security` that accepts any one of the declared security definitions is generated.
-For the example above, that would be :code:`[{'Basic': []}, {'Bearer': []}]`. This can be overriden using the
+For the example above, that would be :code:`[{'Basic': []}, {'Bearer': []}]`. This can be overridden using the
 :ref:`SECURITY_REQUIREMENTS <security-definitions-settings>` setting.
 
 Operation-level overrides can be added using the ``security`` parameter of
@@ -53,7 +53,7 @@ Operation-level overrides can be added using the ``security`` parameter of
 
 It is possible to configure ``swagger-ui`` to authenticate against your (or a third party) OAuth2 service when sending
 "Try it out" requests. This client-side configuration does not remove the requirement of a spec-side
-:ref:`security definiiton <security-definitions-settings>`, but merely allows you to test OAuth2 APIs using
+:ref:`security definition <security-definitions-settings>`, but merely allows you to test OAuth2 APIs using
 ``swagger-ui`` as a client.
 
 **DISCLAIMER**: this setup is very poorly tested as I do not currently implement OAuth in any of my projects. All
@@ -61,7 +61,7 @@ contributions relating to documentation, bugs, mistakes or anything else are wel
 settings described below were added as a result of discussion in issue :issue:`53`.
 
 The settings of interest can be found on the :ref:`settings page <oauth2-settings>`. Configuration options are similar
-to most OAuth client setups like web or mobile applications. Reading the relevant ``swagger-ui`` docmentation linked
+to most OAuth client setups like web or mobile applications. Reading the relevant ``swagger-ui`` documentation linked
 will also probably help.
 
 

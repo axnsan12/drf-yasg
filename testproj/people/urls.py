@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from .views import IdentityViewSet, PersonViewSet
 
@@ -18,9 +18,9 @@ identity_detail = IdentityViewSet.as_view({
 })
 
 urlpatterns = (
-    url(r'^$', person_list, name='people-list'),
-    url(r'^(?P<pk>[0-9]+)$', person_detail, name='person-detail'),
+    path('', person_list, name='people-list'),
+    path('<int:pk>', person_detail, name='person-detail'),
 
-    url(r'^(?P<person>[0-9]+)/identity$', identity_detail,
-        name='person-identity'),
+    path('<int:person>/identity', identity_detail,
+         name='person-identity'),
 )
