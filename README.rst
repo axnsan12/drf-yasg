@@ -5,17 +5,15 @@
 drf-yasg - Yet another Swagger generator
 ########################################
 
-|travis| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
-
-|bmac-button|
+|actions| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
 
 Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
 
 Compatible with
 
-- **Django Rest Framework**: 3.8, 3.9, 3.10
-- **Django**: 1.11, 2.1, 2.2
-- **Python**: 2.7, 3.5, 3.6, 3.7
+- **Django Rest Framework**: 3.10, 3.11, 3.12
+- **Django**: 2.2, 3.0, 3.1
+- **Python**: 3.6, 3.7, 3.8, 3.9
 
 Only the latest patch version of each ``major.minor`` series of Python, Django and Django REST Framework is supported.
 
@@ -32,6 +30,19 @@ Resources:
 * **Live demo**: https://drf-yasg-demo.herokuapp.com/
 
 |heroku-button|
+
+
+****************
+OpenAPI 3.0 note
+****************
+
+If you are looking to add Swagger/OpenAPI support to a new project you might want to take a look at
+`drf-spectacular <https://github.com/tfranzel/drf-spectacular>`_, which is an actively maintained new library that
+shares most of the goals of this project, while working with OpenAPI 3.0 schemas.
+
+OpenAPI 3.0 provides a lot more flexibility than 2.0 in the types of API that can be described.
+``drf-yasg`` is unlikely to soon, if ever, get support for OpenAPI 3.0.
+
 
 ********
 Features
@@ -87,7 +98,7 @@ Usage
 0. Installation
 ===============
 
-The preferred instalation method is directly from pypi:
+The preferred installation method is directly from pypi:
 
 .. code:: console
 
@@ -111,6 +122,7 @@ In ``settings.py``:
 
    INSTALLED_APPS = [
       ...
+      'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
       'drf_yasg',
       ...
    ]
@@ -120,6 +132,7 @@ In ``urls.py``:
 .. code:: python
 
    ...
+   from django.urls import re_path
    from rest_framework import permissions
    from drf_yasg.views import get_schema_view
    from drf_yasg import openapi
@@ -136,13 +149,13 @@ In ``urls.py``:
          license=openapi.License(name="BSD License"),
       ),
       public=True,
-      permission_classes=(permissions.AllowAny,),
+      permission_classes=[permissions.AllowAny],
    )
 
    urlpatterns = [
-      url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-      url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-      url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+      re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+      re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+      re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
       ...
    ]
 
@@ -323,9 +336,9 @@ djangorestframework-recursive
 Integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_ is
 provided out of the box - if you have ``djangorestframework-recursive`` installed.
 
-.. |travis| image:: https://img.shields.io/travis/axnsan12/drf-yasg/master.svg
-   :target: https://travis-ci.org/axnsan12/drf-yasg
-   :alt: Travis CI
+.. |actions| image:: https://img.shields.io/github/workflow/status/axnsan12/drf-yasg/Review
+   :target: https://github.com/axnsan12/drf-yasg/actions
+   :alt: GitHub Workflow Status
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/axnsan12/drf-yasg/master.svg
    :target: https://codecov.io/gh/axnsan12/drf-yasg
@@ -338,10 +351,6 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
 .. |rtd-badge| image:: https://img.shields.io/readthedocs/drf-yasg.svg
    :target: https://drf-yasg.readthedocs.io/
    :alt: ReadTheDocs
-
-.. |bmac-button| image:: https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png
-   :target: https://www.buymeacoffee.com/cvijdea
-   :alt: Buy Me A Coffee
 
 .. |heroku-button| image:: https://www.herokucdn.com/deploy/button.svg
    :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg

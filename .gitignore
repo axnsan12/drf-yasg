@@ -1,3 +1,4 @@
+.idea/
 node_modules/
 testproj/db.sqlite3
 testproj/staticfiles
