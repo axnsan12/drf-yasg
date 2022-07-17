@@ -1,9 +1,8 @@
-from six import StringIO
-
 import copy
 import json
 import os
 from collections import OrderedDict
+from io import StringIO
 
 import pytest
 from datadiff.tools import assert_equal
