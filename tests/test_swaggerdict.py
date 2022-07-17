@@ -28,12 +28,12 @@ def test_ref():
 
 def test_leading_underscore_ignored():
     """Attributes with a leading underscore are set on the object as-is and are not added to its dict form"""
-    sd = openapi.SwaggerDict(_private_attr_1='not_camelised')
+    sd = openapi.SwaggerDict(_private_attr_1='not_camelized')
     initial_len = len(sd)
-    sd._nope = 'not camelised either'
+    sd._nope = 'not camelized either'
     assert len(sd) == initial_len
     assert 'privateAttr1' not in sd
-    assert sd._private_attr_1 == 'not_camelised'
+    assert sd._private_attr_1 == 'not_camelized'
     assert '_private_attr_1' not in sd
     assert hasattr(sd, '_nope')
 

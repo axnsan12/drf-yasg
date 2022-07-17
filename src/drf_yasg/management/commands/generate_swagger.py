@@ -61,8 +61,8 @@ class Command(BaseCommand):
         parser.add_argument(
             '-p', '--private',
             default=False, action="store_true",
-            help='Hides endpoints not accesible to the target user. If --user is not given, only shows endpoints that '
-                 'are accesible to unauthenticated users.\n'
+            help='Hides endpoints not accessible to the target user. If --user is not given, only shows endpoints that '
+                 'are accessible to unauthenticated users.\n'
                  'This has the same effect as passing public=False to get_schema_view() or '
                  'OpenAPISchemaGenerator.get_schema().\n'
                  'This option implies --mock-request.'

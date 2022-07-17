@@ -121,7 +121,7 @@ class SwaggerDict(OrderedDict):
     def _insert_extras__(self):
         """
         From an ordering perspective, it is desired that extra attributes such as vendor extensions stay at the
-        bottom of the object. However, python2.7's OrderdDict craps out if you try to insert into it before calling
+        bottom of the object. However, python2.7's OrderedDict craps out if you try to insert into it before calling
         init. This means that subclasses must call super().__init__ as the first statement of their own __init__,
         which would result in the extra attributes being added first. For this reason, we defer the insertion of the
         attributes and require that subclasses call ._insert_extras__ at the end of their __init__ method.
@@ -163,7 +163,7 @@ class SwaggerDict(OrderedDict):
         return SwaggerDict._as_odict(self, {})
 
     def __reduce__(self):
-        # for pickle supprt; this skips calls to all SwaggerDict __init__ methods and relies
+        # for pickle support; this skips calls to all SwaggerDict __init__ methods and relies
         # on the already set attributes instead
         attrs = {k: v for k, v in vars(self).items() if not k.startswith('_NP_')}
         return _bare_SwaggerDict, (type(self),), attrs, None, iter(self.items())
@@ -243,8 +243,8 @@ class Swagger(SwaggerDict):
         :param str _version: version string to override Info
         :param dict[str,dict] security_definitions: list of supported authentication mechanisms
         :param list[dict[str,list[str]]] security: authentication mechanisms accepted globally
-        :param list[str] consumes: consumed MIME types; can be overriden in Operation
-        :param list[str] produces: produced MIME types; can be overriden in Operation
+        :param list[str] consumes: consumed MIME types; can be overridden in Operation
+        :param list[str] produces: produced MIME types; can be overridden in Operation
         :param Paths paths: paths object
         :param dict[str,Schema] definitions: named models
         """
@@ -512,7 +512,7 @@ class _Ref(SwaggerDict):
         """Base class for all reference types. A reference object has only one property, ``$ref``, which must be a JSON
         reference to a valid object in the specification, e.g. ``#/definitions/Article`` to refer to an article model.
 
-        :param .ReferenceResolver resolver: component resolver which must contain the referneced object
+        :param .ReferenceResolver resolver: component resolver which must contain the referenced object
         :param str name: referenced object name, e.g. "Article"
         :param str scope: reference scope, e.g. "definitions"
         :param type[.SwaggerDict] expected_type: the expected type that will be asserted on the object found in resolver
@@ -530,7 +530,7 @@ class _Ref(SwaggerDict):
     def resolve(self, resolver):
         """Get the object targeted by this reference from the given component resolver.
 
-        :param .ReferenceResolver resolver: component resolver which must contain the referneced object
+        :param .ReferenceResolver resolver: component resolver which must contain the referenced object
         :returns: the target object
         """
         ref_match = self.ref_name_re.match(self.ref)
@@ -561,9 +561,9 @@ Schema.OR_REF = (Schema, SchemaRef)
 
 
 def resolve_ref(ref_or_obj, resolver):
-    """Resolve `ref_or_obj` if it is a reference type. Return it unchaged if not.
+    """Resolve `ref_or_obj` if it is a reference type. Return it unchanged if not.
 
-    :param ref_or_obj: object to derefernece
+    :param ref_or_obj: object to dereference
     :type ref_or_obj: SwaggerDict or _Ref
     :param resolver: component resolver which must contain the referenced object
     """
@@ -609,7 +609,7 @@ class Response(SwaggerDict):
 
 class ReferenceResolver(object):
     """A mapping type intended for storing objects pointed at by Swagger Refs.
-    Provides support and checks for different refernce scopes, e.g. 'definitions'.
+    Provides support and checks for different reference scopes, e.g. 'definitions'.
 
     For example:
 
@@ -658,7 +658,7 @@ class ReferenceResolver(object):
     def _check_scope(self, scope):
         real_scope = self._force_scope or scope
         if scope is not None:
-            assert not self._force_scope or scope == self._force_scope, "cannot overrride forced scope"
+            assert not self._force_scope or scope == self._force_scope, "cannot override forced scope"
         assert real_scope and real_scope in self._objects, "invalid scope %s" % scope
         return real_scope
 

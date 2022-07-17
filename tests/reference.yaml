@@ -880,7 +880,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/UserSerializerrr'
+              $ref: '#/definitions/UserSerializer'
       tags:
         - Users
     post:
@@ -941,7 +941,7 @@ paths:
         '200':
           description: response description
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       tags:
         - Users
     put:
@@ -952,12 +952,12 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       tags:
         - Users
     parameters:
@@ -1450,7 +1450,7 @@ definitions:
         description: No hint on the method, so this is expected to fallback to string
         type: string
         readOnly: true
-  UserSerializerrr:
+  UserSerializer:
     required:
       - username
       - articles

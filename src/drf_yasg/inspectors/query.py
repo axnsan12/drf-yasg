@@ -58,7 +58,7 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
 
 
 class DjangoRestResponsePagination(PaginatorInspector):
-    """Provides response schema pagination warpping for django-rest-framework's LimitOffsetPagination,
+    """Provides response schema pagination wrapping for django-rest-framework's LimitOffsetPagination,
     PageNumberPagination and CursorPagination
     """
 
