@@ -41,7 +41,7 @@ def test_generator_class(call_generate_swagger, db):
     assert len(output_schema['paths']) == 0
 
 
-def silentremove(filename):
+def silent_remove(filename):
     try:
         os.remove(filename)
     except OSError:
@@ -82,6 +82,6 @@ def test_file_output(call_generate_swagger, db):
 
         assert output_yaml == output_json == output_other
     finally:
-        silentremove(yaml_file)
-        silentremove(json_file)
-        silentremove(other_file)
+        silent_remove(yaml_file)
+        silent_remove(json_file)
+        silent_remove(other_file)

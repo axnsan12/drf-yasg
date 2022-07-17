@@ -321,7 +321,7 @@ def force_serializer_instance(serializer):
 
 
 def get_serializer_class(serializer):
-    """Given a ``Serializer`` class or intance, return the ``Serializer`` class. If `serializer` is not a ``Serializer``
+    """Given a ``Serializer`` class or instance, return the ``Serializer`` class. If `serializer` is not a ``Serializer``
     class or instance, raises an assertion error.
 
     :param serializer: serializer class or instance, or ``None``

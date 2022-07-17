@@ -78,7 +78,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
 #. **Update documentation**
 
-   If the change modifies behaviour or adds new features, you should update the documentation and ``README.rst``
+   If the change modifies behavior or adds new features, you should update the documentation and ``README.rst``
    accordingly. Documentation is written in reStructuredText and built using Sphinx. You can find the sources in the
    ``docs`` directory.
 
@@ -96,7 +96,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 #. **Your code must pass all the required CI jobs before it is merged**
 
    As of now, this consists of running on the supported Python, Django, DRF version matrix (see README),
-   and building the docs succesfully.
+   and building the docs successfully.
 
 ******************
 Maintainer's notes
