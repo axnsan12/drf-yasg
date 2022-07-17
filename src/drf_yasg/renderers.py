@@ -113,7 +113,7 @@ class _UIRenderer(BaseRenderer):
 
 
 class SwaggerUIRenderer(_UIRenderer):
-    """Renders a swagger-ui web interface for schema browisng."""
+    """Renders a swagger-ui web interface for schema browsing."""
     template = 'drf-yasg/swagger-ui.html'
     format = 'swagger'
 
@@ -157,7 +157,7 @@ class SwaggerUIRenderer(_UIRenderer):
 
 
 class ReDocRenderer(_UIRenderer):
-    """Renders a ReDoc web interface for schema browisng."""
+    """Renders a ReDoc web interface for schema browsing."""
     template = 'drf-yasg/redoc.html'
     format = 'redoc'
 
@@ -181,5 +181,5 @@ class ReDocRenderer(_UIRenderer):
 
 
 class ReDocOldRenderer(ReDocRenderer):
-    """Renders a ReDoc 1.x.x web interface for schema browisng."""
+    """Renders a ReDoc 1.x.x web interface for schema browsing."""
     template = 'drf-yasg/redoc-old.html'

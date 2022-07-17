@@ -37,7 +37,7 @@ class InlineSerializerInspector(SerializerInspector):
         is called only when the serializer is converted into a list of parameters for use in a form data request.
 
         :param serializer: serializer instance
-        :param list[openapi.Parameter] parameters: genereated parameters
+        :param list[openapi.Parameter] parameters: generated parameters
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
@@ -176,7 +176,7 @@ def get_queryset_from_view(view, serializer=None):
     """Try to get the queryset of the given view
 
     :param view: the view instance or class
-    :param serializer: if given, will check that the view's get_serializer_class return matches this serialzier
+    :param serializer: if given, will check that the view's get_serializer_class return matches this serializer
     :return: queryset or ``None``
     """
     try:
@@ -380,7 +380,7 @@ model_field_to_basic_type = [
     (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (models.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (models.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
-    (models.DurationField, (openapi.TYPE_INTEGER, None)),
+    (models.DurationField, (openapi.TYPE_STRING, None)),
     (models.FloatField, (openapi.TYPE_NUMBER, None)),
     (models.IntegerField, (openapi.TYPE_INTEGER, None)),
     (models.IPAddressField, (openapi.TYPE_STRING, openapi.FORMAT_IPV4)),
@@ -407,7 +407,7 @@ serializer_field_to_basic_type = [
     (serializers.IntegerField, (openapi.TYPE_INTEGER, None)),
     (serializers.FloatField, (openapi.TYPE_NUMBER, None)),
     (serializers.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
-    (serializers.DurationField, (openapi.TYPE_NUMBER, None)),  # ?
+    (serializers.DurationField, (openapi.TYPE_STRING, None)),
     (serializers.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (serializers.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (serializers.ModelField, (openapi.TYPE_STRING, None)),

@@ -71,7 +71,7 @@ class BaseInspector(object):
         that were probed get the chance to alter the result, in reverse order. The inspector that handled the object
         is the first to receive a ``process_result`` call with the object it just returned.
 
-        This behaviour is similar to the Django request/response middleware processing.
+        This behavior is similar to the Django request/response middleware processing.
 
         If this inspector has no post-processing to do, it should just ``return result`` (the default implementation).
 
@@ -140,7 +140,7 @@ class BaseInspector(object):
 class PaginatorInspector(BaseInspector):
     """Base inspector for paginators.
 
-    Responisble for determining extra query parameters and response structure added by given paginators.
+    Responsible for determining extra query parameters and response structure added by given paginators.
     """
 
     def get_paginator_parameters(self, paginator):
@@ -190,7 +190,7 @@ class FieldInspector(BaseInspector):
         self.field_inspectors = field_inspectors
 
     def add_manual_fields(self, serializer_or_field, schema):
-        """Set fields from the ``swagger_schem_fields`` attribute on the Meta class. This method is called
+        """Set fields from the ``swagger_schema_fields`` attribute on the Meta class. This method is called
         only for serializers or fields that are converted into ``openapi.Schema`` objects.
 
         :param serializer_or_field: serializer or field instance
@@ -295,7 +295,7 @@ class FieldInspector(BaseInspector):
             else:
                 result = swagger_object_type(**instance_kwargs)
 
-            # Provide an option to add manual paremeters to a schema
+            # Provide an option to add manual parameters to a schema
             # for example, to add examples
             if swagger_object_type == openapi.Schema:
                 self.add_manual_fields(field, result)
@@ -374,7 +374,7 @@ class ViewInspector(BaseInspector):
     def is_list_view(self):
         """Determine whether this view is a list or a detail view. The difference between the two is that
         detail views depend on a pk/id path parameter. Note that a non-detail view does not necessarily imply a list
-        reponse (:meth:`.has_list_response`), nor are list responses limited to non-detail views.
+        response (:meth:`.has_list_response`), nor are list responses limited to non-detail views.
 
         For example, one might have a `/topic/<pk>/posts` endpoint which is a detail view that has a list response.
 

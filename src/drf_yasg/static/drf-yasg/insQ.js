@@ -3,7 +3,7 @@ var insertionQ = (function () {
 
     var sequence = 100,
         isAnimationSupported = false,
-        animationstring = 'animationName',
+        animation_string = 'animationName',
         keyframeprefix = '',
         domPrefixes = 'Webkit Moz O ms Khtml'.split(' '),
         pfx = '',
@@ -21,7 +21,7 @@ var insertionQ = (function () {
         for (var i = 0; i < domPrefixes.length; i++) {
             if (elm.style[domPrefixes[i] + 'AnimationName'] !== undefined) {
                 pfx = domPrefixes[i];
-                animationstring = pfx + 'AnimationName';
+                animation_string = pfx + 'AnimationName';
                 keyframeprefix = '-' + pfx.toLowerCase() + '-';
                 isAnimationSupported = true;
                 break;
@@ -34,7 +34,7 @@ var insertionQ = (function () {
         var styleAnimation, animationName = 'insQ_' + (sequence++);
 
         var eventHandler = function (event) {
-            if (event.animationName === animationName || event[animationstring] === animationName) {
+            if (event.animationName === animationName || event[animation_string] === animationName) {
                 if (!isTagged(event.target)) {
                     callback(event.target);
                 }
