@@ -27,6 +27,8 @@ SWAGGER_DEFAULTS = {
         'drf_yasg.inspectors.CoreAPICompatInspector',
     ],
 
+    'DEFAULT_JSON_ENCODER': 'rest_framework.utils.encoders.JSONEncoder',
+
     'EXCLUDED_MEDIA_TYPES': ['html'],
 
     'DEFAULT_INFO': None,
@@ -88,6 +90,7 @@ IMPORT_STRINGS = [
     'DEFAULT_FIELD_INSPECTORS',
     'DEFAULT_FILTER_INSPECTORS',
     'DEFAULT_PAGINATOR_INSPECTORS',
+    'DEFAULT_JSON_ENCODER',
     'DEFAULT_INFO',
 ]
 

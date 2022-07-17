@@ -4,7 +4,6 @@ import sys
 import textwrap
 from collections import OrderedDict
 from decimal import Decimal
-
 from django.db import models
 from django.utils.encoding import force_str
 from rest_framework import serializers, status
@@ -467,7 +466,7 @@ def field_value_to_representation(field, value):
 
     # JSON roundtrip ensures that the value is valid JSON;
     # for example, sets and tuples get transformed into lists
-    return json.loads(json.dumps(value, cls=encoders.JSONEncoder))
+    return json.loads(json.dumps(value, cls=swagger_settings.DEFAULT_JSON_ENCODER))
 
 
 def get_field_default(field):
