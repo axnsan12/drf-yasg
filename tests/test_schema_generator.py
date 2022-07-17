@@ -79,7 +79,7 @@ def test_no_netloc(mock_schema_request):
     assert swagger['info']['version'] == 'v2'
 
 
-def test_securiy_requirements(swagger_settings, mock_schema_request):
+def test_security_requirements(swagger_settings, mock_schema_request):
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),
         version="v2",
