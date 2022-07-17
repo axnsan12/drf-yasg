@@ -61,8 +61,8 @@ class Command(BaseCommand):
         parser.add_argument(
             '-p', '--private',
             default=False, action="store_true",
-            help='Hides endpoints not accesible to the target user. If --user is not given, only shows endpoints that '
-                 'are accesible to unauthenticated users.\n'
+            help='Hides endpoints not accessible to the target user. If --user is not given, only shows endpoints that '
+                 'are accessible to unauthenticated users.\n'
                  'This has the same effect as passing public=False to get_schema_view() or '
                  'OpenAPISchemaGenerator.get_schema().\n'
                  'This option implies --mock-request.'
@@ -131,7 +131,7 @@ class Command(BaseCommand):
         if user:
             # Only call get_user_model if --user was passed in order to
             # avoid crashing if auth is not configured in the project
-            user = get_user_model().objects.get(username=user)
+            user = get_user_model().objects.get(**{get_user_model().USERNAME_FIELD: user})
 
         mock = mock or private or (user is not None) or (api_version is not None)
         if mock and not api_url:
@@ -154,10 +154,6 @@ class Command(BaseCommand):
         if output_file == '-':
             self.write_schema(schema, self.stdout, format)
         else:
-            # normally this would be easily done with open(mode='x'/'w'),
-            # but python 2 is a pain in the ass as usual
-            # TODO: simplify when dropping support for python 2.7
-            flags = os.O_CREAT | os.O_WRONLY
-            flags = flags | (os.O_TRUNC if overwrite else os.O_EXCL)
-            with os.fdopen(os.open(output_file, flags), "w") as stream:
+            flags = "w" if overwrite else "x"
+            with open(output_file, flags) as stream:
                 self.write_schema(schema, stream, format)

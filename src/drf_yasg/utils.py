@@ -1,6 +1,7 @@
 import inspect
 import logging
 import sys
+import textwrap
 from collections import OrderedDict
 from decimal import Decimal
 
@@ -38,7 +39,7 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
     `method` and `methods` are mutually exclusive and must only be present when decorating a view method that accepts
     more than one HTTP request method.
 
-    The `auto_schema` and `operation_description` arguments take precendence over view- or method-level values.
+    The `auto_schema` and `operation_description` arguments take precedence over view- or method-level values.
 
     :param str method: for multi-method views, the http method the options should apply to
     :param list[str] methods: for multi-method views, the http methods the options should apply to
@@ -74,12 +75,12 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
 
         It is an error to supply ``form`` parameters when the request does not consume form-data.
 
-    :param str operation_id: operation ID override; the operation ID must be unique accross the whole API
+    :param str operation_id: operation ID override; the operation ID must be unique across the whole API
     :param str operation_description: operation description override
     :param str operation_summary: operation summary string
-    :param list[dict] security: security requirements override; used to specify which authetication mechanism
-        is requried to call this API; an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
-        authentication schemes), and ``None`` will inherit the top-level secuirty requirements
+    :param list[dict] security: security requirements override; used to specify which authentication mechanism
+        is required to call this API; an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
+        authentication schemes), and ``None`` will inherit the top-level security requirements
     :param bool deprecated: deprecation status for operation
     :param responses: a dict of documented manual responses
         keyed on response status code. If no success (``2xx``) response is given, one will automatically be
@@ -95,8 +96,8 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
         * a ``Serializer`` class or instance will be converted into a :class:`.Schema` and treated as above
         * a :class:`.Response` object will be used as-is; however if its ``schema`` attribute is a ``Serializer``,
           it will automatically be converted into a :class:`.Schema`
-    :type responses: dict[str,(drf_yasg.openapi.Schema or drf_yasg.openapi.SchemaRef or drf_yasg.openapi.Response or
-        str or rest_framework.serializers.Serializer)]
+    :type responses: dict[int or str, (drf_yasg.openapi.Schema or drf_yasg.openapi.SchemaRef or
+        drf_yasg.openapi.Response or str or rest_framework.serializers.Serializer)]
 
     :param list[type[drf_yasg.inspectors.FieldInspector]] field_inspectors: extra serializer and field inspectors; these
         will be tried before :attr:`.ViewInspector.field_inspectors` on the :class:`.inspectors.SwaggerAutoSchema`
@@ -320,7 +321,7 @@ def force_serializer_instance(serializer):
 
 
 def get_serializer_class(serializer):
-    """Given a ``Serializer`` class or intance, return the ``Serializer`` class. If `serializer` is not a ``Serializer``
+    """Given a ``Serializer`` class or instance, return the ``Serializer`` class. If `serializer` is not a ``Serializer``
     class or instance, raises an assertion error.
 
     :param serializer: serializer class or instance, or ``None``
@@ -374,10 +375,16 @@ def get_consumes(parser_classes):
     parser_classes = [pc for pc in parser_classes if not issubclass(pc, FileUploadParser)]
     media_types = [parser.media_type for parser in parser_classes or []]
     non_form_media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
+    # Because swagger Parameter objects don't support complex data types (nested objects, arrays),
+    # we can't use those unless we are sure the view *only* accepts form data
+    # This means that a view won't support file upload in swagger unless it explicitly
+    # sets its parser classes to include only form parsers
     if len(non_form_media_types) == 0:
         return media_types
-    else:
-        return non_form_media_types
+
+    # If the form accepts both form data and another type, like json (which is the default config),
+    # we will render its input as a Schema and thus it file parameters will be read-only
+    return non_form_media_types
 
 
 def get_produces(renderer_classes):
@@ -438,6 +445,9 @@ def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
         if type(s) != str:
             s = '' + s
 
+        # Remove common indentation to get the correct Markdown rendering
+        s = textwrap.dedent(s)
+
     return s
 
 
@@ -473,7 +483,10 @@ def get_field_default(field):
             try:
                 if hasattr(default, 'set_context'):
                     default.set_context(field)
-                default = default()
+                if getattr(default, 'requires_context', False):
+                    default = default(field)
+                else:
+                    default = default()
             except Exception:  # pragma: no cover
                 logger.warning("default for %s is callable but it raised an exception when "
                                "called; 'default' will not be set on schema", field, exc_info=True)

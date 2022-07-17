@@ -5,7 +5,7 @@ import json
 import logging
 from collections import OrderedDict
 
-from coreapi.compat import force_bytes
+from django.utils.encoding import force_bytes
 from ruamel import yaml
 
 from . import openapi
@@ -24,16 +24,16 @@ def _validate_flex(spec):
     try:
         validate_flex(spec)
     except ValidationError as ex:
-        raise_from(SwaggerValidationError(str(ex)), ex)
+        raise SwaggerValidationError(str(ex)) from ex
 
 
 def _validate_swagger_spec_validator(spec):
-    from swagger_spec_validator.validator20 import validate_spec as validate_ssv
     from swagger_spec_validator.common import SwaggerValidationError as SSVErr
+    from swagger_spec_validator.validator20 import validate_spec as validate_ssv
     try:
         validate_ssv(spec)
     except SSVErr as ex:
-        raise_from(SwaggerValidationError(str(ex)), ex)
+        raise SwaggerValidationError(str(ex)) from ex
 
 
 #:
@@ -119,12 +119,12 @@ class OpenAPICodecJson(_OpenAPICodec):
 
         :rtype: str"""
         if self.pretty:
-            out = json.dumps(spec, indent=4, separators=(',', ': '))
+            out = json.dumps(spec, indent=4, separators=(',', ': '), ensure_ascii=False)
             if out[-1] != '\n':
                 out += '\n'
             return out
         else:
-            return json.dumps(spec)
+            return json.dumps(spec, ensure_ascii=False)
 
 
 YAML_MAP_TAG = u'tag:yaml.org,2002:map'
@@ -182,8 +182,8 @@ class SaneYamlDumper(yaml.SafeDumper):
         return self.represent_scalar('tag:yaml.org,2002:str', text)
 
 
-SaneYamlDumper.add_representer(binary_type, SaneYamlDumper.represent_text)
-SaneYamlDumper.add_representer(text_type, SaneYamlDumper.represent_text)
+SaneYamlDumper.add_representer(bytes, SaneYamlDumper.represent_text)
+SaneYamlDumper.add_representer(str, SaneYamlDumper.represent_text)
 SaneYamlDumper.add_representer(OrderedDict, SaneYamlDumper.represent_odict)
 SaneYamlDumper.add_multi_representer(OrderedDict, SaneYamlDumper.represent_odict)
 
@@ -201,7 +201,13 @@ def yaml_sane_dump(data, binary):
     :return: the serialized YAML
     :rtype: str or bytes
     """
-    return yaml.dump(data, Dumper=SaneYamlDumper, default_flow_style=False, encoding='utf-8' if binary else None)
+    return yaml.dump(
+        data,
+        Dumper=SaneYamlDumper,
+        default_flow_style=False,
+        encoding='utf-8' if binary else None,
+        allow_unicode=binary
+    )
 
 
 class SaneYamlLoader(yaml.SafeLoader):
