@@ -1,3 +1,9 @@
+// redoc-init.js
+// https://github.com/axnsan12/drf-yasg
+// Copyright 2017 - 2021, Cristian V. <cristi@cvjd.me>
+// This file is licensed under the BSD 3-Clause License.
+// License text available at https://opensource.org/licenses/BSD-3-Clause
+
 "use strict";
 
 var currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;

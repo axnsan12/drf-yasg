@@ -85,8 +85,8 @@ try:
 
     drf_yasg_setup(use_scm_version=True)
 except (ImportError, LookupError) as e:
-    if os.getenv('CI', 'false') == 'true' or os.getenv('TRAVIS', 'false') == 'true':
-        # don't silently fail on travis - we don't want to accidentally push a dummy version to PyPI
+    if os.getenv('CI', 'false') == 'true':
+        # don't silently fail on CI - we don't want to accidentally push a dummy version to PyPI
         raise
 
     err_msg = str(e)
