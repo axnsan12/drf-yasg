@@ -2,6 +2,19 @@
 Changelog
 #########
 
+**********
+**1.21.1**
+**********
+
+*Release date: Jul 17, 2022*
+
+**FIXED:** Refer to permission_classes as a tuple (:pr:`678`)
+**IMPROVED:** Document drf-extra-fields base64 integration (:pr:`445`)
+**ADDED:** Added many support to example code (:pr:`695`)
+**ADDED:** Allow specifying response as a reference (:pr:`757`)
+**FIXED:** Fix old spelling errors and add a cspell configuration (:pr:`796`)
+**FIXED:** Remove universal wheel, python 2 is unsupported (:pr:`782`)
+**FIXED:** Fix duration field inspector (:pr:`549`)
 
 **********
 **1.21.0**
