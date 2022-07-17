@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 from rest_framework import generics, versioning
 
 from snippets.models import Snippet
@@ -23,5 +23,5 @@ class SnippetList(generics.ListCreateAPIView):
 app_name = 'test_ns_versioning'
 
 urlpatterns = required_urlpatterns + [
-    url(r"^$", SnippetList.as_view())
+    path("", SnippetList.as_view())
 ]

@@ -61,6 +61,12 @@ Where you can use the :func:`@swagger_auto_schema <.swagger_auto_schema>` decora
   operations, you have to add the decorator multiple times if you want to override different operations:
 
    .. code-block:: python
+   
+      from drf_yasg import openapi
+      from drf_yasg.utils import swagger_auto_schema
+      from rest_framework.decorators import api_view
+
+      from drf_yasg import openapi
 
       test_param = openapi.Parameter('test', openapi.IN_QUERY, description="test manual param", type=openapi.TYPE_BOOLEAN)
       user_response = openapi.Response('response description', UserSerializer)
@@ -384,6 +390,8 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
 
 .. code-block:: python
 
+   from drf_yasg.inspectors import FieldInspector
+
    class NoSchemaTitleInspector(FieldInspector):
       def process_result(self, result, method_name, obj, **kwargs):
          # remove the `title` attribute of all Schema objects
@@ -415,7 +423,7 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
       - in the output swagger document there is a ``definitions`` section containing :class:`.Schema` objects for all
         models
       - every usage of a model refers to that single :class:`.Schema` object - for example, in the ArticleViewSet
-        above, all requests and responses containg an ``Article`` model would refer to the same schema definition by a
+        above, all requests and responses containing an ``Article`` model would refer to the same schema definition by a
         ``'$ref': '#/definitions/Article'``
 
    This is implemented by only generating **one** :class:`.Schema` object for every serializer **class** encountered.
@@ -425,7 +433,7 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
    for a given serializer.
 
    **IMPORTANT:** nested fields on ``ModelSerializer``\ s that are generated from model ``ForeignKeys`` will always be
-   output by value. If you want the by-reference behaviour you have to explictly set the serializer class of nested
+   output by value. If you want the by-reference behavior you have to explicitly set the serializer class of nested
    fields instead of letting ``ModelSerializer`` generate one automatically; for example:
 
    .. code-block:: python
