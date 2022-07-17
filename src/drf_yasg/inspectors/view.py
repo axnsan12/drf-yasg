@@ -262,6 +262,8 @@ class SwaggerAutoSchema(ViewInspector):
                     description='',
                     schema=serializer,
                 )
+            elif isinstance(serializer, openapi._Ref):
+                response = serializer
             else:
                 serializer = force_serializer_instance(serializer)
                 response = openapi.Response(
