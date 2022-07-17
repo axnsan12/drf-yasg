@@ -85,8 +85,8 @@ class HarvestViewSet(mixins.ListModelMixin,
 
     queryset = Pack.objects.all()
     serializer_class = HarvestSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    authentication_classes = [TokenAuthentication]
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
 
     def perform_update(self, serializer):
         pass
