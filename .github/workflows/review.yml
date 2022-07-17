@@ -1,0 +1,33 @@
+name: Review
+
+on: [push, pull_request]
+
+jobs:
+  review:
+    name: Run linters and tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.6, 3.7, 3.8, 3.9]
+
+    steps:
+      - name: Set up pip package caching
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Checkout the source code
+        uses: actions/checkout@v2
+
+      - name: Set the python version
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install pip dependencies
+        run: pip install -r requirements/ci.txt
+
+      - name: Run unit tests
+        run: tox

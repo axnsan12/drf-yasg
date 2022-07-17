@@ -2,10 +2,11 @@ import datetime
 import inspect
 import logging
 import operator
-import sys
+import typing
 import uuid
 from collections import OrderedDict
 from decimal import Decimal
+from inspect import signature as inspect_signature
 
 from django.core import validators
 from django.db import models
@@ -18,16 +19,6 @@ from ..utils import (
     decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
 )
 from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
-
-try:
-    import typing
-except ImportError:
-    typing = None
-
-try:
-    from inspect import signature as inspect_signature
-except ImportError:
-    inspect_signature = None
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +37,7 @@ class InlineSerializerInspector(SerializerInspector):
         is called only when the serializer is converted into a list of parameters for use in a form data request.
 
         :param serializer: serializer instance
-        :param list[openapi.Parameter] parameters: genereated parameters
+        :param list[openapi.Parameter] parameters: generated parameters
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
@@ -115,15 +106,13 @@ class InlineSerializerInspector(SerializerInspector):
                         required.append(property_name)
 
                 result = SwaggerType(
+                    # the title is derived from the field name and is better to
+                    # be omitted from models
+                    use_field_title=False,
                     type=openapi.TYPE_OBJECT,
                     properties=properties,
                     required=required or None,
                 )
-                if not ref_name and 'title' in result:
-                    # on an inline model, the title is derived from the field name
-                    # but is visno coverually displayed like the model name, which is confusing
-                    # it is better to just remove title from inline models
-                    del result.title
 
                 setattr(result, '_NP_serializer', get_serializer_class(serializer))
                 return result
@@ -142,7 +131,7 @@ class InlineSerializerInspector(SerializerInspector):
                 if not explicit_refs:
                     raise SwaggerGenerationError(
                         "Schema for %s would override distinct serializer %s because they implicitly share the same "
-                        "ref_name; explicitly set the ref_name atribute on both serializers' Meta classes"
+                        "ref_name; explicitly set the ref_name attribute on both serializers' Meta classes"
                         % (actual_serializer, this_serializer))
 
             return openapi.SchemaRef(definitions, ref_name)
@@ -187,7 +176,7 @@ def get_queryset_from_view(view, serializer=None):
     """Try to get the queryset of the given view
 
     :param view: the view instance or class
-    :param serializer: if given, will check that the view's get_serializer_class return matches this serialzier
+    :param serializer: if given, will check that the view's get_serializer_class return matches this serializer
     :return: queryset or ``None``
     """
     try:
@@ -404,7 +393,7 @@ model_field_to_basic_type = [
     (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (models.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (models.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
-    (models.DurationField, (openapi.TYPE_INTEGER, None)),
+    (models.DurationField, (openapi.TYPE_STRING, None)),
     (models.FloatField, (openapi.TYPE_NUMBER, None)),
     (models.IntegerField, (openapi.TYPE_INTEGER, None)),
     (models.IPAddressField, (openapi.TYPE_STRING, openapi.FORMAT_IPV4)),
@@ -431,7 +420,7 @@ serializer_field_to_basic_type = [
     (serializers.IntegerField, (openapi.TYPE_INTEGER, None)),
     (serializers.FloatField, (openapi.TYPE_NUMBER, None)),
     (serializers.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
-    (serializers.DurationField, (openapi.TYPE_NUMBER, None)),  # ?
+    (serializers.DurationField, (openapi.TYPE_STRING, None)),
     (serializers.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (serializers.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (serializers.ModelField, (openapi.TYPE_STRING, None)),
@@ -503,36 +492,34 @@ hinting_type_info = [
     (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
 ]
 
-if sys.version_info < (3, 0):
-    # noinspection PyUnresolvedReferences
-    hinting_type_info.append((unicode, (openapi.TYPE_STRING, None)))  # noqa: F821
 
-if typing:
-    def inspect_collection_hint_class(hint_class):
-        args = hint_class.__args__
-        child_class = args[0] if args else str
-        child_type_info = get_basic_type_info_from_hint(child_class) or {'type': openapi.TYPE_STRING}
+if hasattr(typing, 'get_args'):
+    # python >=3.8
+    typing_get_args = typing.get_args
+else:
+    # python <3.8
+    def typing_get_args(tp):
+        return getattr(tp, '__args__', ())
 
-        return OrderedDict([
-            ('type', openapi.TYPE_ARRAY),
-            ('items', openapi.Items(**child_type_info)),
-        ])
 
-    hinting_type_info.append(((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class))
+def inspect_collection_hint_class(hint_class):
+    args = typing_get_args(hint_class)
+    child_class = args[0] if args else str
+    child_type_info = get_basic_type_info_from_hint(child_class) or {'type': openapi.TYPE_STRING}
+
+    return OrderedDict([
+        ('type', openapi.TYPE_ARRAY),
+        ('items', openapi.Items(**child_type_info)),
+    ])
+
+
+hinting_type_info.append(((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class))
 
 
 def _get_union_types(hint_class):
-    if typing:
-        origin_type = get_origin_type(hint_class)
-        if origin_type is typing.Union:
-            return hint_class.__args__
-        try:
-            # python 3.5.2 and lower compatibility
-            if issubclass(origin_type, typing.Union):
-                return hint_class.__union_params__
-        except TypeError:
-            pass
-    return None
+    origin_type = get_origin_type(hint_class)
+    if origin_type is typing.Union:
+        return hint_class.__args__
 
 
 def get_basic_type_info_from_hint(hint_class):
@@ -546,7 +533,7 @@ def get_basic_type_info_from_hint(hint_class):
     """
     union_types = _get_union_types(hint_class)
 
-    if typing and union_types:
+    if union_types:
         # Optional is implemented as Union[T, None]
         if len(union_types) == 2 and isinstance(None, union_types[1]):
             result = get_basic_type_info_from_hint(union_types[0])
@@ -583,7 +570,7 @@ class SerializerMethodFieldInspector(FieldInspector):
         if not isinstance(field, serializers.SerializerMethodField):
             return NotHandled
 
-        method = getattr(field.parent, field.method_name)
+        method = getattr(field.parent, field.method_name, None)
         if method is None:
             return NotHandled
 
@@ -619,7 +606,7 @@ class SerializerMethodFieldInspector(FieldInspector):
                 serializer.read_only = True
 
             return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
-        elif typing and inspect_signature:
+        else:
             # look for Python 3.5+ style type hinting of the return value
             hint_class = inspect_signature(method).return_annotation
 
@@ -783,8 +770,7 @@ class StringDefaultFieldInspector(FieldInspector):
 
 try:
     from djangorestframework_camel_case.parser import CamelCaseJSONParser
-    from djangorestframework_camel_case.render import CamelCaseJSONRenderer
-    from djangorestframework_camel_case.render import camelize
+    from djangorestframework_camel_case.render import CamelCaseJSONRenderer, camelize
 except ImportError:  # pragma: no cover
     CamelCaseJSONParser = CamelCaseJSONRenderer = None
 
