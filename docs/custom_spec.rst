@@ -429,7 +429,7 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
       - in the output swagger document there is a ``definitions`` section containing :class:`.Schema` objects for all
         models
       - every usage of a model refers to that single :class:`.Schema` object - for example, in the ArticleViewSet
-        above, all requests and responses containg an ``Article`` model would refer to the same schema definition by a
+        above, all requests and responses containing an ``Article`` model would refer to the same schema definition by a
         ``'$ref': '#/definitions/Article'``
 
    This is implemented by only generating **one** :class:`.Schema` object for every serializer **class** encountered.
@@ -439,7 +439,7 @@ A second example, of a :class:`~.inspectors.FieldInspector` that removes the ``t
    for a given serializer.
 
    **IMPORTANT:** nested fields on ``ModelSerializer``\ s that are generated from model ``ForeignKeys`` will always be
-   output by value. If you want the by-reference behaviour you have to explictly set the serializer class of nested
+   output by value. If you want the by-reference behavior you have to explicitly set the serializer class of nested
    fields instead of letting ``ModelSerializer`` generate one automatically; for example:
 
    .. code-block:: python
