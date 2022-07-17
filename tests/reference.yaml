@@ -967,6 +967,7 @@ paths:
         type: string
 definitions:
   Article:
+    description: Article(id, title, body, slug, date_created, date_modified, author, article_type, cover, group, original_group, read_only_nullable)
     required:
       - title
       - body
@@ -1078,6 +1079,7 @@ definitions:
         readOnly: true
         format: uri
   Identity:
+    description: Identity(id, first_name, last_name)
     type: object
     properties:
       id:
@@ -1098,6 +1100,7 @@ definitions:
         minLength: 1
         x-nullable: true
   Person:
+    description: Person(id, identity)
     required:
       - identity
     type: object
@@ -1125,6 +1128,7 @@ definitions:
         type: string
         minLength: 1
   Snippet:
+    description: 'SnippetSerializer classdoc create: docstring for create from serializer classdoc'
     required:
       - code
       - tags
@@ -1250,6 +1254,7 @@ definitions:
             x-nullable: true
         x-nullable: true
   SnippetViewer:
+    description: SnippetViewer(id, snippet, viewer)
     required:
       - snippet
       - viewer
@@ -1266,6 +1271,7 @@ definitions:
         title: Viewer
         type: integer
   Todo:
+    description: Todo(id, title)
     required:
       - title
     type: object
@@ -1276,6 +1282,7 @@ definitions:
         maxLength: 50
         minLength: 1
   TodoAnother:
+    description: TodoAnother(id, todo, title)
     required:
       - title
       - todo
@@ -1289,6 +1296,7 @@ definitions:
       todo:
         $ref: '#/definitions/Todo'
   Harvest:
+    description: Pack(id, size_code)
     type: object
     properties:
       size_code:
@@ -1300,6 +1308,7 @@ definitions:
           - '200'
         readOnly: true
   TodoRecursive:
+    description: TodoTree(id, parent, title)
     required:
       - title
     type: object
@@ -1320,6 +1329,7 @@ definitions:
         title: Parent id
         x-nullable: true
   TodoTree:
+    description: TodoTree(id, parent, title)
     required:
       - title
       - children
@@ -1344,6 +1354,7 @@ definitions:
         items:
           $ref: '#/definitions/TodoTree'
   TodoYetAnother:
+    description: TodoYetAnother(id, todo, title)
     required:
       - title
     type: object
@@ -1354,6 +1365,7 @@ definitions:
         maxLength: 50
         minLength: 1
       todo:
+        description: TodoAnother(id, todo, title)
         required:
           - title
         type: object
@@ -1368,6 +1380,7 @@ definitions:
             maxLength: 50
             minLength: 1
           todo:
+            description: Todo(id, title)
             required:
               - title
             type: object
@@ -1399,6 +1412,7 @@ definitions:
         type: string
         minLength: 1
   MethodFieldExample:
+    description: Implementation of SerializerMethodField using type hinting for Python >= 3.5
     type: object
     properties:
       hinted_bool:
@@ -1451,6 +1465,7 @@ definitions:
         type: string
         readOnly: true
   UserSerializerrr:
+    description: Users within the Django authentication system are represented by this model. Username and password are required. Other fields are optional.
     required:
       - username
       - articles

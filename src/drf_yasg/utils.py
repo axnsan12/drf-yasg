@@ -454,11 +454,10 @@ def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
 def strip_doc_string(doc):
     """
     Remove line breaks and excess space from the start and end of each line of
-    a docstring.  Ignores indenting, so some formatting will be lost.
+    a docstring. Ignores indenting, so some formatting will be lost.
     """
-    if not doc:
-        return ''
-    return ' '.join(line.strip() for line in doc.splitlines() if line.strip())
+    lines = doc.splitlines() if doc else []
+    return ' '.join(line.strip() for line in lines if line.strip())
 
 
 def field_value_to_representation(field, value):

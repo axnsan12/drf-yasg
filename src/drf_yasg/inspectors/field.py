@@ -77,22 +77,34 @@ class InlineSerializerInspector(SerializerInspector):
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
+        
         description = getattr(field, 'description', getattr(field, '__doc__'))
         
         if description is None and hasattr(field, 'Meta') and hasattr(field.Meta, 'model') and hasattr(field.Meta.model, '__doc__'):
             description = field.Meta.model.__doc__
         
-        stripped_description = strip_doc_string(description)
+        description = strip_doc_string(description)
 
         if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
             child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)
             limits = find_limits(field) or {}
-            return SwaggerType(
-                type=openapi.TYPE_ARRAY,
-                description=stripped_description,
-                items=child_schema,
-                **limits
-            )
+            
+            if description:
+                return SwaggerType(
+                    type=openapi.TYPE_ARRAY,
+                    items=child_schema,
+                    description=description,
+                    **limits
+                ) 
+            
+            else:
+                # Don't set a description if it's an empty string or None
+                return SwaggerType(
+                    type=openapi.TYPE_ARRAY,
+                    items=child_schema,
+                    **limits
+                )
+
         elif isinstance(field, serializers.Serializer):
             if swagger_object_type != openapi.Schema:
                 raise SwaggerGenerationError("cannot instantiate nested serializer as " + swagger_object_type.__name__)
@@ -117,15 +129,25 @@ class InlineSerializerInspector(SerializerInspector):
                     if child.required and not getattr(child_schema, 'read_only', False):
                         required.append(property_name)
 
-                result = SwaggerType(
-                    # the title is derived from the field name and is better to
-                    # be omitted from models
-                    use_field_title=False,
-                    description=stripped_description,
-                    type=openapi.TYPE_OBJECT,
-                    properties=properties,
-                    required=required or None,
-                )
+                # the title is derived from the field name and is better to
+                # be omitted from models
+                if description:
+                    result = SwaggerType(
+                        use_field_title=False, 
+                        type=openapi.TYPE_OBJECT, 
+                        properties=properties, 
+                        required=required or None, 
+                        description=description
+                    )
+                
+                # Don't set a description if it's an empty string or None
+                else:
+                    result = SwaggerType(
+                        use_field_title=False,
+                        type=openapi.TYPE_OBJECT,
+                        properties=properties,
+                        required=required or None
+                    )
 
                 setattr(result, '_NP_serializer', get_serializer_class(serializer))
                 return result
