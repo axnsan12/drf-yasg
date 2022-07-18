@@ -15,7 +15,7 @@ runs:
     - name: Set the python version
       uses: actions/setup-python@v3
       with:
-        python-version: ${{ inputs.python-version }}.
+        python-version: ${{ inputs.python-version }}
 
     - name: Set up pip package caching
       uses: actions/cache@v2
