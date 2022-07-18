@@ -30,5 +30,6 @@ jobs:
       - name: Check for incompatibilities with publishing to PyPi
         if: ${{ matrix.python }} == 3.8
         run: |
+           pip install -r requirements/publish.txt
            python setup.py sdist
            twine check dist/*

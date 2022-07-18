@@ -360,26 +360,29 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
    :trim:
 
 drf-extra-fields
-===============================
-Integration with `drf-extra-fields <https://github.com/Hipo/drf-extra-fields>`_ has a problem with Base64 fields. The drf-yasg will generate Base64 file or image fields as Readonly and not required. Here is a workaround code for display the Base64 fields correctly.
+=================
+
+Integration with `drf-extra-fields <https://github.com/Hipo/drf-extra-fields>`_ has a problem with Base64 fields. 
+The drf-yasg will generate Base64 file or image fields as Readonly and not required. Here is a workaround code
+for display the Base64 fields correctly.
 
 .. code:: python
 
-class PDFBase64FileField(Base64FileField):
-    ALLOWED_TYPES = ['pdf']
-
-    class Meta:
-        swagger_schema_fields = {
-            'type': 'string',
-            'title': 'File Content',
-            'description': 'Content of the file base64 encoded',
-            'read_only': False  # <-- FIX
-        }
-
-    def get_file_extension(self, filename, decoded_file):
-        try:
-            PyPDF2.PdfFileReader(io.BytesIO(decoded_file))
-        except PyPDF2.utils.PdfReadError as e:
-            logger.warning(e)
-        else:
-            return 'pdf'
+  class PDFBase64FileField(Base64FileField):
+      ALLOWED_TYPES = ['pdf']
+  
+      class Meta:
+          swagger_schema_fields = {
+              'type': 'string',
+              'title': 'File Content',
+              'description': 'Content of the file base64 encoded',
+              'read_only': False  # <-- FIX
+          }
+  
+      def get_file_extension(self, filename, decoded_file):
+          try:
+              PyPDF2.PdfFileReader(io.BytesIO(decoded_file))
+          except PyPDF2.utils.PdfReadError as e:
+              logger.warning(e)
+          else:
+              return 'pdf'
