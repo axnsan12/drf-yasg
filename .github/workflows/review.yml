@@ -25,11 +25,13 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Run tests
-        run: tox
+        env:
+          TOXENV: ${{ matrix.python }}
+        run: tox -e py${TOXENV//.}
 
       - name: Check for incompatibilities with publishing to PyPi
-        if: ${{ matrix.python }} == 3.8
+        if: ${{ matrix.python == 3.8 }}
         run: |
-           pip install -r requirements/publish.txt
-           python setup.py sdist
-           twine check dist/*
+          pip install -r requirements/publish.txt
+          python setup.py sdist
+          twine check dist/*
