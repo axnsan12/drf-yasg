@@ -1,3 +1,4 @@
+from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
@@ -64,10 +65,15 @@ class _UIRenderer(BaseRenderer):
 
     def render(self, swagger, accepted_media_type=None, renderer_context=None):
         if not isinstance(swagger, Swagger):  # pragma: no cover
-            # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
-            # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
-            # see https://github.com/axnsan12/drf-yasg/issues/58
-            return TemplateHTMLRenderer().render(swagger, accepted_media_type, renderer_context)
+            try:
+                # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
+                # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
+                # see https://github.com/axnsan12/drf-yasg/issues/58
+                return TemplateHTMLRenderer().render(swagger, accepted_media_type, renderer_context)
+            except ImproperlyConfigured:
+                # Fall back to using eg '404 Not Found'
+                response = renderer_context['response']
+                return '%d %s' % (response.status_code, response.status_text.title())
 
         self.set_context(renderer_context, swagger)
         return render_to_string(self.template, renderer_context, renderer_context['request'])
