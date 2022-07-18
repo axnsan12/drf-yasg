@@ -27,7 +27,7 @@ jobs:
       - name: Run tests
         env:
           PYTHON_VERSION: ${{ matrix.python }}
-        run: tox -e $(tox -l | grep ${PYTHON_VERSION//.} | paste -sd "," -)
+        run: tox -e $(tox -l | grep py${PYTHON_VERSION//.} | paste -sd "," -)
 
       - name: Check for incompatibilities with publishing to PyPi
         if: ${{ matrix.python == 3.8 }}
