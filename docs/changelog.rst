@@ -3,10 +3,21 @@ Changelog
 #########
 
 **********
+**1.21.3**
+**********
+
+*Release date: Jul 18, 2022*
+
+**FIXED:** Set generator url for swagger_settings.DEFAULT_API_URL (:pr:`682`)
+**FIXED:** Check fields for allow_null attribute (:pr:`688`)
+**FIXED:** Encode pytz object field as a string by default (:pr:`717`)
+**FIXED:** Handle errors rendering with TemplateHTMLRenderer (:pr:`742`)
+
+**********
 **1.21.2**
 **********
 
-*Release date: Jul 17, 2022*
+*Release date: Jul 18, 2022*
 
 **FIXED:** Fixed code block rst syntax in ``README.rst``
 
