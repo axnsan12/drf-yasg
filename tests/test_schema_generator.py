@@ -1,8 +1,13 @@
 import json
+import typing
 from collections import OrderedDict
 
 import pytest
-from django.conf.urls import url
+from django.contrib.postgres import fields as postgres_fields
+from django.db import models
+from django.urls import path
+from django.utils.inspect import get_func_args
+from django_fake_model import models as fake_models
 from rest_framework import routers, serializers, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -74,7 +79,7 @@ def test_no_netloc(mock_schema_request):
     assert swagger['info']['version'] == 'v2'
 
 
-def test_securiy_requirements(swagger_settings, mock_schema_request):
+def test_security_requirements(swagger_settings, mock_schema_request):
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),
         version="v2",
@@ -84,6 +89,14 @@ def test_securiy_requirements(swagger_settings, mock_schema_request):
 
     swagger = generator.get_schema(mock_schema_request, public=True)
     assert swagger['security'] == []
+
+
+def _basename_or_base_name(basename):
+    # freaking DRF... TODO: remove when dropping support for DRF 3.8
+    if 'basename' in get_func_args(routers.BaseRouter.register):
+        return {'basename': basename}
+    else:
+        return {'base_name': basename}
 
 
 def test_replaced_serializer():
@@ -99,7 +112,7 @@ def test_replaced_serializer():
             return Response(serializer.data)
 
     router = routers.DefaultRouter()
-    router.register(r'details', DetailViewSet, base_name='details')
+    router.register(r'details', DetailViewSet, **_basename_or_base_name('details'))
 
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),
@@ -130,8 +143,8 @@ def test_url_order():
         return Response({"message": "Hello, world!"})
 
     patterns = [
-        url(r'^/test/$', test_override),
-        url(r'^/test/$', test_view),
+        path('test/', test_override),
+        path('test/', test_view),
     ]
 
     generator = OpenAPISchemaGenerator(
@@ -146,11 +159,12 @@ def test_url_order():
     assert swagger['paths']['/test/']['get']['description'] == 'description override'
 
     # get_endpoints only includes one endpoint
-    assert len(generator.get_endpoints(None)['/test/'][1]) == 1
+    endpoints = generator.get_endpoints(None)
+    assert len(endpoints['/test/'][1]) == 1
 
 
 try:
-    from rest_framework.decorators import action, MethodMapper
+    from rest_framework.decorators import MethodMapper, action
 except ImportError:
     action = MethodMapper = None
 
@@ -172,7 +186,7 @@ def test_action_mapping():
             pass
 
     router = routers.DefaultRouter()
-    router.register(r'action', ActionViewSet, base_name='action')
+    router.register(r'action', ActionViewSet, **_basename_or_base_name('action'))
 
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),
@@ -190,3 +204,145 @@ def test_action_mapping():
         assert action_ops['post']['description'] == 'mapping docstring post'
         assert action_ops['get']['description'] == 'mapping docstring get/delete'
         assert action_ops['delete']['description'] == 'mapping docstring get/delete'
+
+
+@pytest.mark.parametrize('choices, expected_type', [
+    (['A', 'B'], openapi.TYPE_STRING),
+    ([u'A', u'B'], openapi.TYPE_STRING),
+    ([123, 456], openapi.TYPE_INTEGER),
+    ([1.2, 3.4], openapi.TYPE_NUMBER),
+    (['A', 456], openapi.TYPE_STRING)
+])
+def test_choice_field(choices, expected_type):
+    class DetailSerializer(serializers.Serializer):
+        detail = serializers.ChoiceField(choices)
+
+    class DetailViewSet(viewsets.ViewSet):
+        @swagger_auto_schema(responses={200: openapi.Response("OK", DetailSerializer)})
+        def retrieve(self, request, pk=None):
+            return Response({'detail': None})
+
+    router = routers.DefaultRouter()
+    router.register(r'details', DetailViewSet, **_basename_or_base_name('details'))
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        patterns=router.urls
+    )
+
+    swagger = generator.get_schema(None, True)
+    property_schema = swagger['definitions']['Detail']['properties']['detail']
+
+    assert property_schema == openapi.Schema(title='Detail', type=expected_type, enum=choices)
+
+
+@pytest.mark.parametrize('choices, field, expected_type', [
+    ([1, 2, 3], models.IntegerField, openapi.TYPE_INTEGER),
+    (["A", "B"], models.CharField, openapi.TYPE_STRING),
+])
+def test_nested_choice_in_array_field(choices, field, expected_type):
+
+    # Create a model class on the fly to avoid warnings about using the several
+    # model class name several times
+    model_class = type(
+        "%sModel" % field.__name__,
+        (fake_models.FakeModel,),
+        {
+            "array": postgres_fields.ArrayField(
+                field(choices=((i, "choice %s" % i) for i in choices))
+            ),
+            "__module__": "test_models",
+        }
+    )
+
+    class ArraySerializer(serializers.ModelSerializer):
+        class Meta:
+            model = model_class
+            fields = ("array",)
+
+    class ArrayViewSet(viewsets.ModelViewSet):
+        serializer_class = ArraySerializer
+
+    router = routers.DefaultRouter()
+    router.register(r'arrays', ArrayViewSet, **_basename_or_base_name('arrays'))
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title='Test array model generator', default_version='v1'),
+        patterns=router.urls
+    )
+
+    swagger = generator.get_schema(None, True)
+    property_schema = swagger['definitions']['Array']['properties']['array']['items']
+    assert property_schema == openapi.Schema(title='Array', type=expected_type, enum=choices)
+
+
+def test_json_field():
+    class TestJSONFieldSerializer(serializers.Serializer):
+        json = serializers.JSONField()
+
+    class JSONViewSet(viewsets.ModelViewSet):
+        serializer_class = TestJSONFieldSerializer
+
+    router = routers.DefaultRouter()
+    router.register(r'jsons', JSONViewSet, **_basename_or_base_name('jsons'))
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title='Test json field generator', default_version='v1'),
+        patterns=router.urls
+    )
+
+    swagger = generator.get_schema(None, True)
+    property_schema = swagger["definitions"]["TestJSONField"]["properties"]["json"]
+    assert property_schema == openapi.Schema(title='Json', type=openapi.TYPE_OBJECT)
+
+
+@pytest.mark.parametrize('py_type, expected_type', [
+    (str, openapi.TYPE_STRING),
+    (int, openapi.TYPE_INTEGER),
+    (float, openapi.TYPE_NUMBER),
+    (bool, openapi.TYPE_BOOLEAN),
+])
+def test_optional_return_type(py_type, expected_type):
+
+    class OptionalMethodSerializer(serializers.Serializer):
+        x = serializers.SerializerMethodField()
+
+        def get_x(self, instance):
+            pass
+
+        # Add the type annotation here in order to avoid a SyntaxError in py27
+        get_x.__annotations__["return"] = typing.Optional[py_type]
+
+    class OptionalMethodViewSet(viewsets.ViewSet):
+        @swagger_auto_schema(responses={200: openapi.Response("OK", OptionalMethodSerializer)})
+        def retrieve(self, request, pk=None):
+            return Response({'optional': None})
+
+    router = routers.DefaultRouter()
+    router.register(r'optional', OptionalMethodViewSet, **_basename_or_base_name('optional'))
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title='Test optional parameter', default_version='v1'),
+        patterns=router.urls
+    )
+    swagger = generator.get_schema(None, True)
+    property_schema = swagger["definitions"]["OptionalMethod"]["properties"]["x"]
+    assert property_schema == openapi.Schema(title='X', type=expected_type, readOnly=True)
+
+
+EXPECTED_DESCRIPTION = """\
+  description: |-
+    This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg) Django Rest Framework library.
+
+    The `swagger-ui` view can be found [here](/cached/swagger).
+    The `ReDoc` view can be found [here](/cached/redoc).
+    The swagger YAML document can be found [here](/cached/swagger.yaml).
+
+    You can log in using the pre-existing `admin` user with password `passwordadmin`.
+"""
+
+
+def test_multiline_strings(call_generate_swagger):
+    output = call_generate_swagger(format='yaml')
+    print("|\n|".join(output.splitlines()[:20]))
+    assert EXPECTED_DESCRIPTION in output

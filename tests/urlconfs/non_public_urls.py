@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.urls import include, path
 from rest_framework import permissions
 
 import testproj.urls
@@ -13,6 +13,6 @@ view = get_schema_view(
 view = view.without_ui(cache_timeout=None)
 
 urlpatterns = [
-    url(r'^', include(testproj.urls)),
-    url(r'^private/swagger.yaml', view, name='schema-private'),
+    path('', include(testproj.urls)),
+    path('private/swagger.yaml', view, name='schema-private'),
 ]

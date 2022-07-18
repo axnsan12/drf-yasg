@@ -5,15 +5,22 @@
 drf-yasg - Yet another Swagger generator
 ########################################
 
-|travis| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
+|actions| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
 
 Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
 
 Compatible with
 
-- **Django Rest Framework**: 3.7.7, 3.8
-- **Django**: 1.11, 2.0, 2.1
-- **Python**: 2.7, 3.4, 3.5, 3.6, 3.7
+- **Django Rest Framework**: 3.10, 3.11, 3.12
+- **Django**: 2.2, 3.0, 3.1
+- **Python**: 3.6, 3.7, 3.8, 3.9
+
+Only the latest patch version of each ``major.minor`` series of Python, Django and Django REST Framework is supported.
+
+**Only the latest version of drf-yasg is supported.** Support of old versions is dropped immediately with the release
+of a new version. Please do not create issues before upgrading to the latest release available at the time. Regression
+reports are accepted and will be resolved with a new release as quickly as possible. Removed features will usually go
+through a deprecation cycle of a few minor releases.
 
 Resources:
 
@@ -22,9 +29,20 @@ Resources:
 * **Changelog**: https://drf-yasg.readthedocs.io/en/stable/changelog.html
 * **Live demo**: https://drf-yasg-demo.herokuapp.com/
 
-.. image:: https://www.herokucdn.com/deploy/button.svg
-   :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg
-   :alt: heroku deploy button
+|heroku-button|
+
+
+****************
+OpenAPI 3.0 note
+****************
+
+If you are looking to add Swagger/OpenAPI support to a new project you might want to take a look at
+`drf-spectacular <https://github.com/tfranzel/drf-spectacular>`_, which is an actively maintained new library that
+shares most of the goals of this project, while working with OpenAPI 3.0 schemas.
+
+OpenAPI 3.0 provides a lot more flexibility than 2.0 in the types of API that can be described.
+``drf-yasg`` is unlikely to soon, if ever, get support for OpenAPI 3.0.
+
 
 ********
 Features
@@ -40,8 +58,7 @@ Features
   `redoc <https://github.com/Rebilly/ReDoc>`_ for viewing the generated documentation
 - schema view is cacheable out of the box
 - generated Swagger schema can be automatically validated by
-  `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`_ or
-  `flex <https://github.com/pipermerriam/flex>`_
+  `swagger-spec-validator <https://github.com/Yelp/swagger_spec_validator>`_
 - supports Django REST Framework API versioning with ``URLPathVersioning`` and ``NamespaceVersioning``; other DRF
   or custom versioning schemes are not currently supported
 
@@ -81,7 +98,7 @@ Usage
 0. Installation
 ===============
 
-The preferred instalation method is directly from pypi:
+The preferred installation method is directly from pypi:
 
 .. code:: console
 
@@ -105,6 +122,7 @@ In ``settings.py``:
 
    INSTALLED_APPS = [
       ...
+      'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
       'drf_yasg',
       ...
    ]
@@ -114,6 +132,8 @@ In ``urls.py``:
 .. code:: python
 
    ...
+   from django.urls import re_path
+   from rest_framework import permissions
    from drf_yasg.views import get_schema_view
    from drf_yasg import openapi
 
@@ -128,19 +148,18 @@ In ``urls.py``:
          contact=openapi.Contact(email="contact@snippets.local"),
          license=openapi.License(name="BSD License"),
       ),
-      validators=['flex', 'ssv'],
       public=True,
       permission_classes=(permissions.AllowAny,),
    )
 
    urlpatterns = [
-      url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-      url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-      url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+      re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+      re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+      re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
       ...
    ]
 
-This exposes 4 cached, validated and publicly available endpoints:
+This exposes 4 endpoints:
 
 * A JSON view of your API specification at ``/swagger.json``
 * A YAML view of your API specification at ``/swagger.yaml``
@@ -159,7 +178,7 @@ a. ``get_schema_view`` parameters
 - ``patterns`` - passed to SchemaGenerator
 - ``urlconf`` - passed to SchemaGenerator
 - ``public`` - if False, includes only endpoints the current user has access to
-- ``validators`` - a list of validator names to apply on the generated schema; allowed values are ``flex``, ``ssv``
+- ``validators`` - a list of validator names to apply on the generated schema; only ``ssv`` is currently supported
 - ``generator_class`` - schema generator class to use; should be a subclass of ``OpenAPISchemaGenerator``
 - ``authentication_classes`` - authentication classes for the schema view itself
 - ``permission_classes`` - permission classes for the schema view itself
@@ -204,9 +223,9 @@ caching the schema view in-memory, with some sane defaults:
 4. Validation
 =============
 
-Given the numerous methods to manually customzie the generated schema, it makes sense to validate the result to ensure
+Given the numerous methods to manually customize the generated schema, it makes sense to validate the result to ensure
 it still conforms to OpenAPI 2.0. To this end, validation is provided at the generation point using python swagger
-libraries, and can be activated by passing :python:`validators=['flex', 'ssv']` to ``get_schema_view``; if the generated
+libraries, and can be activated by passing :python:`validators=['ssv']` to ``get_schema_view``; if the generated
 schema is not valid, a :python:`SwaggerValidationError` is raised by the handling codec.
 
 **Warning:** This internal validation can slow down your server.
@@ -229,7 +248,7 @@ Offline
 ^^^^^^^
 
 If your schema is not accessible from the internet, you can run a local copy of
-`swagger-validator <https://hub.docker.com/r/swaggerapi/swagger-validator/>`_ and set the `VALIDATOR_URL` accordingly:
+`swagger-validator <https://hub.docker.com/r/swaggerapi/swagger-validator/>`_ and set the ``VALIDATOR_URL`` accordingly:
 
 .. code:: python
 
@@ -294,50 +313,11 @@ For additional usage examples, you can take a look at the test project in the ``
    $ virtualenv venv
    $ source venv/bin/activate
    (venv) $ cd testproj
+   (venv) $ python -m pip install -U pip setuptools
    (venv) $ pip install -U -r requirements.txt
    (venv) $ python manage.py migrate
-   (venv) $ python manage.py shell -c "import createsuperuser"
    (venv) $ python manage.py runserver
    (venv) $ firefox localhost:8000/swagger/
-
-**********
-Background
-**********
-
-``OpenAPI 2.0``/``Swagger`` is a format designed to encode information about a Web API into an easily parsable schema
-that can then be used for rendering documentation, generating code, etc.
-
-More details are available on `swagger.io <https://swagger.io/>`__ and on the `OpenAPI 2.0 specification
-page <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md>`__.
-
-From here on, the terms “OpenAPI” and “Swagger” are used interchangeably.
-
-Swagger in Django Rest Framework
-================================
-
-Since Django Rest Framework 3.7, there is now `built in support <http://www.django-rest-framework.org/api-guide/schemas/>`__
-for automatic OpenAPI 2.0 schema generation. However, this generation is based on the `coreapi <http://www.coreapi.org/>`__
-standard, which for the moment is vastly inferior to OpenAPI in both features and tooling support. In particular,
-the OpenAPI codec/compatibility layer provided has a few major problems:
-
-* there is no support for documenting response schemas and status codes
-* nested schemas do not work properly
-* does not handle more complex fields such as ``FileField``, ``ChoiceField``, …
-
-In short this makes the generated schema unusable for code generation, and mediocre at best for documentation.
-
-Other libraries
-===============
-
-There are currently two decent Swagger schema generators that I could find for django-rest-framework:
-
-* `django-rest-swagger <https://github.com/marcgibbons/django-rest-swagger>`__
-* `drf-openapi <https://github.com/limdauto/drf_openapi>`__
-
-``django-rest-swagger`` is just a wrapper around DRF 3.7 schema generation with an added UI, and
-thus presents the same problems, while also being unmaintained. ``drf-openapi`` was
-`discontinued by the author <https://github.com/limdauto/drf_openapi/commit/1673c6e039eec7f089336a83bdc31613f32f7e21>`_
-on April 3rd, 2018.
 
 ************************
 Third-party integrations
@@ -356,9 +336,9 @@ djangorestframework-recursive
 Integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_ is
 provided out of the box - if you have ``djangorestframework-recursive`` installed.
 
-.. |travis| image:: https://img.shields.io/travis/axnsan12/drf-yasg/master.svg
-   :target: https://travis-ci.org/axnsan12/drf-yasg
-   :alt: Travis CI
+.. |actions| image:: https://img.shields.io/github/workflow/status/axnsan12/drf-yasg/Review
+   :target: https://github.com/axnsan12/drf-yasg/actions
+   :alt: GitHub Workflow Status
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/axnsan12/drf-yasg/master.svg
    :target: https://codecov.io/gh/axnsan12/drf-yasg
@@ -372,5 +352,37 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
    :target: https://drf-yasg.readthedocs.io/
    :alt: ReadTheDocs
 
+.. |heroku-button| image:: https://www.herokucdn.com/deploy/button.svg
+   :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg
+   :alt: Heroku deploy button
+
 .. |nbsp| unicode:: 0xA0
    :trim:
+
+drf-extra-fields
+=================
+
+Integration with `drf-extra-fields <https://github.com/Hipo/drf-extra-fields>`_ has a problem with Base64 fields. 
+The drf-yasg will generate Base64 file or image fields as Readonly and not required. Here is a workaround code
+for display the Base64 fields correctly.
+
+.. code:: python
+
+  class PDFBase64FileField(Base64FileField):
+      ALLOWED_TYPES = ['pdf']
+  
+      class Meta:
+          swagger_schema_fields = {
+              'type': 'string',
+              'title': 'File Content',
+              'description': 'Content of the file base64 encoded',
+              'read_only': False  # <-- FIX
+          }
+  
+      def get_file_extension(self, filename, decoded_file):
+          try:
+              PyPDF2.PdfFileReader(io.BytesIO(decoded_file))
+          except PyPDF2.utils.PdfReadError as e:
+              logger.warning(e)
+          else:
+              return 'pdf'

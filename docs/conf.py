@@ -48,6 +48,11 @@ author = 'Cristi V.'
 
 # The full version, including alpha/beta/rc tags.
 release = get_distribution('drf_yasg').version
+if 'noscm' in release:
+    raise AssertionError('Invalid package version string: %s. \n'
+                         'The documentation must be built with drf_yasg installed from a distribution package, '
+                         'which must have been built with a proper version number (i.e. from a full source checkout).'
+                         % (release,))
 
 # The short X.Y.Z version.
 version = '.'.join(release.split('.')[:3])
@@ -171,16 +176,19 @@ nitpick_ignore = [
     ('py:class', 'int'),
     ('py:class', 'bytes'),
     ('py:class', 'tuple'),
-    ('py:class', 'callable'),
+    ('py:class', 'function'),
     ('py:class', 'type'),
     ('py:class', 'OrderedDict'),
     ('py:class', 'None'),
+    ('py:obj', 'None'),
 
     ('py:class', 'Exception'),
     ('py:class', 'collections.OrderedDict'),
 
     ('py:class', 'ruamel.yaml.dumper.SafeDumper'),
+    ('py:class', 'rest_framework.serializers.Serializer'),
     ('py:class', 'rest_framework.renderers.BaseRenderer'),
+    ('py:class', 'rest_framework.parsers.BaseParser'),
     ('py:class', 'rest_framework.schemas.generators.EndpointEnumerator'),
     ('py:class', 'rest_framework.views.APIView'),
 
@@ -205,7 +213,7 @@ nitpick_ignore = [
 # for some reason needs the sources dir to be in the path in order for viewcode to work
 sys.path.insert(0, os.path.abspath('../src'))
 
-# activate the Django testproj to be able to succesfully import drf_yasg
+# activate the Django testproj to be able to successfully import drf_yasg
 sys.path.insert(0, os.path.abspath('../testproj'))
 os.putenv('DJANGO_SETTINGS_MODULE', 'testproj.settings.local')
 
@@ -313,4 +321,4 @@ roles.register_local_role('ghuser', role_github_user)
 
 
 def setup(app):
-    app.add_stylesheet('css/style.css')
+    app.add_css_file('css/style.css')

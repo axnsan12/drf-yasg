@@ -1,11 +1,14 @@
 swagger: '2.0'
 info:
   title: Snippets API
-  description: "This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg)\
-    \ Django Rest Framework library.\n\nThe `swagger-ui` view can be found [here](/cached/swagger).\
-    \  \nThe `ReDoc` view can be found [here](/cached/redoc).  \nThe swagger YAML\
-    \ document can be found [here](/cached/swagger.yaml).  \n\nYou can log in using\
-    \ the pre-existing `admin` user with password `passwordadmin`."
+  description: |-
+    This is a demo project for the [drf-yasg](https://github.com/axnsan12/drf-yasg) Django Rest Framework library.
+
+    The `swagger-ui` view can be found [here](/cached/swagger).
+    The `ReDoc` view can be found [here](/cached/redoc).
+    The swagger YAML document can be found [here](/cached/swagger.yaml).
+
+    You can log in using the pre-existing `admin` user with password `passwordadmin`.
   termsOfService: https://www.google.com/policies/terms/
   contact:
     email: contact@snippets.local
@@ -27,9 +30,22 @@ securityDefinitions:
     in: header
     name: Authorization
     type: apiKey
+  OAuth2 password:
+    flow: password
+    scopes:
+      read: Read everything.
+      write: Write everything,
+    tokenUrl: /o/token/
+    type: oauth2
+  Query:
+    in: query
+    name: auth
+    type: apiKey
 security:
   - Basic: []
   - Bearer: []
+  - OAuth2 password: []
+  - Query: []
 paths:
   /articles/:
     get:
@@ -70,9 +86,11 @@ paths:
               next:
                 type: string
                 format: uri
+                x-nullable: true
               previous:
                 type: string
                 format: uri
+                x-nullable: true
               results:
                 type: array
                 items:
@@ -207,6 +225,7 @@ paths:
           pattern: ^69$
           default: '69'
           minLength: 1
+          x-nullable: true
         - name: image_styles
           in: formData
           description: Parameter with Items
@@ -233,6 +252,21 @@ paths:
         - multipart/form-data
       tags:
         - articles
+    delete:
+      operationId: articles_image_delete
+      description: image method docstring
+      parameters:
+        - name: delete_form_param
+          in: formData
+          description: this should not crash (form parameter on DELETE method)
+          type: integer
+      responses:
+        '204':
+          description: ''
+      consumes:
+        - multipart/form-data
+      tags:
+        - articles
     parameters:
       - name: slug
         in: path
@@ -245,7 +279,10 @@ paths:
     get:
       operationId: people_list
       description: ''
-      parameters: []
+      parameters:
+        - name: unknown_paginator
+          in: query
+          type: string
       responses:
         '200':
           description: ''
@@ -409,6 +446,46 @@ paths:
       tags:
         - snippets
     parameters: []
+  /snippets/views/{snippet_pk}/:
+    get:
+      operationId: snippetsViewsRead
+      description: SnippetViewerList classdoc
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        '200':
+          description: ''
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/SnippetViewer'
+      tags:
+        - snippets
+    parameters:
+      - name: snippet_pk
+        in: path
+        required: true
+        type: string
   /snippets/{id}/:
     get:
       operationId: snippetsRead
@@ -461,10 +538,6 @@ paths:
           in: path
           description: path parameter override
           required: true
-          type: integer
-        - name: delete_form_param
-          in: formData
-          description: this should not crash (form parameter on DELETE method)
           type: integer
       responses:
         '204':
@@ -523,6 +596,60 @@ paths:
       - name: id
         in: path
         description: A unique integer value identifying this todo another.
+        required: true
+        type: integer
+  /todo/harvest/:
+    get:
+      operationId: todo_harvest_list
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Harvest'
+      tags:
+        - todo
+    parameters: []
+  /todo/harvest/{id}/:
+    put:
+      operationId: todo_harvest_update
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Harvest'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Harvest'
+      tags:
+        - todo
+    patch:
+      operationId: todo_harvest_partial_update
+      description: ''
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Harvest'
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Harvest'
+      tags:
+        - todo
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this pack.
         required: true
         type: integer
   /todo/recursive/:
@@ -734,15 +861,28 @@ paths:
           description: this one too!
           required: false
           type: boolean
+        - name: styles
+          in: query
+          description: and this one is fancy!
+          required: true
+          type: array
+          items:
+            type: string
+            enum:
+              - a
+              - b
+              - c
+              - d
+          collectionFormat: multi
       responses:
         '200':
           description: ''
           schema:
             type: array
             items:
-              $ref: '#/definitions/UserSerializerrr'
+              $ref: '#/definitions/UserSerializer'
       tags:
-        - users
+        - Users
     post:
       operationId: users_create
       description: apiview post description override
@@ -768,7 +908,7 @@ paths:
               username:
                 type: string
       tags:
-        - users
+        - Users
       security: []
     patch:
       operationId: users_dummy
@@ -778,7 +918,7 @@ paths:
         '200':
           description: ''
       tags:
-        - users
+        - Users
     parameters: []
   /users/{id}/:
     get:
@@ -789,13 +929,21 @@ paths:
           in: query
           description: test manual param
           type: boolean
+        - name: test_array
+          in: query
+          description: test query array arg
+          required: true
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
       responses:
         '200':
           description: response description
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       tags:
-        - users
+        - Users
     put:
       operationId: users_update
       description: user_detail fbv docstring
@@ -804,14 +952,14 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/UserSerializerrr'
+            $ref: '#/definitions/UserSerializer'
       tags:
-        - users
+        - Users
     parameters:
       - name: id
         in: path
@@ -854,6 +1002,11 @@ definitions:
         type: string
         format: date-time
         readOnly: true
+      read_only_nullable:
+        type: string
+        readOnly: true
+        minLength: 1
+        x-nullable: true
       references:
         description: this is a really bad example
         type: object
@@ -885,6 +1038,7 @@ definitions:
           - 3
           - 7
           - 8
+        x-nullable: true
       group:
         type: string
         format: uuid
@@ -897,12 +1051,17 @@ definitions:
       - image_styles
     type: object
     properties:
+      image_id:
+        type: string
+        format: uuid
+        readOnly: true
       what_am_i_doing:
         description: test
         type: string
         pattern: ^69$
         default: '69'
         minLength: 1
+        x-nullable: true
       image_styles:
         description: Parameter with Items
         type: array
@@ -919,7 +1078,6 @@ definitions:
         readOnly: true
         format: uri
   Identity:
-    title: Identity
     type: object
     properties:
       id:
@@ -931,12 +1089,14 @@ definitions:
         type: string
         maxLength: 30
         minLength: 1
+        x-nullable: true
       last_name:
         title: Last name
         description: <strong>Here's some HTML!</strong>
         type: string
         maxLength: 30
         minLength: 1
+        x-nullable: true
   Person:
     required:
       - identity
@@ -955,7 +1115,7 @@ definitions:
     type: object
     properties:
       projectName:
-        title: Project name
+        title: project name custom title
         description: Name of the project
         type: string
         minLength: 1
@@ -967,7 +1127,9 @@ definitions:
   Snippet:
     required:
       - code
+      - tags
       - language
+      - nullableSecondaryLanguage
     type: object
     properties:
       id:
@@ -1001,6 +1163,13 @@ definitions:
         title: Code
         type: string
         minLength: 1
+      tags:
+        type: array
+        items:
+          type: string
+          minLength: 2
+        maxItems: 15
+        minItems: 3
       linenos:
         title: Linenos
         type: boolean
@@ -1013,486 +1182,37 @@ definitions:
             description: The name of the programming language
             type: string
             enum:
-              - abap
-              - abnf
-              - ada
-              - adl
-              - agda
-              - aheui
-              - ahk
-              - alloy
-              - ampl
-              - antlr
-              - antlr-as
-              - antlr-cpp
-              - antlr-csharp
-              - antlr-java
-              - antlr-objc
-              - antlr-perl
-              - antlr-python
-              - antlr-ruby
-              - apacheconf
-              - apl
-              - applescript
-              - arduino
-              - as
-              - as3
-              - aspectj
-              - aspx-cs
-              - aspx-vb
-              - asy
-              - at
-              - autoit
-              - awk
-              - basemake
-              - bash
-              - bat
-              - bbcode
-              - bc
-              - befunge
-              - bib
-              - blitzbasic
-              - blitzmax
-              - bnf
-              - boo
-              - boogie
-              - brainfuck
-              - bro
-              - bst
-              - bugs
-              - c
-              - c-objdump
-              - ca65
-              - cadl
-              - camkes
-              - capdl
-              - capnp
-              - cbmbas
-              - ceylon
-              - cfc
-              - cfengine3
-              - cfm
-              - cfs
-              - chai
-              - chapel
-              - cheetah
-              - cirru
-              - clay
-              - clean
-              - clojure
-              - clojurescript
-              - cmake
-              - cobol
-              - cobolfree
-              - coffee-script
-              - common-lisp
-              - componentpascal
-              - console
-              - control
-              - coq
               - cpp
-              - cpp-objdump
-              - cpsa
-              - cr
-              - crmsh
-              - croc
-              - cryptol
-              - csharp
-              - csound
-              - csound-document
-              - csound-score
-              - css
-              - css+django
-              - css+erb
-              - css+genshitext
-              - css+lasso
-              - css+mako
-              - css+mozpreproc
-              - css+myghty
-              - css+php
-              - css+smarty
-              - cucumber
-              - cuda
-              - cypher
-              - cython
-              - d
-              - d-objdump
-              - dart
-              - delphi
-              - dg
-              - diff
-              - django
-              - docker
-              - doscon
-              - dpatch
-              - dtd
-              - duel
-              - dylan
-              - dylan-console
-              - dylan-lid
-              - earl-grey
-              - easytrieve
-              - ebnf
-              - ec
-              - ecl
-              - eiffel
-              - elixir
-              - elm
-              - emacs
-              - erb
-              - erl
-              - erlang
-              - evoque
-              - extempore
-              - ezhil
-              - factor
-              - fan
-              - fancy
-              - felix
-              - fish
-              - flatline
-              - forth
-              - fortran
-              - fortranfixed
-              - foxpro
-              - fsharp
-              - gap
-              - gas
-              - genshi
-              - genshitext
-              - glsl
-              - gnuplot
-              - go
-              - golo
-              - gooddata-cl
-              - gosu
-              - groff
-              - groovy
-              - gst
-              - haml
-              - handlebars
-              - haskell
-              - haxeml
-              - hexdump
-              - hsail
-              - html
-              - html+cheetah
-              - html+django
-              - html+evoque
-              - html+genshi
-              - html+handlebars
-              - html+lasso
-              - html+mako
-              - html+myghty
-              - html+ng2
-              - html+php
-              - html+smarty
-              - html+twig
-              - html+velocity
-              - http
-              - hx
-              - hybris
-              - hylang
-              - i6t
-              - idl
-              - idris
-              - iex
-              - igor
-              - inform6
-              - inform7
-              - ini
-              - io
-              - ioke
-              - irc
-              - isabelle
-              - j
-              - jags
-              - jasmin
-              - java
-              - javascript+mozpreproc
-              - jcl
-              - jlcon
               - js
-              - js+cheetah
-              - js+django
-              - js+erb
-              - js+genshitext
-              - js+lasso
-              - js+mako
-              - js+myghty
-              - js+php
-              - js+smarty
-              - jsgf
-              - json
-              - json-object
-              - jsonld
-              - jsp
-              - julia
-              - juttle
-              - kal
-              - kconfig
-              - koka
-              - kotlin
-              - lagda
-              - lasso
-              - lcry
-              - lean
-              - less
-              - lhs
-              - lidr
-              - lighty
-              - limbo
-              - liquid
-              - live-script
-              - llvm
-              - logos
-              - logtalk
-              - lsl
-              - lua
-              - make
-              - mako
-              - maql
-              - mask
-              - mason
-              - mathematica
-              - matlab
-              - matlabsession
-              - md
-              - minid
-              - modelica
-              - modula2
-              - monkey
-              - monte
-              - moocode
-              - moon
-              - mozhashpreproc
-              - mozpercentpreproc
-              - mql
-              - mscgen
-              - mupad
-              - mxml
-              - myghty
-              - mysql
-              - nasm
-              - ncl
-              - nemerle
-              - nesc
-              - newlisp
-              - newspeak
-              - ng2
-              - nginx
-              - nim
-              - nit
-              - nixos
-              - nsis
-              - numpy
-              - nusmv
-              - objdump
-              - objdump-nasm
-              - objective-c
-              - objective-c++
-              - objective-j
-              - ocaml
-              - octave
-              - odin
-              - ooc
-              - opa
-              - openedge
-              - pacmanconf
-              - pan
-              - parasail
-              - pawn
-              - perl
-              - perl6
-              - php
-              - pig
-              - pike
-              - pkgconfig
-              - plpgsql
-              - postgresql
-              - postscript
-              - pot
-              - pov
-              - powershell
-              - praat
-              - prolog
-              - properties
-              - protobuf
-              - ps1con
-              - psql
-              - pug
-              - puppet
-              - py3tb
-              - pycon
-              - pypylog
-              - pytb
               - python
-              - python3
-              - qbasic
-              - qml
-              - qvto
-              - racket
-              - ragel
-              - ragel-c
-              - ragel-cpp
-              - ragel-d
-              - ragel-em
-              - ragel-java
-              - ragel-objc
-              - ragel-ruby
-              - raw
-              - rb
-              - rbcon
-              - rconsole
-              - rd
-              - rebol
-              - red
-              - redcode
-              - registry
-              - resource
-              - rexx
-              - rhtml
-              - rnc
-              - roboconf-graph
-              - roboconf-instances
-              - robotframework
-              - rql
-              - rsl
-              - rst
-              - rts
-              - rust
-              - sas
-              - sass
-              - sc
-              - scala
-              - scaml
-              - scheme
-              - scilab
-              - scss
-              - shen
-              - silver
-              - slim
-              - smali
-              - smalltalk
-              - smarty
-              - sml
-              - snobol
-              - snowball
-              - sourceslist
-              - sp
-              - sparql
-              - spec
-              - splus
-              - sql
-              - sqlite3
-              - squidconf
-              - ssp
-              - stan
-              - stata
-              - swift
-              - swig
-              - systemverilog
-              - tads3
-              - tap
-              - tasm
-              - tcl
-              - tcsh
-              - tcshcon
-              - tea
-              - termcap
-              - terminfo
-              - terraform
-              - tex
-              - text
-              - thrift
-              - todotxt
-              - trac-wiki
-              - treetop
-              - ts
-              - tsql
-              - turtle
-              - twig
-              - typoscript
-              - typoscriptcssdata
-              - typoscripthtmldata
-              - urbiscript
-              - vala
-              - vb.net
-              - vcl
-              - vclsnippets
-              - vctreestatus
-              - velocity
-              - verilog
-              - vgl
-              - vhdl
-              - vim
-              - wdiff
-              - whiley
-              - x10
-              - xml
-              - xml+cheetah
-              - xml+django
-              - xml+erb
-              - xml+evoque
-              - xml+lasso
-              - xml+mako
-              - xml+myghty
-              - xml+php
-              - xml+smarty
-              - xml+velocity
-              - xquery
-              - xslt
-              - xtend
-              - xul+mozpreproc
-              - yaml
-              - yaml+jinja
-              - zephir
             default: python
+          readOnlyNullable:
+            title: Read only nullable
+            type: string
+            readOnly: true
+            minLength: 1
+            x-nullable: true
       styles:
         type: array
         items:
           type: string
           enum:
-            - abap
-            - algol
-            - algol_nu
-            - arduino
-            - autumn
-            - borland
-            - bw
-            - colorful
-            - default
-            - emacs
-            - friendly
-            - fruity
-            - igor
-            - lovelace
-            - manni
             - monokai
-            - murphy
-            - native
-            - paraiso-dark
-            - paraiso-light
-            - pastie
-            - perldoc
-            - rainbow_dash
-            - rrt
-            - tango
-            - trac
+            - solarized-dark
             - vim
-            - vs
-            - xcode
         default:
-          - friendly
+          - solarized-dark
       lines:
         type: array
         items:
           type: integer
+        x-nullable: true
       exampleProjects:
         type: array
         items:
           $ref: '#/definitions/Project'
         readOnly: true
+        maxItems: 100
       difficultyFactor:
         title: Difficulty factor
         description: this is here just to test FloatField
@@ -1510,6 +1230,41 @@ definitions:
         format: decimal
         default: 0.0
         minimum: 0.0
+      nullableSecondaryLanguage:
+        type: object
+        properties:
+          name:
+            title: Name
+            description: The name of the programming language
+            type: string
+            enum:
+              - cpp
+              - js
+              - python
+            default: python
+          readOnlyNullable:
+            title: Read only nullable
+            type: string
+            readOnly: true
+            minLength: 1
+            x-nullable: true
+        x-nullable: true
+  SnippetViewer:
+    required:
+      - snippet
+      - viewer
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      snippet:
+        title: Snippet
+        type: integer
+      viewer:
+        title: Viewer
+        type: integer
   Todo:
     required:
       - title
@@ -1533,6 +1288,17 @@ definitions:
         minLength: 1
       todo:
         $ref: '#/definitions/Todo'
+  Harvest:
+    type: object
+    properties:
+      size_code:
+        title: Size code
+        type: string
+        enum:
+          - '50'
+          - '100'
+          - '200'
+        readOnly: true
   TodoRecursive:
     required:
       - title
@@ -1552,10 +1318,12 @@ definitions:
       parent_id:
         type: integer
         title: Parent id
+        x-nullable: true
   TodoTree:
     required:
       - title
       - children
+      - many_children
     type: object
     properties:
       id:
@@ -1568,6 +1336,10 @@ definitions:
         maxLength: 50
         minLength: 1
       children:
+        type: array
+        items:
+          $ref: '#/definitions/TodoTree'
+      many_children:
         type: array
         items:
           $ref: '#/definitions/TodoTree'
@@ -1617,7 +1389,6 @@ definitions:
         title: child
         todo: null
   OtherStuff:
-    title: Other stuff
     description: the decorator should determine the serializer class for this
     required:
       - foo
@@ -1628,7 +1399,6 @@ definitions:
         type: string
         minLength: 1
   MethodFieldExample:
-    title: Hint example
     type: object
     properties:
       hinted_bool:
@@ -1680,7 +1450,7 @@ definitions:
         description: No hint on the method, so this is expected to fallback to string
         type: string
         readOnly: true
-  UserSerializerrr:
+  UserSerializer:
     required:
       - username
       - articles
@@ -1752,7 +1522,9 @@ definitions:
         readOnly: true
       help_text_example_3:
         title: Help text example 3
-        description: "\n        docstring is set so should appear in swagger as fallback\n\
-          \        :return:\n        "
+        description: |2
+
+          docstring is set so should appear in swagger as fallback
+          :return:
         type: integer
         readOnly: true

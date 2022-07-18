@@ -1,3 +1,9 @@
+// redoc-init.js
+// https://github.com/axnsan12/drf-yasg
+// Copyright 2017 - 2021, Cristian V. <cristi@cvjd.me>
+// This file is licensed under the BSD 3-Clause License.
+// License text available at https://opensource.org/licenses/BSD-3-Clause
+
 "use strict";
 
 var currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
@@ -7,8 +13,20 @@ var redoc = document.createElement("redoc");
 var redocSettings = JSON.parse(document.getElementById('redoc-settings').innerHTML);
 if (redocSettings.url) {
     specURL = redocSettings.url;
-    delete redocSettings.url;
 }
+delete redocSettings.url;
+if (redocSettings.fetchSchemaWithQuery) {
+    var query = new URLSearchParams(window.location.search || '').entries();
+    var url = specURL.split('?');
+    var usp = new URLSearchParams(url[1] || '');
+    for (var it = query.next(); !it.done; it = query.next()) {
+        usp.set(it.value[0], it.value[1]);
+    }
+    url[1] = usp.toString();
+    specURL = url[1] ? url.join('?') : url[0];
+}
+delete redocSettings.fetchSchemaWithQuery;
+
 redoc.setAttribute("spec-url", specURL);
 
 function camelToKebab(str) {
@@ -23,7 +41,7 @@ for (var p in redocSettings) {
     }
 }
 
-document.body.appendChild(redoc);
+document.body.replaceChild(redoc, document.getElementById('redoc-placeholder'));
 
 function hideEmptyVersion() {
     // 'span.api-info-version' is for redoc 1.x, 'div.api-info span' is for redoc 2-alpha
@@ -36,8 +54,8 @@ function hideEmptyVersion() {
     var versionString = apiVersion.innerText;
     if (versionString) {
         // trim spaces and surrounding ()
-        versionString = versionString.replace(/ /g,'');
-        versionString = versionString.replace(/(^\()|(\)$)/g,'');
+        versionString = versionString.replace(/ /g, '');
+        versionString = versionString.replace(/(^\()|(\)$)/g, '');
     }
 
     if (!versionString) {

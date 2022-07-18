@@ -2,10 +2,11 @@ import datetime
 import inspect
 import logging
 import operator
+import typing
 import uuid
 from collections import OrderedDict
 from decimal import Decimal
-from inspect import isclass
+from inspect import signature as inspect_signature
 
 from django.core import validators
 from django.db import models
@@ -14,14 +15,10 @@ from rest_framework.settings import api_settings as rest_framework_settings
 
 from .. import openapi
 from ..errors import SwaggerGenerationError
-from ..utils import decimal_as_float, filter_none, get_serializer_class, get_serializer_ref_name
-from .base import FieldInspector, NotHandled, SerializerInspector
-
-try:
-    # Python>=3.5
-    import typing
-except ImportError:
-    typing = None
+from ..utils import (
+    decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
+)
+from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +37,7 @@ class InlineSerializerInspector(SerializerInspector):
         is called only when the serializer is converted into a list of parameters for use in a form data request.
 
         :param serializer: serializer instance
-        :param list[openapi.Parameter] parameters: genereated parameters
+        :param list[openapi.Parameter] parameters: generated parameters
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
@@ -55,6 +52,7 @@ class InlineSerializerInspector(SerializerInspector):
             )
             for key, value
             in fields.items()
+            if not getattr(value, 'read_only', False)
         ]
 
         return self.add_manual_parameters(serializer, parameters)
@@ -68,14 +66,20 @@ class InlineSerializerInspector(SerializerInspector):
     def get_serializer_ref_name(self, serializer):
         return get_serializer_ref_name(serializer)
 
+    def _has_ref_name(self, serializer):
+        serializer_meta = getattr(serializer, 'Meta', None)
+        return hasattr(serializer_meta, 'ref_name')
+
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
 
         if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
             child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)
+            limits = find_limits(field) or {}
             return SwaggerType(
                 type=openapi.TYPE_ARRAY,
                 items=child_schema,
+                **limits
             )
         elif isinstance(field, serializers.Serializer):
             if swagger_object_type != openapi.Schema:
@@ -83,10 +87,10 @@ class InlineSerializerInspector(SerializerInspector):
 
             ref_name = self.get_serializer_ref_name(field)
 
-            def make_schema_definition():
+            def make_schema_definition(serializer=field):
                 properties = OrderedDict()
                 required = []
-                for property_name, child in field.fields.items():
+                for property_name, child in serializer.fields.items():
                     property_name = self.get_property_name(property_name)
                     prop_kwargs = {
                         'read_only': bool(child.read_only) or None
@@ -102,16 +106,15 @@ class InlineSerializerInspector(SerializerInspector):
                         required.append(property_name)
 
                 result = SwaggerType(
+                    # the title is derived from the field name and is better to
+                    # be omitted from models
+                    use_field_title=False,
                     type=openapi.TYPE_OBJECT,
                     properties=properties,
                     required=required or None,
                 )
-                if not ref_name and 'title' in result:
-                    # on an inline model, the title is derived from the field name
-                    # but is visno coverually displayed like the model name, which is confusing
-                    # it is better to just remove title from inline models
-                    del result.title
 
+                setattr(result, '_NP_serializer', get_serializer_class(serializer))
                 return result
 
             if not ref_name or not use_references:
@@ -121,11 +124,15 @@ class InlineSerializerInspector(SerializerInspector):
             actual_schema = definitions.setdefault(ref_name, make_schema_definition)
             actual_schema._remove_read_only()
 
-            actual_serializer = get_serializer_class(getattr(actual_schema, '_serializer', None))
+            actual_serializer = getattr(actual_schema, '_NP_serializer', None)
             this_serializer = get_serializer_class(field)
             if actual_serializer and actual_serializer != this_serializer:  # pragma: no cover
-                logger.warning("Schema for %s will override distinct serializer %s because they "
-                               "share the same ref_name", actual_serializer, this_serializer)
+                explicit_refs = self._has_ref_name(actual_serializer) and self._has_ref_name(this_serializer)
+                if not explicit_refs:
+                    raise SwaggerGenerationError(
+                        "Schema for %s would override distinct serializer %s because they implicitly share the same "
+                        "ref_name; explicitly set the ref_name attribute on both serializers' Meta classes"
+                        % (actual_serializer, this_serializer))
 
             return openapi.SchemaRef(definitions, ref_name)
 
@@ -169,15 +176,15 @@ def get_queryset_from_view(view, serializer=None):
     """Try to get the queryset of the given view
 
     :param view: the view instance or class
-    :param serializer: if given, will check that the view's get_serializer_class return matches this serialzier
+    :param serializer: if given, will check that the view's get_serializer_class return matches this serializer
     :return: queryset or ``None``
     """
     try:
-        queryset = getattr(view, 'queryset', None)
+        queryset = call_view_method(view, 'get_queryset', 'queryset')
 
         if queryset is not None and serializer is not None:
             # make sure the view is actually using *this* serializer
-            assert type(serializer) == view.get_serializer_class()
+            assert type(serializer) == call_view_method(view, 'get_serializer_class', 'serializer_class')
 
         return queryset
     except Exception:  # pragma: no cover
@@ -319,8 +326,8 @@ limit_validators = [
     (validators.MaxLengthValidator, serializers.CharField, 'max_length', operator.__lt__),
 
     # minItems and maxItems apply to lists
-    (validators.MinLengthValidator, serializers.ListField, 'min_items', operator.__gt__),
-    (validators.MaxLengthValidator, serializers.ListField, 'max_items', operator.__lt__),
+    (validators.MinLengthValidator, (serializers.ListField, serializers.ListSerializer), 'min_items', operator.__gt__),
+    (validators.MaxLengthValidator, (serializers.ListField, serializers.ListSerializer), 'max_items', operator.__lt__),
 ]
 
 
@@ -373,7 +380,7 @@ model_field_to_basic_type = [
     (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (models.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (models.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
-    (models.DurationField, (openapi.TYPE_INTEGER, None)),
+    (models.DurationField, (openapi.TYPE_STRING, None)),
     (models.FloatField, (openapi.TYPE_NUMBER, None)),
     (models.IntegerField, (openapi.TYPE_INTEGER, None)),
     (models.IPAddressField, (openapi.TYPE_STRING, openapi.FORMAT_IPV4)),
@@ -400,7 +407,7 @@ serializer_field_to_basic_type = [
     (serializers.IntegerField, (openapi.TYPE_INTEGER, None)),
     (serializers.FloatField, (openapi.TYPE_NUMBER, None)),
     (serializers.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
-    (serializers.DurationField, (openapi.TYPE_NUMBER, None)),  # ?
+    (serializers.DurationField, (openapi.TYPE_STRING, None)),
     (serializers.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (serializers.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (serializers.ModelField, (openapi.TYPE_STRING, None)),
@@ -451,18 +458,55 @@ def decimal_return_type():
     return openapi.TYPE_STRING if rest_framework_settings.COERCE_DECIMAL_TO_STRING else openapi.TYPE_NUMBER
 
 
-raw_type_info = [
+def get_origin_type(hint_class):
+    return getattr(hint_class, '__origin__', None) or hint_class
+
+
+def hint_class_issubclass(hint_class, check_class):
+    origin_type = get_origin_type(hint_class)
+    return inspect.isclass(origin_type) and issubclass(origin_type, check_class)
+
+
+hinting_type_info = [
     (bool, (openapi.TYPE_BOOLEAN, None)),
     (int, (openapi.TYPE_INTEGER, None)),
+    (str, (openapi.TYPE_STRING, None)),
     (float, (openapi.TYPE_NUMBER, None)),
+    (dict, (openapi.TYPE_OBJECT, None)),
     (Decimal, (decimal_return_type, openapi.FORMAT_DECIMAL)),
     (uuid.UUID, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
     (datetime.datetime, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
-    # TODO - support typing.List etc
 ]
 
-hinting_type_info = raw_type_info
+
+if hasattr(typing, 'get_args'):
+    # python >=3.8
+    typing_get_args = typing.get_args
+else:
+    # python <3.8
+    def typing_get_args(tp):
+        return getattr(tp, '__args__', ())
+
+
+def inspect_collection_hint_class(hint_class):
+    args = typing_get_args(hint_class)
+    child_class = args[0] if args else str
+    child_type_info = get_basic_type_info_from_hint(child_class) or {'type': openapi.TYPE_STRING}
+
+    return OrderedDict([
+        ('type', openapi.TYPE_ARRAY),
+        ('items', openapi.Items(**child_type_info)),
+    ])
+
+
+hinting_type_info.append(((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class))
+
+
+def _get_union_types(hint_class):
+    origin_type = get_origin_type(hint_class)
+    if origin_type is typing.Union:
+        return hint_class.__args__
 
 
 def get_basic_type_info_from_hint(hint_class):
@@ -474,27 +518,34 @@ def get_basic_type_info_from_hint(hint_class):
     :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
     :rtype: OrderedDict
     """
+    union_types = _get_union_types(hint_class)
 
-    for check_class, type_format in hinting_type_info:
-        if issubclass(hint_class, check_class):
-            swagger_type, format = type_format
-            if callable(swagger_type):
-                swagger_type = swagger_type()
-            # if callable(format):
-            #     format = format(klass)
-            break
-    else:  # pragma: no cover
+    if union_types:
+        # Optional is implemented as Union[T, None]
+        if len(union_types) == 2 and isinstance(None, union_types[1]):
+            result = get_basic_type_info_from_hint(union_types[0])
+            if result:
+                result['x-nullable'] = True
+
+            return result
+
         return None
 
-    pattern = None
+    for check_class, info in hinting_type_info:
+        if hint_class_issubclass(hint_class, check_class):
+            if callable(info):
+                return info(hint_class)
 
-    result = OrderedDict([
-        ('type', swagger_type),
-        ('format', format),
-        ('pattern', pattern)
-    ])
+            swagger_type, format = info
+            if callable(swagger_type):
+                swagger_type = swagger_type()
 
-    return result
+            return OrderedDict([
+                ('type', swagger_type),
+                ('format', format),
+            ])
+
+    return None
 
 
 class SerializerMethodFieldInspector(FieldInspector):
@@ -506,16 +557,14 @@ class SerializerMethodFieldInspector(FieldInspector):
         if not isinstance(field, serializers.SerializerMethodField):
             return NotHandled
 
-        method = getattr(field.parent, field.method_name)
+        method = getattr(field.parent, field.method_name, None)
         if method is None:
             return NotHandled
 
+        # attribute added by the swagger_serializer_method decorator
         serializer = getattr(method, "_swagger_serializer", None)
 
         if serializer:
-            # attribute added by the swagger_serializer_method decorator
-            serializer = getattr(method, '_swagger_serializer', None)
-
             # in order of preference for description, use:
             # 1) field.help_text from SerializerMethodField(help_text)
             # 2) serializer.help_text from swagger_serializer_method(serializer)
@@ -544,13 +593,13 @@ class SerializerMethodFieldInspector(FieldInspector):
                 serializer.read_only = True
 
             return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
-        elif typing:
+        else:
             # look for Python 3.5+ style type hinting of the return value
-            hint_class = inspect.signature(method).return_annotation
+            hint_class = inspect_signature(method).return_annotation
 
-            if not isclass(hint_class) and hasattr(hint_class, '__args__'):
+            if not inspect.isclass(hint_class) and hasattr(hint_class, '__args__'):
                 hint_class = hint_class.__args__[0]
-            if isclass(hint_class) and not issubclass(hint_class, inspect._empty):
+            if inspect.isclass(hint_class) and not issubclass(hint_class, inspect._empty):
                 type_info = get_basic_type_info_from_hint(hint_class)
 
                 if type_info is not None:
@@ -583,27 +632,51 @@ class ChoiceFieldInspector(FieldInspector):
 
         if isinstance(field, serializers.ChoiceField):
             enum_type = openapi.TYPE_STRING
+            enum_values = []
+            for choice in field.choices.keys():
+                if isinstance(field, serializers.MultipleChoiceField):
+                    choice = field_value_to_representation(field, [choice])[0]
+                else:
+                    choice = field_value_to_representation(field, choice)
+
+                enum_values.append(choice)
 
             # for ModelSerializer, try to infer the type from the associated model field
             serializer = get_parent_serializer(field)
             if isinstance(serializer, serializers.ModelSerializer):
                 model = getattr(getattr(serializer, 'Meta'), 'model')
-                model_field = get_model_field(model, field.source)
+                # Use the parent source for nested fields
+                model_field = get_model_field(model, field.source or field.parent.source)
+                # If the field has a base_field its type must be used
+                if getattr(model_field, "base_field", None):
+                    model_field = model_field.base_field
                 if model_field:
                     model_type = get_basic_type_info(model_field)
                     if model_type:
                         enum_type = model_type.get('type', enum_type)
+            else:
+                # Try to infer field type based on enum values
+                enum_value_types = {type(v) for v in enum_values}
+                if len(enum_value_types) == 1:
+                    values_type = get_basic_type_info_from_hint(next(iter(enum_value_types)))
+                    if values_type:
+                        enum_type = values_type.get('type', enum_type)
 
             if isinstance(field, serializers.MultipleChoiceField):
-                return SwaggerType(
+                result = SwaggerType(
                     type=openapi.TYPE_ARRAY,
                     items=ChildSwaggerType(
                         type=enum_type,
-                        enum=list(field.choices.keys())
+                        enum=enum_values
                     )
                 )
+                if swagger_object_type == openapi.Parameter:
+                    if result['in'] in (openapi.IN_FORM, openapi.IN_QUERY):
+                        result.collection_format = 'multi'
+            else:
+                result = SwaggerType(type=enum_type, enum=enum_values)
 
-            return SwaggerType(type=enum_type, enum=list(field.choices.keys()))
+            return result
 
         return NotHandled
 
@@ -661,56 +734,81 @@ class HiddenFieldInspector(FieldInspector):
         return NotHandled
 
 
+class JSONFieldInspector(FieldInspector):
+    """Provides conversion for ``JSONField``."""
+
+    def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
+        SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
+
+        if isinstance(field, serializers.JSONField) and swagger_object_type == openapi.Schema:
+            return SwaggerType(type=openapi.TYPE_OBJECT)
+
+        return NotHandled
+
+
 class StringDefaultFieldInspector(FieldInspector):
     """For otherwise unhandled fields, return them as plain :data:`.TYPE_STRING` objects."""
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):  # pragma: no cover
-        # TODO unhandled fields: TimeField JSONField
+        # TODO unhandled fields: TimeField
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
         return SwaggerType(type=openapi.TYPE_STRING)
 
 
 try:
     from djangorestframework_camel_case.parser import CamelCaseJSONParser
-    from djangorestframework_camel_case.render import CamelCaseJSONRenderer
-    from djangorestframework_camel_case.render import camelize
+    from djangorestframework_camel_case.render import CamelCaseJSONRenderer, camelize
 except ImportError:  # pragma: no cover
-    class CamelCaseJSONFilter(FieldInspector):
-        """Converts property names to camelCase if ``djangorestframework_camel_case`` is used."""
-        pass
-else:
-    def camelize_string(s):
-        """Hack to force ``djangorestframework_camel_case`` to camelize a plain string."""
+    CamelCaseJSONParser = CamelCaseJSONRenderer = None
+
+    def camelize(data):
+        return data
+
+
+class CamelCaseJSONFilter(FieldInspector):
+    """Converts property names to camelCase if ``djangorestframework_camel_case`` is used."""
+
+    def camelize_string(self, s):
+        """Hack to force ``djangorestframework_camel_case`` to camelize a plain string.
+
+        :param str s: the string
+        :return: camelized string
+        :rtype: str
+        """
         return next(iter(camelize({s: ''})))
 
-    def camelize_schema(schema_or_ref, components):
-        """Recursively camelize property names for the given schema using ``djangorestframework_camel_case``."""
-        schema = openapi.resolve_ref(schema_or_ref, components)
+    def camelize_schema(self, schema):
+        """Recursively camelize property names for the given schema using ``djangorestframework_camel_case``.
+        The target schema object must be modified in-place.
+
+        :param openapi.Schema schema: the :class:`.Schema` object
+        """
         if getattr(schema, 'properties', {}):
             schema.properties = OrderedDict(
-                (camelize_string(key), camelize_schema(val, components))
+                (self.camelize_string(key), self.camelize_schema(openapi.resolve_ref(val, self.components)) or val)
                 for key, val in schema.properties.items()
             )
 
             if getattr(schema, 'required', []):
-                schema.required = [camelize_string(p) for p in schema.required]
+                schema.required = [self.camelize_string(p) for p in schema.required]
 
-        return schema_or_ref
+    def process_result(self, result, method_name, obj, **kwargs):
+        if isinstance(result, openapi.Schema.OR_REF) and self.is_camel_case():
+            schema = openapi.resolve_ref(result, self.components)
+            self.camelize_schema(schema)
 
-    class CamelCaseJSONFilter(FieldInspector):
-        """Converts property names to camelCase if ``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer`` are used."""
+        return result
 
+    if CamelCaseJSONParser and CamelCaseJSONRenderer:
         def is_camel_case(self):
             return (
-                any(issubclass(parser, CamelCaseJSONParser) for parser in self.view.parser_classes) or
-                any(issubclass(renderer, CamelCaseJSONRenderer) for renderer in self.view.renderer_classes)
+                any(issubclass(parser, CamelCaseJSONParser) for parser in self.get_parser_classes()) or
+                any(issubclass(renderer, CamelCaseJSONRenderer) for renderer in self.get_renderer_classes())
             )
+    else:
+        def is_camel_case(self):
+            return False
 
-        def process_result(self, result, method_name, obj, **kwargs):
-            if isinstance(result, openapi.Schema.OR_REF) and self.is_camel_case():
-                return camelize_schema(result, self.components)
-
-            return result
 
 try:
     from rest_framework_recursive.fields import RecursiveField
@@ -726,10 +824,19 @@ else:
             if isinstance(field, RecursiveField) and swagger_object_type == openapi.Schema:
                 assert use_references is True, "Can not create schema for RecursiveField when use_references is False"
 
-                ref_name = get_serializer_ref_name(field.proxied)
-                assert ref_name is not None, "Can't create RecursiveField schema for inline " + str(type(field.proxied))
+                proxied = field.proxied
+                if isinstance(field.proxied, serializers.ListSerializer):
+                    proxied = proxied.child
+
+                ref_name = get_serializer_ref_name(proxied)
+                assert ref_name is not None, "Can't create RecursiveField schema for inline " + str(type(proxied))
 
                 definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
-                return openapi.SchemaRef(definitions, ref_name, ignore_unresolved=True)
+
+                ref = openapi.SchemaRef(definitions, ref_name, ignore_unresolved=True)
+                if isinstance(field.proxied, serializers.ListSerializer):
+                    ref = openapi.Items(type=openapi.TYPE_ARRAY, items=ref)
+
+                return ref
 
             return NotHandled

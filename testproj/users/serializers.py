@@ -1,21 +1,19 @@
+import typing  # noqa: F401
+
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from drf_yasg.utils import swagger_serializer_method
 from snippets.models import Snippet
 
-try:
-    import typing  # noqa: F401
-    from .method_serializers_with_typing import MethodFieldExampleSerializer
-except ImportError:
-    from .method_serializers_without_typing import MethodFieldExampleSerializer
+from .method_serializers import MethodFieldExampleSerializer
 
 
 class OtherStuffSerializer(serializers.Serializer):
     foo = serializers.CharField()
 
 
-class UserSerializerrr(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all())
     article_slugs = serializers.SlugRelatedField(read_only=True, slug_field='slug', many=True, source='articles')
     last_connected_ip = serializers.IPAddressField(help_text="i'm out of ideas", protocol='ipv4', read_only=True)
@@ -77,7 +75,9 @@ class UserSerializerrr(serializers.ModelSerializer):
                   'last_connected_ip', 'last_connected_at', 'article_slugs', 'other_stuff', 'hint_example',
                   'help_text_example_1', 'help_text_example_2', 'help_text_example_3')
 
+        ref_name = "UserSerializer"
 
 class UserListQuerySerializer(serializers.Serializer):
     username = serializers.CharField(help_text="this field is generated from a query_serializer", required=False)
     is_staff = serializers.BooleanField(help_text="this one too!", required=False)
+    styles = serializers.MultipleChoiceField(help_text="and this one is fancy!", choices=('a', 'b', 'c', 'd'))

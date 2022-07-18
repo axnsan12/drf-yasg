@@ -1,9 +1,9 @@
-from django.conf.urls import url
+from django.urls import re_path
 from rest_framework import fields, generics, versioning
 
 from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer
-from testproj.urls import SchemaView
+from testproj.urls import SchemaView, required_urlpatterns
 
 
 class SnippetSerializerV2(SnippetSerializer):
@@ -42,7 +42,8 @@ class VersionedSchemaView(SchemaView):
     versioning_class = versioning.URLPathVersioning
 
 
-urlpatterns = [
-    url(VERSION_PREFIX_URL + r"snippets/$", SnippetList.as_view()),
-    url(VERSION_PREFIX_URL + r'swagger(?P<format>.json|.yaml)$', VersionedSchemaView.without_ui(), name='vschema-json'),
+urlpatterns = required_urlpatterns + [
+    re_path(VERSION_PREFIX_URL + r"snippets/$", SnippetList.as_view()),
+    re_path(VERSION_PREFIX_URL + r'swagger(?P<format>.json|.yaml)$', VersionedSchemaView.without_ui(),
+            name='vschema-json'),
 ]

@@ -6,7 +6,6 @@ import tempfile
 from collections import OrderedDict
 
 import pytest
-from django.contrib.auth.models import User
 
 from drf_yasg import openapi
 from drf_yasg.codecs import yaml_sane_load
@@ -14,8 +13,6 @@ from drf_yasg.generators import OpenAPISchemaGenerator
 
 
 def test_reference_schema(call_generate_swagger, db, reference_schema):
-    User.objects.create_superuser('admin', 'admin@admin.admin', 'blabla')
-
     output = call_generate_swagger(format='yaml', api_url='http://test.local:8002/', user='admin')
     output_schema = yaml_sane_load(output)
     assert output_schema == reference_schema
@@ -44,7 +41,7 @@ def test_generator_class(call_generate_swagger, db):
     assert len(output_schema['paths']) == 0
 
 
-def silentremove(filename):
+def silent_remove(filename):
     try:
         os.remove(filename)
     except OSError:
@@ -85,6 +82,6 @@ def test_file_output(call_generate_swagger, db):
 
         assert output_yaml == output_json == output_other
     finally:
-        silentremove(yaml_file)
-        silentremove(json_file)
-        silentremove(other_file)
+        silent_remove(yaml_file)
+        silent_remove(json_file)
+        silent_remove(other_file)

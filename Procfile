@@ -1,2 +1,2 @@
-release: python testproj/manage.py migrate && python testproj/manage.py shell -c "import createsuperuser"
+release: python testproj/manage.py migrate
 web: gunicorn --chdir testproj testproj.wsgi --log-file -

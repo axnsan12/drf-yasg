@@ -12,6 +12,7 @@ SWAGGER_DEFAULTS = {
         'drf_yasg.inspectors.ChoiceFieldInspector',
         'drf_yasg.inspectors.FileFieldInspector',
         'drf_yasg.inspectors.DictFieldInspector',
+        'drf_yasg.inspectors.JSONFieldInspector',
         'drf_yasg.inspectors.HiddenFieldInspector',
         'drf_yasg.inspectors.RelatedFieldInspector',
         'drf_yasg.inspectors.SerializerMethodFieldInspector',
@@ -33,15 +34,19 @@ SWAGGER_DEFAULTS = {
 
     'USE_SESSION_AUTH': True,
     'SECURITY_DEFINITIONS': {
-        'basic': {
+        'Basic': {
             'type': 'basic'
         }
     },
     'SECURITY_REQUIREMENTS': None,
     'LOGIN_URL': getattr(settings, 'LOGIN_URL', None),
-    'LOGOUT_URL': getattr(settings, 'LOGOUT_URL', None),
+    'LOGOUT_URL': '/accounts/logout/',
     'SPEC_URL': None,
     'VALIDATOR_URL': '',
+    'PERSIST_AUTH': False,
+    'REFETCH_SCHEMA_WITH_AUTH': False,
+    'REFETCH_SCHEMA_ON_LOGOUT': False,
+    'FETCH_SCHEMA_WITH_QUERY': True,
 
     'OPERATIONS_SORTER': None,
     'TAGS_SORTER': None,
@@ -74,6 +79,7 @@ REDOC_DEFAULTS = {
     'PATH_IN_MIDDLE': False,
     'NATIVE_SCROLLBARS': False,
     'REQUIRED_PROPS_FIRST': False,
+    'FETCH_SCHEMA_WITH_QUERY': True,
 }
 
 IMPORT_STRINGS = [

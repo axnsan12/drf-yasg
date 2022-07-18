@@ -6,7 +6,7 @@
 Contributing
 ############
 
-Contributions are always welcome and appreciated! Here are some ways you can contribut.
+Contributions are always welcome and appreciated! Here are some ways you can contribute.
 
 ******
 Issues
@@ -33,8 +33,9 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
    .. code:: console
 
-      $ virtualenv venv
+      $ python -m venv venv
       $ source venv/bin/activate
+      (venv) $ python -m pip install -U pip setuptools
       (venv) $ pip install -U -e .[validation]
       (venv) $ pip install -U -r requirements/dev.txt
 
@@ -44,7 +45,6 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
       (venv) $ cd testproj
       (venv) $ python manage.py migrate
-      (venv) $ python manage.py shell -c "import createsuperuser"
       (venv) $ python manage.py runserver
       (venv) $ firefox localhost:8000/swagger/
 
@@ -57,8 +57,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
    .. code:: console
 
-      (venv) $ cd testproj
-      (venv) $ python manage.py generate_swagger ../tests/reference.yaml --overwrite --user admin --url http://test.local:8002/
+      (venv) $ python testproj/manage.py generate_swagger tests/reference.yaml --overwrite --user admin --url http://test.local:8002/
 
    After checking the git diff to verify that no unexpected changes appeared, you should commit the new
    ``reference.yaml`` together with your changes.
@@ -67,17 +66,19 @@ You want to contribute some code? Great! Here are a few steps to get you started
 
    .. code:: console
 
+      # install test dependencies
+      (venv) $ pip install -U -r requirements/test.txt
+      # run tests in the current environment, faster than tox
+      (venv) $ pytest -n auto --cov
       # (optional) sort imports with isort and check flake8 linting
       (venv) $ isort --apply
       (venv) $ flake8 src/drf_yasg testproj tests setup.py
-      # run tests in the current environment, faster than tox
-      (venv) $ pytest --cov
       # (optional) run tests for other python versions in separate environments
       (venv) $ tox
 
 #. **Update documentation**
 
-   If the change modifies behaviour or adds new features, you should update the documentation and ``README.rst``
+   If the change modifies behavior or adds new features, you should update the documentation and ``README.rst``
    accordingly. Documentation is written in reStructuredText and built using Sphinx. You can find the sources in the
    ``docs`` directory.
 
@@ -92,9 +93,10 @@ You want to contribute some code? Great! Here are a few steps to get you started
    Incomplete/Work In Progress pull requests are encouraged, because they allow you to get feedback and help more
    easily.
 
-#. **Your code must pass all the required travis jobs before it is merged**
+#. **Your code must pass all the required CI jobs before it is merged**
 
-   As of now, this consists of running on Python 2.7, 3.4, 3.5 and 3.6, and building the docs succesfully.
+   As of now, this consists of running on the supported Python, Django, DRF version matrix (see README),
+   and building the docs successfully.
 
 ******************
 Maintainer's notes
@@ -106,13 +108,13 @@ Release checklist
 * update ``docs/changelog.rst`` with changes since the last tagged version
 * commit & tag the release - ``git tag x.x.x -m "Release version x.x.x"``
 * push using ``git push --follow-tags``
-* verify that `Travis`_ has built the tag and succesfully published the release to `PyPI`_
+* verify that `Actions`_ has built the tag and successfully published the release to `PyPI`_
 * publish release notes `on GitHub`_
 * start the `ReadTheDocs build`_ if it has not already started
 * deploy the live demo `on Heroku`_
 
 
-.. _Travis: https://travis-ci.org/axnsan12/drf-yasg/builds
+.. _Actions: https://github.com/axnsan12/drf-yasg/actions
 .. _PyPI: https://pypi.org/project/drf-yasg/
 .. _on GitHub: https://github.com/axnsan12/drf-yasg/releases
 .. _ReadTheDocs build: https://readthedocs.org/projects/drf-yasg/builds/

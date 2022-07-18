@@ -8,35 +8,37 @@ from rest_framework.status import is_success
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
-    force_real_str, force_serializer_instance, get_consumes, get_produces, guess_response_status, is_list_view,
+    filter_none, force_real_str, force_serializer_instance, get_consumes, get_produces, guess_response_status,
     merge_params, no_body, param_list_to_odict
 )
-from .base import ViewInspector
+from .base import ViewInspector, call_view_method
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class SwaggerAutoSchema(ViewInspector):
-    def __init__(self, view, path, method, components, request, overrides):
+    def __init__(self, view, path, method, components, request, overrides, operation_keys=None):
         super(SwaggerAutoSchema, self).__init__(view, path, method, components, request, overrides)
         self._sch = AutoSchema()
         self._sch.view = view
+        self.operation_keys = operation_keys
 
-    def get_operation(self, operation_keys):
+    def get_operation(self, operation_keys=None):
+        operation_keys = operation_keys or self.operation_keys
+
         consumes = self.get_consumes()
         produces = self.get_produces()
 
         body = self.get_request_body_parameters(consumes)
         query = self.get_query_parameters()
         parameters = body + query
-        parameters = [param for param in parameters if param is not None]
+        parameters = filter_none(parameters)
         parameters = self.add_manual_parameters(parameters)
 
         operation_id = self.get_operation_id(operation_keys)
-        description = self.get_description()
-        summary = self.get_summary()
+        summary, description = self.get_summary_and_description()
         security = self.get_security()
-        assert security is None or isinstance(security, list), "security must be a list of securiy requirement objects"
+        assert security is None or isinstance(security, list), "security must be a list of security requirement objects"
         deprecated = self.is_deprecated()
         tags = self.get_tags(operation_keys)
 
@@ -87,21 +89,12 @@ class SwaggerAutoSchema(ViewInspector):
         """Return the serializer as defined by the view's ``get_serializer()`` method.
 
         :return: the view's ``Serializer``
+        :rtype: rest_framework.serializers.Serializer
         """
-        if not hasattr(self.view, 'get_serializer'):
-            return None
-        try:
-            return self.view.get_serializer()
-        except Exception:
-            log.warning("view's get_serializer raised exception (%s %s %s)",
-                        self.method, self.path, type(self.view).__name__, exc_info=True)
-            return None
+        return call_view_method(self.view, 'get_serializer')
 
     def _get_request_body_override(self):
-        """Parse the request_body key in the override dict. This method is not public API.
-
-        :return:
-        """
+        """Parse the request_body key in the override dict. This method is not public API."""
         body_override = self.overrides.get('request_body', None)
 
         if body_override is not None:
@@ -120,6 +113,7 @@ class SwaggerAutoSchema(ViewInspector):
         """Return the request serializer (used for parsing the request payload) for this endpoint.
 
         :return: the request serializer, or one of :class:`.Schema`, :class:`.SchemaRef`, ``None``
+        :rtype: rest_framework.serializers.Serializer
         """
         body_override = self._get_request_body_override()
 
@@ -158,7 +152,7 @@ class SwaggerAutoSchema(ViewInspector):
     def add_manual_parameters(self, parameters):
         """Add/replace parameters from the given list of automatically generated request parameters.
 
-        :param list[openapi.Parameter] parameters: genereated parameters
+        :param list[openapi.Parameter] parameters: generated parameters
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
@@ -167,12 +161,13 @@ class SwaggerAutoSchema(ViewInspector):
         if any(param.in_ == openapi.IN_BODY for param in manual_parameters):  # pragma: no cover
             raise SwaggerGenerationError("specify the body parameter as a Schema or Serializer in request_body")
         if any(param.in_ == openapi.IN_FORM for param in manual_parameters):  # pragma: no cover
-            if any(param.in_ == openapi.IN_BODY for param in parameters):
+            has_body_parameter = any(param.in_ == openapi.IN_BODY for param in parameters)
+            if has_body_parameter or not any(is_form_media_type(encoding) for encoding in self.get_consumes()):
                 raise SwaggerGenerationError("cannot add form parameters when the request has a request body; "
                                              "did you forget to set an appropriate parser class on the view?")
             if self.method not in self.body_methods:
-                raise SwaggerGenerationError("form parameters can only be applied to (" + ','.join(self.body_methods) +
-                                             ") HTTP methods")
+                raise SwaggerGenerationError("form parameters can only be applied to "
+                                             "(" + ','.join(self.body_methods) + ") HTTP methods")
 
         return merge_params(parameters, manual_parameters)
 
@@ -216,7 +211,7 @@ class SwaggerAutoSchema(ViewInspector):
             default_schema = self.serializer_to_schema(default_schema) or ''
 
         if default_schema:
-            if is_list_view(self.path, self.method, self.view) and self.method.lower() == 'get':
+            if self.has_list_response():
                 default_schema = openapi.Schema(type=openapi.TYPE_ARRAY, items=default_schema)
             if self.should_page():
                 default_schema = self.get_paginated_response(default_schema) or default_schema
@@ -267,6 +262,8 @@ class SwaggerAutoSchema(ViewInspector):
                     description='',
                     schema=serializer,
                 )
+            elif isinstance(serializer, openapi._Ref):
+                response = serializer
             else:
                 serializer = force_serializer_instance(serializer)
                 response = openapi.Response(
@@ -308,20 +305,47 @@ class SwaggerAutoSchema(ViewInspector):
 
         return natural_parameters + serializer_parameters
 
-    def get_operation_id(self, operation_keys):
+    def get_operation_id(self, operation_keys=None):
         """Return an unique ID for this operation. The ID must be unique across
         all :class:`.Operation` objects in the API.
 
-        :param tuple[str] operation_keys: an array of keys derived from the pathdescribing the hierarchical layout
+        :param tuple[str] operation_keys: an array of keys derived from the path describing the hierarchical layout
             of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: str
         """
+        operation_keys = operation_keys or self.operation_keys
+
         operation_id = self.overrides.get('operation_id', '')
         if not operation_id:
             operation_id = '_'.join(operation_keys)
         return operation_id
 
-    def _extract_description_and_summary(self):
+    def split_summary_from_description(self, description):
+        """Decide if and how to split a summary out of the given description. The default implementation
+        uses the first paragraph of the description as a summary if it is less than 120 characters long.
+
+        :param description: the full description to be analyzed
+        :return: summary and description
+        :rtype: (str,str)
+        """
+        # https://www.python.org/dev/peps/pep-0257/#multi-line-docstrings
+        summary = None
+        summary_max_len = 120  # OpenAPI 2.0 spec says summary should be under 120 characters
+        sections = description.split('\n\n', 1)
+        if len(sections) == 2:
+            sections[0] = sections[0].strip()
+            if len(sections[0]) < summary_max_len:
+                summary, description = sections
+                description = description.strip()
+
+        return summary, description
+
+    def get_summary_and_description(self):
+        """Return an operation summary and description determined from the view's docstring.
+
+        :return: summary and description
+        :rtype: (str,str)
+        """
         description = self.overrides.get('operation_description', None)
         summary = self.overrides.get('operation_summary', None)
         if description is None:
@@ -329,38 +353,16 @@ class SwaggerAutoSchema(ViewInspector):
             description = description.strip().replace('\r', '')
 
             if description and (summary is None):
-                # description from docstring ... do summary magic
-                # https://www.python.org/dev/peps/pep-0257/#multi-line-docstrings
-                summary_max_len = 120  # OpenAPI 2.0 spec says summary should be under 120 characters
-                sections = description.split('\n\n', 1)
-                if len(sections) == 2:
-                    sections[0] = sections[0].strip()
-                    if len(sections[0]) < summary_max_len:
-                        summary, description = sections
+                # description from docstring... do summary magic
+                summary, description = self.split_summary_from_description(description)
 
-        return description, summary
-
-    def get_description(self):
-        """Return an operation description determined as appropriate from the view's method and class docstrings.
-
-        :return: the operation description
-        :rtype: str
-        """
-        return self._extract_description_and_summary()[0]
-
-    def get_summary(self):
-        """Return a summary description for this operation.
-
-        :return: the summary
-        :rtype: str
-        """
-        return self._extract_description_and_summary()[1]
+        return summary, description
 
     def get_security(self):
         """Return a list of security requirements for this operation.
 
         Returning an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
-        authentication schemes). Returning ``None`` will inherit the top-level secuirty requirements.
+        authentication schemes). Returning ``None`` will inherit the top-level security requirements.
 
         :return: security requirements
         :rtype: list[dict[str,list[str]]]"""
@@ -374,26 +376,33 @@ class SwaggerAutoSchema(ViewInspector):
         """
         return self.overrides.get('deprecated', None)
 
-    def get_tags(self, operation_keys):
+    def get_tags(self, operation_keys=None):
         """Get a list of tags for this operation. Tags determine how operations relate with each other, and in the UI
-        each tag will show as a group containing the operations that use it.
+        each tag will show as a group containing the operations that use it. If not provided in overrides,
+        tags will be inferred from the operation url.
 
-        :param tuple[str] operation_keys: an array of keys derived from the pathdescribing the hierarchical layout
+        :param tuple[str] operation_keys: an array of keys derived from the path describing the hierarchical layout
             of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: list[str]
         """
-        return [operation_keys[0]]
+        operation_keys = operation_keys or self.operation_keys
+
+        tags = self.overrides.get('tags')
+        if not tags:
+            tags = [operation_keys[0]]
+
+        return tags
 
     def get_consumes(self):
         """Return the MIME types this endpoint can consume.
 
         :rtype: list[str]
         """
-        return get_consumes(getattr(self.view, 'parser_classes', []))
+        return get_consumes(self.get_parser_classes())
 
     def get_produces(self):
         """Return the MIME types this endpoint can produce.
 
         :rtype: list[str]
         """
-        return get_produces(getattr(self.view, 'renderer_classes', []))
+        return get_produces(self.get_renderer_classes())

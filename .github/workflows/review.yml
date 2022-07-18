@@ -1,0 +1,37 @@
+name: Review
+
+on: [push, pull_request]
+
+jobs:
+  review:
+    name: Run linters and tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.6, 3.7, 3.8, 3.9]
+
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@v2
+
+      - name: Set the python version
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Run tests
+        env:
+          PYTHON_VERSION: ${{ matrix.python }}
+        run: tox -e $(tox -l | grep py${PYTHON_VERSION//.} | paste -sd "," -)
+
+      - name: Check for incompatibilities with publishing to PyPi
+        if: ${{ matrix.python == 3.8 }}
+        run: |
+          pip install -r requirements/publish.txt
+          python setup.py sdist
+          twine check dist/*

@@ -58,7 +58,7 @@ DEFAULT_GENERATOR_CLASS
 -------------------------
 
 :class:`~.generators.OpenAPISchemaGenerator` subclass that will be used by default for generating the final
-:class:`.Schema` object. Can be overriden by the ``generator_class`` argument to :func:`.get_schema_view`.
+:class:`.Schema` object. Can be overridden by the ``generator_class`` argument to :func:`.get_schema_view`.
 
 **Default**: :class:`drf_yasg.generators.OpenAPISchemaGenerator`
 
@@ -66,7 +66,7 @@ DEFAULT_AUTO_SCHEMA_CLASS
 -------------------------
 
 :class:`~.inspectors.ViewInspector` subclass that will be used by default for generating :class:`.Operation`
-objects when iterating over endpoints. Can be overriden by using the `auto_schema` argument of
+objects when iterating over endpoints. Can be overridden by using the `auto_schema` argument of
 :func:`@swagger_auto_schema <.swagger_auto_schema>` or by a ``swagger_schema`` attribute on the view class.
 
 **Default**: :class:`drf_yasg.inspectors.SwaggerAutoSchema`
@@ -85,6 +85,7 @@ to this list.
 :class:`'drf_yasg.inspectors.ChoiceFieldInspector' <.inspectors.ChoiceFieldInspector>`, |br| \
 :class:`'drf_yasg.inspectors.FileFieldInspector' <.inspectors.FileFieldInspector>`, |br| \
 :class:`'drf_yasg.inspectors.DictFieldInspector' <.inspectors.DictFieldInspector>`, |br| \
+:class:`'drf_yasg.inspectors.JSONFieldInspector' <.inspectors.JSONFieldInspector>`, |br| \
 :class:`'drf_yasg.inspectors.HiddenFieldInspector' <.inspectors.HiddenFieldInspector>`, |br| \
 :class:`'drf_yasg.inspectors.RecursiveFieldInspector' <.inspectors.RecursiveFieldInspector>`, |br| \
 :class:`'drf_yasg.inspectors.SerializerMethodFieldInspector' <.inspectors.SerializerMethodFieldInspector>`, |br| \
@@ -168,7 +169,7 @@ LOGOUT_URL
 
 URL for the Django Logout action when using `USE_SESSION_AUTH`_.
 
-**Default**: :python:`django.conf.settings.LOGOUT_URL`
+**Default**: :python:`'/accounts/logout/'`
 
 .. _security-definitions-settings:
 
@@ -206,7 +207,7 @@ See https://github.com/swagger-api/swagger-ui/blob/112bca906553a937ac67adc2e500b
 SPEC_URL
 --------
 
-URL pointing to a swagger document for use by swagger-ui. The default behaviour is to append ``?format=openapi`` to the
+URL pointing to a swagger document for use by swagger-ui. The default behavior is to append ``?format=openapi`` to the
 URL which serves the UI; see :ref:`note on URL settings <url-settings>` above.
 
 **Default**: :python:`None` |br|
@@ -221,6 +222,40 @@ set to ``None`` to remove the badge.
 
 **Default**: :python:`'http://online.swagger.io/validator/'` |br|
 *Maps to parameter*: ``validatorUrl``
+
+PERSIST_AUTH
+------------
+
+Persist swagger-ui authorization data to local storage. |br|
+**WARNING:** This may be a security risk as the credentials are stored unencrypted and can be accessed
+by all javascript code running on the same domain.
+
+**Default**: :python:`False` |br|
+*Maps to parameter*: -
+
+REFETCH_SCHEMA_WITH_AUTH
+------------------------
+
+Re-fetch the OpenAPI document with the new credentials after authorization is performed through swagger-ui.
+
+**Default**: :python:`False` |br|
+*Maps to parameter*: -
+
+REFETCH_SCHEMA_ON_LOGOUT
+------------------------
+
+Re-fetch the OpenAPI document without credentials after authorization is removed through swagger-ui.
+
+**Default**: :python:`False` |br|
+*Maps to parameter*: -
+
+FETCH_SCHEMA_WITH_QUERY
+-----------------------
+
+Fetch the OpenAPI document using the query parameters passed to the swagger-ui page request.
+
+**Default**: :python:`True` |br|
+*Maps to parameter*: -
 
 OPERATIONS_SORTER
 -----------------
@@ -287,7 +322,7 @@ Controls whether operations show the model structure or the example value by def
 DEFAULT_MODEL_DEPTH
 -------------------
 
-Controls how many levels are expaned by default when showing nested models.
+Controls how many levels are expanded by default when showing nested models.
 
 **Default**: :python:`3` |br|
 *Maps to parameter*: ``defaultModelExpandDepth``
@@ -306,7 +341,7 @@ values for Parameters.
 OAUTH2_REDIRECT_URL
 -------------------
 
-Used when OAuth2 authenitcation of API requests via swagger-ui is desired. If ``None`` is passed, the
+Used when OAuth2 authentication of API requests via swagger-ui is desired. If ``None`` is passed, the
 ``oauth2RedirectUrl`` parameter will be set to ``{% static 'drf-yasg/swagger-ui-dist/oauth2-redirect.html' %}``. This
 is the default `https://github.com/swagger-api/swagger-ui/blob/master/dist/oauth2-redirect.html <oauth2-redirect>`_
 file provided by ``swagger-ui``.
@@ -317,7 +352,7 @@ file provided by ``swagger-ui``.
 OAUTH2_CONFIG
 -------------
 
-Used when OAuth2 authenitcation of API requests via swagger-ui is desired. Provides OAuth2 configuration parameters
+Used when OAuth2 authentication of API requests via swagger-ui is desired. Provides OAuth2 configuration parameters
 to the ``SwaggerUIBundle#initOAuth`` method, and must be a dictionary. See
 `OAuth2 configuration <https://github.com/swagger-api/swagger-ui/blob/master/docs/usage/oauth2.md>`_.
 
@@ -355,7 +390,7 @@ See https://github.com/Rebilly/ReDoc#configuration.
 SPEC_URL
 --------
 
-URL pointing to a swagger document for use by ReDoc. The default behaviour is to append ``?format=openapi`` to the
+URL pointing to a swagger document for use by ReDoc. The default behavior is to append ``?format=openapi`` to the
 URL which serves the UI; see :ref:`note on URL settings <url-settings>` above.
 
 **Default**: :python:`None` |br|
@@ -414,6 +449,14 @@ Show required properties first ordered in the same order as in required array.
 
 **Default**: :python:`False` |br|
 *Maps to attribute*: ``requiredPropsFirst``
+
+FETCH_SCHEMA_WITH_QUERY
+-----------------------
+
+Fetch the OpenAPI document using the query parameters passed to the ReDoc page request.
+
+**Default**: :python:`True` |br|
+*Maps to parameter*: -
 
 
 .. _FORCE_SCRIPT_NAME: https://docs.djangoproject.com/en/2.0/ref/settings/#force-script-name

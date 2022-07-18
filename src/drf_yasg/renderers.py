@@ -1,9 +1,10 @@
-import six
-
-from django.shortcuts import render, resolve_url
+from django.core.exceptions import ImproperlyConfigured
+from django.shortcuts import resolve_url
+from django.template.loader import render_to_string
+from django.utils.encoding import force_str
 from django.utils.functional import Promise
 from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer
-from rest_framework.utils import json
+from rest_framework.utils import encoders, json
 
 from .app_settings import redoc_settings, swagger_settings
 from .codecs import VALIDATORS, OpenAPICodecJson, OpenAPICodecYaml
@@ -28,9 +29,10 @@ class _SpecRenderer(BaseRenderer):
 
         if not isinstance(data, Swagger):  # pragma: no cover
             # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
-            # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
+            # in that case, it's probably better to let the default ``JSONRenderer`` render it
             # see https://github.com/axnsan12/drf-yasg/issues/58
             return JSONRenderer().render(data, media_type, renderer_context)
+
         return codec.encode(data)
 
 
@@ -63,21 +65,23 @@ class _UIRenderer(BaseRenderer):
 
     def render(self, swagger, accepted_media_type=None, renderer_context=None):
         if not isinstance(swagger, Swagger):  # pragma: no cover
-            # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
-            # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
-            # see https://github.com/axnsan12/drf-yasg/issues/58
-            return TemplateHTMLRenderer().render(swagger, accepted_media_type, renderer_context)
-        self.set_context(renderer_context, swagger)
-        return render(
-            renderer_context['request'],
-            self.template,
-            renderer_context
-        )
+            try:
+                # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
+                # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
+                # see https://github.com/axnsan12/drf-yasg/issues/58
+                return TemplateHTMLRenderer().render(swagger, accepted_media_type, renderer_context)
+            except ImproperlyConfigured:
+                # Fall back to using eg '404 Not Found'
+                response = renderer_context['response']
+                return '%d %s' % (response.status_code, response.status_text.title())
 
-    def set_context(self, renderer_context, swagger):
-        renderer_context['title'] = swagger.info.title
-        renderer_context['version'] = swagger.info.version
-        renderer_context['oauth2_config'] = json.dumps(self.get_oauth2_config())
+        self.set_context(renderer_context, swagger)
+        return render_to_string(self.template, renderer_context, renderer_context['request'])
+
+    def set_context(self, renderer_context, swagger=None):
+        renderer_context['title'] = swagger.info.title or '' if swagger else ''
+        renderer_context['version'] = swagger.info.version or '' if swagger else ''
+        renderer_context['oauth2_config'] = json.dumps(self.get_oauth2_config(), cls=encoders.JSONEncoder)
         renderer_context['USE_SESSION_AUTH'] = swagger_settings.USE_SESSION_AUTH
         renderer_context.update(self.get_auth_urls())
 
@@ -89,7 +93,7 @@ class _UIRenderer(BaseRenderer):
             return None
 
         args, kwargs = None, None
-        if not isinstance(to, six.string_types):
+        if not isinstance(to, str):
             if len(to) > 2:
                 to, args, kwargs = to
             elif len(to) == 2:
@@ -115,13 +119,20 @@ class _UIRenderer(BaseRenderer):
 
 
 class SwaggerUIRenderer(_UIRenderer):
-    """Renders a swagger-ui web interface for schema browisng."""
+    """Renders a swagger-ui web interface for schema browsing."""
     template = 'drf-yasg/swagger-ui.html'
     format = 'swagger'
 
-    def set_context(self, renderer_context, swagger):
+    def set_context(self, renderer_context, swagger=None):
         super(SwaggerUIRenderer, self).set_context(renderer_context, swagger)
-        renderer_context['swagger_settings'] = json.dumps(self.get_swagger_ui_settings())
+        swagger_ui_settings = self.get_swagger_ui_settings()
+
+        request = renderer_context.get('request', None)
+        oauth_redirect_url = force_str(swagger_ui_settings.get('oauth2RedirectUrl', ''))
+        if request and oauth_redirect_url:
+            swagger_ui_settings['oauth2RedirectUrl'] = request.build_absolute_uri(oauth_redirect_url)
+
+        renderer_context['swagger_settings'] = json.dumps(swagger_ui_settings, cls=encoders.JSONEncoder)
 
     def get_swagger_ui_settings(self):
         data = {
@@ -138,6 +149,10 @@ class SwaggerUIRenderer(_UIRenderer):
             'oauth2RedirectUrl': swagger_settings.OAUTH2_REDIRECT_URL,
             'supportedSubmitMethods': swagger_settings.SUPPORTED_SUBMIT_METHODS,
             'displayOperationId': swagger_settings.DISPLAY_OPERATION_ID,
+            'persistAuth': swagger_settings.PERSIST_AUTH,
+            'refetchWithAuth': swagger_settings.REFETCH_SCHEMA_WITH_AUTH,
+            'refetchOnLogout': swagger_settings.REFETCH_SCHEMA_ON_LOGOUT,
+            'fetchSchemaWithQuery': swagger_settings.FETCH_SCHEMA_WITH_QUERY,
         }
 
         data = filter_none(data)
@@ -148,13 +163,13 @@ class SwaggerUIRenderer(_UIRenderer):
 
 
 class ReDocRenderer(_UIRenderer):
-    """Renders a ReDoc web interface for schema browisng."""
+    """Renders a ReDoc web interface for schema browsing."""
     template = 'drf-yasg/redoc.html'
     format = 'redoc'
 
-    def set_context(self, renderer_context, swagger):
+    def set_context(self, renderer_context, swagger=None):
         super(ReDocRenderer, self).set_context(renderer_context, swagger)
-        renderer_context['redoc_settings'] = json.dumps(self.get_redoc_settings())
+        renderer_context['redoc_settings'] = json.dumps(self.get_redoc_settings(), cls=encoders.JSONEncoder)
 
     def get_redoc_settings(self):
         data = {
@@ -165,11 +180,12 @@ class ReDocRenderer(_UIRenderer):
             'pathInMiddlePanel': redoc_settings.PATH_IN_MIDDLE,
             'nativeScrollbars': redoc_settings.NATIVE_SCROLLBARS,
             'requiredPropsFirst': redoc_settings.REQUIRED_PROPS_FIRST,
+            'fetchSchemaWithQuery': redoc_settings.FETCH_SCHEMA_WITH_QUERY,
         }
 
         return filter_none(data)
 
 
 class ReDocOldRenderer(ReDocRenderer):
-    """Renders a ReDoc 1.x.x web interface for schema browisng."""
+    """Renders a ReDoc 1.x.x web interface for schema browsing."""
     template = 'drf-yasg/redoc-old.html'

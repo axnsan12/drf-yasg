@@ -1,12 +1,19 @@
+import collections
 import logging
 import re
+import urllib.parse as urlparse
 from collections import OrderedDict
 
-from coreapi.compat import urlparse
 from django.urls import get_script_prefix
+from django.utils.functional import Promise
 from inflection import camelize
 
-from .utils import filter_none
+from .utils import dict_has_ordered_keys, filter_none, force_real_str
+
+try:
+    from collections import abc as collections_abc
+except ImportError:
+    collections_abc = collections
 
 logger = logging.getLogger(__name__)
 
@@ -114,7 +121,7 @@ class SwaggerDict(OrderedDict):
     def _insert_extras__(self):
         """
         From an ordering perspective, it is desired that extra attributes such as vendor extensions stay at the
-        bottom of the object. However, python2.7's OrderdDict craps out if you try to insert into it before calling
+        bottom of the object. However, python2.7's OrderedDict craps out if you try to insert into it before calling
         init. This means that subclasses must call super().__init__ as the first statement of their own __init__,
         which would result in the extra attributes being added first. For this reason, we defer the insertion of the
         attributes and require that subclasses call ._insert_extras__ at the end of their __init__ method.
@@ -128,13 +135,22 @@ class SwaggerDict(OrderedDict):
         if id(obj) in memo:
             return memo[id(obj)]
 
-        if isinstance(obj, dict):
+        if isinstance(obj, Promise) and hasattr(obj, '_proxy____cast'):
+            # handle __proxy__ objects from django.utils.functional.lazy
+            obj = obj._proxy____cast()
+
+        if isinstance(obj, collections_abc.Mapping):
             result = OrderedDict()
             memo[id(obj)] = result
-            for attr, val in obj.items():
+            items = obj.items()
+            if not dict_has_ordered_keys(obj):
+                items = sorted(items)
+            for attr, val in items:
                 result[attr] = SwaggerDict._as_odict(val, memo)
             return result
-        elif isinstance(obj, (list, tuple)):
+        elif isinstance(obj, str):
+            return force_real_str(obj)
+        elif isinstance(obj, collections_abc.Iterable) and not isinstance(obj, collections_abc.Iterator):
             return type(obj)(SwaggerDict._as_odict(elem, memo) for elem in obj)
 
         return obj
@@ -147,9 +163,10 @@ class SwaggerDict(OrderedDict):
         return SwaggerDict._as_odict(self, {})
 
     def __reduce__(self):
-        # for pickle supprt; this skips calls to all SwaggerDict __init__ methods and relies
+        # for pickle support; this skips calls to all SwaggerDict __init__ methods and relies
         # on the already set attributes instead
-        return _bare_SwaggerDict, (type(self),), vars(self), None, iter(self.items())
+        attrs = {k: v for k, v in vars(self).items() if not k.startswith('_NP_')}
+        return _bare_SwaggerDict, (type(self),), attrs, None, iter(self.items())
 
 
 class Contact(SwaggerDict):
@@ -224,12 +241,12 @@ class Swagger(SwaggerDict):
         :param str _prefix: api path prefix to use in setting basePath; this will be appended to the wsgi
             SCRIPT_NAME prefix or Django's FORCE_SCRIPT_NAME if applicable
         :param str _version: version string to override Info
-        :param dict[str,dict[str,str]] security_definitions: list of supported authentication mechanisms
-        :param list[dict] security: authentication mechanisms accepted by default; can be overriden in Operation
-        :param list[str] consumes: consumed MIME types; can be overriden in Operation
-        :param list[str] produces: produced MIME types; can be overriden in Operation
-        :param .Paths paths: paths object
-        :param dict[str,.Schema] definitions: named models
+        :param dict[str,dict] security_definitions: list of supported authentication mechanisms
+        :param list[dict[str,list[str]]] security: authentication mechanisms accepted globally
+        :param list[str] consumes: consumed MIME types; can be overridden in Operation
+        :param list[str] produces: produced MIME types; can be overridden in Operation
+        :param Paths paths: paths object
+        :param dict[str,Schema] definitions: named models
         """
         super(Swagger, self).__init__(**extra)
         self.swagger = '2.0'
@@ -280,7 +297,7 @@ class Paths(SwaggerDict):
     def __init__(self, paths, **extra):
         """A listing of all the paths in the API.
 
-        :param dict[str,.PathItem] paths:
+        :param dict[str,PathItem] paths:
         """
         super(Paths, self).__init__(**extra)
         for path, path_obj in paths.items():
@@ -297,14 +314,14 @@ class PathItem(SwaggerDict):
                  head=None, patch=None, parameters=None, **extra):
         """Information about a single path
 
-        :param .Operation get: operation for GET
-        :param .Operation put: operation for PUT
-        :param .Operation post: operation for POST
-        :param .Operation delete: operation for DELETE
-        :param .Operation options: operation for OPTIONS
-        :param .Operation head: operation for HEAD
-        :param .Operation patch: operation for PATCH
-        :param list[.Parameter] parameters: parameters that apply to all operations
+        :param Operation get: operation for GET
+        :param Operation put: operation for PUT
+        :param Operation post: operation for POST
+        :param Operation delete: operation for DELETE
+        :param Operation options: operation for OPTIONS
+        :param Operation head: operation for HEAD
+        :param Operation patch: operation for PATCH
+        :param list[Parameter] parameters: parameters that apply to all operations
         """
         super(PathItem, self).__init__(**extra)
         self.get = get
@@ -333,8 +350,8 @@ class Operation(SwaggerDict):
         """Information about an API operation (path + http method combination)
 
         :param str operation_id: operation ID, should be unique across all operations
-        :param .Responses responses: responses returned
-        :param list[.Parameter] parameters: parameters accepted
+        :param Responses responses: responses returned
+        :param list[Parameter] parameters: parameters accepted
         :param list[str] consumes: content types accepted
         :param list[str] produces: content types produced
         :param str summary: operation summary; should be < 120 characters
@@ -355,6 +372,17 @@ class Operation(SwaggerDict):
         self._insert_extras__()
 
 
+def _check_type(type, format, enum, pattern, items, _obj_type):
+    if items and type != TYPE_ARRAY:
+        raise AssertionError("items can only be used when type is array")
+    if type == TYPE_ARRAY and not items:
+        raise AssertionError("TYPE_ARRAY requires the items attribute")
+    if pattern and type != TYPE_STRING:
+        raise AssertionError("pattern can only be used when type is string")
+    if (format or enum or pattern) and type in (TYPE_OBJECT, TYPE_ARRAY, None):
+        raise AssertionError("[format, enum, pattern] can only be applied to primitive " + _obj_type)
+
+
 class Items(SwaggerDict):
     def __init__(self, type=None, format=None, enum=None, pattern=None, items=None, **extra):
         """Used when defining an array :class:`.Parameter` to describe the array elements.
@@ -371,12 +399,9 @@ class Items(SwaggerDict):
         self.format = format
         self.enum = enum
         self.pattern = pattern
-        self.items = items
+        self.items_ = items
         self._insert_extras__()
-        if items and type != TYPE_ARRAY:
-            raise AssertionError("items can only be used when type is array")
-        if pattern and type != TYPE_STRING:
-            raise AssertionError("pattern can only be used when type is string")
+        _check_type(type, format, enum, pattern, items, self.__class__)
 
 
 class Parameter(SwaggerDict):
@@ -389,7 +414,8 @@ class Parameter(SwaggerDict):
         :param str in_: parameter location
         :param str description: parameter description
         :param bool required: whether the parameter is required for the operation
-        :param .Schema,.SchemaRef schema: required if `in_` is ``body``
+        :param schema: required if `in_` is ``body``
+        :type schema: Schema or SchemaRef
         :param str type: parameter type; required if `in_` is not ``body``; must not be ``object``
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
@@ -407,7 +433,7 @@ class Parameter(SwaggerDict):
         self.format = format
         self.enum = enum
         self.pattern = pattern
-        self.items = items
+        self.items_ = items
         self.default = default
         self._insert_extras__()
         if (not schema and not type) or (schema and type):
@@ -420,12 +446,9 @@ class Parameter(SwaggerDict):
             self.required = True
         if self['in'] != IN_BODY and schema is not None:
             raise AssertionError("schema can only be applied to a body Parameter, not %s" % type)
-        if (format or enum or pattern or default) and not type:
-            raise AssertionError("[format, enum, pattern, default] can only be applied to non-body Parameter")
-        if items and type != TYPE_ARRAY:
-            raise AssertionError("items can only be used when type is array")
-        if pattern and type != TYPE_STRING:
-            raise AssertionError("pattern can only be used when type is string")
+        if default and not type:
+            raise AssertionError("default can only be applied to a non-body Parameter")
+        _check_type(type, format, enum, pattern, items, self.__class__)
 
 
 class Schema(SwaggerDict):
@@ -441,10 +464,13 @@ class Schema(SwaggerDict):
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
-        :param dict[str,(.Schema,.SchemaRef)] properties: object properties; required if `type` is ``object``
-        :param bool,.Schema,.SchemaRef additional_properties: allow wildcard properties not listed in `properties`
-        :param list[str] required: list of requried property names
-        :param .Schema,.SchemaRef items: type of array items, only valid if `type` is ``array``
+        :param properties: object properties; required if `type` is ``object``
+        :type properties: dict[str,Schema or SchemaRef]
+        :param additional_properties: allow wildcard properties not listed in `properties`
+        :type additional_properties: bool or Schema or SchemaRef
+        :param list[str] required: list of required property names
+        :param items: type of array items, only valid if `type` is ``array``
+        :type items: Schema or SchemaRef
         :param default: only valid when insider another ``Schema``\\ 's ``properties``;
             the default value of this property if it is not provided, must conform to the type of this Schema
         :param read_only: only valid when insider another ``Schema``\\ 's ``properties``;
@@ -465,18 +491,13 @@ class Schema(SwaggerDict):
         self.format = format
         self.enum = enum
         self.pattern = pattern
-        self.items = items
+        self.items_ = items
         self.read_only = read_only
         self.default = default
         self._insert_extras__()
         if (properties or (additional_properties is not None)) and type != TYPE_OBJECT:
             raise AssertionError("only object Schema can have properties")
-        if (format or enum or pattern) and type in (TYPE_OBJECT, TYPE_ARRAY):
-            raise AssertionError("[format, enum, pattern] can only be applied to primitive Schema")
-        if items and type != TYPE_ARRAY:
-            raise AssertionError("items can only be used when type is array")
-        if pattern and type != TYPE_STRING:
-            raise AssertionError("pattern can only be used when type is string")
+        _check_type(type, format, enum, pattern, items, self.__class__)
 
     def _remove_read_only(self):
         # readOnly is only valid for Schemas inside another Schema's properties;
@@ -491,11 +512,11 @@ class _Ref(SwaggerDict):
         """Base class for all reference types. A reference object has only one property, ``$ref``, which must be a JSON
         reference to a valid object in the specification, e.g. ``#/definitions/Article`` to refer to an article model.
 
-        :param .ReferenceResolver resolver: component resolver which must contain the referneced object
+        :param .ReferenceResolver resolver: component resolver which must contain the referenced object
         :param str name: referenced object name, e.g. "Article"
         :param str scope: reference scope, e.g. "definitions"
         :param type[.SwaggerDict] expected_type: the expected type that will be asserted on the object found in resolver
-        :param bool ignore_unresolved: allow the reference to be not defined in resolver
+        :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
         super(_Ref, self).__init__()
         assert not type(self) == _Ref, "do not instantiate _Ref directly"
@@ -509,7 +530,7 @@ class _Ref(SwaggerDict):
     def resolve(self, resolver):
         """Get the object targeted by this reference from the given component resolver.
 
-        :param .ReferenceResolver resolver: component resolver which must contain the referneced object
+        :param .ReferenceResolver resolver: component resolver which must contain the referenced object
         :returns: the target object
         """
         ref_match = self.ref_name_re.match(self.ref)
@@ -530,7 +551,7 @@ class SchemaRef(_Ref):
 
         :param .ReferenceResolver resolver: component resolver which must contain the definition
         :param str schema_name: schema name
-        :param bool ignore_unresolved: allow the reference to be not defined in resolver
+        :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
         assert SCHEMA_DEFINITIONS in resolver.scopes
         super(SchemaRef, self).__init__(resolver, schema_name, SCHEMA_DEFINITIONS, Schema, ignore_unresolved)
@@ -540,9 +561,10 @@ Schema.OR_REF = (Schema, SchemaRef)
 
 
 def resolve_ref(ref_or_obj, resolver):
-    """Resolve `ref_or_obj` if it is a reference type. Return it unchaged if not.
+    """Resolve `ref_or_obj` if it is a reference type. Return it unchanged if not.
 
-    :param SwaggerDict,_Ref ref_or_obj:
+    :param ref_or_obj: object to dereference
+    :type ref_or_obj: SwaggerDict or _Ref
     :param resolver: component resolver which must contain the referenced object
     """
     if isinstance(ref_or_obj, _Ref):
@@ -554,8 +576,9 @@ class Responses(SwaggerDict):
     def __init__(self, responses, default=None, **extra):
         """Describes the expected responses of an :class:`.Operation`.
 
-        :param dict[(str,int),.Response] responses: mapping of status code to response definition
-        :param .Response default: description of the response structure to expect if another status code is returned
+        :param responses: mapping of status code to response definition
+        :type responses: dict[str or int,Response]
+        :param Response default: description of the response structure to expect if another status code is returned
         """
         super(Responses, self).__init__(**extra)
         for status, response in responses.items():
@@ -570,7 +593,9 @@ class Response(SwaggerDict):
         """Describes the structure of an operation's response.
 
         :param str description: response description
-        :param .Schema,.SchemaRef schema: sturcture of the response body
+        :param schema: structure of the response body
+        :type schema: Schema or SchemaRef or rest_framework.serializers.Serializer
+            or type[rest_framework.serializers.Serializer]
         :param dict examples: example bodies mapped by mime type
         """
         super(Response, self).__init__(**extra)
@@ -584,23 +609,33 @@ class Response(SwaggerDict):
 
 class ReferenceResolver(object):
     """A mapping type intended for storing objects pointed at by Swagger Refs.
-    Provides support and checks for different refernce scopes, e.g. 'definitions'.
+    Provides support and checks for different reference scopes, e.g. 'definitions'.
 
     For example:
 
     ::
 
         > components = ReferenceResolver('definitions', 'parameters')
-        > definitions = ReferenceResolver.with_scope('definitions')
+        > definitions = components.with_scope('definitions')
         > definitions.set('Article', Schema(...))
         > print(components)
         {'definitions': OrderedDict([('Article', Schema(...)]), 'parameters': OrderedDict()}
     """
 
-    def __init__(self, *scopes):
+    def __init__(self, *scopes, **kwargs):
         """
         :param str scopes: an enumeration of the valid scopes this resolver will contain
         """
+        force_init = kwargs.pop('force_init', False)
+        if not force_init:
+            raise AssertionError(
+                "Creating an instance of ReferenceResolver almost certainly won't do what you want it to do.\n"
+                "See https://github.com/axnsan12/drf-yasg/issues/211, "
+                "https://github.com/axnsan12/drf-yasg/issues/271, "
+                "https://github.com/axnsan12/drf-yasg/issues/325.\n"
+                "Pass `force_init=True` to override this."
+            )
+
         self._objects = OrderedDict()
         self._force_scope = None
         for scope in scopes:
@@ -615,7 +650,7 @@ class ReferenceResolver(object):
         :rtype: .ReferenceResolver
         """
         assert scope in self.scopes, "unknown scope %s" % scope
-        ret = ReferenceResolver()
+        ret = ReferenceResolver(force_init=True)
         ret._objects = self._objects
         ret._force_scope = scope
         return ret
@@ -623,7 +658,7 @@ class ReferenceResolver(object):
     def _check_scope(self, scope):
         real_scope = self._force_scope or scope
         if scope is not None:
-            assert not self._force_scope or scope == self._force_scope, "cannot overrride forced scope"
+            assert not self._force_scope or scope == self._force_scope, "cannot override forced scope"
         assert real_scope and real_scope in self._objects, "invalid scope %s" % scope
         return real_scope
 
@@ -643,7 +678,7 @@ class ReferenceResolver(object):
         """Set an object in the given scope only if it does not exist.
 
         :param str name: reference name
-        :param callable maker: object factory, called only if necessary
+        :param function maker: object factory, called only if necessary
         :param str scope: reference scope
         """
         scope = self._check_scope(scope)

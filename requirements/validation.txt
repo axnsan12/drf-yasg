@@ -1,3 +1,2 @@
 # requirements for the validation feature
-flex>=6.11.1
 swagger-spec-validator>=2.1.0

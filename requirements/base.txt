@@ -1,9 +1,9 @@
 coreapi>=2.3.3
 coreschema>=0.0.4
-ruamel.yaml>=0.15.34
+djangorestframework>=3.10.3
+django>=2.2.16
+ruamel.yaml>=0.16.13
 inflection>=0.3.1
-six>=1.10.0
+packaging>=21.0
+pytz>=2021.1
 uritemplate>=3.0.0
-
-djangorestframework>=3.7.7
-Django>=1.11.7

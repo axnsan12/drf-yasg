@@ -1,9 +1,8 @@
-from six import StringIO
-
 import copy
 import json
 import os
 from collections import OrderedDict
+from io import StringIO
 
 import pytest
 from datadiff.tools import assert_equal
@@ -22,8 +21,7 @@ def mock_schema_request(db):
     from rest_framework.test import force_authenticate
 
     factory = APIRequestFactory()
-    user = User.objects.create_user(username='admin', is_staff=True, is_superuser=True)
-
+    user = User.objects.get(username='admin')
     request = factory.get('/swagger.json')
     force_authenticate(request, user=user)
     request = APIView().initialize_request(request)
@@ -56,12 +54,17 @@ def swagger_dict(swagger, codec_json):
 
 
 @pytest.fixture
-def validate_schema(db):
+def validate_schema():
     def validate_schema(swagger):
-        from flex.core import parse as validate_flex
+        try:
+            from flex.core import parse as validate_flex
+
+            validate_flex(copy.deepcopy(swagger))
+        except ImportError:
+            pass
+
         from swagger_spec_validator.validator20 import validate_spec as validate_ssv
 
-        validate_flex(copy.deepcopy(swagger))
         validate_ssv(copy.deepcopy(swagger))
 
     return validate_schema

@@ -1,8 +1,7 @@
 import warnings
-from functools import wraps
+from functools import WRAPPER_ASSIGNMENTS, wraps
 
 from django.utils.cache import add_never_cache_headers
-from django.utils.decorators import available_attrs
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
 from rest_framework import exceptions
@@ -12,7 +11,8 @@ from rest_framework.views import APIView
 
 from .app_settings import swagger_settings
 from .renderers import (
-    OpenAPIRenderer, ReDocOldRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer
+    OpenAPIRenderer, ReDocOldRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer,
+    _SpecRenderer
 )
 
 SPEC_RENDERERS = (SwaggerYAMLRenderer, SwaggerJSONRenderer, OpenAPIRenderer)
@@ -29,7 +29,7 @@ def deferred_never_cache(view_func):
     never be cached.
     """
 
-    @wraps(view_func, assigned=available_attrs(view_func))
+    @wraps(view_func, assigned=WRAPPER_ASSIGNMENTS)
     def _wrapped_view_func(request, *args, **kwargs):
         response = view_func(request, *args, **kwargs)
 
@@ -55,13 +55,13 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
     :param str url: same as :class:`.OpenAPISchemaGenerator`
     :param patterns: same as :class:`.OpenAPISchemaGenerator`
     :param urlconf: same as :class:`.OpenAPISchemaGenerator`
-    :param bool public: if False, includes only the endpoints that are accesible by the user viewing the schema
-    :param list validators: a list of validator names to apply; allowed values are ``flex``, ``ssv``
+    :param bool public: if False, includes only the endpoints that are accessible by the user viewing the schema
+    :param list validators: a list of validator names to apply; the only allowed value is ``ssv``, for now
     :param type generator_class: schema generator class to use; should be a subclass of :class:`.OpenAPISchemaGenerator`
-    :param tuple authentication_classes: authentication classes for the schema view itself
-    :param tuple permission_classes: permission classes for the schema view itself
+    :param list authentication_classes: authentication classes for the schema view itself
+    :param list permission_classes: permission classes for the schema view itself
     :return: SchemaView class
-    :rtype: type[.SchemaView]
+    :rtype: type[drf_yasg.views.SchemaView]
     """
     _public = public
     _generator_class = generator_class or swagger_settings.DEFAULT_GENERATOR_CLASS
@@ -85,7 +85,12 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
         renderer_classes = _spec_renderers
 
         def get(self, request, version='', format=None):
-            generator = self.generator_class(info, request.version or version or '', url, patterns, urlconf)
+            version = request.version or version or ''
+            if isinstance(request.accepted_renderer, _SpecRenderer):
+                generator = self.generator_class(info, version, url, patterns, urlconf)
+            else:
+                generator = self.generator_class(info, version, url, patterns=[])
+
             schema = generator.get_schema(request, self.public)
             if schema is None:
                 raise exceptions.PermissionDenied()  # pragma: no cover
@@ -106,7 +111,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
         def as_cached_view(cls, cache_timeout=0, cache_kwargs=None, **initkwargs):
             """
             Calls .as_view() and wraps the result in a cache_page decorator.
-            See https://docs.djangoproject.com/en/1.11/topics/cache/
+            See https://docs.djangoproject.com/en/dev/topics/cache/
 
             :param int cache_timeout: same as cache_page; set to 0 for no cache
             :param dict cache_kwargs: dictionary of kwargs to be passed to cache_page
@@ -125,7 +130,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
         def without_ui(cls, cache_timeout=0, cache_kwargs=None):
             """
             Instantiate this view with just JSON and YAML renderers, optionally wrapped with cache_page.
-            See https://docs.djangoproject.com/en/1.11/topics/cache/.
+            See https://docs.djangoproject.com/en/dev/topics/cache/.
 
             :param int cache_timeout: same as cache_page; set to 0 for no cache
             :param dict cache_kwargs: dictionary of kwargs to be passed to cache_page
@@ -137,7 +142,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
         def with_ui(cls, renderer='swagger', cache_timeout=0, cache_kwargs=None):
             """
             Instantiate this view with a Web UI renderer, optionally wrapped with cache_page.
-            See https://docs.djangoproject.com/en/1.11/topics/cache/.
+            See https://docs.djangoproject.com/en/dev/topics/cache/.
 
             :param str renderer: UI renderer; allowed values are ``swagger``, ``redoc``
             :param int cache_timeout: same as cache_page; set to 0 for no cache

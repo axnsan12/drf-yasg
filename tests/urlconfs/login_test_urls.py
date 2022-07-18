@@ -1,11 +1,13 @@
-from django.conf.urls import url
+from django.urls import path
+
+from testproj.urls import required_urlpatterns
 
 
 def dummy(request):
     pass
 
 
-urlpatterns = [
-    url(r'^test/login$', dummy, name='login'),
-    url(r'^test/logout$', dummy, name='logout'),
+urlpatterns = required_urlpatterns + [
+    path('test/login', dummy, name='login'),
+    path('test/logout', dummy, name='logout'),
 ]

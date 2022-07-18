@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from articles.models import Article, ArticleGroup
@@ -17,10 +17,9 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('title', 'author', 'body', 'slug', 'date_created', 'date_modified',
+        fields = ('title', 'author', 'body', 'slug', 'date_created', 'date_modified', 'read_only_nullable',
                   'references', 'uuid', 'cover', 'cover_name', 'article_type', 'group', 'original_group', )
-        read_only_fields = ('date_created', 'date_modified',
-                            'references', 'uuid', 'cover_name')
+        read_only_fields = ('date_created', 'date_modified', 'references', 'uuid', 'cover_name', 'read_only_nullable')
         lookup_field = 'slug'
         extra_kwargs = {
             'body': {'help_text': 'body serializer help_text'},
@@ -29,11 +28,18 @@ class ArticleSerializer(serializers.ModelSerializer):
                 'help_text': _("The ID of the user that created this article; if none is provided, "
                                "defaults to the currently logged in user.")
             },
+            'read_only_nullable': {'allow_null': True},
         }
 
 
 class ImageUploadSerializer(serializers.Serializer):
-    what_am_i_doing = serializers.RegexField(regex=r"^69$", help_text="test", default="69")
+    image_id = serializers.UUIDField(read_only=True)
+    what_am_i_doing = serializers.RegexField(
+        regex=r"^69$",
+        help_text="test",
+        default="69",
+        allow_null=True
+    )
     image_styles = serializers.ListSerializer(
         child=serializers.ChoiceField(choices=['wide', 'tall', 'thumb', 'social']),
         help_text="Parameter with Items"
