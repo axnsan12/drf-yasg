@@ -3,6 +3,14 @@ Changelog
 #########
 
 **********
+**1.21.2**
+**********
+
+*Release date: Jul 17, 2022*
+
+**FIXED:** Fixed code block rst syntax in ``README.rst``
+
+**********
 **1.21.1**
 **********
 
