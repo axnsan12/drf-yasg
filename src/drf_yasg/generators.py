@@ -195,6 +195,8 @@ class OpenAPISchemaGenerator(object):
                 raise SwaggerGenerationError("`url` must be an absolute HTTP(S) url")
             if parsed_url.path:
                 logger.warning("path component of api base URL %s is ignored; use FORCE_SCRIPT_NAME instead" % url)
+            else:
+                self._gen.url = url
 
     @property
     def url(self):
