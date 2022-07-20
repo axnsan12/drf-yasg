@@ -2,6 +2,7 @@ import datetime
 import inspect
 import logging
 import operator
+import types
 import typing
 import uuid
 from collections import OrderedDict
@@ -459,7 +460,11 @@ def decimal_return_type():
 
 
 def get_origin_type(hint_class):
-    return getattr(hint_class, '__origin__', None) or hint_class
+    # Added in Python 3.8
+    if hasattr(typing, 'get_origin'):
+        return typing.get_origin(hint_class)
+    else:
+        return getattr(hint_class, '__origin__', None) or hint_class
 
 
 def hint_class_issubclass(hint_class, check_class):
@@ -502,16 +507,16 @@ def inspect_collection_hint_class(hint_class):
 
 hinting_type_info.append(((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class))
 
-# typing.UnionType was added in Python 3.10 for new PEP 604 pipe union syntax
-try:
-    from types import UnionType
-except ImportError:
-    UnionType = None
+# types.UnionType was added in Python 3.10 for new PEP 604 pipe union syntax
+if hasattr(types, 'UnionType'):
+    UNION_TYPES = (typing.Union, types.UnionType)
+else:
+    UNION_TYPES = (typing.Union,)
 
 
 def _get_union_types(hint_class):
     origin_type = get_origin_type(hint_class)
-    if origin_type is typing.Union or (UnionType is not None and origin_type is UnionType):
+    if origin_type in UNION_TYPES:
         return hint_class.__args__
 
 

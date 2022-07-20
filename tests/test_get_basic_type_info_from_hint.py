@@ -17,13 +17,13 @@ if sys.version_info >= (3, 9):
 
 python310_union_tests = []
 if sys.version_info >= (3, 10):
-    # # New PEP 604 union syntax in Python 3.10+
+    # New PEP 604 union syntax in Python 3.10+
     python310_union_tests = [
         (bool | None, {'type': openapi.TYPE_BOOLEAN, 'format': None, 'x-nullable': True}),
         (list[int] | None, {
             'type': openapi.TYPE_ARRAY, 'items': openapi.Items(openapi.TYPE_INTEGER), 'x-nullable': True
         }),
-        # Following cases are not 100% correct, but it should work somehow and not crash.
+        # Following case is not handled, but it should not crash.
         (int | float, None),
     ]
 
