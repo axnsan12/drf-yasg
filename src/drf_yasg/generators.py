@@ -94,13 +94,14 @@ class EndpointEnumerator(_EndpointEnumerator):
                     if self.should_include_endpoint(path, callback, app_name or '', namespace or '', url_name):
                         path = self.replace_version(path, callback)
 
-                        # avoid adding endpoints that have already been seen,
-                        # as Django resolves urls in top-down order
-                        if path in ignored_endpoints:
-                            continue
-                        ignored_endpoints.add(path)
-
                         for method in self.get_allowed_methods(callback):
+                            # avoid adding endpoints that have already been seen,
+                            # as Django resolves urls in top-down order
+                            ignore_endpoint = (path, method)
+                            if ignore_endpoint in ignored_endpoints:
+                                continue
+                            ignored_endpoints.add(ignore_endpoint)
+
                             endpoint = (path, method, callback)
                             api_endpoints.append(endpoint)
                 except Exception:  # pragma: no cover

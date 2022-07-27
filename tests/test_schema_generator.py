@@ -206,6 +206,41 @@ def test_action_mapping():
         assert action_ops['delete']['description'] == 'mapping docstring get/delete'
 
 
+@pytest.mark.skipif(not MethodMapper or not action, reason="actions - same url_path ")
+def test_action_same_url_path():
+    class ActionViewSet(viewsets.ViewSet):
+        @swagger_auto_schema(method='get', operation_id='method_get')
+        @action(detail=False, methods=['get'], url_path='test')
+        def action_get(self, request):
+            """docstring get"""
+            pass
+
+        @swagger_auto_schema(method='post', operation_id='method_post')
+        @action(detail=False, methods=['post'], url_path='test')
+        def action_post(self, request):
+            """docstring post"""
+            pass
+
+    router = routers.DefaultRouter()
+    router.register(r'action', ActionViewSet, **_basename_or_base_name('action'))
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        version="v2",
+        url='',
+        patterns=router.urls
+    )
+
+    for _ in range(3):
+        swagger = generator.get_schema(None, True)
+        action_ops = swagger['paths']['/test/']
+        methods = ['get', 'post']
+        assert all(mth in action_ops for mth in methods)
+        assert all(action_ops[mth]['operationId'] == 'method_' + mth for mth in methods)
+        assert action_ops['post']['description'] == 'docstring post'
+        assert action_ops['get']['description'] == 'docstring get'
+
+
 @pytest.mark.parametrize('choices, expected_type', [
     (['A', 'B'], openapi.TYPE_STRING),
     ([u'A', u'B'], openapi.TYPE_STRING),
