@@ -36,7 +36,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
       $ python -m venv venv
       $ source venv/bin/activate
       (venv) $ python -m pip install -U pip setuptools
-      (venv) $ pip install -U -e .[validation]
+      (venv) $ pip install -U -e '.[validation]'
       (venv) $ pip install -U -r requirements/dev.txt
 
 #. **Make your changes and check them against the test project**
@@ -96,7 +96,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
 #. **Your code must pass all the required CI jobs before it is merged**
 
    As of now, this consists of running on the supported Python, Django, DRF version matrix (see README),
-   and building the docs succesfully.
+   and building the docs successfully.
 
 ******************
 Maintainer's notes
