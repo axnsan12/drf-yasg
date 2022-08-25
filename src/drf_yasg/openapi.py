@@ -236,7 +236,7 @@ class Swagger(SwaggerDict):
                  security_definitions=None, security=None, paths=None, definitions=None, **extra):
         """Root Swagger object.
 
-        :param .Info info: info object
+        :param Info info: info object
         :param str _url: URL used for setting the API host and scheme
         :param str _prefix: api path prefix to use in setting basePath; this will be appended to the wsgi
             SCRIPT_NAME prefix or Django's FORCE_SCRIPT_NAME if applicable
@@ -391,7 +391,7 @@ class Items(SwaggerDict):
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
-        :param .Items items: only valid if `type` is ``array``
+        :param Items items: only valid if `type` is ``array``
         """
         super(Items, self).__init__(**extra)
         assert type is not None, "type is required!"
@@ -420,7 +420,7 @@ class Parameter(SwaggerDict):
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
-        :param .Items items: only valid if `type` is ``array``
+        :param Items items: only valid if `type` is ``array``
         :param default: default value if the parameter is not provided; must conform to parameter type
         """
         super(Parameter, self).__init__(**extra)
@@ -512,10 +512,10 @@ class _Ref(SwaggerDict):
         """Base class for all reference types. A reference object has only one property, ``$ref``, which must be a JSON
         reference to a valid object in the specification, e.g. ``#/definitions/Article`` to refer to an article model.
 
-        :param .ReferenceResolver resolver: component resolver which must contain the referneced object
+        :param ReferenceResolver resolver: component resolver which must contain the referneced object
         :param str name: referenced object name, e.g. "Article"
         :param str scope: reference scope, e.g. "definitions"
-        :param type[.SwaggerDict] expected_type: the expected type that will be asserted on the object found in resolver
+        :param type[SwaggerDict] expected_type: the expected type that will be asserted on the object found in resolver
         :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
         super(_Ref, self).__init__()
@@ -530,7 +530,7 @@ class _Ref(SwaggerDict):
     def resolve(self, resolver):
         """Get the object targeted by this reference from the given component resolver.
 
-        :param .ReferenceResolver resolver: component resolver which must contain the referneced object
+        :param ReferenceResolver resolver: component resolver which must contain the referneced object
         :returns: the target object
         """
         ref_match = self.ref_name_re.match(self.ref)
@@ -549,7 +549,7 @@ class SchemaRef(_Ref):
     def __init__(self, resolver, schema_name, ignore_unresolved=False):
         """Adds a reference to a named Schema defined in the ``#/definitions/`` object.
 
-        :param .ReferenceResolver resolver: component resolver which must contain the definition
+        :param ReferenceResolver resolver: component resolver which must contain the definition
         :param str schema_name: schema name
         :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
@@ -647,7 +647,7 @@ class ReferenceResolver(object):
 
         :param str scope: target scope, must be in this resolver's `scopes`
         :return: the bound resolver
-        :rtype: .ReferenceResolver
+        :rtype: ReferenceResolver
         """
         assert scope in self.scopes, "unknown scope %s" % scope
         ret = ReferenceResolver(force_init=True)
