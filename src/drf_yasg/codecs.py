@@ -2,9 +2,11 @@ import copy
 import json
 import logging
 from collections import OrderedDict
+from io import StringIO
 
 from django.utils.encoding import force_bytes
-from ruamel import yaml
+from ruamel.yaml import YAML
+from ruamel.yaml.representer import SafeRepresenter
 
 from . import openapi
 from .errors import SwaggerValidationError
@@ -125,65 +127,37 @@ class OpenAPICodecJson(_OpenAPICodec):
             return json.dumps(spec)
 
 
-YAML_MAP_TAG = u'tag:yaml.org,2002:map'
-
-
-class SaneYamlDumper(yaml.SafeDumper):
-    """YamlDumper class usable for dumping ``OrderedDict`` and list instances in a standard way."""
+class SaneYamlRepresenter(SafeRepresenter):
+    """SafeRepresenter class usable for dumping ``OrderedDict`` and list instances in a standard way."""
 
     def ignore_aliases(self, data):
         """Disable YAML references."""
         return True
 
-    def increase_indent(self, flow=False, indentless=False, **kwargs):
-        """https://stackoverflow.com/a/39681672
-
-        Indent list elements.
-        """
-        return super(SaneYamlDumper, self).increase_indent(flow=flow, indentless=False, **kwargs)
-
-    def represent_odict(self, mapping, flow_style=None):  # pragma: no cover
-        """https://gist.github.com/miracle2k/3184458
-
-        Make PyYAML output an OrderedDict.
-
-        It will do so fine if you use yaml.dump(), but that generates ugly, non-standard YAML code.
-
-        To use yaml.safe_dump(), you need the following.
-        """
-        tag = YAML_MAP_TAG
-        value = []
-        node = yaml.MappingNode(tag, value, flow_style=flow_style)
-        if self.alias_key is not None:
-            self.represented_objects[self.alias_key] = node
-        best_style = True
-        if hasattr(mapping, 'items'):
-            mapping = mapping.items()
-        for item_key, item_value in mapping:
-            node_key = self.represent_data(item_key)
-            node_value = self.represent_data(item_value)
-            if not (isinstance(node_key, yaml.ScalarNode) and not node_key.style):
-                best_style = False
-            if not (isinstance(node_value, yaml.ScalarNode) and not node_value.style):
-                best_style = False
-            value.append((node_key, node_value))
-        if flow_style is None:
-            if self.default_flow_style is not None:
-                node.flow_style = self.default_flow_style
-            else:
-                node.flow_style = best_style
-        return node
-
     def represent_text(self, text):
+        """Write multi-line strings in block style."""
         if "\n" in text:
-            return self.represent_scalar('tag:yaml.org,2002:str', text, style='|')
-        return self.represent_scalar('tag:yaml.org,2002:str', text)
+            return self.represent_scalar("tag:yaml.org,2002:str", text, style="|")
+        return self.represent_scalar("tag:yaml.org,2002:str", text)
 
 
-SaneYamlDumper.add_representer(bytes, SaneYamlDumper.represent_text)
-SaneYamlDumper.add_representer(str, SaneYamlDumper.represent_text)
-SaneYamlDumper.add_representer(OrderedDict, SaneYamlDumper.represent_odict)
-SaneYamlDumper.add_multi_representer(OrderedDict, SaneYamlDumper.represent_odict)
+# Use block style for multi-line strings
+SaneYamlRepresenter.add_representer(str, SaneYamlRepresenter.represent_text)
+
+
+# Avoid YAML !!omap tag for OrderedDict
+SaneYamlRepresenter.add_representer(OrderedDict, SaneYamlRepresenter.represent_dict)
+SaneYamlRepresenter.add_multi_representer(OrderedDict, SaneYamlRepresenter.represent_dict)
+
+yaml = YAML(typ="safe")
+yaml.Representer = SaneYamlRepresenter
+
+# Add 2 extra spaces when indenting lists
+# https://stackoverflow.com/q/25108581/10612
+yaml.indent(sequence=4, offset=2)
+
+# Do not sort dicts by keys in Representer.represent_dict
+sort_base_mapping_type_on_output = False
 
 
 def yaml_sane_dump(data, binary):
@@ -199,16 +173,13 @@ def yaml_sane_dump(data, binary):
     :return: the serialized YAML
     :rtype: str or bytes
     """
-    return yaml.dump(data, Dumper=SaneYamlDumper, default_flow_style=False, encoding='utf-8' if binary else None)
-
-
-class SaneYamlLoader(yaml.SafeLoader):
-    def construct_odict(self, node, deep=False):
-        self.flatten_mapping(node)
-        return OrderedDict(self.construct_pairs(node))
-
-
-SaneYamlLoader.add_constructor(YAML_MAP_TAG, SaneYamlLoader.construct_odict)
+    out = StringIO()
+    yaml.dump(data, stream=out)
+    contents = out.getvalue()
+    out.close()
+    if binary:
+        return contents.encode()
+    return contents
 
 
 def yaml_sane_load(stream):
@@ -217,7 +188,7 @@ def yaml_sane_load(stream):
     :param stream: YAML stream (can be a string or a file-like object)
     :rtype: OrderedDict
     """
-    return yaml.load(stream, Loader=SaneYamlLoader)
+    return yaml.load(stream)
 
 
 class OpenAPICodecYaml(_OpenAPICodec):
