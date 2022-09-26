@@ -4,6 +4,8 @@ import logging
 import operator
 import typing
 import uuid
+import pkg_resources
+from packaging import version
 from collections import OrderedDict
 from decimal import Decimal
 from inspect import signature as inspect_signature
@@ -19,6 +21,9 @@ from ..utils import (
     decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
 )
 from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
+
+
+drf_version = pkg_resources.get_distribution("djangorestframework").version
 
 logger = logging.getLogger(__name__)
 
@@ -376,7 +381,6 @@ model_field_to_basic_type = [
     (models.AutoField, (openapi.TYPE_INTEGER, None)),
     (models.BinaryField, (openapi.TYPE_STRING, openapi.FORMAT_BINARY)),
     (models.BooleanField, (openapi.TYPE_BOOLEAN, None)),
-    (models.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (models.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (models.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
@@ -390,7 +394,7 @@ model_field_to_basic_type = [
     (models.TimeField, (openapi.TYPE_STRING, None)),
     (models.UUIDField, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
     (models.CharField, (openapi.TYPE_STRING, None)),
-]
+]    
 
 ip_format = {'ipv4': openapi.FORMAT_IPV4, 'ipv6': openapi.FORMAT_IPV6}
 
@@ -403,7 +407,6 @@ serializer_field_to_basic_type = [
     (serializers.RegexField, (openapi.TYPE_STRING, None)),
     (serializers.CharField, (openapi.TYPE_STRING, None)),
     (serializers.BooleanField, (openapi.TYPE_BOOLEAN, None)),
-    (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (serializers.IntegerField, (openapi.TYPE_INTEGER, None)),
     (serializers.FloatField, (openapi.TYPE_NUMBER, None)),
     (serializers.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
@@ -412,6 +415,15 @@ serializer_field_to_basic_type = [
     (serializers.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (serializers.ModelField, (openapi.TYPE_STRING, None)),
 ]
+
+if version.parse(drf_version) < version.parse("3.14.0"):
+    model_field_to_basic_type.append(
+        (models.NullBooleanField, (openapi.TYPE_BOOLEAN, None))
+    )
+
+    serializer_field_to_basic_type.append(
+        (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
+    )
 
 basic_type_info = serializer_field_to_basic_type + model_field_to_basic_type
 
@@ -840,3 +852,4 @@ else:
                 return ref
 
             return NotHandled
+
