@@ -3,6 +3,14 @@ Changelog
 #########
 
 **********
+**1.21.4**
+**********
+
+*Release date: Sep 26, 2022*
+
+**FIXED:** Remove NullBooleanFields if the django-rest-framework version >= 3.14.0 (:pr:`814`)
+
+**********
 **1.21.3**
 **********
 
