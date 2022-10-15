@@ -403,7 +403,6 @@ serializer_field_to_basic_type = [
     (serializers.RegexField, (openapi.TYPE_STRING, None)),
     (serializers.CharField, (openapi.TYPE_STRING, None)),
     (serializers.BooleanField, (openapi.TYPE_BOOLEAN, None)),
-    (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (serializers.IntegerField, (openapi.TYPE_INTEGER, None)),
     (serializers.FloatField, (openapi.TYPE_NUMBER, None)),
     (serializers.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
@@ -412,6 +411,15 @@ serializer_field_to_basic_type = [
     (serializers.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (serializers.ModelField, (openapi.TYPE_STRING, None)),
 ]
+
+try:
+    serializer_field_to_basic_type.append(
+        (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None))
+    )
+except AttributeError:
+    # serializers.NullBooleanField is removed in drf 3.14
+    pass
+
 
 basic_type_info = serializer_field_to_basic_type + model_field_to_basic_type
 
