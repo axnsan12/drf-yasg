@@ -505,7 +505,14 @@ class Schema(SwaggerDict):
         self.pop('readOnly', '')
 
 
-class _Ref(SwaggerDict):
+class _ResolveMixin(object):
+    """Mixin to identify resolvable types."""
+
+    def resolve(self, resolver):
+        raise NotImplementedError('Implement me')
+
+
+class _Ref(_ResolveMixin, SwaggerDict):
     ref_name_re = re.compile(r"#/(?P<scope>.+)/(?P<name>[^/]+)$")
 
     def __init__(self, resolver, name, scope, expected_type, ignore_unresolved=False):
@@ -519,7 +526,7 @@ class _Ref(SwaggerDict):
         :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
         super(_Ref, self).__init__()
-        assert not type(self) == _Ref, "do not instantiate _Ref directly"
+        assert type(self) != _Ref, "do not instantiate _Ref directly"
         ref_name = "#/{scope}/{name}".format(scope=scope, name=name)
         if not ignore_unresolved:
             obj = resolver.get(name, scope)
@@ -545,7 +552,7 @@ class _Ref(SwaggerDict):
         raise NotImplementedError("cannot delete property of Reference object")
 
 
-class SchemaRef(_Ref):
+class InnerRef(_Ref):
     def __init__(self, resolver, schema_name, ignore_unresolved=False):
         """Adds a reference to a named Schema defined in the ``#/definitions/`` object.
 
@@ -554,7 +561,63 @@ class SchemaRef(_Ref):
         :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
         assert SCHEMA_DEFINITIONS in resolver.scopes
-        super(SchemaRef, self).__init__(resolver, schema_name, SCHEMA_DEFINITIONS, Schema, ignore_unresolved)
+        super(InnerRef, self).__init__(resolver, schema_name, SCHEMA_DEFINITIONS, Schema, ignore_unresolved)
+
+
+class SchemaRef(_ResolveMixin, SwaggerDict):
+    def __init__(self, resolver, schema_name, read_only, description, ignore_unresolved=False):
+        """Holds a reference to a named Schema and it's extended local properties.
+
+        Stores a reference schema and it's additional local properties such as serializer's read_only and help_text
+        in all_of objects array to allow combining objects properties
+        for nested serializers to remove them from expected payload representation
+        if they have read_only attribute set True and represent in-place reference description from help_text.
+
+        :param .ReferenceResolver resolver: component resolver which must contain the definition
+        :param str schema_name: schema name
+        :param bool read_only: read_only attribute of serializer instance
+        :param str description: overriden help_text from serializer instance
+        :param bool ignore_unresolved: do not throw if the referenced object does not exist
+        """
+        super(SchemaRef, self).__init__()
+        overriden_params = {
+            'read_only': read_only or False,
+        }
+        if description is not None:
+            overriden_params['description'] = description
+        self.all_of = [
+            InnerRef(resolver, schema_name, ignore_unresolved),
+            SwaggerDict(**overriden_params),
+        ]
+
+    def resolve(self, resolver):
+        return self.all_of[0].resolve(resolver)
+
+    def __setitem__(self, key, value):
+        if hasattr(self, 'all_of') and key not in ['all_of', 'allOf']:
+            if key == '$ref':
+                self.all_of[0][key] = value
+                return
+            self.all_of[1][key] = value
+            return
+        elif key == 'allOf':
+            return super(SchemaRef, self).__setitem__(key, value)
+        raise NotImplementedError("cannot set %s" % key)
+
+    def __getitem__(self, key):
+        if key == '$ref':
+            return self.all_of[0][key]
+        elif key in ['all_of', 'allOf', ]:
+            return super(SchemaRef, self).__getitem__(key)
+        return self.all_of[1][key]
+
+    def __delitem__(self, key):
+        if key == "$ref":
+            del self.all_of[0][key]
+        elif key in ['all_of', 'allOf', ]:
+            raise NotImplementedError("cannot delete property %s contains referenced object" % key)
+        else:
+            del self.all_of[1][key]
 
 
 Schema.OR_REF = (Schema, SchemaRef)
@@ -567,7 +630,7 @@ def resolve_ref(ref_or_obj, resolver):
     :type ref_or_obj: SwaggerDict or _Ref
     :param resolver: component resolver which must contain the referenced object
     """
-    if isinstance(ref_or_obj, _Ref):
+    if isinstance(ref_or_obj, _ResolveMixin):
         return ref_or_obj.resolve(resolver)
     return ref_or_obj
 

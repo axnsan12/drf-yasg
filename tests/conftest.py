@@ -3,6 +3,7 @@ import json
 import os
 from collections import OrderedDict
 from io import StringIO
+from unittest import mock
 
 import pytest
 from datadiff.tools import assert_equal
@@ -14,6 +15,7 @@ from rest_framework.views import APIView
 from drf_yasg import codecs, openapi
 from drf_yasg.codecs import yaml_sane_dump, yaml_sane_load
 from drf_yasg.generators import OpenAPISchemaGenerator
+from drf_yasg.openapi import Schema
 
 
 @pytest.fixture
@@ -119,3 +121,9 @@ def redoc_settings(settings):
 def reference_schema():
     with open(os.path.join(os.path.dirname(__file__), 'reference.yaml')) as reference:
         return yaml_sane_load(reference)
+
+@pytest.fixture
+def resolver_mock():
+    resolver = mock.Mock()
+    resolver.scopes = {'definitions': None}
+    return resolver

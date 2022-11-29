@@ -127,7 +127,12 @@ def test_replaced_serializer():
         assert 'detail' in swagger['definitions']['Detail']['properties']
         responses = swagger['paths']['/details/{id}/']['get']['responses']
         assert '404' in responses
-        assert responses['404']['schema']['$ref'] == "#/definitions/Detail"
+        schema = responses['404']['schema']
+        assert 'allOf' in schema
+        ref_objects = schema['allOf']
+        assert len(ref_objects) == 2
+        ref_object = ref_objects[0]
+        assert ref_object['$ref'] == "#/definitions/Detail"
 
 
 def test_url_order():

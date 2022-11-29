@@ -94,7 +94,9 @@ paths:
               results:
                 type: array
                 items:
-                  $ref: '#/definitions/Article'
+                  allOf:
+                    - $ref: '#/definitions/Article'
+                    - readOnly: false
       tags:
         - articles
     post:
@@ -105,12 +107,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Article'
+            allOf:
+              - $ref: '#/definitions/Article'
+              - readOnly: false
       responses:
         '201':
           description: ''
           schema:
-            $ref: '#/definitions/Article'
+            allOf:
+              - $ref: '#/definitions/Article'
+              - readOnly: false
       tags:
         - articles
     parameters: []
@@ -135,7 +141,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Article'
+              allOf:
+                - $ref: '#/definitions/Article'
+                - readOnly: false
       tags:
         - articles
     parameters: []
@@ -148,7 +156,9 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Article'
+            allOf:
+              - $ref: '#/definitions/Article'
+              - readOnly: false
       tags:
         - articles
     put:
@@ -159,7 +169,9 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Article'
+            allOf:
+              - $ref: '#/definitions/Article'
+              - readOnly: false
       tags:
         - articles
     patch:
@@ -171,12 +183,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Article'
+            allOf:
+              - $ref: '#/definitions/Article'
+              - readOnly: false
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Article'
+            allOf:
+              - $ref: '#/definitions/Article'
+              - readOnly: false
         '404':
           description: slug not found
       tags:
@@ -208,7 +224,9 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Article'
+            allOf:
+              - $ref: '#/definitions/Article'
+              - readOnly: false
       consumes:
         - multipart/form-data
       tags:
@@ -247,7 +265,9 @@ paths:
         '201':
           description: ''
           schema:
-            $ref: '#/definitions/ImageUpload'
+            allOf:
+              - $ref: '#/definitions/ImageUpload'
+              - readOnly: false
       consumes:
         - multipart/form-data
       tags:
@@ -289,7 +309,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Person'
+              allOf:
+                - $ref: '#/definitions/Person'
+                - readOnly: false
       tags:
         - people
     post:
@@ -300,12 +322,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Person'
+            allOf:
+              - $ref: '#/definitions/Person'
+              - readOnly: false
       responses:
         '201':
           description: ''
           schema:
-            $ref: '#/definitions/Person'
+            allOf:
+              - $ref: '#/definitions/Person'
+              - readOnly: false
       tags:
         - people
     parameters: []
@@ -318,7 +344,9 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Person'
+            allOf:
+              - $ref: '#/definitions/Person'
+              - readOnly: false
       tags:
         - people
     patch:
@@ -329,12 +357,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Person'
+            allOf:
+              - $ref: '#/definitions/Person'
+              - readOnly: false
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Person'
+            allOf:
+              - $ref: '#/definitions/Person'
+              - readOnly: false
       tags:
         - people
     delete:
@@ -361,7 +393,9 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Identity'
+            allOf:
+              - $ref: '#/definitions/Identity'
+              - readOnly: false
       tags:
         - people
     patch:
@@ -372,12 +406,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Identity'
+            allOf:
+              - $ref: '#/definitions/Identity'
+              - readOnly: false
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Identity'
+            allOf:
+              - $ref: '#/definitions/Identity'
+              - readOnly: false
       tags:
         - people
     parameters:
@@ -407,7 +445,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Snippet'
+              allOf:
+                - $ref: '#/definitions/Snippet'
+                - readOnly: false
       tags:
         - snippets
     post:
@@ -418,12 +458,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Snippet'
+            allOf:
+              - $ref: '#/definitions/Snippet'
+              - readOnly: false
       responses:
         '201':
           description: ''
           schema:
-            $ref: '#/definitions/Snippet'
+            allOf:
+              - $ref: '#/definitions/Snippet'
+              - readOnly: false
       tags:
         - snippets
     delete:
@@ -478,7 +522,9 @@ paths:
               results:
                 type: array
                 items:
-                  $ref: '#/definitions/SnippetViewer'
+                  allOf:
+                    - $ref: '#/definitions/SnippetViewer'
+                    - readOnly: false
       tags:
         - snippets
     parameters:
@@ -495,7 +541,9 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Snippet'
+            allOf:
+              - $ref: '#/definitions/Snippet'
+              - readOnly: false
       tags:
         - snippets
     put:
@@ -506,12 +554,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Snippet'
+            allOf:
+              - $ref: '#/definitions/Snippet'
+              - readOnly: false
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Snippet'
+            allOf:
+              - $ref: '#/definitions/Snippet'
+              - readOnly: false
       tags:
         - snippets
     patch:
@@ -522,12 +574,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Snippet'
+            allOf:
+              - $ref: '#/definitions/Snippet'
+              - readOnly: false
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Snippet'
+            allOf:
+              - $ref: '#/definitions/Snippet'
+              - readOnly: false
       tags:
         - snippets
     delete:
@@ -561,7 +617,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Todo'
+              allOf:
+                - $ref: '#/definitions/Todo'
+                - readOnly: false
       tags:
         - todo
     parameters: []
@@ -576,7 +634,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TodoAnother'
+              allOf:
+                - $ref: '#/definitions/TodoAnother'
+                - readOnly: false
       tags:
         - todo
     parameters: []
@@ -589,7 +649,9 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoAnother'
+            allOf:
+              - $ref: '#/definitions/TodoAnother'
+              - readOnly: false
       tags:
         - todo
     parameters:
@@ -609,7 +671,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Harvest'
+              allOf:
+                - $ref: '#/definitions/Harvest'
+                - readOnly: false
       tags:
         - todo
     parameters: []
@@ -622,12 +686,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Harvest'
+            allOf:
+              - $ref: '#/definitions/Harvest'
+              - readOnly: false
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Harvest'
+            allOf:
+              - $ref: '#/definitions/Harvest'
+              - readOnly: false
       tags:
         - todo
     patch:
@@ -638,12 +706,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/Harvest'
+            allOf:
+              - $ref: '#/definitions/Harvest'
+              - readOnly: false
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Harvest'
+            allOf:
+              - $ref: '#/definitions/Harvest'
+              - readOnly: false
       tags:
         - todo
     parameters:
@@ -663,7 +735,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TodoRecursive'
+              allOf:
+                - $ref: '#/definitions/TodoRecursive'
+                - readOnly: false
       tags:
         - todo
     post:
@@ -674,12 +748,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            allOf:
+              - $ref: '#/definitions/TodoRecursive'
+              - readOnly: false
       responses:
         '201':
           description: ''
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            allOf:
+              - $ref: '#/definitions/TodoRecursive'
+              - readOnly: false
       tags:
         - todo
     parameters: []
@@ -701,12 +779,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            allOf:
+              - $ref: '#/definitions/TodoRecursive'
+              - readOnly: false
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            allOf:
+              - $ref: '#/definitions/TodoRecursive'
+              - readOnly: false
       tags:
         - todo
     patch:
@@ -717,12 +799,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            allOf:
+              - $ref: '#/definitions/TodoRecursive'
+              - readOnly: false
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoRecursive'
+            allOf:
+              - $ref: '#/definitions/TodoRecursive'
+              - readOnly: false
       tags:
         - todo
     delete:
@@ -751,7 +837,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TodoTree'
+              allOf:
+                - $ref: '#/definitions/TodoTree'
+                - readOnly: false
       tags:
         - todo
     parameters: []
@@ -764,7 +852,9 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoTree'
+            allOf:
+              - $ref: '#/definitions/TodoTree'
+              - readOnly: false
       tags:
         - todo
     parameters:
@@ -784,7 +874,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TodoYetAnother'
+              allOf:
+                - $ref: '#/definitions/TodoYetAnother'
+                - readOnly: false
       tags:
         - todo
     parameters: []
@@ -797,7 +889,9 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoYetAnother'
+            allOf:
+              - $ref: '#/definitions/TodoYetAnother'
+              - readOnly: false
       tags:
         - todo
     parameters:
@@ -815,7 +909,9 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/Todo'
+            allOf:
+              - $ref: '#/definitions/Todo'
+              - readOnly: false
       tags:
         - todo
     parameters:
@@ -833,7 +929,9 @@ paths:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/TodoYetAnother'
+            allOf:
+              - $ref: '#/definitions/TodoYetAnother'
+              - readOnly: false
       tags:
         - todo
     parameters:
@@ -880,7 +978,9 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/UserSerializer'
+              allOf:
+                - $ref: '#/definitions/UserSerializer'
+                - readOnly: false
       tags:
         - Users
     post:
@@ -941,7 +1041,9 @@ paths:
         '200':
           description: response description
           schema:
-            $ref: '#/definitions/UserSerializer'
+            allOf:
+              - $ref: '#/definitions/UserSerializer'
+              - readOnly: false
       tags:
         - Users
     put:
@@ -952,12 +1054,16 @@ paths:
           in: body
           required: true
           schema:
-            $ref: '#/definitions/UserSerializer'
+            allOf:
+              - $ref: '#/definitions/UserSerializer'
+              - readOnly: false
       responses:
         '200':
           description: ''
           schema:
-            $ref: '#/definitions/UserSerializer'
+            allOf:
+              - $ref: '#/definitions/UserSerializer'
+              - readOnly: false
       tags:
         - Users
     parameters:
@@ -966,6 +1072,23 @@ paths:
         required: true
         type: string
 definitions:
+  CoAuthor:
+    description: co-author custom help text
+    type: object
+    properties:
+      id:
+        type: integer
+        readOnly: true
+      email:
+        type: string
+        format: email
+        maxLength: 254
+      first_name:
+        type: string
+        maxLength: 150
+      last_name:
+        type: string
+        maxLength: 150
   Article:
     required:
       - title
@@ -1046,6 +1169,19 @@ definitions:
         type: string
         format: uuid
         readOnly: true
+      co_author:
+        allOf:
+          - $ref: '#/definitions/CoAuthor'
+          - description: co-author custom help text
+            readOnly: true
+      co_author_id:
+        type: integer
+        x-nullable: true
+      co_author_clone:
+        allOf:
+          - $ref: '#/definitions/CoAuthor'
+          - description: just in case you'll lost the original
+            readOnly: true
   ImageUpload:
     required:
       - image_styles
@@ -1107,7 +1243,9 @@ definitions:
         type: integer
         readOnly: true
       identity:
-        $ref: '#/definitions/Identity'
+        allOf:
+          - $ref: '#/definitions/Identity'
+          - readOnly: false
   Project:
     required:
       - projectName
@@ -1210,7 +1348,9 @@ definitions:
       exampleProjects:
         type: array
         items:
-          $ref: '#/definitions/Project'
+          allOf:
+            - $ref: '#/definitions/Project'
+            - readOnly: false
         readOnly: true
         maxItems: 100
       difficultyFactor:
@@ -1287,7 +1427,9 @@ definitions:
         maxLength: 50
         minLength: 1
       todo:
-        $ref: '#/definitions/Todo'
+        allOf:
+          - $ref: '#/definitions/Todo'
+          - readOnly: false
   Harvest:
     type: object
     properties:
@@ -1314,7 +1456,9 @@ definitions:
         maxLength: 50
         minLength: 1
       parent:
-        $ref: '#/definitions/TodoRecursive'
+        allOf:
+          - $ref: '#/definitions/TodoRecursive'
+          - readOnly: true
       parent_id:
         type: integer
         title: Parent id
@@ -1338,11 +1482,15 @@ definitions:
       children:
         type: array
         items:
-          $ref: '#/definitions/TodoTree'
+          allOf:
+            - $ref: '#/definitions/TodoTree'
+            - readOnly: false
       many_children:
         type: array
         items:
-          $ref: '#/definitions/TodoTree'
+          allOf:
+            - $ref: '#/definitions/TodoTree'
+            - readOnly: false
   TodoYetAnother:
     required:
       - title
@@ -1507,9 +1655,14 @@ definitions:
         readOnly: true
         uniqueItems: true
       other_stuff:
-        $ref: '#/definitions/OtherStuff'
+        allOf:
+          - $ref: '#/definitions/OtherStuff'
+          - description: the decorator should determine the serializer class for this
+            readOnly: true
       hint_example:
-        $ref: '#/definitions/MethodFieldExample'
+        allOf:
+          - $ref: '#/definitions/MethodFieldExample'
+          - readOnly: false
       help_text_example_1:
         title: Help text example 1
         description: help text on field is set, so this should appear in swagger

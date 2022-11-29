@@ -10,6 +10,11 @@ class Article(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     author = models.ForeignKey('auth.User', related_name='articles', on_delete=models.CASCADE)
+    co_author = models.ForeignKey(
+        "auth.User", related_name="co_articles",
+        null=True, blank=True, default=None, on_delete=models.PROTECT,
+        help_text="co-author of the article",
+    )
     article_type = models.PositiveSmallIntegerField(
         help_text="IntegerField declared on model with choices=(...) and exposed via ModelSerializer",
         choices=((1, "first"), (2, "second"), (3, "third"), (7, "seven"), (8, "eight")), null=True
