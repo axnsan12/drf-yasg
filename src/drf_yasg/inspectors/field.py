@@ -4,6 +4,8 @@ import logging
 import operator
 import typing
 import uuid
+import pkg_resources
+from packaging import version
 from collections import OrderedDict
 from decimal import Decimal
 from inspect import signature as inspect_signature
@@ -19,6 +21,9 @@ from ..utils import (
     decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
 )
 from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
+
+
+drf_version = pkg_resources.get_distribution("djangorestframework").version
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +42,7 @@ class InlineSerializerInspector(SerializerInspector):
         is called only when the serializer is converted into a list of parameters for use in a form data request.
 
         :param serializer: serializer instance
-        :param list[openapi.Parameter] parameters: genereated parameters
+        :param list[openapi.Parameter] parameters: generated parameters
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
@@ -176,7 +181,7 @@ def get_queryset_from_view(view, serializer=None):
     """Try to get the queryset of the given view
 
     :param view: the view instance or class
-    :param serializer: if given, will check that the view's get_serializer_class return matches this serialzier
+    :param serializer: if given, will check that the view's get_serializer_class return matches this serializer
     :return: queryset or ``None``
     """
     try:
@@ -376,7 +381,6 @@ model_field_to_basic_type = [
     (models.AutoField, (openapi.TYPE_INTEGER, None)),
     (models.BinaryField, (openapi.TYPE_STRING, openapi.FORMAT_BINARY)),
     (models.BooleanField, (openapi.TYPE_BOOLEAN, None)),
-    (models.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (models.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (models.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
@@ -390,7 +394,7 @@ model_field_to_basic_type = [
     (models.TimeField, (openapi.TYPE_STRING, None)),
     (models.UUIDField, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
     (models.CharField, (openapi.TYPE_STRING, None)),
-]
+]    
 
 ip_format = {'ipv4': openapi.FORMAT_IPV4, 'ipv6': openapi.FORMAT_IPV6}
 
@@ -412,14 +416,14 @@ serializer_field_to_basic_type = [
     (serializers.ModelField, (openapi.TYPE_STRING, None)),
 ]
 
-try:
-    serializer_field_to_basic_type.append(
-        (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None))
+if version.parse(drf_version) < version.parse("3.14.0"):
+    model_field_to_basic_type.append(
+        (models.NullBooleanField, (openapi.TYPE_BOOLEAN, None))
     )
-except AttributeError:
-    # serializers.NullBooleanField is removed in drf 3.14
-    pass
 
+    serializer_field_to_basic_type.append(
+        (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
+    )
 
 basic_type_info = serializer_field_to_basic_type + model_field_to_basic_type
 
@@ -848,3 +852,4 @@ else:
                 return ref
 
             return NotHandled
+

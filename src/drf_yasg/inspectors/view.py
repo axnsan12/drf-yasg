@@ -152,7 +152,7 @@ class SwaggerAutoSchema(ViewInspector):
     def add_manual_parameters(self, parameters):
         """Add/replace parameters from the given list of automatically generated request parameters.
 
-        :param list[openapi.Parameter] parameters: genereated parameters
+        :param list[openapi.Parameter] parameters: generated parameters
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
@@ -262,6 +262,8 @@ class SwaggerAutoSchema(ViewInspector):
                     description='',
                     schema=serializer,
                 )
+            elif isinstance(serializer, openapi._Ref):
+                response = serializer
             else:
                 serializer = force_serializer_instance(serializer)
                 response = openapi.Response(
@@ -307,7 +309,7 @@ class SwaggerAutoSchema(ViewInspector):
         """Return an unique ID for this operation. The ID must be unique across
         all :class:`.Operation` objects in the API.
 
-        :param tuple[str] operation_keys: an array of keys derived from the pathdescribing the hierarchical layout
+        :param tuple[str] operation_keys: an array of keys derived from the path describing the hierarchical layout
             of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: str
         """
@@ -360,7 +362,7 @@ class SwaggerAutoSchema(ViewInspector):
         """Return a list of security requirements for this operation.
 
         Returning an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
-        authentication schemes). Returning ``None`` will inherit the top-level secuirty requirements.
+        authentication schemes). Returning ``None`` will inherit the top-level security requirements.
 
         :return: security requirements
         :rtype: list[dict[str,list[str]]]"""
@@ -379,7 +381,7 @@ class SwaggerAutoSchema(ViewInspector):
         each tag will show as a group containing the operations that use it. If not provided in overrides,
         tags will be inferred from the operation url.
 
-        :param tuple[str] operation_keys: an array of keys derived from the pathdescribing the hierarchical layout
+        :param tuple[str] operation_keys: an array of keys derived from the path describing the hierarchical layout
             of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: list[str]
         """
