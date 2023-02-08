@@ -5,10 +5,10 @@ on: [push, pull_request]
 jobs:
   review:
     name: Run linters and tests
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-20.04"
     strategy:
       matrix:
-        python: [3.6, 3.7, 3.8, 3.9, 3.10]
+        python: [3.7, 3.8, 3.9, 3.10]
 
     steps:
       - name: Checkout the source code
