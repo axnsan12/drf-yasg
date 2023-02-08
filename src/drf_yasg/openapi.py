@@ -534,7 +534,7 @@ class _Ref(SwaggerDict):
         :returns: the target object
         """
         ref_match = self.ref_name_re.match(self.ref)
-        return resolver.get(ref_match.group('name'), scope=ref_match.group('scope'))
+        return resolver.getdefault(ref_match.group('name'), scope=ref_match.group('scope'))
 
     def __setitem__(self, key, value):
         if key == "$ref":
