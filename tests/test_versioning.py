@@ -28,14 +28,24 @@ def _check_base(swagger, prefix, validate_schema):
 def _check_v1(swagger):
     assert swagger['info']['version'] == '1.0'
     versioned_post = swagger['paths']['/snippets/']['post']
-    assert versioned_post['responses']['201']['schema']['$ref'] == '#/definitions/Snippet'
+    schema = versioned_post['responses']['201']['schema']
+    assert 'allOf' in schema
+    ref_objects = schema['allOf']
+    assert len(ref_objects) == 2
+    ref_obj = ref_objects[0]
+    assert ref_obj['$ref'] == '#/definitions/Snippet'
     assert 'v2field' not in swagger['definitions']['Snippet']['properties']
 
 
 def _check_v2(swagger):
     assert swagger['info']['version'] == '2.0'
     versioned_post = swagger['paths']['/snippets/']['post']
-    assert versioned_post['responses']['201']['schema']['$ref'] == '#/definitions/SnippetV2'
+    schema = versioned_post['responses']['201']['schema']
+    assert 'allOf' in schema
+    ref_objects = schema['allOf']
+    assert len(ref_objects) == 2
+    ref_object = ref_objects[0]
+    assert ref_object['$ref'] == '#/definitions/SnippetV2'
     assert 'v2field' in swagger['definitions']['SnippetV2']['properties']
     v2field = swagger['definitions']['SnippetV2']['properties']['v2field']
     assert v2field['description'] == 'version 2.0 field'

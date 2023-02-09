@@ -22,7 +22,6 @@ from ..utils import (
 )
 from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
 
-
 drf_version = pkg_resources.get_distribution("djangorestframework").version
 
 logger = logging.getLogger(__name__)
@@ -139,7 +138,7 @@ class InlineSerializerInspector(SerializerInspector):
                         "ref_name; explicitly set the ref_name attribute on both serializers' Meta classes"
                         % (actual_serializer, this_serializer))
 
-            return openapi.SchemaRef(definitions, ref_name)
+            return openapi.SchemaRef(definitions, ref_name, read_only=field.read_only, description=field.help_text)
 
         return NotHandled
 
@@ -394,7 +393,7 @@ model_field_to_basic_type = [
     (models.TimeField, (openapi.TYPE_STRING, None)),
     (models.UUIDField, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
     (models.CharField, (openapi.TYPE_STRING, None)),
-]    
+]
 
 ip_format = {'ipv4': openapi.FORMAT_IPV4, 'ipv6': openapi.FORMAT_IPV6}
 
@@ -490,7 +489,6 @@ hinting_type_info = [
     (datetime.datetime, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
 ]
-
 
 if hasattr(typing, 'get_args'):
     # python >=3.8
@@ -773,6 +771,7 @@ try:
 except ImportError:  # pragma: no cover
     CamelCaseJSONParser = CamelCaseJSONRenderer = None
 
+
     def camelize(data):
         return data
 
@@ -845,11 +844,11 @@ else:
 
                 definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
 
-                ref = openapi.SchemaRef(definitions, ref_name, ignore_unresolved=True)
+                ref = openapi.SchemaRef(definitions, ref_name, ignore_unresolved=True, read_only=field.read_only,
+                                        description=field.help_text)
                 if isinstance(field.proxied, serializers.ListSerializer):
                     ref = openapi.Items(type=openapi.TYPE_ARRAY, items=ref)
 
                 return ref
 
             return NotHandled
-
