@@ -3,6 +3,16 @@ Changelog
 #########
 
 **********
+**1.21.5**
+**********
+
+*Release date: Feb 09, 2023*
+
+**ADDED:** Python 3.10 support  (:pr:`818`)
+**DEPRECATED:** Python 3.6 support as it's been deprecated by swagger-spec-validator
+**FIXED:** RecursiveField resolver (:pr:`822`)
+
+**********
 **1.21.4**
 **********
 
