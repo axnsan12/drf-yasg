@@ -1,6 +1,7 @@
 import collections
 import logging
 import re
+import enum
 import urllib.parse as urlparse
 from collections import OrderedDict
 
@@ -152,6 +153,8 @@ class SwaggerDict(OrderedDict):
             return force_real_str(obj)
         elif isinstance(obj, collections_abc.Iterable) and not isinstance(obj, collections_abc.Iterator):
             return type(obj)(SwaggerDict._as_odict(elem, memo) for elem in obj)
+        elif isinstance(obj, enum.Enum):
+            return obj.value
 
         return obj
 
