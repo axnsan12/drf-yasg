@@ -1,20 +1,14 @@
-import collections
+import enum
 import logging
 import re
-import enum
 import urllib.parse as urlparse
-from collections import OrderedDict
+from collections import OrderedDict, abc as collections_abc
 
 from django.urls import get_script_prefix
 from django.utils.functional import Promise
 from inflection import camelize
 
-from .utils import dict_has_ordered_keys, filter_none, force_real_str
-
-try:
-    from collections import abc as collections_abc
-except ImportError:
-    collections_abc = collections
+from .utils import filter_none, force_real_str
 
 logger = logging.getLogger(__name__)
 
@@ -144,7 +138,7 @@ class SwaggerDict(OrderedDict):
             result = OrderedDict()
             memo[id(obj)] = result
             items = obj.items()
-            if not dict_has_ordered_keys(obj):
+            if not isinstance(obj, dict):
                 items = sorted(items)
             for attr, val in items:
                 result[attr] = SwaggerDict._as_odict(val, memo)

@@ -505,16 +505,3 @@ def get_field_default(field):
                 default = serializers.empty
 
     return default
-
-
-def dict_has_ordered_keys(obj):
-    """Check if a given object is a dict that maintains insertion order.
-
-    :param obj: the dict object to check
-    :rtype: bool
-    """
-    if sys.version_info >= (3, 7):
-        # the Python 3.7 language spec says that dict must maintain insertion order.
-        return isinstance(obj, dict)
-
-    return isinstance(obj, OrderedDict)

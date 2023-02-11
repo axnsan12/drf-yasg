@@ -155,7 +155,7 @@ class EndpointEnumerator(_EndpointEnumerator):
         return clean_path
 
 
-class OpenAPISchemaGenerator(object):
+class OpenAPISchemaGenerator:
     """
     This class iterates over all registered API endpoints and returns an appropriate OpenAPI 2.0 compliant schema.
     Method implementations shamelessly stolen and adapted from rest-framework ``SchemaGenerator``.

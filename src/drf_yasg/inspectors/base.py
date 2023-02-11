@@ -51,7 +51,7 @@ def call_view_method(view, method_name, fallback_attr=None, default=None):
     return default
 
 
-class BaseInspector(object):
+class BaseInspector:
     def __init__(self, view, path, method, components, request):
         """
         :param rest_framework.views.APIView view: the view associated with this endpoint

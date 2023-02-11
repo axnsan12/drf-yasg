@@ -4,7 +4,7 @@ from .codecs import _OpenAPICodec
 from .errors import SwaggerValidationError
 
 
-class SwaggerExceptionMiddleware(object):
+class SwaggerExceptionMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
