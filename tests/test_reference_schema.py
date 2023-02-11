@@ -1,5 +1,5 @@
-import json
 import enum
+import json
 from collections import OrderedDict
 
 from drf_yasg import openapi

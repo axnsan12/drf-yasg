@@ -1,6 +1,5 @@
 import inspect
 import logging
-import sys
 import textwrap
 from collections import OrderedDict
 from decimal import Decimal
@@ -322,8 +321,8 @@ def force_serializer_instance(serializer):
 
 
 def get_serializer_class(serializer):
-    """Given a ``Serializer`` class or instance, return the ``Serializer`` class. If `serializer` is not a ``Serializer``
-    class or instance, raises an assertion error.
+    """Given a ``Serializer`` class or instance, return the ``Serializer`` class.
+    If `serializer` is not a ``Serializer`` class or instance, raises an assertion error.
 
     :param serializer: serializer class or instance, or ``None``
     :return: serializer class
