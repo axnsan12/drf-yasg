@@ -141,7 +141,7 @@ class SwaggerDict(OrderedDict):
             if not isinstance(obj, dict):
                 items = sorted(items)
             for attr, val in items:
-                result[attr] = SwaggerDict._as_odict(val, memo)
+                result[SwaggerDict._as_odict(attr, memo)] = SwaggerDict._as_odict(val, memo)
             return result
         elif isinstance(obj, str):
             return force_real_str(obj)
