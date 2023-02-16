@@ -36,14 +36,6 @@ drf\_yasg\.inspectors
     :undoc-members:
     :show-inheritance:
 
-drf\_yasg\.middleware
--------------------------------
-
-.. automodule:: drf_yasg.middleware
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 drf\_yasg\.openapi
 ----------------------------
 

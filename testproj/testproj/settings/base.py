@@ -45,7 +45,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'drf_yasg.middleware.SwaggerExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'testproj.urls'
@@ -150,7 +149,7 @@ SWAGGER_SETTINGS = {
 }
 
 REDOC_SETTINGS = {
-    'SPEC_URL': ('schema-json', {'format': '.json'}),
+    'SPEC_URL': ('schema-json', {'format': 'json'}),
 }
 
 # Internationalization

@@ -1,4 +1,7 @@
-class SwaggerError(Exception):
+from rest_framework.exceptions import APIException
+
+
+class SwaggerError(APIException):
     pass
 
 
@@ -8,6 +11,11 @@ class SwaggerValidationError(SwaggerError):
         self.errors = errors
         self.spec = spec
         self.source_codec = source_codec
+
+        self.detail = {
+            'errors': errors,
+            'message': msg,
+        }
 
 
 class SwaggerGenerationError(SwaggerError):

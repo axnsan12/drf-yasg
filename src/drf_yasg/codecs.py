@@ -9,7 +9,9 @@ from ruamel import yaml
 from . import openapi
 from .errors import SwaggerValidationError
 
-logger = logging.getLogger(__name__)
+from ruamel import yaml
+
+from .errors import SwaggerValidationError
 
 
 def _validate_flex(spec):
@@ -224,17 +226,3 @@ def yaml_sane_load(stream):
     :rtype: OrderedDict
     """
     return yaml.load(stream, Loader=SaneYamlLoader)
-
-
-class OpenAPICodecYaml(_OpenAPICodec):
-    media_type = 'application/yaml'
-
-    def __init__(self, validators, media_type='application/yaml'):
-        super(OpenAPICodecYaml, self).__init__(validators)
-        self.media_type = media_type
-
-    def _dump_dict(self, spec):
-        """Dump ``spec`` into YAML.
-
-        :rtype: bytes"""
-        return yaml_sane_dump(spec, binary=True)

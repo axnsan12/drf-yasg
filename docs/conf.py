@@ -186,14 +186,17 @@ nitpick_ignore = [
     ('py:class', 'collections.OrderedDict'),
 
     ('py:class', 'ruamel.yaml.dumper.SafeDumper'),
+    ('py:class', 'rest_framework.exceptions.APIException'),
     ('py:class', 'rest_framework.serializers.Serializer'),
     ('py:class', 'rest_framework.renderers.BaseRenderer'),
+    ('py:class', 'rest_framework.renderers.JSONOpenAPIRenderer'),
+    ('py:class', 'rest_framework.renderers.OpenAPIRenderer'),
     ('py:class', 'rest_framework.parsers.BaseParser'),
+    ('py:class', 'rest_framework.schemas.coreapi.SchemaGenerator'),
     ('py:class', 'rest_framework.schemas.generators.EndpointEnumerator'),
+    ('py:class', 'rest_framework.schemas.views.SchemaView'),
     ('py:class', 'rest_framework.views.APIView'),
 
-    ('py:class', 'OpenAPICodecYaml'),
-    ('py:class', 'OpenAPICodecJson'),
     ('py:class', 'OpenAPISchemaGenerator'),
 
     ('py:class', 'coreapi.Field'),

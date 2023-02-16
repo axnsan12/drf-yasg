@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 
@@ -11,7 +12,7 @@ from rest_framework.views import APIView
 
 from ... import openapi
 from ...app_settings import swagger_settings
-from ...codecs import OpenAPICodecJson, OpenAPICodecYaml
+from ...codecs import yaml_sane_dump
 
 
 class Command(BaseCommand):
@@ -75,12 +76,10 @@ class Command(BaseCommand):
 
     def write_schema(self, schema, stream, format):
         if format == 'json':
-            codec = OpenAPICodecJson(validators=[], pretty=True)
-            swagger_json = codec.encode(schema).decode('utf-8')
+            swagger_json = json.dumps(schema, indent=4, separators=(',', ': '))
             stream.write(swagger_json)
         elif format == 'yaml':
-            codec = OpenAPICodecYaml(validators=[])
-            swagger_yaml = codec.encode(schema).decode('utf-8')
+            swagger_yaml = yaml_sane_dump(schema, False)
             # YAML is already pretty!
             stream.write(swagger_yaml)
         else:  # pragma: no cover

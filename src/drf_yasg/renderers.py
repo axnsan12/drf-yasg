@@ -3,58 +3,50 @@ from django.shortcuts import resolve_url
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.functional import Promise
-from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer
+from packaging.version import Version
+from rest_framework.renderers import BaseRenderer, TemplateHTMLRenderer
 from rest_framework.utils import encoders, json
 
 from .app_settings import redoc_settings, swagger_settings
-from .codecs import VALIDATORS, OpenAPICodecJson, OpenAPICodecYaml
 from .openapi import Swagger
 from .utils import filter_none
 
+if Version(rest_framework.__version__) >= Version('3.10'):
+    from rest_framework.renderers import (
+        JSONOpenAPIRenderer as _JSONOpenAPIRenderer,
+        OpenAPIRenderer as _YAMLOpenAPIRenderer,
+    )
+else:
+    from rest_framework.renderers import JSONRenderer
 
-class _SpecRenderer(BaseRenderer):
-    """Base class for text renderers. Handles encoding and validation."""
-    charset = 'utf-8'
-    validators = []
-    codec_class = None
+    class _JSONOpenAPIRenderer(JSONRenderer):
+        media_type = 'application/vnd.oai.openapi+json'
+        charset = None
 
-    @classmethod
-    def with_validators(cls, validators):
-        assert all(vld in VALIDATORS for vld in validators), "allowed validators are " + ", ".join(VALIDATORS)
-        return type(cls.__name__, (cls,), {'validators': validators})
+        def get_indent(self, *args, **kwargs):
+            return 2
+
+    class _YAMLOpenAPIRenderer(BaseRenderer):
+        media_type = 'application/vnd.oai.openapi'
+        charset = None
+
+
+class OpenAPIRenderer(_JSONOpenAPIRenderer):
+    """Renders the schema as a JSON document with the ``application/openapi+json`` specific mime type."""
+    format = 'openapi'
+
+
+class SwaggerJSONRenderer(_JSONOpenAPIRenderer):
+    format = 'json'
+
+
+class SwaggerYAMLRenderer(_YAMLOpenAPIRenderer):
+    format = 'yaml'
 
     def render(self, data, media_type=None, renderer_context=None):
-        assert self.codec_class, "must override codec_class"
-        codec = self.codec_class(self.validators)
+        from .codecs import yaml_sane_dump
 
-        if not isinstance(data, Swagger):  # pragma: no cover
-            # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
-            # in that case, it's probably better to let the default ``JSONRenderer`` render it
-            # see https://github.com/axnsan12/drf-yasg/issues/58
-            return JSONRenderer().render(data, media_type, renderer_context)
-
-        return codec.encode(data)
-
-
-class OpenAPIRenderer(_SpecRenderer):
-    """Renders the schema as a JSON document with the ``application/openapi+json`` specific mime type."""
-    media_type = 'application/openapi+json'
-    format = 'openapi'
-    codec_class = OpenAPICodecJson
-
-
-class SwaggerJSONRenderer(_SpecRenderer):
-    """Renders the schema as a JSON document with the generic ``application/json`` mime type."""
-    media_type = 'application/json'
-    format = '.json'
-    codec_class = OpenAPICodecJson
-
-
-class SwaggerYAMLRenderer(_SpecRenderer):
-    """Renders the schema as a YAML document."""
-    media_type = 'application/yaml'
-    format = '.yaml'
-    codec_class = OpenAPICodecYaml
+        return yaml_sane_dump(data, True)
 
 
 class _UIRenderer(BaseRenderer):

@@ -2,6 +2,7 @@ import inspect
 import logging
 
 from rest_framework import serializers
+from rest_framework.fields import is_simple_callable
 
 from .. import openapi
 from ..utils import force_real_str, get_field_default, get_object_classes, is_list_view
@@ -37,8 +38,8 @@ def call_view_method(view, method_name, fallback_attr=None, default=None):
     """
     if hasattr(view, method_name):
         try:
-            view_method, is_callabale = is_callable_method(view, method_name)
-            if is_callabale:
+            view_method = getattr(view, method_name)
+            if is_simple_callable(view_method):
                 return view_method()
         except Exception:  # pragma: no cover
             logger.warning("view's %s raised exception during schema generation; use "
