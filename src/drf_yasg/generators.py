@@ -495,7 +495,7 @@ class OpenAPISchemaGenerator(object):
         parameters = []
         queryset = get_queryset_from_view(view_cls)
 
-        for variable in sorted(uritemplate.variables(path)):
+        for variable in uritemplate.variables(path):
             model, model_field = get_queryset_field(queryset, variable)
             attrs = get_basic_type_info(model_field) or {'type': openapi.TYPE_STRING}
             if getattr(view_cls, 'lookup_field', None) == variable and attrs['type'] == openapi.TYPE_STRING:
