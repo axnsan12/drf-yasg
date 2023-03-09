@@ -1,2 +1,2 @@
 # requirements for building and running tox
-tox>=3.3.0
+tox>=3.3.0,<4
