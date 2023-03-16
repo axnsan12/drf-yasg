@@ -8,7 +8,7 @@ router.register(r'', views.TodoViewSet)
 router.register(r'another', views.TodoAnotherViewSet)
 router.register(r'yetanother', views.TodoYetAnotherViewSet)
 router.register(r'tree', views.TodoTreeView)
-router.register(r'recursive', views.TodoRecursiveView)
+router.register(r'recursive', views.TodoRecursiveView, basename='todorecursivetree')
 router.register(r'harvest', views.HarvestViewSet)
 
 urlpatterns = router.urls
