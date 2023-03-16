@@ -51,7 +51,7 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
                     generator_class=None, authentication_classes=None, permission_classes=None):
     """Create a SchemaView class with default renderers and generators.
 
-    :param .Info info: information about the API; if omitted, defaults to :ref:`DEFAULT_INFO <default-swagger-settings>`
+    :param Info info: information about the API; if omitted, defaults to :ref:`DEFAULT_INFO <default-swagger-settings>`
     :param str url: same as :class:`.OpenAPISchemaGenerator`
     :param patterns: same as :class:`.OpenAPISchemaGenerator`
     :param urlconf: same as :class:`.OpenAPISchemaGenerator`

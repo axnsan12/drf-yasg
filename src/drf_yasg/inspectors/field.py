@@ -2,26 +2,25 @@ import datetime
 import inspect
 import logging
 import operator
-import typing
 import uuid
-import pkg_resources
-from packaging import version
 from collections import OrderedDict
 from decimal import Decimal
 from inspect import signature as inspect_signature
 
+import pkg_resources
+import typing
 from django.core import validators
 from django.db import models
+from packaging import version
 from rest_framework import serializers
 from rest_framework.settings import api_settings as rest_framework_settings
 
+from .base import call_view_method, FieldInspector, NotHandled, SerializerInspector
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
     decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
 )
-from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
-
 
 drf_version = pkg_resources.get_distribution("djangorestframework").version
 
@@ -394,7 +393,7 @@ model_field_to_basic_type = [
     (models.TimeField, (openapi.TYPE_STRING, None)),
     (models.UUIDField, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
     (models.CharField, (openapi.TYPE_STRING, None)),
-]    
+]
 
 ip_format = {'ipv4': openapi.FORMAT_IPV4, 'ipv6': openapi.FORMAT_IPV6}
 
@@ -852,4 +851,3 @@ else:
                 return ref
 
             return NotHandled
-

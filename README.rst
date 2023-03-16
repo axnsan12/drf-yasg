@@ -13,7 +13,7 @@ Compatible with
 
 - **Django Rest Framework**: 3.10, 3.11, 3.12, 3.13, 3.14
 - **Django**: 2.2, 3.0, 3.1, 3.2, 4.0, 4.1
-- **Python**: 3.6, 3.7, 3.8, 3.9, 3.10
+- **Python**: 3.6, 3.7, 3.8, 3.9, 3.10, 3.11
 
 Only the latest patch version of each ``major.minor`` series of Python, Django and Django REST Framework is supported.
 
@@ -362,7 +362,7 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
 drf-extra-fields
 =================
 
-Integration with `drf-extra-fields <https://github.com/Hipo/drf-extra-fields>`_ has a problem with Base64 fields. 
+Integration with `drf-extra-fields <https://github.com/Hipo/drf-extra-fields>`_ has a problem with Base64 fields.
 The drf-yasg will generate Base64 file or image fields as Readonly and not required. Here is a workaround code
 for display the Base64 fields correctly.
 
@@ -370,7 +370,7 @@ for display the Base64 fields correctly.
 
   class PDFBase64FileField(Base64FileField):
       ALLOWED_TYPES = ['pdf']
-  
+
       class Meta:
           swagger_schema_fields = {
               'type': 'string',
@@ -378,7 +378,7 @@ for display the Base64 fields correctly.
               'description': 'Content of the file base64 encoded',
               'read_only': False  # <-- FIX
           }
-  
+
       def get_file_extension(self, filename, decoded_file):
           try:
               PyPDF2.PdfFileReader(io.BytesIO(decoded_file))

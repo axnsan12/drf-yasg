@@ -41,7 +41,7 @@ VALIDATORS = {
 }
 
 
-class _OpenAPICodec(object):
+class _OpenAPICodec:
     media_type = None
 
     def __init__(self, validators):
