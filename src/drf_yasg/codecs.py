@@ -4,7 +4,7 @@ import logging
 from collections import OrderedDict
 
 from django.utils.encoding import force_bytes
-from ruamel import yaml
+import yaml
 
 from . import openapi
 from .errors import SwaggerValidationError
@@ -126,21 +126,16 @@ class OpenAPICodecJson(_OpenAPICodec):
 
 
 YAML_MAP_TAG = u'tag:yaml.org,2002:map'
+YamlDumper = getattr(yaml, 'CSafeDumper', yaml.SafeDumper)
+YamlLoader = getattr(yaml, 'CSafeLoader', yaml.SafeLoader)
 
 
-class SaneYamlDumper(yaml.SafeDumper):
+class SaneYamlDumper(YamlDumper):
     """YamlDumper class usable for dumping ``OrderedDict`` and list instances in a standard way."""
 
     def ignore_aliases(self, data):
         """Disable YAML references."""
         return True
-
-    def increase_indent(self, flow=False, indentless=False, **kwargs):
-        """https://stackoverflow.com/a/39681672
-
-        Indent list elements.
-        """
-        return super(SaneYamlDumper, self).increase_indent(flow=flow, indentless=False, **kwargs)
 
     def represent_odict(self, mapping, flow_style=None):  # pragma: no cover
         """https://gist.github.com/miracle2k/3184458
@@ -204,11 +199,12 @@ def yaml_sane_dump(data, binary):
         Dumper=SaneYamlDumper,
         default_flow_style=False,
         encoding='utf-8' if binary else None,
-        allow_unicode=binary
+        allow_unicode=binary,
+        sort_keys=False,
     )
 
 
-class SaneYamlLoader(yaml.SafeLoader):
+class SaneYamlLoader(YamlLoader):
     def construct_odict(self, node, deep=False):
         self.flatten_mapping(node)
         return OrderedDict(self.construct_pairs(node))
@@ -223,7 +219,7 @@ def yaml_sane_load(stream):
     :param stream: YAML stream (can be a string or a file-like object)
     :rtype: OrderedDict
     """
-    return yaml.load(stream, Loader=SaneYamlLoader)
+    return yaml.load(stream, Loader=YamlLoader)
 
 
 class OpenAPICodecYaml(_OpenAPICodec):
