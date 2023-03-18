@@ -10,6 +10,6 @@
   },
   "private": true,
   "devDependencies": {
-    "cspell": "^6.2.3"
+    "cspell": "^6.30.0"
   }
 }
