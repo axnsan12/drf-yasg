@@ -7,10 +7,10 @@ from collections import OrderedDict, defaultdict
 import uritemplate
 from django.urls import URLPattern, URLResolver
 from rest_framework import versioning
-from rest_framework.schemas import SchemaGenerator
+from rest_framework.schemas.openapi import SchemaGenerator
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
 from rest_framework.schemas.generators import endpoint_ordering, get_pk_name
-from rest_framework.schemas.utils import get_pk_description
+from rest_framework.schemas.utils import get_pk_description, is_list_view
 from rest_framework.settings import api_settings
 
 from . import openapi
@@ -23,6 +23,24 @@ from .utils import force_real_str, get_consumes, get_produces
 logger = logging.getLogger(__name__)
 
 PATH_PARAMETER_RE = re.compile(r'{(?P<parameter>\w+)}')
+
+
+def common_path(paths):
+    split_paths = [path.strip('/').split('/') for path in paths]
+    s1 = min(split_paths)
+    s2 = max(split_paths)
+    common = s1
+    for i, c in enumerate(s1):
+        if c != s2[i]:
+            common = s1[:i]
+            break
+    return '/' + '/'.join(common)
+
+
+def is_custom_action(action):
+    return action not in {
+        'retrieve', 'list', 'create', 'update', 'partial_update', 'destroy'
+    }
 
 
 class EndpointEnumerator(_EndpointEnumerator):
@@ -163,6 +181,15 @@ class OpenAPISchemaGenerator:
     endpoint_enumerator_class = EndpointEnumerator
     reference_resolver_class = ReferenceResolver
 
+    # Map HTTP methods onto actions.
+    default_mapping = {
+        'get': 'retrieve',
+        'post': 'create',
+        'put': 'update',
+        'patch': 'partial_update',
+        'delete': 'destroy',
+    }
+
     def __init__(self, info, version='', url=None, patterns=None, urlconf=None):
         """
 
@@ -185,6 +212,7 @@ class OpenAPISchemaGenerator:
         self.version = version
         self.consumes = []
         self.produces = []
+        self.coerce_method_names = api_settings.SCHEMA_COERCE_METHOD_NAMES
 
         if url is None and swagger_settings.DEFAULT_API_URL is not None:
             url = swagger_settings.DEFAULT_API_URL
@@ -337,7 +365,41 @@ class OpenAPISchemaGenerator:
         :param view: the view associated with the operation
         :rtype: list[str]
         """
-        return self._gen.get_keys(subpath, method, view)
+        if hasattr(view, 'action'):
+            # Viewsets have explicitly named actions.
+            action = view.action
+        else:
+            # Views have no associated action, so we determine one from the method.
+            if is_list_view(subpath, method, view):
+                action = 'list'
+            else:
+                action = self.default_mapping[method.lower()]
+
+        named_path_components = [
+            component for component
+            in subpath.strip('/').split('/')
+            if '{' not in component
+        ]
+
+        if is_custom_action(action):
+            # Custom action, eg "/users/{pk}/activate/", "/users/active/"
+            mapped_methods = {
+                # Don't count head mapping, e.g. not part of the schema
+                method for method in view.action_map if method != 'head'
+            }
+            if len(mapped_methods) > 1:
+                action = self.default_mapping[method.lower()]
+                if action in self.coerce_method_names:
+                    action = self.coerce_method_names[action]
+                return named_path_components + [action]
+            else:
+                return named_path_components[:-1] + [action]
+
+        if action in self.coerce_method_names:
+            action = self.coerce_method_names[action]
+
+        # Default action, eg "/users/", "/users/{pk}/"
+        return named_path_components + [action]
 
     def determine_path_prefix(self, paths):
         """
@@ -357,7 +419,21 @@ class OpenAPISchemaGenerator:
         :param list[str] paths: list of paths
         :rtype: str
         """
-        return self._gen.determine_path_prefix(paths)
+        prefixes = []
+        for path in paths:
+            components = path.strip('/').split('/')
+            initial_components = []
+            for component in components:
+                if '{' in component:
+                    break
+                initial_components.append(component)
+            prefix = '/'.join(initial_components[:-1])
+            if not prefix:
+                # We can just break early in the case that there's at least
+                # one URL that doesn't have a path prefix.
+                return '/'
+            prefixes.append('/' + prefix + '/')
+        return common_path(prefixes)
 
     def should_include_endpoint(self, path, method, view, public):
         """Check if a given endpoint should be included in the resulting schema.

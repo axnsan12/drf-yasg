@@ -1,6 +1,9 @@
 from collections import OrderedDict
 
-import coreschema
+try:
+    import coreschema
+except ImportError:
+    coreschema = None
 from rest_framework.pagination import CursorPagination, LimitOffsetPagination, PageNumberPagination
 
 from .. import openapi
