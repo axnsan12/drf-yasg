@@ -3,6 +3,17 @@ Changelog
 #########
 
 **********
+**1.21.6**
+**********
+
+*Release date: Jun 15, 2023*
+
+**IMPROVED:** Remove required coreapi dependency (:pr:`854`)
+**IMPROVED:** Feature: Migrate to PyYAML for yaml generator (:pr:`845`)
+**FIXED:** Keep path parameters in their given order (:pr:`841`)
+**FIXED:** Provide support for enums in codecs (:pr:`837`)
+
+**********
 **1.21.5**
 **********
 
