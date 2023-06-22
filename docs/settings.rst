@@ -114,6 +114,18 @@ Paginator inspectors given to :func:`@swagger_auto_schema <.swagger_auto_schema>
 :class:`'drf_yasg.inspectors.CoreAPICompatInspector' <.inspectors.CoreAPICompatInspector>`, |br| \
 ``]``
 
+DEFAULT_SPEC_RENDERERS
+----------------------
+
+List of spec renderers classes which used for plain schema rendering.
+
+**Default**: ``[``  |br| \
+:class:`'drf_yasg.renderers.SwaggerYAMLRenderer' <.renderers.SwaggerYAMLRenderer>`, |br| \
+:class:`'drf_yasg.renderers.SwaggerJSONRenderer' <.renderers.SwaggerJSONRenderer>`, |br| \
+:class:`'drf_yasg.renderers.OpenAPIRenderer' <.renderers.OpenAPIRenderer>`, |br| \
+``]``
+
+
 Swagger document attributes
 ===========================
 
