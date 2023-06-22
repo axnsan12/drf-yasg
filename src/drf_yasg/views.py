@@ -11,11 +11,13 @@ from rest_framework.views import APIView
 
 from .app_settings import swagger_settings
 from .renderers import (
-    OpenAPIRenderer, ReDocOldRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer,
-    _SpecRenderer
+    ReDocOldRenderer,
+    ReDocRenderer,
+    SwaggerUIRenderer,
+    _SpecRenderer,
 )
 
-SPEC_RENDERERS = (SwaggerYAMLRenderer, SwaggerJSONRenderer, OpenAPIRenderer)
+SPEC_RENDERERS = swagger_settings.DEFAULT_SPEC_RENDERERS
 UI_RENDERERS = {
     'swagger': (SwaggerUIRenderer, ReDocRenderer),
     'redoc': (ReDocRenderer, SwaggerUIRenderer),

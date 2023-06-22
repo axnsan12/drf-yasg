@@ -27,6 +27,12 @@ SWAGGER_DEFAULTS = {
         'drf_yasg.inspectors.CoreAPICompatInspector',
     ],
 
+    'DEFAULT_SPEC_RENDERERS': [
+        'drf_yasg.renderers.SwaggerYAMLRenderer',
+        'drf_yasg.renderers.SwaggerJSONRenderer',
+        'drf_yasg.renderers.OpenAPIRenderer',
+    ],
+
     'EXCLUDED_MEDIA_TYPES': ['html'],
 
     'DEFAULT_INFO': None,
@@ -88,6 +94,7 @@ IMPORT_STRINGS = [
     'DEFAULT_FIELD_INSPECTORS',
     'DEFAULT_FILTER_INSPECTORS',
     'DEFAULT_PAGINATOR_INSPECTORS',
+    'DEFAULT_SPEC_RENDERERS',
     'DEFAULT_INFO',
 ]
 
