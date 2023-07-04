@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from functools import wraps
 
 try:
     import coreschema
@@ -8,7 +9,39 @@ from rest_framework.pagination import CursorPagination, LimitOffsetPagination, P
 
 from .. import openapi
 from ..utils import force_real_str
-from .base import FilterInspector, PaginatorInspector
+from .base import FilterInspector, PaginatorInspector, NotHandled
+
+
+def ignore_assert_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except AssertionError:
+            return NotHandled
+
+    return wrapper
+
+
+class DrfAPICompatInspector(PaginatorInspector, FilterInspector):
+    def param_to_schema(self, param):
+        return openapi.Parameter(
+            name=param['name'],
+            in_=param['in'],
+            description=param.get('description'),
+            required=param.get('required', False),
+            **param['schema'],
+        )
+
+    def get_paginator_parameters(self, paginator):
+        if hasattr(paginator, 'get_schema_operation_parameters'):
+            return list(map(self.param_to_schema, paginator.get_schema_operation_parameters(self.view)))
+        return NotHandled
+
+    def get_filter_parameters(self, filter_backend):
+        if hasattr(filter_backend, 'get_schema_operation_parameters'):
+            return list(map(self.param_to_schema, filter_backend.get_schema_operation_parameters(self.view)))
+        return NotHandled
 
 
 class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
@@ -16,6 +49,7 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
     ``get_schema_fields`` method.
     """
 
+    @ignore_assert_decorator
     def get_paginator_parameters(self, paginator):
         fields = []
         if hasattr(paginator, 'get_schema_fields'):
@@ -23,6 +57,7 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
 
         return [self.coreapi_field_to_parameter(field) for field in fields]
 
+    @ignore_assert_decorator
     def get_filter_parameters(self, filter_backend):
         fields = []
         if hasattr(filter_backend, 'get_schema_fields'):
