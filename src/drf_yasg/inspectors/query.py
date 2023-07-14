@@ -5,7 +5,6 @@ try:
     import coreschema
 except ImportError:
     coreschema = None
-from rest_framework.pagination import CursorPagination, LimitOffsetPagination, PageNumberPagination
 
 from .. import openapi
 from ..utils import force_real_str
@@ -100,23 +99,33 @@ class DjangoRestResponsePagination(PaginatorInspector):
     PageNumberPagination and CursorPagination
     """
 
+    def fix_paginated_property(self, key: str, value: dict):
+        # Need to remove useless params from schema
+        value.pop('example', None)
+        if 'nullable' in value:
+            value['x-nullable'] = value.pop('nullable')
+        if key in {'next', 'previous'} and 'format' not in value:
+            value['format'] = 'uri'
+        return openapi.Schema(**value)
+
     def get_paginated_response(self, paginator, response_schema):
-        assert response_schema.type == openapi.TYPE_ARRAY, "array return expected for paged response"
-        paged_schema = None
-        if isinstance(paginator, (LimitOffsetPagination, PageNumberPagination, CursorPagination)):
-            has_count = not isinstance(paginator, CursorPagination)
-            paged_schema = openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties=OrderedDict((
-                    ('count', openapi.Schema(type=openapi.TYPE_INTEGER) if has_count else None),
-                    ('next', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI, x_nullable=True)),
-                    ('previous', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI, x_nullable=True)),
-                    ('results', response_schema),
-                )),
-                required=['results']
-            )
+        if hasattr(paginator, 'get_paginated_response_schema'):
+            paginator_schema = paginator.get_paginated_response_schema(response_schema)
+            if paginator_schema['type'] == openapi.TYPE_OBJECT:
+                properties = {
+                    k: self.fix_paginated_property(k, v)
+                    for k, v in paginator_schema.pop('properties').items()
+                }
+                if 'required' not in paginator_schema:
+                    paginator_schema.setdefault('required', [])
+                    for prop in ('count', 'results'):
+                        if prop in properties:
+                            paginator_schema['required'].append(prop)
+                return openapi.Schema(
+                    **paginator_schema,
+                    properties=properties
+                )
+            else:
+                return openapi.Schema(**paginator_schema)
 
-            if has_count:
-                paged_schema.required.insert(0, 'count')
-
-        return paged_schema
+        return response_schema

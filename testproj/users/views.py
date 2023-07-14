@@ -60,3 +60,18 @@ def user_detail(request, pk):
     user = get_object_or_404(User.objects, pk=pk)
     serializer = UserSerializer(user)
     return Response(serializer.data)
+
+
+class DummyAutoSchema:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def get_operation(self, keys):
+        pass
+
+
+@swagger_auto_schema(methods=['get'], auto_schema=DummyAutoSchema)
+@swagger_auto_schema(methods=['PUT'], auto_schema=None)
+@api_view(['GET', 'PUT'])
+def test_view_with_dummy_schema(request, pk):
+    return Response({})

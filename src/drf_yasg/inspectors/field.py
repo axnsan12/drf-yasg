@@ -3,6 +3,7 @@ import inspect
 import logging
 import operator
 import uuid
+from contextlib import suppress
 from collections import OrderedDict
 from decimal import Decimal
 from inspect import signature as inspect_signature
@@ -130,7 +131,7 @@ class InlineSerializerInspector(SerializerInspector):
 
             actual_serializer = getattr(actual_schema, '_NP_serializer', None)
             this_serializer = get_serializer_class(field)
-            if actual_serializer and actual_serializer != this_serializer:  # pragma: no cover
+            if actual_serializer and actual_serializer != this_serializer:
                 explicit_refs = self._has_ref_name(actual_serializer) and self._has_ref_name(this_serializer)
                 if not explicit_refs:
                     raise SwaggerGenerationError(
@@ -209,6 +210,14 @@ def get_parent_serializer(field):
     return None  # pragma: no cover
 
 
+def get_model_from_descriptor(descriptor):
+    with suppress(Exception):
+        try:
+            return descriptor.rel.related_model
+        except Exception:
+            return descriptor.field.remote_field.model
+
+
 def get_related_model(model, source):
     """Try to find the other side of a model relationship given the name of a related field.
 
@@ -216,14 +225,12 @@ def get_related_model(model, source):
     :param str source: related field name
     :return: related model or ``None``
     """
-    try:
-        descriptor = getattr(model, source)
-        try:
-            return descriptor.rel.related_model
-        except Exception:
-            return descriptor.field.remote_field.model
-    except Exception:  # pragma: no cover
-        return None
+
+    with suppress(Exception):
+        if '.' in source and source.index('.'):
+            attr, source = source.split('.', maxsplit=1)
+            return get_related_model(get_model_from_descriptor(getattr(model, attr)), source)
+        return get_model_from_descriptor(getattr(model, source))
 
 
 class RelatedFieldInspector(FieldInspector):
@@ -281,7 +288,7 @@ class RelatedFieldInspector(FieldInspector):
         elif isinstance(field, serializers.HyperlinkedRelatedField):
             return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)
 
-        return SwaggerType(type=openapi.TYPE_STRING)
+        return NotHandled  # pragma: no cover
 
 
 def find_regex(regex_field):

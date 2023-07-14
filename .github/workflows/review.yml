@@ -29,6 +29,12 @@ jobs:
           PYTHON_VERSION: ${{ matrix.python }}
         run: tox -e $(tox -l | grep py${PYTHON_VERSION//.} | paste -sd "," -)
 
+      - name: Report coverage
+        if: ${{ matrix.python == 3.9 }}
+        run: |
+          pip install coverage
+          coverage report
+
       - name: Check for incompatibilities with publishing to PyPi
         if: ${{ matrix.python == 3.8 }}
         run: |

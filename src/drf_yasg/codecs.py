@@ -6,6 +6,18 @@ from collections import OrderedDict
 from django.utils.encoding import force_bytes
 import yaml
 
+try:
+    from swagger_spec_validator.common import SwaggerValidationError as SSVErr
+    from swagger_spec_validator.validator20 import validate_spec as validate_ssv
+except ImportError:  # pragma: no cover
+    validate_ssv = None
+
+try:
+    from flex.core import parse as validate_flex
+    from flex.exceptions import ValidationError
+except ImportError:  # pragma: no cover
+    validate_flex = None
+
 from . import openapi
 from .errors import SwaggerValidationError
 
@@ -13,11 +25,6 @@ logger = logging.getLogger(__name__)
 
 
 def _validate_flex(spec):
-    try:
-        from flex.core import parse as validate_flex
-        from flex.exceptions import ValidationError
-    except ImportError:
-        return
 
     try:
         validate_flex(spec)
@@ -26,8 +33,6 @@ def _validate_flex(spec):
 
 
 def _validate_swagger_spec_validator(spec):
-    from swagger_spec_validator.common import SwaggerValidationError as SSVErr
-    from swagger_spec_validator.validator20 import validate_spec as validate_ssv
     try:
         validate_ssv(spec)
     except SSVErr as ex:
@@ -36,8 +41,8 @@ def _validate_swagger_spec_validator(spec):
 
 #:
 VALIDATORS = {
-    'flex': _validate_flex,
-    'ssv': _validate_swagger_spec_validator,
+    "flex": _validate_flex if validate_flex else lambda s: None,
+    "ssv": _validate_swagger_spec_validator if validate_ssv else lambda s: None,
 }
 
 
@@ -117,10 +122,7 @@ class OpenAPICodecJson(_OpenAPICodec):
 
         :rtype: str"""
         if self.pretty:
-            out = json.dumps(spec, indent=4, separators=(',', ': '), ensure_ascii=False)
-            if out[-1] != '\n':
-                out += '\n'
-            return out
+            return f"{json.dumps(spec, indent=4, separators=(',', ': '), ensure_ascii=False)}\n"
         else:
             return json.dumps(spec, ensure_ascii=False)
 
@@ -219,7 +221,7 @@ def yaml_sane_load(stream):
     :param stream: YAML stream (can be a string or a file-like object)
     :rtype: OrderedDict
     """
-    return yaml.load(stream, Loader=YamlLoader)
+    return yaml.load(stream, Loader=SaneYamlLoader)
 
 
 class OpenAPICodecYaml(_OpenAPICodec):
