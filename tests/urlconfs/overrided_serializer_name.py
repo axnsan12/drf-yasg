@@ -6,26 +6,23 @@ from snippets.serializers import SnippetSerializer
 from testproj.urls import SchemaView, required_urlpatterns
 
 
-class SnippetSerializerV2(SnippetSerializer):
+class SnippetV1Serializer(SnippetSerializer):
+    v1field = fields.IntegerField(help_text="version 1.0 field")
+
+
+class SnippetSerializerV2(SnippetV1Serializer):
     v2field = fields.IntegerField(help_text="version 2.0 field")
 
     class Meta:
-        ref_name = 'SnippetV2'
+        # Same name for check failing
+        ref_name = 'SnippetV1'
 
 
 class SnippetList(generics.ListCreateAPIView):
     """SnippetList classdoc"""
     queryset = Snippet.objects.all()
-    serializer_class = SnippetSerializer
+    serializer_class = SnippetV1Serializer
     versioning_class = versioning.URLPathVersioning
-
-    def get_serializer_class(self):
-        context = self.get_serializer_context()
-        request = context['request']
-        if int(float(request.version)) >= 2:
-            return SnippetSerializerV2
-        else:
-            return SnippetSerializer
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -35,8 +32,8 @@ class SnippetList(generics.ListCreateAPIView):
         return super(SnippetList, self).post(request, *args, **kwargs)
 
 
-class ExcludedSnippets(SnippetList):
-    swagger_schema = None
+class SnippetsV2(SnippetList):
+    serializer_class = SnippetSerializerV2
 
 
 VERSION_PREFIX_URL = r"^versioned/url/v(?P<version>1.0|2.0)/"
@@ -48,7 +45,7 @@ class VersionedSchemaView(SchemaView):
 
 urlpatterns = required_urlpatterns + [
     re_path(VERSION_PREFIX_URL + r"snippets/$", SnippetList.as_view()),
-    re_path(VERSION_PREFIX_URL + r"snippets_excluded/$", ExcludedSnippets.as_view()),
+    re_path(VERSION_PREFIX_URL + r"other_snippets/$", SnippetsV2.as_view()),
     re_path(VERSION_PREFIX_URL + r'swagger(?P<format>.json|.yaml)$', VersionedSchemaView.without_ui(),
             name='vschema-json'),
 ]
