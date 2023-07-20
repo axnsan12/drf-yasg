@@ -62,7 +62,7 @@ version = '.'.join(release.split('.')[:3])
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -185,7 +185,7 @@ nitpick_ignore = [
     ('py:class', 'Exception'),
     ('py:class', 'collections.OrderedDict'),
 
-    ('py:class', 'ruamel.yaml.dumper.SafeDumper'),
+    ('py:class', 'yaml.CSafeDumper'),
     ('py:class', 'rest_framework.serializers.Serializer'),
     ('py:class', 'rest_framework.renderers.BaseRenderer'),
     ('py:class', 'rest_framework.parsers.BaseParser'),
@@ -213,7 +213,7 @@ nitpick_ignore = [
 # for some reason needs the sources dir to be in the path in order for viewcode to work
 sys.path.insert(0, os.path.abspath('../src'))
 
-# activate the Django testproj to be able to succesfully import drf_yasg
+# activate the Django testproj to be able to successfully import drf_yasg
 sys.path.insert(0, os.path.abspath('../testproj'))
 os.putenv('DJANGO_SETTINGS_MODULE', 'testproj.settings.local')
 

@@ -1,19 +1,14 @@
-import collections
+import enum
 import logging
 import re
 import urllib.parse as urlparse
-from collections import OrderedDict
+from collections import OrderedDict, abc as collections_abc
 
 from django.urls import get_script_prefix
 from django.utils.functional import Promise
 from inflection import camelize
 
-from .utils import dict_has_ordered_keys, filter_none, force_real_str
-
-try:
-    from collections import abc as collections_abc
-except ImportError:
-    collections_abc = collections
+from .utils import filter_none, force_real_str
 
 logger = logging.getLogger(__name__)
 
@@ -121,7 +116,7 @@ class SwaggerDict(OrderedDict):
     def _insert_extras__(self):
         """
         From an ordering perspective, it is desired that extra attributes such as vendor extensions stay at the
-        bottom of the object. However, python2.7's OrderdDict craps out if you try to insert into it before calling
+        bottom of the object. However, python2.7's OrderedDict craps out if you try to insert into it before calling
         init. This means that subclasses must call super().__init__ as the first statement of their own __init__,
         which would result in the extra attributes being added first. For this reason, we defer the insertion of the
         attributes and require that subclasses call ._insert_extras__ at the end of their __init__ method.
@@ -143,15 +138,17 @@ class SwaggerDict(OrderedDict):
             result = OrderedDict()
             memo[id(obj)] = result
             items = obj.items()
-            if not dict_has_ordered_keys(obj):
+            if not isinstance(obj, dict):
                 items = sorted(items)
             for attr, val in items:
-                result[attr] = SwaggerDict._as_odict(val, memo)
+                result[SwaggerDict._as_odict(attr, memo)] = SwaggerDict._as_odict(val, memo)
             return result
         elif isinstance(obj, str):
             return force_real_str(obj)
         elif isinstance(obj, collections_abc.Iterable) and not isinstance(obj, collections_abc.Iterator):
             return type(obj)(SwaggerDict._as_odict(elem, memo) for elem in obj)
+        elif isinstance(obj, enum.Enum):
+            return obj.value
 
         return obj
 
@@ -163,7 +160,7 @@ class SwaggerDict(OrderedDict):
         return SwaggerDict._as_odict(self, {})
 
     def __reduce__(self):
-        # for pickle supprt; this skips calls to all SwaggerDict __init__ methods and relies
+        # for pickle support; this skips calls to all SwaggerDict __init__ methods and relies
         # on the already set attributes instead
         attrs = {k: v for k, v in vars(self).items() if not k.startswith('_NP_')}
         return _bare_SwaggerDict, (type(self),), attrs, None, iter(self.items())
@@ -236,15 +233,15 @@ class Swagger(SwaggerDict):
                  security_definitions=None, security=None, paths=None, definitions=None, **extra):
         """Root Swagger object.
 
-        :param .Info info: info object
+        :param Info info: info object
         :param str _url: URL used for setting the API host and scheme
         :param str _prefix: api path prefix to use in setting basePath; this will be appended to the wsgi
             SCRIPT_NAME prefix or Django's FORCE_SCRIPT_NAME if applicable
         :param str _version: version string to override Info
         :param dict[str,dict] security_definitions: list of supported authentication mechanisms
         :param list[dict[str,list[str]]] security: authentication mechanisms accepted globally
-        :param list[str] consumes: consumed MIME types; can be overriden in Operation
-        :param list[str] produces: produced MIME types; can be overriden in Operation
+        :param list[str] consumes: consumed MIME types; can be overridden in Operation
+        :param list[str] produces: produced MIME types; can be overridden in Operation
         :param Paths paths: paths object
         :param dict[str,Schema] definitions: named models
         """
@@ -391,7 +388,7 @@ class Items(SwaggerDict):
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
-        :param .Items items: only valid if `type` is ``array``
+        :param Items items: only valid if `type` is ``array``
         """
         super(Items, self).__init__(**extra)
         assert type is not None, "type is required!"
@@ -420,7 +417,7 @@ class Parameter(SwaggerDict):
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
-        :param .Items items: only valid if `type` is ``array``
+        :param Items items: only valid if `type` is ``array``
         :param default: default value if the parameter is not provided; must conform to parameter type
         """
         super(Parameter, self).__init__(**extra)
@@ -512,10 +509,10 @@ class _Ref(SwaggerDict):
         """Base class for all reference types. A reference object has only one property, ``$ref``, which must be a JSON
         reference to a valid object in the specification, e.g. ``#/definitions/Article`` to refer to an article model.
 
-        :param .ReferenceResolver resolver: component resolver which must contain the referneced object
+        :param ReferenceResolver resolver: component resolver which must contain the referenced object
         :param str name: referenced object name, e.g. "Article"
         :param str scope: reference scope, e.g. "definitions"
-        :param type[.SwaggerDict] expected_type: the expected type that will be asserted on the object found in resolver
+        :param type[SwaggerDict] expected_type: the expected type that will be asserted on the object found in resolver
         :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
         super(_Ref, self).__init__()
@@ -530,11 +527,11 @@ class _Ref(SwaggerDict):
     def resolve(self, resolver):
         """Get the object targeted by this reference from the given component resolver.
 
-        :param .ReferenceResolver resolver: component resolver which must contain the referneced object
+        :param ReferenceResolver resolver: component resolver which must contain the referenced object
         :returns: the target object
         """
         ref_match = self.ref_name_re.match(self.ref)
-        return resolver.get(ref_match.group('name'), scope=ref_match.group('scope'))
+        return resolver.getdefault(ref_match.group('name'), scope=ref_match.group('scope'))
 
     def __setitem__(self, key, value):
         if key == "$ref":
@@ -549,7 +546,7 @@ class SchemaRef(_Ref):
     def __init__(self, resolver, schema_name, ignore_unresolved=False):
         """Adds a reference to a named Schema defined in the ``#/definitions/`` object.
 
-        :param .ReferenceResolver resolver: component resolver which must contain the definition
+        :param ReferenceResolver resolver: component resolver which must contain the definition
         :param str schema_name: schema name
         :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
@@ -561,9 +558,9 @@ Schema.OR_REF = (Schema, SchemaRef)
 
 
 def resolve_ref(ref_or_obj, resolver):
-    """Resolve `ref_or_obj` if it is a reference type. Return it unchaged if not.
+    """Resolve `ref_or_obj` if it is a reference type. Return it unchanged if not.
 
-    :param ref_or_obj: object to derefernece
+    :param ref_or_obj: object to dereference
     :type ref_or_obj: SwaggerDict or _Ref
     :param resolver: component resolver which must contain the referenced object
     """
@@ -609,7 +606,7 @@ class Response(SwaggerDict):
 
 class ReferenceResolver(object):
     """A mapping type intended for storing objects pointed at by Swagger Refs.
-    Provides support and checks for different refernce scopes, e.g. 'definitions'.
+    Provides support and checks for different reference scopes, e.g. 'definitions'.
 
     For example:
 
@@ -647,7 +644,7 @@ class ReferenceResolver(object):
 
         :param str scope: target scope, must be in this resolver's `scopes`
         :return: the bound resolver
-        :rtype: .ReferenceResolver
+        :rtype: ReferenceResolver
         """
         assert scope in self.scopes, "unknown scope %s" % scope
         ret = ReferenceResolver(force_init=True)
@@ -658,7 +655,7 @@ class ReferenceResolver(object):
     def _check_scope(self, scope):
         real_scope = self._force_scope or scope
         if scope is not None:
-            assert not self._force_scope or scope == self._force_scope, "cannot overrride forced scope"
+            assert not self._force_scope or scope == self._force_scope, "cannot override forced scope"
         assert real_scope and real_scope in self._objects, "invalid scope %s" % scope
         return real_scope
 

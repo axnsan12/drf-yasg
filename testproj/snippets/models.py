@@ -17,6 +17,10 @@ class Snippet(models.Model):
         ordering = ('created',)
 
     @property
+    def owner_snippets(self):
+        return Snippet._default_manager.filter(owner=self.owner)
+
+    @property
     def nullable_secondary_language(self):
         return None
 

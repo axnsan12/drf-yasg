@@ -2,6 +2,95 @@
 Changelog
 #########
 
+**********
+**1.21.7**
+**********
+
+*Release date: Jul 20, 2023*
+
+**ADDED:** Added ``drf_yasg.inspectors.query.DrfAPICompatInspector`` (:pr:`857`)
+**ADDED:** Added ``DrfAPICompatInspector`` to serve as a replacement ``CoreAPICompatInspector`` (:pr:`857`)
+**ADDED:** Allow ``DEFAULT_SPEC_RENDERERS`` default renderers to be overriden in the settings (:pr:`857`)
+**FIXED:** Fixed redoc source mapping (:pr:`859`)
+
+**********
+**1.21.6**
+**********
+
+*Release date: Jun 15, 2023*
+
+**IMPROVED:** Remove required coreapi dependency (:pr:`854`)
+**IMPROVED:** Feature: Migrate to PyYAML for yaml generator (:pr:`845`)
+**FIXED:** Keep path parameters in their given order (:pr:`841`)
+**FIXED:** Provide support for enums in codecs (:pr:`837`)
+
+**********
+**1.21.5**
+**********
+
+*Release date: Feb 09, 2023*
+
+**ADDED:** Python 3.10 support  (:pr:`818`)
+**DEPRECATED:** Python 3.6 support as it's been deprecated by swagger-spec-validator
+**FIXED:** RecursiveField resolver (:pr:`822`)
+
+**********
+**1.21.4**
+**********
+
+*Release date: Sep 26, 2022*
+
+**FIXED:** Remove NullBooleanFields if the django-rest-framework version >= 3.14.0 (:pr:`814`)
+
+**********
+**1.21.3**
+**********
+
+*Release date: Jul 18, 2022*
+
+**FIXED:** Set generator url for swagger_settings.DEFAULT_API_URL (:pr:`682`)
+**FIXED:** Check fields for allow_null attribute (:pr:`688`)
+**FIXED:** Encode pytz object field as a string by default (:pr:`717`)
+**FIXED:** Handle errors rendering with TemplateHTMLRenderer (:pr:`742`)
+
+**********
+**1.21.2**
+**********
+
+*Release date: Jul 18, 2022*
+
+**FIXED:** Fixed code block rst syntax in ``README.rst``
+
+**********
+**1.21.1**
+**********
+
+*Release date: Jul 17, 2022*
+
+**FIXED:** Refer to permission_classes as a tuple (:pr:`678`)
+**IMPROVED:** Document drf-extra-fields base64 integration (:pr:`445`)
+**ADDED:** Added many support to example code (:pr:`695`)
+**ADDED:** Allow specifying response as a reference (:pr:`757`)
+**FIXED:** Fix old spelling errors and add a cspell configuration (:pr:`796`)
+**FIXED:** Remove universal wheel, python 2 is unsupported (:pr:`782`)
+**FIXED:** Fix duration field inspector (:pr:`549`)
+
+**********
+**1.21.0**
+**********
+
+*Release date: Jul 14, 2022*
+
+- **IMPROVED:** Add utf-8 support to yaml loaders (:pr:`692`)
+
+**********
+**1.20.3**
+**********
+
+*Release date: Jul 14, 2022*
+
+- **FIXED:** Source mapping in ``redoc.min.js`` (:pr:`778`)
+- **FIXED:** Publish action tag pattern in ``publish.yml`` (:pr:`794`)
 
 **********
 **1.20.0**
@@ -87,7 +176,7 @@ and the problems it has caused.
 - **IMPROVED:** updated ``swagger-ui`` to version 3.22.0
 - **IMPROVED:** updated ``ReDoc`` to version 2.0.0-rc.4
 - **FIXED:** ``ListModelMixin`` will now always be treated as a list view (:issue:`306`)
-- **FIXED:** non-primtive values in field ``choices`` will now be handled properly (:issue:`340`)
+- **FIXED:** non-primitive values in field ``choices`` will now be handled properly (:issue:`340`)
 
 **********
 **1.14.0**
@@ -133,7 +222,7 @@ and the problems it has caused.
 
 - **ADDED:** ``get_security_definitions`` and ``get_security_requirements`` hooks to ``OpenAPISchemaGenerator``
 - **ADDED:** added ``get_summary_and_description`` and ``split_summary_from_description`` extension points to
-  ``SwaggerAutoSchema`` to allow for better customisation
+  ``SwaggerAutoSchema`` to allow for better customization
 - **IMPROVED:** updated ``swagger-ui`` to version 3.20.4
 - **IMPROVED:** paginator ``next`` and ``previous`` fields are now marked as ``x-nullable`` (:issue:`263`)
 - **IMPROVED:** added the ``tags`` argument to ``swagger_auto_schema`` (:pr:`259`)
@@ -144,7 +233,7 @@ and the problems it has caused.
 - **FIXED:** fixed handling of lazy objects in user-supplied values
 - **FIXED:** ``read_only`` serializer fields will be correctly ignored when generating form parameters (:issue:`261`)
 - **FIXED:** fixed incorrect return type from ``UIRenderer`` (:pr:`268`)
-- **FIXED:** fixed incosistent ordering of global ``securityDefinitions`` and ``security`` objects
+- **FIXED:** fixed inconsistent ordering of global ``securityDefinitions`` and ``security`` objects
 - **DEPRECATED:** the ``get_summary`` and ``get_description`` extension points have been deprecated in favor of the
   new ``get_summary_and_description``, and will be removed in a future release
 
@@ -170,7 +259,7 @@ case). Building without ``.git`` or without ``setuptools-scm`` will result in a 
 - **FIXED:** ``minLength`` and ``maxLength`` will now also work for ``ListSerializer`` in addition to ``ListField``
 - **FIXED:** ``MultipleChoiceField`` will now use the ``multi`` ``collectionFormat`` where appropriate (:issue:`257`)
 - **FIXED:** the ``format``, ``pattern``, ``enum``, ``min_length`` and ``max_length`` attributes of
-  ``coreschema.Schema`` will now be persited into the converted ``openapi.Parameter`` (:issue:`212`, :pr:`233`)
+  ``coreschema.Schema`` will now be persisted into the converted ``openapi.Parameter`` (:issue:`212`, :pr:`233`)
 
 **********
 **1.11.0**
@@ -281,7 +370,7 @@ case). Building without ``.git`` or without ``setuptools-scm`` will result in a 
 - **ADDED:** added ``DEFAULT_GENERATOR_CLASS`` setting and ``--generator-class`` argument to the ``generate_swagger``
   management command (:issue:`140`)
 - **FIXED:** fixed wrongly required ``'count'`` response field on ``CursorPagination`` (:issue:`141`)
-- **FIXED:** fixed some cases where ``swagger_schema_fields`` would not be handlded (:pr:`142`)
+- **FIXED:** fixed some cases where ``swagger_schema_fields`` would not be handled (:pr:`142`)
 - **FIXED:** fixed crash when encountering ``coreapi.Fields``\ s without a ``schema`` (:issue:`143`)
 
 *********
@@ -321,7 +410,7 @@ case). Building without ``.git`` or without ``setuptools-scm`` will result in a 
 
 *Release date: May 12, 2018*
 
-- **FIXED:** fixed generation of default ``SECURITY_REQUIREMENTS`` to match documented behaviour
+- **FIXED:** fixed generation of default ``SECURITY_REQUIREMENTS`` to match documented behavior
 - **FIXED:** ordering of ``SECURITY_REQUIREMENTS`` and ``SECURITY_DEFINITIONS`` is now stable
 
 *********
@@ -531,7 +620,7 @@ case). Building without ``.git`` or without ``setuptools-scm`` will result in a 
 - **IMPROVED:** removed inline scripts and styles from bundled HTML templates to increase CSP compatibility
 - **IMPROVED:** improved validation errors and added more assertion sanity checks (:issue:`37`, :issue:`40`)
 - **IMPROVED:** improved handling of NamespaceVersioning by excluding endpoints of differing versions
-  (i.e. when accesing the schema view for v1, v2 endpoints will not be included in swagger)
+  (i.e. when accessing the schema view for v1, v2 endpoints will not be included in swagger)
 
 *********
 **1.1.3**
@@ -560,7 +649,7 @@ case). Building without ``.git`` or without ``setuptools-scm`` will result in a 
 
 - **ADDED:** :ref:`generate_swagger management command <management-command>`
   (:issue:`29`, :pr:`31`, thanks to :ghuser:`beaugunderson`)
-- **FIXED:** fixed improper generation of ``\Z`` regex tokens - will now be repalced by ``$``
+- **FIXED:** fixed improper generation of ``\Z`` regex tokens - will now be replaced by ``$``
 
 *********
 **1.1.0**
@@ -570,7 +659,7 @@ case). Building without ``.git`` or without ``setuptools-scm`` will result in a 
 
 - **ADDED:** added support for APIs versioned with ``URLPathVersioning`` or ``NamespaceVersioning``
 - **ADDED:** added ability to recursively customize schema generation
-  :ref:`using pluggable inspector classes <custom-spec-inspectors>`
+  :ref:`using plugable inspector classes <custom-spec-inspectors>`
 - **ADDED:** added ``operation_id`` parameter to :func:`@swagger_auto_schema <.swagger_auto_schema>`
 - **ADDED:** integration with `djangorestframework-camel-case
   <https://github.com/vbabiy/djangorestframework-camel-case>`_ (:issue:`28`)

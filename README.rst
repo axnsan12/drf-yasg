@@ -11,9 +11,9 @@ Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framewor
 
 Compatible with
 
-- **Django Rest Framework**: 3.10, 3.11, 3.12
-- **Django**: 2.2, 3.0, 3.1
-- **Python**: 3.6, 3.7, 3.8, 3.9
+- **Django Rest Framework**: 3.10, 3.11, 3.12, 3.13, 3.14
+- **Django**: 2.2, 3.0, 3.1, 3.2, 4.0, 4.1
+- **Python**: 3.6, 3.7, 3.8, 3.9, 3.10, 3.11
 
 Only the latest patch version of each ``major.minor`` series of Python, Django and Django REST Framework is supported.
 
@@ -132,6 +132,7 @@ In ``urls.py``:
 .. code:: python
 
    ...
+   from django.urls import re_path
    from rest_framework import permissions
    from drf_yasg.views import get_schema_view
    from drf_yasg import openapi
@@ -148,13 +149,13 @@ In ``urls.py``:
          license=openapi.License(name="BSD License"),
       ),
       public=True,
-      permission_classes=[permissions.AllowAny],
+      permission_classes=(permissions.AllowAny,),
    )
 
    urlpatterns = [
-      re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-      re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-      re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+      path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+      path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+      path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
       ...
    ]
 
@@ -357,3 +358,31 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
 
 .. |nbsp| unicode:: 0xA0
    :trim:
+
+drf-extra-fields
+=================
+
+Integration with `drf-extra-fields <https://github.com/Hipo/drf-extra-fields>`_ has a problem with Base64 fields.
+The drf-yasg will generate Base64 file or image fields as Readonly and not required. Here is a workaround code
+for display the Base64 fields correctly.
+
+.. code:: python
+
+  class PDFBase64FileField(Base64FileField):
+      ALLOWED_TYPES = ['pdf']
+
+      class Meta:
+          swagger_schema_fields = {
+              'type': 'string',
+              'title': 'File Content',
+              'description': 'Content of the file base64 encoded',
+              'read_only': False  # <-- FIX
+          }
+
+      def get_file_extension(self, filename, decoded_file):
+          try:
+              PyPDF2.PdfFileReader(io.BytesIO(decoded_file))
+          except PyPDF2.utils.PdfReadError as e:
+              logger.warning(e)
+          else:
+              return 'pdf'

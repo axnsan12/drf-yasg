@@ -8,5 +8,8 @@
     "type": "git",
     "url": "https://github.com/axnsan12/drf-yasg.git"
   },
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "cspell": "^6.30.0"
+  }
 }

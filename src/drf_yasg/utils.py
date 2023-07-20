@@ -1,10 +1,10 @@
 import inspect
 import logging
-import sys
 import textwrap
 from collections import OrderedDict
 from decimal import Decimal
 
+import pytz
 from django.db import models
 from django.utils.encoding import force_str
 from rest_framework import serializers, status
@@ -321,8 +321,8 @@ def force_serializer_instance(serializer):
 
 
 def get_serializer_class(serializer):
-    """Given a ``Serializer`` class or intance, return the ``Serializer`` class. If `serializer` is not a ``Serializer``
-    class or instance, raises an assertion error.
+    """Given a ``Serializer`` class or instance, return the ``Serializer`` class.
+    If `serializer` is not a ``Serializer`` class or instance, raises an assertion error.
 
     :param serializer: serializer class or instance, or ``None``
     :return: serializer class
@@ -465,6 +465,9 @@ def field_value_to_representation(field, value):
         else:
             value = str(value)
 
+    if isinstance(value, pytz.BaseTzInfo):
+        value = str(value)
+
     # JSON roundtrip ensures that the value is valid JSON;
     # for example, sets and tuples get transformed into lists
     return json.loads(json.dumps(value, cls=encoders.JSONEncoder))
@@ -501,16 +504,3 @@ def get_field_default(field):
                 default = serializers.empty
 
     return default
-
-
-def dict_has_ordered_keys(obj):
-    """Check if a given object is a dict that maintains insertion order.
-
-    :param obj: the dict object to check
-    :rtype: bool
-    """
-    if sys.version_info >= (3, 7):
-        # the Python 3.7 language spec says that dict must maintain insertion order.
-        return isinstance(obj, dict)
-
-    return isinstance(obj, OrderedDict)

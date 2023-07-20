@@ -4,7 +4,19 @@ import logging
 from collections import OrderedDict
 
 from django.utils.encoding import force_bytes
-from ruamel import yaml
+import yaml
+
+try:
+    from swagger_spec_validator.common import SwaggerValidationError as SSVErr
+    from swagger_spec_validator.validator20 import validate_spec as validate_ssv
+except ImportError:  # pragma: no cover
+    validate_ssv = None
+
+try:
+    from flex.core import parse as validate_flex
+    from flex.exceptions import ValidationError
+except ImportError:  # pragma: no cover
+    validate_flex = None
 
 from . import openapi
 from .errors import SwaggerValidationError
@@ -13,11 +25,6 @@ logger = logging.getLogger(__name__)
 
 
 def _validate_flex(spec):
-    try:
-        from flex.core import parse as validate_flex
-        from flex.exceptions import ValidationError
-    except ImportError:
-        return
 
     try:
         validate_flex(spec)
@@ -26,8 +33,6 @@ def _validate_flex(spec):
 
 
 def _validate_swagger_spec_validator(spec):
-    from swagger_spec_validator.common import SwaggerValidationError as SSVErr
-    from swagger_spec_validator.validator20 import validate_spec as validate_ssv
     try:
         validate_ssv(spec)
     except SSVErr as ex:
@@ -36,12 +41,12 @@ def _validate_swagger_spec_validator(spec):
 
 #:
 VALIDATORS = {
-    'flex': _validate_flex,
-    'ssv': _validate_swagger_spec_validator,
+    "flex": _validate_flex if validate_flex else lambda s: None,
+    "ssv": _validate_swagger_spec_validator if validate_ssv else lambda s: None,
 }
 
 
-class _OpenAPICodec(object):
+class _OpenAPICodec:
     media_type = None
 
     def __init__(self, validators):
@@ -117,30 +122,22 @@ class OpenAPICodecJson(_OpenAPICodec):
 
         :rtype: str"""
         if self.pretty:
-            out = json.dumps(spec, indent=4, separators=(',', ': '))
-            if out[-1] != '\n':
-                out += '\n'
-            return out
+            return f"{json.dumps(spec, indent=4, separators=(',', ': '), ensure_ascii=False)}\n"
         else:
-            return json.dumps(spec)
+            return json.dumps(spec, ensure_ascii=False)
 
 
 YAML_MAP_TAG = u'tag:yaml.org,2002:map'
+YamlDumper = getattr(yaml, 'CSafeDumper', yaml.SafeDumper)
+YamlLoader = getattr(yaml, 'CSafeLoader', yaml.SafeLoader)
 
 
-class SaneYamlDumper(yaml.SafeDumper):
+class SaneYamlDumper(YamlDumper):
     """YamlDumper class usable for dumping ``OrderedDict`` and list instances in a standard way."""
 
     def ignore_aliases(self, data):
         """Disable YAML references."""
         return True
-
-    def increase_indent(self, flow=False, indentless=False, **kwargs):
-        """https://stackoverflow.com/a/39681672
-
-        Indent list elements.
-        """
-        return super(SaneYamlDumper, self).increase_indent(flow=flow, indentless=False, **kwargs)
 
     def represent_odict(self, mapping, flow_style=None):  # pragma: no cover
         """https://gist.github.com/miracle2k/3184458
@@ -199,10 +196,17 @@ def yaml_sane_dump(data, binary):
     :return: the serialized YAML
     :rtype: str or bytes
     """
-    return yaml.dump(data, Dumper=SaneYamlDumper, default_flow_style=False, encoding='utf-8' if binary else None)
+    return yaml.dump(
+        data,
+        Dumper=SaneYamlDumper,
+        default_flow_style=False,
+        encoding='utf-8' if binary else None,
+        allow_unicode=binary,
+        sort_keys=False,
+    )
 
 
-class SaneYamlLoader(yaml.SafeLoader):
+class SaneYamlLoader(YamlLoader):
     def construct_odict(self, node, deep=False):
         self.flatten_mapping(node)
         return OrderedDict(self.construct_pairs(node))

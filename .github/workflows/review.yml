@@ -5,29 +5,44 @@ on: [push, pull_request]
 jobs:
   review:
     name: Run linters and tests
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-20.04"
     strategy:
       matrix:
-        python: [3.6, 3.7, 3.8, 3.9]
+        python: ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11"]
 
     steps:
-      - name: Set up pip package caching
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-
-
       - name: Checkout the source code
         uses: actions/checkout@v2
 
       - name: Set the python version
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python }}
 
-      - name: Install pip dependencies
-        run: pip install -r requirements/ci.txt
+      - name: Install dependencies
+        uses: ./.github/actions/install
+        with:
+          python-version: ${{ matrix.python }}
 
-      - name: Run unit tests
-        run: tox
+      - name: Run tests
+        
+        # Python 3.6 tests have been removed since swagger-spec-validator no longer supports it.
+        # A successful workflow run for Python 3.6 is required by the GitHub branch protection rules.
+        if: ${{ matrix.python != 3.6 }}
+        
+        env:
+          PYTHON_VERSION: ${{ matrix.python }}
+        run: tox -e $(tox -l | grep py${PYTHON_VERSION//.} | paste -sd "," -)
+
+      - name: Report coverage
+        if: ${{ matrix.python == 3.9 }}
+        run: |
+          pip install coverage
+          coverage report
+
+      - name: Check for incompatibilities with publishing to PyPi
+        if: ${{ matrix.python == 3.8 }}
+        run: |
+          pip install -r requirements/publish.txt
+          python setup.py sdist
+          twine check dist/*
