@@ -3,6 +3,17 @@ Changelog
 #########
 
 **********
+**1.21.7**
+**********
+
+*Release date: Jul 20, 2023*
+
+**ADDED:** Added ``drf_yasg.inspectors.query.DrfAPICompatInspector`` (:pr:`857`)
+**ADDED:** Added ``DrfAPICompatInspector`` to serve as a replacement ``CoreAPICompatInspector`` (:pr:`857`)
+**ADDED:** Allow ``DEFAULT_SPEC_RENDERERS`` default renderers to be overriden in the settings (:pr:`857`)
+**FIXED:** Fixed redoc source mapping (:pr:`859`)
+
+**********
 **1.21.6**
 **********
 
