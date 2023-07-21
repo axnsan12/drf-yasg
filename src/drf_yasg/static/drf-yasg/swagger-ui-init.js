@@ -36,11 +36,26 @@ var swaggerUiConfig = {
     ],
     layout: "StandaloneLayout",
     filter: true,
+    csrfCookie: 'csrftoken',
+    csrfHeader: 'X-CSRFToken',
     requestInterceptor: function (request) {
         var headers = request.headers || {};
         var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]");
         if (csrftoken) {
-            headers["X-CSRFToken"] = csrftoken.value;
+            csrftoken = csrftoken.value;
+        } else {
+            var cookies = document.cookie.split(/;\s+/);
+            var name = swaggerUiConfig.csrfCookie;
+            for (var i = 0; i < cookies.length; i++) {
+                if (cookies[i].indexOf(name) === 0) {
+                    csrftoken = cookies[i].slice(cookies[i].indexOf('=') + 1);
+                    break;
+                }
+            }
+        }
+
+        if (csrftoken) {
+            headers[swaggerUiConfig.csrfHeader] = csrftoken;
         }
 
         return request;

@@ -153,6 +153,9 @@ class SwaggerUIRenderer(_UIRenderer):
             'refetchWithAuth': swagger_settings.REFETCH_SCHEMA_WITH_AUTH,
             'refetchOnLogout': swagger_settings.REFETCH_SCHEMA_ON_LOGOUT,
             'fetchSchemaWithQuery': swagger_settings.FETCH_SCHEMA_WITH_QUERY,
+            'csrfCookie': swagger_settings.CSRF_COOKIE_NAME,
+            # remove HTTP_ and convert underscores to dashes
+            'csrfHeader': swagger_settings.CSRF_HEADER_NAME[5:].replace('_', '-'),
         }
 
         data = filter_none(data)
