@@ -382,8 +382,21 @@ def find_limits(field):
 def decimal_field_type(field):
     return openapi.TYPE_NUMBER if decimal_as_float(field) else openapi.TYPE_STRING
 
+def recurse_one_to_one(field, visited_set=None):
+    if visited_set is None:
+        visited_set = set()
+    if field in visited_set:
+        return None #cycle?
+    if isinstance(field, models.OneToOneField):
+        tgt = field.target_field
+        visited_set.add(field)
+        return recurse_one_to_one(tgt, visited_set=visited_set)
+    else:
+        tmp = get_basic_type_info(field)
+        return tmp['type']
 
 model_field_to_basic_type = [
+    (models.OneToOneField, (recurse_one_to_one, None)),
     (models.AutoField, (openapi.TYPE_INTEGER, None)),
     (models.BinaryField, (openapi.TYPE_STRING, openapi.FORMAT_BINARY)),
     (models.BooleanField, (openapi.TYPE_BOOLEAN, None)),
