@@ -48,11 +48,6 @@ class EndpointEnumerator(_EndpointEnumerator):
         super(EndpointEnumerator, self).__init__(patterns, urlconf)
         self.request = request
 
-    def get_path_from_regex(self, path_regex):
-        if path_regex.endswith(')'):
-            logger.warning("url pattern does not end in $ ('%s') - unexpected things might happen", path_regex)
-        return self.unescape_path(super(EndpointEnumerator, self).get_path_from_regex(path_regex))
-
     def should_include_endpoint(self, path, callback, app_name='', namespace='', url_name=None):
         if not super(EndpointEnumerator, self).should_include_endpoint(path, callback):
             return False
