@@ -442,7 +442,7 @@ def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     if s is not None:
         s = force_str(s, encoding, strings_only, errors)
-        if type(s) != str:
+        if type(s) is not str:
             s = '' + s
 
         # Remove common indentation to get the correct Markdown rendering
