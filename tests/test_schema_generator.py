@@ -345,7 +345,7 @@ def test_optional_return_type(py_type, expected_type):
     )
     swagger = generator.get_schema(None, True)
     property_schema = swagger["definitions"]["OptionalMethod"]["properties"]["x"]
-    assert property_schema == openapi.Schema(title='X', type=expected_type, readOnly=True)
+    assert property_schema == openapi.Schema(title='X', type=expected_type, readOnly=True, x_nullable=True)
 
 
 EXPECTED_DESCRIPTION = """\
