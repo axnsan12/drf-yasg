@@ -36,8 +36,9 @@ def test_noop_inspectors(swagger_settings, mock_schema_request, codec_json, refe
     from drf_yasg import app_settings
 
     def set_inspectors(inspectors, setting_name):
+        existing = swagger_settings.get(setting_name, app_settings.SWAGGER_DEFAULTS[setting_name])
         inspectors = [__name__ + '.' + inspector.__name__ for inspector in inspectors]
-        swagger_settings[setting_name] = inspectors + app_settings.SWAGGER_DEFAULTS[setting_name]
+        swagger_settings[setting_name] = inspectors + existing
 
     set_inspectors([NoOpFieldInspector, NoOpSerializerInspector], 'DEFAULT_FIELD_INSPECTORS')
     set_inspectors([NoOpFilterInspector], 'DEFAULT_FILTER_INSPECTORS')

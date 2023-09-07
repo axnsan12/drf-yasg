@@ -6,7 +6,7 @@ from django.utils.functional import Promise
 from rest_framework.renderers import BaseRenderer, JSONRenderer, TemplateHTMLRenderer
 from rest_framework.utils import encoders, json
 
-from .app_settings import redoc_settings, swagger_settings
+from .app_settings import redoc_settings as _redoc_settings, swagger_settings as _swagger_settings
 from .codecs import VALIDATORS, OpenAPICodecJson, OpenAPICodecYaml
 from .openapi import Swagger
 from .utils import filter_none
@@ -62,6 +62,7 @@ class _UIRenderer(BaseRenderer):
     media_type = 'text/html'
     charset = 'utf-8'
     template = ''
+    swagger_settings = _swagger_settings
 
     def render(self, swagger, accepted_media_type=None, renderer_context=None):
         if not isinstance(swagger, Swagger):  # pragma: no cover
@@ -82,7 +83,7 @@ class _UIRenderer(BaseRenderer):
         renderer_context['title'] = swagger.info.title or '' if swagger else ''
         renderer_context['version'] = swagger.info.version or '' if swagger else ''
         renderer_context['oauth2_config'] = json.dumps(self.get_oauth2_config(), cls=encoders.JSONEncoder)
-        renderer_context['USE_SESSION_AUTH'] = swagger_settings.USE_SESSION_AUTH
+        renderer_context['USE_SESSION_AUTH'] = self.swagger_settings.USE_SESSION_AUTH
         renderer_context.update(self.get_auth_urls())
 
     def resolve_url(self, to):
@@ -106,14 +107,14 @@ class _UIRenderer(BaseRenderer):
 
     def get_auth_urls(self):
         urls = {
-            'LOGIN_URL': self.resolve_url(swagger_settings.LOGIN_URL),
-            'LOGOUT_URL': self.resolve_url(swagger_settings.LOGOUT_URL),
+            'LOGIN_URL': self.resolve_url(self.swagger_settings.LOGIN_URL),
+            'LOGOUT_URL': self.resolve_url(self.swagger_settings.LOGOUT_URL),
         }
 
         return filter_none(urls)
 
     def get_oauth2_config(self):
-        data = swagger_settings.OAUTH2_CONFIG
+        data = self.swagger_settings.OAUTH2_CONFIG
         assert isinstance(data, dict), "OAUTH2_CONFIG must be a dict"
         return data
 
@@ -136,31 +137,31 @@ class SwaggerUIRenderer(_UIRenderer):
 
     def get_swagger_ui_settings(self):
         data = {
-            'url': self.resolve_url(swagger_settings.SPEC_URL),
-            'operationsSorter': swagger_settings.OPERATIONS_SORTER,
-            'tagsSorter': swagger_settings.TAGS_SORTER,
-            'docExpansion': swagger_settings.DOC_EXPANSION,
-            'deepLinking': swagger_settings.DEEP_LINKING,
-            'showExtensions': swagger_settings.SHOW_EXTENSIONS,
-            'defaultModelRendering': swagger_settings.DEFAULT_MODEL_RENDERING,
-            'defaultModelExpandDepth': swagger_settings.DEFAULT_MODEL_DEPTH,
-            'defaultModelsExpandDepth': swagger_settings.DEFAULT_MODEL_DEPTH,
-            'showCommonExtensions': swagger_settings.SHOW_COMMON_EXTENSIONS,
-            'oauth2RedirectUrl': swagger_settings.OAUTH2_REDIRECT_URL,
-            'supportedSubmitMethods': swagger_settings.SUPPORTED_SUBMIT_METHODS,
-            'displayOperationId': swagger_settings.DISPLAY_OPERATION_ID,
-            'persistAuth': swagger_settings.PERSIST_AUTH,
-            'refetchWithAuth': swagger_settings.REFETCH_SCHEMA_WITH_AUTH,
-            'refetchOnLogout': swagger_settings.REFETCH_SCHEMA_ON_LOGOUT,
-            'fetchSchemaWithQuery': swagger_settings.FETCH_SCHEMA_WITH_QUERY,
-            'csrfCookie': swagger_settings.CSRF_COOKIE_NAME,
+            'url': self.resolve_url(self.swagger_settings.SPEC_URL),
+            'operationsSorter': self.swagger_settings.OPERATIONS_SORTER,
+            'tagsSorter': self.swagger_settings.TAGS_SORTER,
+            'docExpansion': self.swagger_settings.DOC_EXPANSION,
+            'deepLinking': self.swagger_settings.DEEP_LINKING,
+            'showExtensions': self.swagger_settings.SHOW_EXTENSIONS,
+            'defaultModelRendering': self.swagger_settings.DEFAULT_MODEL_RENDERING,
+            'defaultModelExpandDepth': self.swagger_settings.DEFAULT_MODEL_DEPTH,
+            'defaultModelsExpandDepth': self.swagger_settings.DEFAULT_MODEL_DEPTH,
+            'showCommonExtensions': self.swagger_settings.SHOW_COMMON_EXTENSIONS,
+            'oauth2RedirectUrl': self.swagger_settings.OAUTH2_REDIRECT_URL,
+            'supportedSubmitMethods': self.swagger_settings.SUPPORTED_SUBMIT_METHODS,
+            'displayOperationId': self.swagger_settings.DISPLAY_OPERATION_ID,
+            'persistAuth': self.swagger_settings.PERSIST_AUTH,
+            'refetchWithAuth': self.swagger_settings.REFETCH_SCHEMA_WITH_AUTH,
+            'refetchOnLogout': self.swagger_settings.REFETCH_SCHEMA_ON_LOGOUT,
+            'fetchSchemaWithQuery': self.swagger_settings.FETCH_SCHEMA_WITH_QUERY,
+            'csrfCookie': self.swagger_settings.CSRF_COOKIE_NAME,
             # remove HTTP_ and convert underscores to dashes
-            'csrfHeader': swagger_settings.CSRF_HEADER_NAME[5:].replace('_', '-'),
+            'csrfHeader': self.swagger_settings.CSRF_HEADER_NAME[5:].replace('_', '-'),
         }
 
         data = filter_none(data)
-        if swagger_settings.VALIDATOR_URL != '':
-            data['validatorUrl'] = self.resolve_url(swagger_settings.VALIDATOR_URL)
+        if self.swagger_settings.VALIDATOR_URL != '':
+            data['validatorUrl'] = self.resolve_url(self.swagger_settings.VALIDATOR_URL)
 
         return data
 
@@ -169,6 +170,7 @@ class ReDocRenderer(_UIRenderer):
     """Renders a ReDoc web interface for schema browsing."""
     template = 'drf-yasg/redoc.html'
     format = 'redoc'
+    redoc_settings = _redoc_settings
 
     def set_context(self, renderer_context, swagger=None):
         super(ReDocRenderer, self).set_context(renderer_context, swagger)
@@ -176,14 +178,14 @@ class ReDocRenderer(_UIRenderer):
 
     def get_redoc_settings(self):
         data = {
-            'url': self.resolve_url(redoc_settings.SPEC_URL),
-            'lazyRendering': redoc_settings.LAZY_RENDERING,
-            'hideHostname': redoc_settings.HIDE_HOSTNAME,
-            'expandResponses': redoc_settings.EXPAND_RESPONSES,
-            'pathInMiddlePanel': redoc_settings.PATH_IN_MIDDLE,
-            'nativeScrollbars': redoc_settings.NATIVE_SCROLLBARS,
-            'requiredPropsFirst': redoc_settings.REQUIRED_PROPS_FIRST,
-            'fetchSchemaWithQuery': redoc_settings.FETCH_SCHEMA_WITH_QUERY,
+            'url': self.resolve_url(self.redoc_settings.SPEC_URL),
+            'lazyRendering': self.redoc_settings.LAZY_RENDERING,
+            'hideHostname': self.redoc_settings.HIDE_HOSTNAME,
+            'expandResponses': self.redoc_settings.EXPAND_RESPONSES,
+            'pathInMiddlePanel': self.redoc_settings.PATH_IN_MIDDLE,
+            'nativeScrollbars': self.redoc_settings.NATIVE_SCROLLBARS,
+            'requiredPropsFirst': self.redoc_settings.REQUIRED_PROPS_FIRST,
+            'fetchSchemaWithQuery': self.redoc_settings.FETCH_SCHEMA_WITH_QUERY,
         }
 
         return filter_none(data)

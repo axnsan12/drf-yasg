@@ -15,7 +15,7 @@ from rest_framework.settings import api_settings as rest_framework_settings
 from rest_framework.utils import encoders, json
 from rest_framework.views import APIView
 
-from .app_settings import swagger_settings
+from .app_settings import swagger_settings as _swagger_settings
 
 logger = logging.getLogger(__name__)
 
@@ -387,7 +387,7 @@ def get_consumes(parser_classes):
     return non_form_media_types
 
 
-def get_produces(renderer_classes):
+def get_produces(renderer_classes, swagger_settings=_swagger_settings):
     """Extract ``produces`` MIME types from a list of renderer classes.
 
     :param list renderer_classes: renderer classes

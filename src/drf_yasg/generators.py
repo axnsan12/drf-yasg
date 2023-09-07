@@ -14,7 +14,7 @@ from rest_framework.schemas.utils import get_pk_description, is_list_view
 from rest_framework.settings import api_settings
 
 from . import openapi
-from .app_settings import swagger_settings
+from .app_settings import swagger_settings as _swagger_settings
 from .errors import SwaggerGenerationError
 from .inspectors.field import get_basic_type_info, get_queryset_field, get_queryset_from_view
 from .openapi import ReferenceResolver, SwaggerDict
@@ -190,7 +190,7 @@ class OpenAPISchemaGenerator:
         'delete': 'destroy',
     }
 
-    def __init__(self, info, version='', url=None, patterns=None, urlconf=None):
+    def __init__(self, info, version='', url=None, patterns=None, urlconf=None, swagger_settings=_swagger_settings):
         """
 
         :param openapi.Info info: information about the API
@@ -206,9 +206,11 @@ class OpenAPISchemaGenerator:
         :param patterns: if given, only these patterns will be enumerated for inclusion in the API spec
         :param urlconf: if patterns is not given, use this urlconf to enumerate patterns;
             if not given, the default urlconf is used
+        :param swagger_settings: if given global swagger_settings are overridden with local settings
         """
         self._gen = SchemaGenerator(info.title, url, info.get('description', ''), patterns, urlconf)
         self.info = info
+        self.swagger_settings = swagger_settings
         self.version = version
         self.consumes = []
         self.produces = []
@@ -237,7 +239,7 @@ class OpenAPISchemaGenerator:
         :return: the security schemes usable with this API
         :rtype: dict[str,dict] or None
         """
-        security_definitions = swagger_settings.SECURITY_DEFINITIONS
+        security_definitions = self.swagger_settings.SECURITY_DEFINITIONS
         if security_definitions is not None:
             security_definitions = SwaggerDict._as_odict(security_definitions, {})
 
@@ -251,7 +253,7 @@ class OpenAPISchemaGenerator:
         :return: the security schemes accepted by default
         :rtype: list[dict[str,list[str]]] or None
         """
-        security_requirements = swagger_settings.SECURITY_REQUIREMENTS
+        security_requirements = self.swagger_settings.SECURITY_REQUIREMENTS
         if security_requirements is None:
             security_requirements = [{security_scheme: []} for security_scheme in security_definitions]
 
@@ -272,7 +274,7 @@ class OpenAPISchemaGenerator:
         endpoints = self.get_endpoints(request)
         components = self.reference_resolver_class(openapi.SCHEMA_DEFINITIONS, force_init=True)
         self.consumes = get_consumes(api_settings.DEFAULT_PARSER_CLASSES)
-        self.produces = get_produces(api_settings.DEFAULT_RENDERER_CLASSES)
+        self.produces = get_produces(api_settings.DEFAULT_RENDERER_CLASSES, self.swagger_settings)
         paths, prefix = self.get_paths(endpoints, components, request, public)
 
         security_definitions = self.get_security_definitions()
@@ -511,7 +513,7 @@ class OpenAPISchemaGenerator:
 
         # the inspector class can be specified, in decreasing order of priority,
         #   1. globally via DEFAULT_AUTO_SCHEMA_CLASS
-        view_inspector_cls = swagger_settings.DEFAULT_AUTO_SCHEMA_CLASS
+        view_inspector_cls = self.swagger_settings.DEFAULT_AUTO_SCHEMA_CLASS
         #   2. on the view/viewset class
         view_inspector_cls = getattr(view, 'swagger_schema', view_inspector_cls)
         #   3. on the swagger_auto_schema decorator
@@ -520,7 +522,8 @@ class OpenAPISchemaGenerator:
         if view_inspector_cls is None:
             return None
 
-        view_inspector = view_inspector_cls(view, path, method, components, request, overrides, operation_keys)
+        view_inspector = view_inspector_cls(
+            view, path, method, components, request, overrides, operation_keys, self.swagger_settings)
         operation = view_inspector.get_operation(operation_keys)
         if operation is None:
             return None

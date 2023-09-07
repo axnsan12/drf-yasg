@@ -87,6 +87,7 @@ def test_paginator_schema(client, swagger_settings):
     swagger_settings['DEFAULT_PAGINATOR_INSPECTORS'] = [
         'drf_yasg.inspectors.CoreAPICompatInspector',
         'drf_yasg.inspectors.DrfAPICompatInspector',
+        'drf_yasg.inspectors.DjangoRestResponsePagination',
     ]
 
     response = client.get('/versioned/url/v1.0/swagger.yaml')
