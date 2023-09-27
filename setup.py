@@ -48,7 +48,7 @@ django_classifiers = [
 
 def drf_yasg_setup(**kwargs):
     setup(
-        name='drf-yasg',
+        name='humansignal-drf-yasg',
         packages=find_packages('src'),
         package_dir={'': 'src'},
         include_package_data=True,
