@@ -384,7 +384,7 @@ paths:
       - name: person
         in: path
         required: true
-        type: string
+        type: integer
   /plain/:
     get:
       operationId: plain_list

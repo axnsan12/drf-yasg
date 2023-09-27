@@ -574,6 +574,9 @@ class OpenAPISchemaGenerator:
         for variable in uritemplate.variables(path):
             model, model_field = get_queryset_field(queryset, variable)
             attrs = get_basic_type_info(model_field) or {'type': openapi.TYPE_STRING}
+            if hasattr(model_field, 'one_to_one') and model_field.one_to_one is True and hasattr(model_field,
+                                                                                                 'target_field'):
+                attrs = get_basic_type_info(model_field.target_field) or {'type': openapi.TYPE_STRING}
             if getattr(view_cls, 'lookup_field', None) == variable and attrs['type'] == openapi.TYPE_STRING:
                 attrs['pattern'] = getattr(view_cls, 'lookup_value_regex', attrs.get('pattern', None))
 

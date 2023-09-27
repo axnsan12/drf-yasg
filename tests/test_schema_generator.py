@@ -259,7 +259,6 @@ def test_choice_field(choices, expected_type):
     (["A", "B"], models.CharField, openapi.TYPE_STRING),
 ])
 def test_nested_choice_in_array_field(choices, field, expected_type):
-
     # Create a model class on the fly to avoid warnings about using the several
     # model class name several times
     model_class = type(
@@ -321,7 +320,6 @@ def test_json_field():
     (bool, openapi.TYPE_BOOLEAN),
 ])
 def test_optional_return_type(py_type, expected_type):
-
     class OptionalMethodSerializer(serializers.Serializer):
         x = serializers.SerializerMethodField()
 
