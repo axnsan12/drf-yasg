@@ -8,7 +8,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from inspect import signature as inspect_signature
 
-import pkg_resources
+import importlib.metadata
 import typing
 from django.core import validators
 from django.db import models
@@ -23,7 +23,7 @@ from ..utils import (
     decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
 )
 
-drf_version = pkg_resources.get_distribution("djangorestframework").version
+drf_version = importlib.metadata.version("djangorestframework")
 
 logger = logging.getLogger(__name__)
 
