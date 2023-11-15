@@ -1,11 +1,14 @@
 # coding=utf-8
-from pkg_resources import DistributionNotFound, get_distribution
+try:
+    import importlib.metadata as importlib_metadata
+except ImportError:
+    import importlib_metadata
 
 __author__ = """Cristi V."""
 __email__ = 'cristi@cvjd.me'
 
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:  # pragma: no cover
+    __version__ = importlib_metadata.version(__name__)
+except importlib_metadata.PackageNotFoundError:  # pragma: no cover
     # package is not installed
     pass
