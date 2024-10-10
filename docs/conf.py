@@ -12,7 +12,11 @@ import sphinx_rtd_theme
 from docutils import nodes, utils
 from docutils.parsers.rst import roles
 from docutils.parsers.rst.roles import set_classes
-from pkg_resources import get_distribution
+
+try:
+    from importlib import metadata
+except ImportError:  # Python < 3.8
+    from pkg_resources import get_distribution
 
 # -- General configuration ------------------------------------------------
 
@@ -47,7 +51,10 @@ author = 'Cristi V.'
 # built documents.
 
 # The full version, including alpha/beta/rc tags.
-release = get_distribution('drf_yasg').version
+try:
+    release = metadata.version('drf_yasg')
+except NameError:  # Python < 3.8
+    release = get_distribution('drf_yasg').version
 if 'noscm' in release:
     raise AssertionError('Invalid package version string: %s. \n'
                          'The documentation must be built with drf_yasg installed from a distribution package, '
