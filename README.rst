@@ -102,14 +102,14 @@ The preferred installation method is directly from pypi:
 
 .. code:: console
 
-   pip install -U drf-yasg
+   pip install --upgrade drf-yasg
 
 Additionally, if you want to use the built-in validation mechanisms (see `4. Validation`_), you need to install
 some extra requirements:
 
 .. code:: console
 
-   pip install -U drf-yasg[validation]
+   pip install --upgrade drf-yasg[validation]
 
 .. _readme-quickstart:
 
@@ -297,7 +297,7 @@ You can use the specification outputted by this library together with
 
    $ docker run --rm -v ${PWD}:/local swaggerapi/swagger-codegen-cli generate -i /local/tests/reference.yaml -l javascript -o /local/.codegen/js
 
-See the github page linked above for more details.
+See the GitHub page linked above for more details.
 
 .. _readme-testproj:
 
@@ -313,8 +313,8 @@ For additional usage examples, you can take a look at the test project in the ``
    $ virtualenv venv
    $ source venv/bin/activate
    (venv) $ cd testproj
-   (venv) $ python -m pip install -U pip setuptools
-   (venv) $ pip install -U -r requirements.txt
+   (venv) $ python -m pip install --upgrade pip setuptools
+   (venv) $ pip install --upgrade -r requirements.txt
    (venv) $ python manage.py migrate
    (venv) $ python manage.py runserver
    (venv) $ firefox localhost:8000/swagger/
