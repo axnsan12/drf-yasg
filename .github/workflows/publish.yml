@@ -20,12 +20,12 @@ jobs:
       - name: Set the python version
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.11
 
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
-          python-version: 3.8
+          python-version: 3.11
 
       - name: Install builders for publishing
         run: pip install -r requirements/publish.txt
