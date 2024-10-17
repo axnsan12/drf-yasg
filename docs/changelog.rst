@@ -2,6 +2,10 @@
 Changelog
 #########
 
+**********
+**1.21.8**
+**********
+
 **ADDED:** Python 3.11 and 3.12 support (:pr:`891`)
 **FIXED:** Fix pkg_resources version lookups for Python 3.9+ (:pr:`891`)
 
