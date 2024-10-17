@@ -41,6 +41,8 @@ SWAGGER_DEFAULTS = {
     'DEFAULT_API_URL': None,
 
     'USE_SESSION_AUTH': True,
+    'CSRF_COOKIE_NAME': settings.CSRF_COOKIE_NAME,
+    'CSRF_HEADER_NAME': settings.CSRF_HEADER_NAME,
     'SECURITY_DEFINITIONS': {
         'Basic': {
             'type': 'basic'
