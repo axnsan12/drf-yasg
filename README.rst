@@ -5,7 +5,7 @@
 drf-yasg - Yet another Swagger generator
 ########################################
 
-|actions| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
+|actions| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version| |nbsp| |gitter|
 
 Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
 
@@ -24,13 +24,13 @@ through a deprecation cycle of a few minor releases.
 
 Resources:
 
-* **Source**: https://github.com/axnsan12/drf-yasg/
-* **Documentation**: https://drf-yasg.readthedocs.io/
-* **Changelog**: https://drf-yasg.readthedocs.io/en/stable/changelog.html
-* **Live demo**: https://drf-yasg-demo.herokuapp.com/
+* `Sources <https://github.com/axnsan12/drf-yasg>`_
+* `Documentation <https://drf-yasg.readthedocs.io>`_
+* `Changelog <https://drf-yasg.readthedocs.io/en/stable/changelog.html>`_
+* `Live demo <https://drf-yasg-demo.herokuapp.com>`_
+* `Discussion <https://app.gitter.im/#/room/#drf-yasg:gitter.im>`_
 
 |heroku-button|
-
 
 ****************
 OpenAPI 3.0 note
@@ -336,7 +336,7 @@ djangorestframework-recursive
 Integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_ is
 provided out of the box - if you have ``djangorestframework-recursive`` installed.
 
-.. |actions| image:: https://img.shields.io/github/workflow/status/axnsan12/drf-yasg/Review
+.. |actions| image:: https://img.shields.io/github/actions/workflow/status/axnsan12/drf-yasg/review.yml?branch=master
    :target: https://github.com/axnsan12/drf-yasg/actions
    :alt: GitHub Workflow Status
 
@@ -347,6 +347,10 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
 .. |pypi-version| image:: https://img.shields.io/pypi/v/drf-yasg.svg
    :target: https://pypi.org/project/drf-yasg/
    :alt: PyPI
+
+.. |gitter| image:: https://badges.gitter.im/drf-yasg.svg
+    :target: https://app.gitter.im/#/room/#drf-yasg:gitter.im
+    :alt: Gitter
 
 .. |rtd-badge| image:: https://img.shields.io/readthedocs/drf-yasg.svg
    :target: https://drf-yasg.readthedocs.io/
