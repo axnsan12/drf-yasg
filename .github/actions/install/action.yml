@@ -10,15 +10,15 @@ runs:
   using: composite
   steps:
     - name: Checkout the source code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set the python version
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version }}
 
     - name: Set up pip package caching
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}

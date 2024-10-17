@@ -12,8 +12,8 @@ Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framewor
 Compatible with
 
 - **Django Rest Framework**: 3.10, 3.11, 3.12, 3.13, 3.14
-- **Django**: 2.2, 3.0, 3.1, 3.2, 4.0, 4.1
-- **Python**: 3.6, 3.7, 3.8, 3.9, 3.10, 3.11
+- **Django**: 2.2, 3.0, 3.1, 3.2, 4.0, 4.1, 4.2
+- **Python**: 3.6, 3.7, 3.8, 3.9, 3.10, 3.11, 3.12
 
 Only the latest patch version of each ``major.minor`` series of Python, Django and Django REST Framework is supported.
 
@@ -102,14 +102,14 @@ The preferred installation method is directly from pypi:
 
 .. code:: console
 
-   pip install -U drf-yasg
+   pip install --upgrade drf-yasg
 
 Additionally, if you want to use the built-in validation mechanisms (see `4. Validation`_), you need to install
 some extra requirements:
 
 .. code:: console
 
-   pip install -U drf-yasg[validation]
+   pip install --upgrade drf-yasg[validation]
 
 .. _readme-quickstart:
 
@@ -132,7 +132,7 @@ In ``urls.py``:
 .. code:: python
 
    ...
-   from django.urls import path
+   from django.urls import re_path
    from rest_framework import permissions
    from drf_yasg.views import get_schema_view
    from drf_yasg import openapi
@@ -297,7 +297,7 @@ You can use the specification outputted by this library together with
 
    $ docker run --rm -v ${PWD}:/local swaggerapi/swagger-codegen-cli generate -i /local/tests/reference.yaml -l javascript -o /local/.codegen/js
 
-See the github page linked above for more details.
+See the GitHub page linked above for more details.
 
 .. _readme-testproj:
 
@@ -313,8 +313,8 @@ For additional usage examples, you can take a look at the test project in the ``
    $ virtualenv venv
    $ source venv/bin/activate
    (venv) $ cd testproj
-   (venv) $ python -m pip install -U pip setuptools
-   (venv) $ pip install -U -r requirements.txt
+   (venv) $ python -m pip install --upgrade pip setuptools
+   (venv) $ pip install --upgrade -r requirements.txt
    (venv) $ python manage.py migrate
    (venv) $ python manage.py runserver
    (venv) $ firefox localhost:8000/swagger/
