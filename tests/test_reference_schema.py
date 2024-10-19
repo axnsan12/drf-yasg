@@ -4,7 +4,12 @@ from collections import OrderedDict
 
 from drf_yasg import openapi
 from drf_yasg.generators import OpenAPISchemaGenerator
-from drf_yasg.inspectors import FieldInspector, FilterInspector, PaginatorInspector, SerializerInspector
+from drf_yasg.inspectors import (
+    FieldInspector,
+    FilterInspector,
+    PaginatorInspector,
+    SerializerInspector,
+)
 
 
 def test_reference_schema(swagger_dict, reference_schema, compare_schemas):

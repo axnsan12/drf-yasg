@@ -3,7 +3,12 @@ from rest_framework import serializers
 
 from testproj.urls import required_urlpatterns
 
-from .url_versioning import SnippetList, SnippetSerializer, VersionedSchemaView, VERSION_PREFIX_URL
+from .url_versioning import (
+    VERSION_PREFIX_URL,
+    SnippetList,
+    SnippetSerializer,
+    VersionedSchemaView,
+)
 
 
 class SnippetsSerializer(serializers.HyperlinkedModelSerializer, SnippetSerializer):

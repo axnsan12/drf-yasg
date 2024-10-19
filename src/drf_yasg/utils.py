@@ -8,7 +8,12 @@ import pytz
 from django.db import models
 from django.utils.encoding import force_str
 from rest_framework import serializers, status
-from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin, UpdateModelMixin
+from rest_framework.mixins import (
+    DestroyModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+)
 from rest_framework.parsers import FileUploadParser
 from rest_framework.request import is_form_media_type
 from rest_framework.settings import api_settings as rest_framework_settings
@@ -451,7 +456,7 @@ def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     if s is not None:
         s = force_str(s, encoding, strings_only, errors)
-        if type(s) is not str:
+        if not isinstance(s, str):
             s = '' + s
 
         # Remove common indentation to get the correct Markdown rendering
