@@ -2,7 +2,8 @@ import enum
 import logging
 import re
 import urllib.parse as urlparse
-from collections import OrderedDict, abc as collections_abc
+from collections import OrderedDict
+from collections import abc as collections_abc
 
 from django.urls import get_script_prefix
 from django.utils.functional import Promise
