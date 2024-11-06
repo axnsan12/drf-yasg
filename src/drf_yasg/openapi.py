@@ -88,7 +88,7 @@ class SwaggerDict(OrderedDict):
     def __init__(self, **attrs):
         super(SwaggerDict, self).__init__()
         self._extras__ = attrs
-        if type(self) == SwaggerDict:
+        if type(self) is SwaggerDict:
             self._insert_extras__()
 
     def __setattr__(self, key, value):
@@ -516,7 +516,7 @@ class _Ref(SwaggerDict):
         :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
         super(_Ref, self).__init__()
-        assert not type(self) == _Ref, "do not instantiate _Ref directly"
+        assert not type(self) is _Ref, "do not instantiate _Ref directly"
         ref_name = "#/{scope}/{name}".format(scope=scope, name=name)
         if not ignore_unresolved:
             obj = resolver.get(name, scope)
