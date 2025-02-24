@@ -1,6 +1,6 @@
 # test project requirements
 Pillow>=4.3.0
-django-filter>=2.4.0
+django-filter>=2.4.0,<25
 djangorestframework-camel-case>=1.1.2
 djangorestframework-recursive>=0.1.2
 dj-database-url>=0.4.2

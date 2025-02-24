@@ -3,6 +3,12 @@ Changelog
 #########
 
 **********
+**1.21.9**
+**********
+
+**ADDED:** Added support for zoneinfo object fields (:pr:`908`)
+
+**********
 **1.21.8**
 **********
 
