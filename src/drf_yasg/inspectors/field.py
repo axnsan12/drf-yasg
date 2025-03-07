@@ -193,7 +193,7 @@ def get_queryset_from_view(view, serializer=None):
 
         if queryset is not None and serializer is not None:
             # make sure the view is actually using *this* serializer
-            assert type(serializer) == call_view_method(view, 'get_serializer_class', 'serializer_class')
+            assert type(serializer) is call_view_method(view, 'get_serializer_class', 'serializer_class')
 
         return queryset
     except Exception:  # pragma: no cover
