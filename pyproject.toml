@@ -1,80 +1,44 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-
-requires = [ "setuptools>=68", "setuptools-scm>=3.0.3", "wheel" ]
+requires = ["setuptools>=68", "setuptools-scm>=3.0.3", "wheel"]
 
 [tool.ruff]
-exclude = [ "**/migrations/*" ]
-line-length = 169
-lint.select = [
-  "AIR",   # Airflow
-  "ASYNC", # flake8-async
-  "C4",    # flake8-comprehensions
-  "C90",   # mccabe
-  "E",     # pycodestyle errors
-  "F",     # Pyflakes
-  "FA",    # flake8-future-annotations
-  "FLY",   # flynt
-  "I",     # isort
-  "ICN",   # flake8-import-conventions
-  "INT",   # flake8-gettext
-  "LOG",   # flake8-logging
-  "NPY",   # NumPy-specific rules
-  "PD",    # pandas-vet
-  "PLE",   # Pylint errors
-  "PYI",   # flake8-pyi
-  "SLOT",  # flake8-slots
-  "T10",   # flake8-debugger
-  "TCH",   # flake8-type-checking
-  "W",     # pycodestyle warnings
-  "YTT",   # flake8-2020
-  # "A",     # flake8-builtins
-  # "ANN",   # flake8-annotations
-  # "ARG",   # flake8-unused-arguments
-  # "B",     # flake8-bugbear
-  # "BLE",   # flake8-blind-except
-  # "COM",   # flake8-commas
-  # "CPY",   # flake8-copyright
-  # "D",     # pydocstyle
-  # "DJ",    # flake8-django
-  # "DOC",   # pydoclint
-  # "DTZ",   # flake8-datetimez
-  # "EM",    # flake8-errmsg
-  # "ERA",   # eradicate
-  # "EXE",   # flake8-executable
-  # "FAST",  # FastAPI
-  # "FBT",   # flake8-boolean-trap
-  # "FIX",   # flake8-fixme
-  # "FURB",  # refurb
-  # "G",     # flake8-logging-format
-  # "INP",   # flake8-no-pep420
-  # "ISC",   # flake8-implicit-str-concat
-  # "N",     # pep8-naming
-  # "PERF",  # Perflint
-  # "PGH",   # pygrep-hooks
-  # "PIE",   # flake8-pie
-  # "PLC",   # Pylint conventions
-  # "PLR",   # Pylint refactorings
-  # "PLW",   # Pylint warnings
-  # "PT",    # flake8-pytest-style
-  # "PTH",   # flake8-use-pathlib
-  # "Q",     # flake8-quotes
-  # "RET",   # flake8-return
-  # "RSE",   # flake8-raise
-  # "RUF",   # Ruff-specific rules
-  # "S",     # flake8-bandit
-  # "SIM",   # flake8-simplify
-  # "SLF",   # flake8-self
-  # "T20",   # flake8-print
-  # "TD",    # flake8-todos
-  # "TID",   # flake8-tidy-imports
-  # "TRY",   # tryceratops
-  # "UP",    # pyupgrade
-]
-lint.isort.known-first-party = [ "drf_yasg", "testproj", "articles", "people", "snippets", "todo", "users", "urlconfs" ]
-lint.mccabe.max-complexity = 13
-lint.per-file-ignores."src/drf_yasg/inspectors/field.py" = [ "E721" ]
-lint.per-file-ignores."src/drf_yasg/openapi.py" = [ "E721" ]
-lint.per-file-ignores."testproj/testproj/settings/*" = [ "F405" ]
+exclude = ["**/migrations/*"]
+line-length = 80
 
-[tool.setuptools_scm]
+lint.select = [
+    "ASYNC", # flake8-async
+    "C4",    # flake8-comprehensions
+    "C90",   # mccabe
+    "E",     # pycodestyle
+    "F",     # pyflakes
+    "FA",    # flake8-future-annotations
+    "FLY",   # flynt
+    "I",     # isort
+    "ICN",   # flake8-import-conventions
+    "INT",   # flake8-gettext
+    "LOG",   # flake8-logging
+    "PLE",   # pylint
+    "PYI",   # flake8-pyi
+    "SLOT",  # flake8-slots
+    "T10",   # flake8-debugger
+    "TCH",   # flake8-type-checking
+    "W",     # pycodestyle warnings
+    "YTT",   # flake8-2020
+]
+
+lint.isort.known-first-party = [
+    "articles",
+    "drf_yasg",
+    "people",
+    "snippets",
+    "testproj",
+    "todo",
+    "urlconfs",
+    "users",
+]
+
+lint.mccabe.max-complexity = 13
+lint.per-file-ignores."src/drf_yasg/inspectors/field.py" = ["E721"]
+lint.per-file-ignores."src/drf_yasg/openapi.py" = ["E721"]
+lint.per-file-ignores."testproj/testproj/settings/*" = ["F405"]
