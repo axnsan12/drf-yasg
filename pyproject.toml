@@ -4,7 +4,6 @@ requires = ["setuptools>=68", "setuptools-scm>=3.0.3", "wheel"]
 
 [tool.ruff]
 exclude = ["**/migrations/*"]
-line-length = 80
 
 lint.select = [
     "ASYNC", # flake8-async
