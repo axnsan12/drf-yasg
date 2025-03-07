@@ -517,7 +517,7 @@ class _Ref(SwaggerDict):
         :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
         super(_Ref, self).__init__()
-        assert not type(self) is _Ref, "do not instantiate _Ref directly"
+        assert type(self) is not _Ref, "do not instantiate _Ref directly"
         ref_name = "#/{scope}/{name}".format(scope=scope, name=name)
         if not ignore_unresolved:
             obj = resolver.get(name, scope)
