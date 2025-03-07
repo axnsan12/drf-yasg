@@ -5,15 +5,15 @@
 drf-yasg - Yet another Swagger generator
 ########################################
 
-|travis| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version|
+|actions| |nbsp| |codecov| |nbsp| |rtd-badge| |nbsp| |pypi-version| |nbsp| |gitter|
 
 Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framework API.
 
 Compatible with
 
-- **Django Rest Framework**: 3.10, 3.11, 3.12
-- **Django**: 2.2, 3.0, 3.1
-- **Python**: 3.6, 3.7, 3.8, 3.9
+- **Django Rest Framework**: 3.10, 3.11, 3.12, 3.13, 3.14
+- **Django**: 2.2, 3.0, 3.1, 3.2, 4.0, 4.1, 4.2
+- **Python**: 3.6, 3.7, 3.8, 3.9, 3.10, 3.11, 3.12
 
 Only the latest patch version of each ``major.minor`` series of Python, Django and Django REST Framework is supported.
 
@@ -24,13 +24,13 @@ through a deprecation cycle of a few minor releases.
 
 Resources:
 
-* **Source**: https://github.com/axnsan12/drf-yasg/
-* **Documentation**: https://drf-yasg.readthedocs.io/
-* **Changelog**: https://drf-yasg.readthedocs.io/en/stable/changelog.html
-* **Live demo**: https://drf-yasg-demo.herokuapp.com/
+* `Sources <https://github.com/axnsan12/drf-yasg>`_
+* `Documentation <https://drf-yasg.readthedocs.io>`_
+* `Changelog <https://drf-yasg.readthedocs.io/en/stable/changelog.html>`_
+* `Live demo <https://drf-yasg-demo.herokuapp.com>`_
+* `Discussion <https://app.gitter.im/#/room/#drf-yasg:gitter.im>`_
 
 |heroku-button|
-
 
 ****************
 OpenAPI 3.0 note
@@ -98,18 +98,18 @@ Usage
 0. Installation
 ===============
 
-The preferred instalation method is directly from pypi:
+The preferred installation method is directly from pypi:
 
 .. code:: console
 
-   pip install -U drf-yasg
+   pip install --upgrade drf-yasg
 
 Additionally, if you want to use the built-in validation mechanisms (see `4. Validation`_), you need to install
 some extra requirements:
 
 .. code:: console
 
-   pip install -U drf-yasg[validation]
+   pip install --upgrade drf-yasg[validation]
 
 .. _readme-quickstart:
 
@@ -132,6 +132,7 @@ In ``urls.py``:
 .. code:: python
 
    ...
+   from django.urls import re_path
    from rest_framework import permissions
    from drf_yasg.views import get_schema_view
    from drf_yasg import openapi
@@ -152,9 +153,9 @@ In ``urls.py``:
    )
 
    urlpatterns = [
-      url(r'^swagger\.(?P<format>json|yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-      url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-      url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+      path('swagger.<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+      path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+      path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
       ...
    ]
 
@@ -296,7 +297,7 @@ You can use the specification outputted by this library together with
 
    $ docker run --rm -v ${PWD}:/local swaggerapi/swagger-codegen-cli generate -i /local/tests/reference.yaml -l javascript -o /local/.codegen/js
 
-See the github page linked above for more details.
+See the GitHub page linked above for more details.
 
 .. _readme-testproj:
 
@@ -312,8 +313,8 @@ For additional usage examples, you can take a look at the test project in the ``
    $ virtualenv venv
    $ source venv/bin/activate
    (venv) $ cd testproj
-   (venv) $ python -m pip install -U pip setuptools
-   (venv) $ pip install -U -r requirements.txt
+   (venv) $ python -m pip install --upgrade pip setuptools
+   (venv) $ pip install --upgrade -r requirements.txt
    (venv) $ python manage.py migrate
    (venv) $ python manage.py runserver
    (venv) $ firefox localhost:8000/swagger/
@@ -335,9 +336,9 @@ djangorestframework-recursive
 Integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_ is
 provided out of the box - if you have ``djangorestframework-recursive`` installed.
 
-.. |travis| image:: https://img.shields.io/travis/axnsan12/drf-yasg/master.svg
-   :target: https://travis-ci.org/axnsan12/drf-yasg
-   :alt: Travis CI
+.. |actions| image:: https://img.shields.io/github/actions/workflow/status/axnsan12/drf-yasg/review.yml?branch=master
+   :target: https://github.com/axnsan12/drf-yasg/actions
+   :alt: GitHub Workflow Status
 
 .. |codecov| image:: https://img.shields.io/codecov/c/github/axnsan12/drf-yasg/master.svg
    :target: https://codecov.io/gh/axnsan12/drf-yasg
@@ -346,6 +347,10 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
 .. |pypi-version| image:: https://img.shields.io/pypi/v/drf-yasg.svg
    :target: https://pypi.org/project/drf-yasg/
    :alt: PyPI
+
+.. |gitter| image:: https://badges.gitter.im/drf-yasg.svg
+    :target: https://app.gitter.im/#/room/#drf-yasg:gitter.im
+    :alt: Gitter
 
 .. |rtd-badge| image:: https://img.shields.io/readthedocs/drf-yasg.svg
    :target: https://drf-yasg.readthedocs.io/
@@ -357,3 +362,31 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
 
 .. |nbsp| unicode:: 0xA0
    :trim:
+
+drf-extra-fields
+=================
+
+Integration with `drf-extra-fields <https://github.com/Hipo/drf-extra-fields>`_ has a problem with Base64 fields.
+The drf-yasg will generate Base64 file or image fields as Readonly and not required. Here is a workaround code
+for display the Base64 fields correctly.
+
+.. code:: python
+
+  class PDFBase64FileField(Base64FileField):
+      ALLOWED_TYPES = ['pdf']
+
+      class Meta:
+          swagger_schema_fields = {
+              'type': 'string',
+              'title': 'File Content',
+              'description': 'Content of the file base64 encoded',
+              'read_only': False  # <-- FIX
+          }
+
+      def get_file_extension(self, filename, decoded_file):
+          try:
+              PyPDF2.PdfFileReader(io.BytesIO(decoded_file))
+          except PyPDF2.utils.PdfReadError as e:
+              logger.warning(e)
+          else:
+              return 'pdf'

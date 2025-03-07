@@ -26,7 +26,7 @@ You can log in using the pre-existing `admin` user with password `passwordadmin`
 SchemaView = get_schema_view(
     validators=['ssv', 'flex'],
     public=True,
-    permission_classes=(permissions.AllowAny,),
+    permission_classes=[permissions.AllowAny],
 )
 
 
@@ -36,7 +36,7 @@ def plain_view(request):
 
 
 def root_redirect(request):
-    user_agent_string = request.META.get('HTTP_USER_AGENT', '')
+    user_agent_string = request.headers.get('user-agent', '')
     user_agent = user_agents.parse(user_agent_string)
 
     if user_agent.is_mobile:

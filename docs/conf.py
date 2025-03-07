@@ -12,7 +12,11 @@ import sphinx_rtd_theme
 from docutils import nodes, utils
 from docutils.parsers.rst import roles
 from docutils.parsers.rst.roles import set_classes
-from pkg_resources import get_distribution
+
+try:
+    from importlib import metadata
+except ImportError:  # Python < 3.8
+    from pkg_resources import get_distribution
 
 # -- General configuration ------------------------------------------------
 
@@ -47,7 +51,10 @@ author = 'Cristi V.'
 # built documents.
 
 # The full version, including alpha/beta/rc tags.
-release = get_distribution('drf_yasg').version
+try:
+    release = metadata.version('drf_yasg')
+except NameError:  # Python < 3.8
+    release = get_distribution('drf_yasg').version
 if 'noscm' in release:
     raise AssertionError('Invalid package version string: %s. \n'
                          'The documentation must be built with drf_yasg installed from a distribution package, '
@@ -62,7 +69,7 @@ version = '.'.join(release.split('.')[:3])
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -82,7 +89,6 @@ modindex_common_prefix = ['drf_yasg.']
 # html_theme = 'default'
 
 html_theme = "sphinx_rtd_theme"
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -185,7 +191,7 @@ nitpick_ignore = [
     ('py:class', 'Exception'),
     ('py:class', 'collections.OrderedDict'),
 
-    ('py:class', 'ruamel.yaml.dumper.SafeDumper'),
+    ('py:class', 'yaml.CSafeDumper'),
     ('py:class', 'rest_framework.serializers.Serializer'),
     ('py:class', 'rest_framework.renderers.BaseRenderer'),
     ('py:class', 'rest_framework.parsers.BaseParser'),
@@ -213,7 +219,7 @@ nitpick_ignore = [
 # for some reason needs the sources dir to be in the path in order for viewcode to work
 sys.path.insert(0, os.path.abspath('../src'))
 
-# activate the Django testproj to be able to succesfully import drf_yasg
+# activate the Django testproj to be able to successfully import drf_yasg
 sys.path.insert(0, os.path.abspath('../testproj'))
 os.putenv('DJANGO_SETTINGS_MODULE', 'testproj.settings.local')
 
@@ -321,4 +327,4 @@ roles.register_local_role('ghuser', role_github_user)
 
 
 def setup(app):
-    app.add_stylesheet('css/style.css')
+    app.add_css_file('css/style.css')

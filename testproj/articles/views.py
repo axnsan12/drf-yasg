@@ -12,16 +12,16 @@ from articles import serializers
 from articles.models import Article
 from drf_yasg import openapi
 from drf_yasg.app_settings import swagger_settings
-from drf_yasg.inspectors import CoreAPICompatInspector, FieldInspector, NotHandled, SwaggerAutoSchema
+from drf_yasg.inspectors import DrfAPICompatInspector, FieldInspector, NotHandled, SwaggerAutoSchema
 from drf_yasg.utils import no_body, swagger_auto_schema
 
 
-class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
+class DjangoFilterDescriptionInspector(DrfAPICompatInspector):
     def get_filter_parameters(self, filter_backend):
         if isinstance(filter_backend, DjangoFilterBackend):
             result = super(DjangoFilterDescriptionInspector, self).get_filter_parameters(filter_backend)
             for param in result:
-                if not param.get('description', ''):
+                if not param.get('description', '') or param.get('description') == param.name:
                     param.description = "Filter the returned list by {field_name}".format(field_name=param.name)
 
             return result

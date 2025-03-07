@@ -1,3 +1,9 @@
+// swagger-ui-init.js
+// https://github.com/axnsan12/drf-yasg
+// Copyright 2017 - 2021, Cristian V. <cristi@cvjd.me>
+// This file is licensed under the BSD 3-Clause License.
+// License text available at https://opensource.org/licenses/BSD-3-Clause
+
 "use strict";
 var currentPath = window.location.protocol + "//" + window.location.host + window.location.pathname;
 var defaultSpecUrl = currentPath + '?format=openapi';
@@ -30,11 +36,26 @@ var swaggerUiConfig = {
     ],
     layout: "StandaloneLayout",
     filter: true,
+    csrfCookie: 'csrftoken',
+    csrfHeader: 'X-CSRFToken',
     requestInterceptor: function (request) {
         var headers = request.headers || {};
         var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]");
         if (csrftoken) {
-            headers["X-CSRFToken"] = csrftoken.value;
+            csrftoken = csrftoken.value;
+        } else {
+            var cookies = document.cookie.split(/;\s+/);
+            var name = swaggerUiConfig.csrfCookie;
+            for (var i = 0; i < cookies.length; i++) {
+                if (cookies[i].indexOf(name) === 0) {
+                    csrftoken = cookies[i].slice(cookies[i].indexOf('=') + 1);
+                    break;
+                }
+            }
+        }
+
+        if (csrftoken) {
+            headers[swaggerUiConfig.csrfHeader] = csrftoken;
         }
 
         return request;

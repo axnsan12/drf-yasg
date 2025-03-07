@@ -1,11 +1,46 @@
 from collections import OrderedDict
+from functools import wraps
 
-import coreschema
-from rest_framework.pagination import CursorPagination, LimitOffsetPagination, PageNumberPagination
+try:
+    import coreschema
+except ImportError:
+    coreschema = None
 
 from .. import openapi
 from ..utils import force_real_str
-from .base import FilterInspector, PaginatorInspector
+from .base import FilterInspector, PaginatorInspector, NotHandled
+
+
+def ignore_assert_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except AssertionError:
+            return NotHandled
+
+    return wrapper
+
+
+class DrfAPICompatInspector(PaginatorInspector, FilterInspector):
+    def param_to_schema(self, param):
+        return openapi.Parameter(
+            name=param['name'],
+            in_=param['in'],
+            description=param.get('description'),
+            required=param.get('required', False),
+            **param['schema'],
+        )
+
+    def get_paginator_parameters(self, paginator):
+        if hasattr(paginator, 'get_schema_operation_parameters'):
+            return list(map(self.param_to_schema, paginator.get_schema_operation_parameters(self.view)))
+        return NotHandled
+
+    def get_filter_parameters(self, filter_backend):
+        if hasattr(filter_backend, 'get_schema_operation_parameters'):
+            return list(map(self.param_to_schema, filter_backend.get_schema_operation_parameters(self.view)))
+        return NotHandled
 
 
 class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
@@ -13,6 +48,7 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
     ``get_schema_fields`` method.
     """
 
+    @ignore_assert_decorator
     def get_paginator_parameters(self, paginator):
         fields = []
         if hasattr(paginator, 'get_schema_fields'):
@@ -20,6 +56,7 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
 
         return [self.coreapi_field_to_parameter(field) for field in fields]
 
+    @ignore_assert_decorator
     def get_filter_parameters(self, filter_backend):
         fields = []
         if hasattr(filter_backend, 'get_schema_fields'):
@@ -58,27 +95,37 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
 
 
 class DjangoRestResponsePagination(PaginatorInspector):
-    """Provides response schema pagination warpping for django-rest-framework's LimitOffsetPagination,
+    """Provides response schema pagination wrapping for django-rest-framework's LimitOffsetPagination,
     PageNumberPagination and CursorPagination
     """
 
+    def fix_paginated_property(self, key: str, value: dict):
+        # Need to remove useless params from schema
+        value.pop('example', None)
+        if 'nullable' in value:
+            value['x-nullable'] = value.pop('nullable')
+        if key in {'next', 'previous'} and 'format' not in value:
+            value['format'] = 'uri'
+        return openapi.Schema(**value)
+
     def get_paginated_response(self, paginator, response_schema):
-        assert response_schema.type == openapi.TYPE_ARRAY, "array return expected for paged response"
-        paged_schema = None
-        if isinstance(paginator, (LimitOffsetPagination, PageNumberPagination, CursorPagination)):
-            has_count = not isinstance(paginator, CursorPagination)
-            paged_schema = openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties=OrderedDict((
-                    ('count', openapi.Schema(type=openapi.TYPE_INTEGER) if has_count else None),
-                    ('next', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI, x_nullable=True)),
-                    ('previous', openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI, x_nullable=True)),
-                    ('results', response_schema),
-                )),
-                required=['results']
-            )
+        if hasattr(paginator, 'get_paginated_response_schema'):
+            paginator_schema = paginator.get_paginated_response_schema(response_schema)
+            if paginator_schema['type'] == openapi.TYPE_OBJECT:
+                properties = {
+                    k: self.fix_paginated_property(k, v)
+                    for k, v in paginator_schema.pop('properties').items()
+                }
+                if 'required' not in paginator_schema:
+                    paginator_schema.setdefault('required', [])
+                    for prop in ('count', 'results'):
+                        if prop in properties:
+                            paginator_schema['required'].append(prop)
+                return openapi.Schema(
+                    **paginator_schema,
+                    properties=properties
+                )
+            else:
+                return openapi.Schema(**paginator_schema)
 
-            if has_count:
-                paged_schema.required.insert(0, 'count')
-
-        return paged_schema
+        return response_schema

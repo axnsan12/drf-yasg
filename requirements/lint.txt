@@ -1,4 +1,4 @@
 # used by the 'lint' tox env for linting via flake8
-isort>=4.2
-flake8>=3.5.0
-flake8-isort>=2.3
+isort>=5.12
+flake8>=6.0.0
+flake8-isort>=6.0.0

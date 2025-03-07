@@ -1,0 +1,29 @@
+name: Install
+description: Install dependencies
+
+inputs:
+  python-version:
+    description: Python version for installing dependencies
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout the source code
+      uses: actions/checkout@v4
+
+    - name: Set the python version
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Set up pip package caching
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      shell: bash
+      run: pip install -r requirements/ci.txt

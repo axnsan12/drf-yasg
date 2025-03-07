@@ -2,23 +2,32 @@ import datetime
 import inspect
 import logging
 import operator
-import typing
 import uuid
+from contextlib import suppress
 from collections import OrderedDict
 from decimal import Decimal
 from inspect import signature as inspect_signature
 
+import typing
 from django.core import validators
 from django.db import models
+from packaging import version
 from rest_framework import serializers
 from rest_framework.settings import api_settings as rest_framework_settings
 
+from .base import call_view_method, FieldInspector, NotHandled, SerializerInspector
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
     decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
 )
-from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
+
+try:
+    from importlib import metadata
+    drf_version = metadata.version("djangorestframework")
+except ImportError:  # Python < 3.8
+    import pkg_resources
+    drf_version = pkg_resources.get_distribution("djangorestframework").version
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +46,7 @@ class InlineSerializerInspector(SerializerInspector):
         is called only when the serializer is converted into a list of parameters for use in a form data request.
 
         :param serializer: serializer instance
-        :param list[openapi.Parameter] parameters: genereated parameters
+        :param list[openapi.Parameter] parameters: generated parameters
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
@@ -126,7 +135,7 @@ class InlineSerializerInspector(SerializerInspector):
 
             actual_serializer = getattr(actual_schema, '_NP_serializer', None)
             this_serializer = get_serializer_class(field)
-            if actual_serializer and actual_serializer != this_serializer:  # pragma: no cover
+            if actual_serializer and actual_serializer != this_serializer:
                 explicit_refs = self._has_ref_name(actual_serializer) and self._has_ref_name(this_serializer)
                 if not explicit_refs:
                     raise SwaggerGenerationError(
@@ -176,7 +185,7 @@ def get_queryset_from_view(view, serializer=None):
     """Try to get the queryset of the given view
 
     :param view: the view instance or class
-    :param serializer: if given, will check that the view's get_serializer_class return matches this serialzier
+    :param serializer: if given, will check that the view's get_serializer_class return matches this serializer
     :return: queryset or ``None``
     """
     try:
@@ -184,7 +193,7 @@ def get_queryset_from_view(view, serializer=None):
 
         if queryset is not None and serializer is not None:
             # make sure the view is actually using *this* serializer
-            assert type(serializer) == call_view_method(view, 'get_serializer_class', 'serializer_class')
+            assert type(serializer) is call_view_method(view, 'get_serializer_class', 'serializer_class')
 
         return queryset
     except Exception:  # pragma: no cover
@@ -205,6 +214,14 @@ def get_parent_serializer(field):
     return None  # pragma: no cover
 
 
+def get_model_from_descriptor(descriptor):
+    with suppress(Exception):
+        try:
+            return descriptor.rel.related_model
+        except Exception:
+            return descriptor.field.remote_field.model
+
+
 def get_related_model(model, source):
     """Try to find the other side of a model relationship given the name of a related field.
 
@@ -212,14 +229,12 @@ def get_related_model(model, source):
     :param str source: related field name
     :return: related model or ``None``
     """
-    try:
-        descriptor = getattr(model, source)
-        try:
-            return descriptor.rel.related_model
-        except Exception:
-            return descriptor.field.remote_field.model
-    except Exception:  # pragma: no cover
-        return None
+
+    with suppress(Exception):
+        if '.' in source and source.index('.'):
+            attr, source = source.split('.', maxsplit=1)
+            return get_related_model(get_model_from_descriptor(getattr(model, attr)), source)
+        return get_model_from_descriptor(getattr(model, source))
 
 
 class RelatedFieldInspector(FieldInspector):
@@ -277,7 +292,7 @@ class RelatedFieldInspector(FieldInspector):
         elif isinstance(field, serializers.HyperlinkedRelatedField):
             return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)
 
-        return SwaggerType(type=openapi.TYPE_STRING)
+        return NotHandled  # pragma: no cover
 
 
 def find_regex(regex_field):
@@ -376,11 +391,10 @@ model_field_to_basic_type = [
     (models.AutoField, (openapi.TYPE_INTEGER, None)),
     (models.BinaryField, (openapi.TYPE_STRING, openapi.FORMAT_BINARY)),
     (models.BooleanField, (openapi.TYPE_BOOLEAN, None)),
-    (models.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (models.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (models.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
-    (models.DurationField, (openapi.TYPE_INTEGER, None)),
+    (models.DurationField, (openapi.TYPE_STRING, None)),
     (models.FloatField, (openapi.TYPE_NUMBER, None)),
     (models.IntegerField, (openapi.TYPE_INTEGER, None)),
     (models.IPAddressField, (openapi.TYPE_STRING, openapi.FORMAT_IPV4)),
@@ -403,15 +417,23 @@ serializer_field_to_basic_type = [
     (serializers.RegexField, (openapi.TYPE_STRING, None)),
     (serializers.CharField, (openapi.TYPE_STRING, None)),
     (serializers.BooleanField, (openapi.TYPE_BOOLEAN, None)),
-    (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (serializers.IntegerField, (openapi.TYPE_INTEGER, None)),
     (serializers.FloatField, (openapi.TYPE_NUMBER, None)),
     (serializers.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
-    (serializers.DurationField, (openapi.TYPE_NUMBER, None)),  # ?
+    (serializers.DurationField, (openapi.TYPE_STRING, None)),
     (serializers.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (serializers.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (serializers.ModelField, (openapi.TYPE_STRING, None)),
 ]
+
+if version.parse(drf_version) < version.parse("3.14.0"):
+    model_field_to_basic_type.append(
+        (models.NullBooleanField, (openapi.TYPE_BOOLEAN, None))
+    )
+
+    serializer_field_to_basic_type.append(
+        (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
+    )
 
 basic_type_info = serializer_field_to_basic_type + model_field_to_basic_type
 

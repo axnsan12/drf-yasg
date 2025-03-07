@@ -55,6 +55,7 @@ def drf_yasg_setup(**kwargs):
         install_requires=requirements,
         extras_require={
             'validation': requirements_validation,
+            'coreapi': ['coreapi>=2.3.3', 'coreschema>=0.0.4']
         },
         license='BSD License',
         description='Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code.',
@@ -85,8 +86,8 @@ try:
 
     drf_yasg_setup(use_scm_version=True)
 except (ImportError, LookupError) as e:
-    if os.getenv('CI', 'false') == 'true' or os.getenv('TRAVIS', 'false') == 'true':
-        # don't silently fail on travis - we don't want to accidentally push a dummy version to PyPI
+    if os.getenv('CI', 'false') == 'true':
+        # don't silently fail on CI - we don't want to accidentally push a dummy version to PyPI
         raise
 
     err_msg = str(e)

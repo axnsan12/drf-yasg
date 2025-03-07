@@ -1,0 +1,36 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+jobs:
+  publish:
+    name: Publish the package on pypi
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@v4
+
+      - name: Set the python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+        with:
+          python-version: 3.11
+
+      - name: Install builders for publishing
+        run: pip install -r requirements/publish.txt
+
+      - name: Build the distributions
+        run: python setup.py sdist bdist_wheel
+
+      - name: Publish the package
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}

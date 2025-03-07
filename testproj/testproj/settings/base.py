@@ -88,9 +88,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Django Rest Framework
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
+    'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ]
 }
 
 OAUTH2_CLIENT_ID = '12ee6bgxtpSEgP8TioWcHSXOiDBOUrVav4mRbVEs'
@@ -145,6 +145,7 @@ SWAGGER_SETTINGS = {
     "DEFAULT_PAGINATOR_INSPECTORS": [
         'testproj.inspectors.UnknownPaginatorInspector',
         'drf_yasg.inspectors.DjangoRestResponsePagination',
+        'drf_yasg.inspectors.DrfAPICompatInspector',
         'drf_yasg.inspectors.CoreAPICompatInspector',
     ]
 }
@@ -157,7 +158,6 @@ REDOC_SETTINGS = {
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)

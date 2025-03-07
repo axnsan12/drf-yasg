@@ -79,7 +79,7 @@ def test_no_netloc(mock_schema_request):
     assert swagger['info']['version'] == 'v2'
 
 
-def test_securiy_requirements(swagger_settings, mock_schema_request):
+def test_security_requirements(swagger_settings, mock_schema_request):
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),
         version="v2",
@@ -89,6 +89,24 @@ def test_securiy_requirements(swagger_settings, mock_schema_request):
 
     swagger = generator.get_schema(mock_schema_request, public=True)
     assert swagger['security'] == []
+
+    swagger_settings['SECURITY_REQUIREMENTS'] = None
+    swagger_settings['SECURITY_DEFINITIONS'] = None
+
+    swagger = generator.get_schema(mock_schema_request, public=True)
+    assert 'security' not in swagger
+
+
+def test_default_url(swagger_settings, mock_schema_request):
+    swagger_settings['DEFAULT_API_URL'] = 'http://api.example.com'
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        version="v2",
+    )
+
+    swagger = generator.get_schema(public=True)
+    assert swagger['host'] == 'api.example.com'
+    assert swagger['basePath'] == '/'
 
 
 def _basename_or_base_name(basename):

@@ -35,6 +35,10 @@ class SnippetList(generics.ListCreateAPIView):
         return super(SnippetList, self).post(request, *args, **kwargs)
 
 
+class ExcludedSnippets(SnippetList):
+    swagger_schema = None
+
+
 VERSION_PREFIX_URL = r"^versioned/url/v(?P<version>1.0|2.0)/"
 
 
@@ -44,6 +48,7 @@ class VersionedSchemaView(SchemaView):
 
 urlpatterns = required_urlpatterns + [
     re_path(VERSION_PREFIX_URL + r"snippets/$", SnippetList.as_view()),
+    re_path(VERSION_PREFIX_URL + r"snippets_excluded/$", ExcludedSnippets.as_view()),
     re_path(VERSION_PREFIX_URL + r'swagger\.(?P<format>json|yaml)$', VersionedSchemaView.without_ui(),
             name='vschema-json'),
 ]
