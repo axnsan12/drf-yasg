@@ -17,6 +17,15 @@ from rest_framework.views import APIView
 
 from .app_settings import swagger_settings
 
+try:
+    import zoneinfo
+except ImportError:
+    try:
+        from backports import zoneinfo
+    except ImportError:
+        zoneinfo = None
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -434,7 +443,7 @@ def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     if s is not None:
         s = force_str(s, encoding, strings_only, errors)
-        if type(s) != str:
+        if type(s) is not str:
             s = '' + s
 
         # Remove common indentation to get the correct Markdown rendering
@@ -457,7 +466,10 @@ def field_value_to_representation(field, value):
         else:
             value = str(value)
 
-    if isinstance(value, pytz.BaseTzInfo):
+    elif isinstance(value, pytz.BaseTzInfo):
+        value = str(value)
+
+    elif zoneinfo is not None and isinstance(value, zoneinfo.ZoneInfo):
         value = str(value)
 
     # JSON roundtrip ensures that the value is valid JSON;

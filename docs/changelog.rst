@@ -3,6 +3,19 @@ Changelog
 #########
 
 **********
+**1.21.9**
+**********
+
+**ADDED:** Added support for zoneinfo object fields (:pr:`908`)
+
+**********
+**1.21.8**
+**********
+
+**ADDED:** Python 3.11 and 3.12 support (:pr:`891`)
+**FIXED:** Fix pkg_resources version lookups for Python 3.9+ (:pr:`891`)
+
+**********
 **1.21.7**
 **********
 
