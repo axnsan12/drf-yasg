@@ -405,7 +405,7 @@ version. For example:
 .. figure:: ./docs/images/flow.png
    :width: 70%
    :figwidth: image
-   :alt: redoc screenshot
+   :alt: Git flow
    :align: center
 
 Labels

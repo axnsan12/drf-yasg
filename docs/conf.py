@@ -7,6 +7,7 @@ import inspect
 import os
 import re
 import sys
+import shutil
 
 import sphinx_rtd_theme
 from docutils import nodes, utils
@@ -326,5 +327,9 @@ roles.register_local_role('issue', role_github_pull_request_or_issue)
 roles.register_local_role('ghuser', role_github_user)
 
 
+def copy_static(app, build):
+    shutil.copytree("docs/images", "docs/_build/html/docs/images", dirs_exist_ok=True)
+
 def setup(app):
     app.add_css_file('css/style.css')
+    app.connect("build-finished", copy_static)
