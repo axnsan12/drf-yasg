@@ -273,6 +273,9 @@ gh_issue_uri = "https://github.com/axnsan12/drf-yasg/issues/{}"
 gh_pr_uri = "https://github.com/axnsan12/drf-yasg/pull/{}"
 gh_user_uri = "https://github.com/{}"
 
+suppress_warnings = [
+    'image.not_readable'
+]
 
 def sphinx_err(inliner, lineno, rawtext, msg):
     msg = inliner.reporter.error(msg, line=lineno)
@@ -322,13 +325,14 @@ def role_github_pull_request_or_issue(name, rawtext, text, lineno, inliner, opti
     return sphinx_ref(options, rawtext, text, ref)
 
 
+def copy_static(app, build):
+    shutil.copytree("docs/images", "docs/_build/html/docs/images", dirs_exist_ok=True)
+
+
 roles.register_local_role('pr', role_github_pull_request_or_issue)
 roles.register_local_role('issue', role_github_pull_request_or_issue)
 roles.register_local_role('ghuser', role_github_user)
 
-
-def copy_static(app, build):
-    shutil.copytree("docs/images", "docs/_build/html/docs/images", dirs_exist_ok=True)
 
 def setup(app):
     app.add_css_file('css/style.css')
