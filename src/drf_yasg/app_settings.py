@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.functional import lazystr
 from rest_framework.settings import perform_import
 
 SWAGGER_DEFAULTS = {
@@ -49,7 +50,7 @@ SWAGGER_DEFAULTS = {
         }
     },
     'SECURITY_REQUIREMENTS': None,
-    'LOGIN_URL': getattr(settings, 'LOGIN_URL', None),
+    'LOGIN_URL': lazystr(lambda: getattr(settings, 'LOGIN_URL', None)),
     'LOGOUT_URL': '/accounts/logout/',
     'SPEC_URL': None,
     'VALIDATOR_URL': '',
