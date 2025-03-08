@@ -5,6 +5,7 @@
   },
   "devDependencies": {
     "cspell": "^6.30.0",
+    "luxon": "^3.5.0",
     "octokit": "^4.1.2"
   }
 }
