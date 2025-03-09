@@ -1,15 +1,11 @@
 {
-  "name": "drf-yasg",
   "dependencies": {
     "redoc": "^2.0.0-rc.59",
     "swagger-ui-dist": "^5.18.2"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/axnsan12/drf-yasg.git"
-  },
-  "private": true,
   "devDependencies": {
-    "cspell": "^6.30.0"
+    "cspell": "^6.30.0",
+    "luxon": "^3.5.0",
+    "octokit": "^4.1.2"
   }
 }
