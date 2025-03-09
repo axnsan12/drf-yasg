@@ -151,7 +151,7 @@ SWAGGER_SETTINGS = {
 }
 
 REDOC_SETTINGS = {
-    'SPEC_URL': ('schema-json', {'format': '.json'}),
+    'SPEC_URL': ('schema-json', {'format': 'json'}),
 }
 
 # Internationalization

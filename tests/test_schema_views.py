@@ -53,6 +53,30 @@ def test_redoc(client, validate_schema):
     _validate_text_schema_view(client, validate_schema, '/redoc/?format=openapi', json.loads)
 
 
+@pytest.mark.urls('urlconfs.legacy_renderer')
+@pytest.mark.parametrize('format', ('.json', '.yaml'))
+def test_swagger_ui_legacy_renderer(settings, client, validate_schema, format):
+    settings.SWAGGER_SETTINGS = {
+        **settings.SWAGGER_SETTINGS,
+        'SPEC_URL': ('schema-json', {'format': format}),
+    }
+
+    _validate_ui_schema_view(client, '/swagger/', 'swagger-ui-dist/swagger-ui-bundle.js')
+    _validate_text_schema_view(client, validate_schema, '/swagger/?format=openapi', json.loads)
+
+
+@pytest.mark.urls('urlconfs.legacy_renderer')
+@pytest.mark.parametrize('format', ('.json', '.yaml'))
+def test_redoc_legacy_renderer(settings, client, validate_schema, format):
+    settings.REDOC_SETTINGS = {
+        **settings.REDOC_SETTINGS,
+        'SPEC_URL': ('schema-json', {'format': format}),
+    }
+
+    _validate_ui_schema_view(client, '/redoc/', 'redoc/redoc.min.js')
+    _validate_text_schema_view(client, validate_schema, '/redoc/?format=openapi', json.loads)
+
+
 def test_caching(client, validate_schema):
     prev_schema = None
 
