@@ -5,10 +5,7 @@ from rest_framework.generics import RetrieveAPIView
 from drf_yasg.utils import swagger_auto_schema
 
 from .models import Pack, Todo, TodoAnother, TodoTree, TodoYetAnother
-from .serializer import (
-    HarvestSerializer, TodoAnotherSerializer, TodoRecursiveSerializer, TodoSerializer, TodoTreeSerializer,
-    TodoYetAnotherSerializer
-)
+from .serializer import HarvestSerializer, TodoAnotherSerializer, TodoRecursiveSerializer, TodoSerializer, TodoTreeSerializer, TodoYetAnotherSerializer
 
 
 class TodoViewSet(viewsets.ReadOnlyModelViewSet):

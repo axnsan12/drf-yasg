@@ -7,9 +7,9 @@ from collections import OrderedDict, defaultdict
 import uritemplate
 from django.urls import URLPattern, URLResolver
 from rest_framework import versioning
-from rest_framework.schemas.openapi import SchemaGenerator
 from rest_framework.schemas.generators import EndpointEnumerator as _EndpointEnumerator
 from rest_framework.schemas.generators import endpoint_ordering, get_pk_name
+from rest_framework.schemas.openapi import SchemaGenerator
 from rest_framework.schemas.utils import get_pk_description, is_list_view
 from rest_framework.settings import api_settings
 
