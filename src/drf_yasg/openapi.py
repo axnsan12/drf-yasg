@@ -2,7 +2,8 @@ import enum
 import logging
 import re
 import urllib.parse as urlparse
-from collections import OrderedDict, abc as collections_abc
+from collections import OrderedDict
+from collections import abc as collections_abc
 
 from django.urls import get_script_prefix
 from django.utils.functional import Promise
@@ -516,7 +517,7 @@ class _Ref(SwaggerDict):
         :param bool ignore_unresolved: do not throw if the referenced object does not exist
         """
         super(_Ref, self).__init__()
-        assert not type(self) is _Ref, "do not instantiate _Ref directly"
+        assert type(self) is not _Ref, "do not instantiate _Ref directly"
         ref_name = "#/{scope}/{name}".format(scope=scope, name=name)
         if not ignore_unresolved:
             obj = resolver.get(name, scope)

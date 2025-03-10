@@ -1,7 +1,7 @@
 import pytest
 
-from drf_yasg.errors import SwaggerGenerationError
 from drf_yasg.codecs import yaml_sane_load
+from drf_yasg.errors import SwaggerGenerationError
 
 
 def _get_versioned_schema(prefix, client, validate_schema, path='/snippets/'):
