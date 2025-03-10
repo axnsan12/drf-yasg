@@ -2,9 +2,9 @@
 Changelog
 #########
 
-**********
+***********
 **1.21.10**
-**********
+***********
 
 **FIXED:** Fix type hints when using postponed evaluation of annotations (PEP-563) (:pr:`840`)
 **IMPROVED:** Update JSON & YAML renderers to not use a "." in their format string (:pr:`911`)
