@@ -153,7 +153,7 @@ In ``urls.py``:
    )
 
    urlpatterns = [
-      path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+      path('swagger.<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
       path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
       path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
       ...
@@ -390,3 +390,33 @@ for display the Base64 fields correctly.
               logger.warning(e)
           else:
               return 'pdf'
+
+************
+Contributing
+************
+
+This repository adheres to semantic versioning standards. For more
+information on semantic versioning visit `SemVer <https://semver.org>`_.
+
+To keep our process simple we merge pull requests into the master branch we use
+git tags for releases. We use labels to mark which issues are intended for each
+version. For example:
+
+.. figure:: ./docs/images/flow.png
+   :width: 70%
+   :figwidth: image
+   :alt: Git flow
+   :align: center
+
+Labels
+======
+
+- New issues without a version are given a ``triage`` label.
+
+- Issues are labeled ``bug``, ``enhancement`` or ``question`` to describe their
+  content
+
+- Once given a version, an issue will either have an assignee or be given a
+  ``help wanted`` label
+
+- A question that hasn't been answered will be given an ``unanswered`` label

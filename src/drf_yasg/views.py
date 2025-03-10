@@ -13,7 +13,9 @@ from .app_settings import swagger_settings
 from .renderers import (
     ReDocOldRenderer,
     ReDocRenderer,
+    SwaggerJSONRenderer,
     SwaggerUIRenderer,
+    SwaggerYAMLRenderer,
     _SpecRenderer,
 )
 
@@ -76,6 +78,20 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
     info = info or swagger_settings.DEFAULT_INFO
     validators = validators or []
     _spec_renderers = tuple(renderer.with_validators(validators) for renderer in SPEC_RENDERERS)
+
+    # optionally copy renderers with the validators that are configured above
+    if swagger_settings.USE_COMPAT_RENDERERS:
+        warnings.warn(
+            "SwaggerJSONRenderer & SwaggerYAMLRenderer's `format` has changed to not include a `.` prefix, "
+            "please silence this warning by setting `SWAGGER_USE_COMPAT_RENDERERS = False` "
+            "in your Django settings and ensure your application works "
+            "(check your URLCONF and swagger/redoc URLs).",
+            DeprecationWarning)
+        _spec_renderers += tuple(
+            type(cls.__name__, (cls,), {'format': '.' + cls.format})
+            for cls in _spec_renderers
+            if issubclass(cls, (SwaggerJSONRenderer, SwaggerYAMLRenderer))
+        )
 
     class SchemaView(APIView):
         _ignore_model_permissions = True
