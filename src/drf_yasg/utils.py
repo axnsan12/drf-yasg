@@ -382,18 +382,10 @@ def get_consumes(parser_classes):
     """
     parser_classes = get_object_classes(parser_classes)
     parser_classes = [pc for pc in parser_classes if not issubclass(pc, FileUploadParser)]
-    media_types = [parser.media_type for parser in parser_classes or []]
-    non_form_media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
-    # Because swagger Parameter objects don't support complex data types (nested objects, arrays),
-    # we can't use those unless we are sure the view *only* accepts form data
-    # This means that a view won't support file upload in swagger unless it explicitly
-    # sets its parser classes to include only form parsers
-    if len(non_form_media_types) == 0:
-        return media_types
-
-    # If the form accepts both form data and another type, like json (which is the default config),
-    # we will render its input as a Schema and thus it file parameters will be read-only
-    return non_form_media_types
+    media_types = [parser.media_type for parser in parser_classes]
+    # ensure first of chain. I think it may be straight forward
+    return [media_types[0]]
+   
 
 
 def get_produces(renderer_classes):
