@@ -88,10 +88,7 @@ class InlineSerializerInspector(SerializerInspector):
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
-        description = getattr(field, 'description', getattr(field, '__doc__'))
-        if description is None and hasattr(field, 'Meta') and hasattr(field.Meta, 'model') and hasattr(field.Meta.model, '__doc__'):
-            description = field.Meta.model.__doc__
-        description = strip_doc_string(description)
+        description = strip_doc_string(getattr(field, 'description', getattr(field, '__doc__')))
 
         if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
             child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)
@@ -588,7 +585,8 @@ class SerializerMethodFieldInspector(FieldInspector):
         if not isinstance(field, serializers.SerializerMethodField):
             return NotHandled
 
-        method = getattr(field.parent, field.method_name)
+        method = getattr(field.parent, field.method_name, None)
+
         if method is None:
             return NotHandled
 
