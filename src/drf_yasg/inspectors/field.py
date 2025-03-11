@@ -18,7 +18,12 @@ from .base import call_view_method, FieldInspector, NotHandled, SerializerInspec
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
-    decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
+    decimal_as_float,
+    field_value_to_representation,
+    filter_none,
+    get_serializer_class,
+    get_serializer_ref_name,
+    strip_doc_string
 )
 
 try:
@@ -88,7 +93,8 @@ class InlineSerializerInspector(SerializerInspector):
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
-        description = strip_doc_string(getattr(field, 'description', getattr(field, '__doc__')))
+        description = getattr(field, 'description', getattr(field, '__doc__'))
+        description = strip_doc_string(description)
 
         if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
             child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)

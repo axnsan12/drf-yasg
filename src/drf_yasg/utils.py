@@ -516,3 +516,14 @@ def get_field_default(field):
                 default = serializers.empty
 
     return default
+
+
+def strip_doc_string(doc):
+    """
+    Remove line breaks and excess space from the start and end of each line of
+    a docstring. Ignores indenting, so some formatting will be lost.
+    """
+    if not doc:
+        doc = ""
+
+    return " ".join(line.strip() for line in doc.splitlines() if line.strip())
