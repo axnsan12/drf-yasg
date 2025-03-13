@@ -18,7 +18,12 @@ from .base import call_view_method, FieldInspector, NotHandled, SerializerInspec
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
-    decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
+    decimal_as_float,
+    field_value_to_representation,
+    filter_none,
+    get_serializer_class,
+    get_serializer_ref_name,
+    strip_doc_string
 )
 
 try:
@@ -88,12 +93,15 @@ class InlineSerializerInspector(SerializerInspector):
 
     def field_to_swagger_object(self, field, swagger_object_type, use_references, **kwargs):
         SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type, use_references, **kwargs)
+        description = getattr(field, 'description', getattr(field, '__doc__'))
+        description = strip_doc_string(description)
 
         if isinstance(field, (serializers.ListSerializer, serializers.ListField)):
             child_schema = self.probe_field_inspectors(field.child, ChildSwaggerType, use_references)
             limits = find_limits(field) or {}
             return SwaggerType(
                 type=openapi.TYPE_ARRAY,
+                description=description,
                 items=child_schema,
                 **limits
             )
@@ -125,6 +133,7 @@ class InlineSerializerInspector(SerializerInspector):
                     # the title is derived from the field name and is better to
                     # be omitted from models
                     use_field_title=False,
+                    description=description,
                     type=openapi.TYPE_OBJECT,
                     properties=properties,
                     required=required or None,
@@ -583,6 +592,7 @@ class SerializerMethodFieldInspector(FieldInspector):
             return NotHandled
 
         method = getattr(field.parent, field.method_name, None)
+
         if method is None:
             return NotHandled
 

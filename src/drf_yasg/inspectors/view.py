@@ -8,8 +8,16 @@ from rest_framework.status import is_success
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
-    filter_none, force_real_str, force_serializer_instance, get_consumes, get_produces, guess_response_status,
-    merge_params, no_body, param_list_to_odict
+    filter_none,
+    force_real_str,
+    force_serializer_instance,
+    get_consumes,
+    get_produces,
+    guess_response_status,
+    merge_params,
+    no_body,
+    param_list_to_odict,
+    strip_doc_string,
 )
 from .base import ViewInspector, call_view_method
 
@@ -267,7 +275,11 @@ class SwaggerAutoSchema(ViewInspector):
             else:
                 serializer = force_serializer_instance(serializer)
                 response = openapi.Response(
-                    description='',
+                    description=strip_doc_string(
+                        serializer.child.__doc__
+                        if getattr(serializer, 'many', False)
+                        else serializer.__doc__
+                    ),
                     schema=self.serializer_to_schema(serializer),
                 )
 
