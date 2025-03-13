@@ -524,6 +524,6 @@ def strip_doc_string(doc):
     a docstring. Ignores indenting, so some formatting will be lost.
     """
     if not doc:
-        doc = ""
+        return ""
 
     return " ".join(line.strip() for line in doc.splitlines() if line.strip())
