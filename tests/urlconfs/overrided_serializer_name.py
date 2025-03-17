@@ -15,11 +15,12 @@ class SnippetSerializerV2(SnippetV1Serializer):
 
     class Meta:
         # Same name for check failing
-        ref_name = 'SnippetV1'
+        ref_name = "SnippetV1"
 
 
 class SnippetList(generics.ListCreateAPIView):
     """SnippetList classdoc"""
+
     queryset = Snippet.objects.all()
     serializer_class = SnippetV1Serializer
     versioning_class = versioning.URLPathVersioning
@@ -46,6 +47,9 @@ class VersionedSchemaView(SchemaView):
 urlpatterns = required_urlpatterns + [
     re_path(VERSION_PREFIX_URL + r"snippets/$", SnippetList.as_view()),
     re_path(VERSION_PREFIX_URL + r"other_snippets/$", SnippetsV2.as_view()),
-    re_path(VERSION_PREFIX_URL + r'swagger(?P<format>.json|.yaml)$', VersionedSchemaView.without_ui(),
-            name='vschema-json'),
+    re_path(
+        VERSION_PREFIX_URL + r"swagger(?P<format>.json|.yaml)$",
+        VersionedSchemaView.without_ui(),
+        name="vschema-json",
+    ),
 ]

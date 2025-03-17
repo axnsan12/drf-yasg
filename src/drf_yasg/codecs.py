@@ -25,7 +25,6 @@ logger = logging.getLogger(__name__)
 
 
 def _validate_flex(spec):
-
     try:
         validate_flex(spec)
     except ValidationError as ex:
@@ -67,7 +66,7 @@ class _OpenAPICodec:
         :rtype: bytes
         """
         if not isinstance(document, openapi.Swagger):
-            raise TypeError('Expected a `openapi.Swagger` instance')
+            raise TypeError("Expected a `openapi.Swagger` instance")
 
         spec = self.generate_swagger_object(document)
         errors = {}
@@ -80,7 +79,9 @@ class _OpenAPICodec:
                 errors[validator] = str(e)
 
         if errors:
-            exc = SwaggerValidationError("spec validation failed: {}".format(errors), errors, spec, self)
+            exc = SwaggerValidationError(
+                "spec validation failed: {}".format(errors), errors, spec, self
+            )
             logger.warning(str(exc))
             raise exc
 
@@ -110,9 +111,9 @@ class _OpenAPICodec:
 
 
 class OpenAPICodecJson(_OpenAPICodec):
-    media_type = 'application/json'
+    media_type = "application/json"
 
-    def __init__(self, validators, pretty=False, media_type='application/json'):
+    def __init__(self, validators, pretty=False, media_type="application/json"):
         super(OpenAPICodecJson, self).__init__(validators)
         self.pretty = pretty
         self.media_type = media_type
@@ -127,9 +128,9 @@ class OpenAPICodecJson(_OpenAPICodec):
             return json.dumps(spec, ensure_ascii=False)
 
 
-YAML_MAP_TAG = u'tag:yaml.org,2002:map'
-YamlDumper = getattr(yaml, 'CSafeDumper', yaml.SafeDumper)
-YamlLoader = getattr(yaml, 'CSafeLoader', yaml.SafeLoader)
+YAML_MAP_TAG = "tag:yaml.org,2002:map"
+YamlDumper = getattr(yaml, "CSafeDumper", yaml.SafeDumper)
+YamlLoader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
 
 class SaneYamlDumper(YamlDumper):
@@ -154,7 +155,7 @@ class SaneYamlDumper(YamlDumper):
         if self.alias_key is not None:
             self.represented_objects[self.alias_key] = node
         best_style = True
-        if hasattr(mapping, 'items'):
+        if hasattr(mapping, "items"):
             mapping = mapping.items()
         for item_key, item_value in mapping:
             node_key = self.represent_data(item_key)
@@ -173,8 +174,8 @@ class SaneYamlDumper(YamlDumper):
 
     def represent_text(self, text):
         if "\n" in text:
-            return self.represent_scalar('tag:yaml.org,2002:str', text, style='|')
-        return self.represent_scalar('tag:yaml.org,2002:str', text)
+            return self.represent_scalar("tag:yaml.org,2002:str", text, style="|")
+        return self.represent_scalar("tag:yaml.org,2002:str", text)
 
 
 SaneYamlDumper.add_representer(bytes, SaneYamlDumper.represent_text)
@@ -200,7 +201,7 @@ def yaml_sane_dump(data, binary):
         data,
         Dumper=SaneYamlDumper,
         default_flow_style=False,
-        encoding='utf-8' if binary else None,
+        encoding="utf-8" if binary else None,
         allow_unicode=binary,
         sort_keys=False,
     )
@@ -225,9 +226,9 @@ def yaml_sane_load(stream):
 
 
 class OpenAPICodecYaml(_OpenAPICodec):
-    media_type = 'application/yaml'
+    media_type = "application/yaml"
 
-    def __init__(self, validators, media_type='application/yaml'):
+    def __init__(self, validators, media_type="application/yaml"):
         super(OpenAPICodecYaml, self).__init__(validators)
         self.media_type = media_type
 

@@ -4,8 +4,8 @@ from rest_framework.routers import SimpleRouter
 from articles import views
 
 router = SimpleRouter()
-router.register('', views.ArticleViewSet)
+router.register("", views.ArticleViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path("", include(router.urls)),
 ]

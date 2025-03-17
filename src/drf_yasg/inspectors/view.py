@@ -24,8 +24,12 @@ logger = logging.getLogger(__name__)
 
 
 class SwaggerAutoSchema(ViewInspector):
-    def __init__(self, view, path, method, components, request, overrides, operation_keys=None):
-        super(SwaggerAutoSchema, self).__init__(view, path, method, components, request, overrides)
+    def __init__(
+        self, view, path, method, components, request, overrides, operation_keys=None
+    ):
+        super(SwaggerAutoSchema, self).__init__(
+            view, path, method, components, request, overrides
+        )
         self._sch = AutoSchema()
         self._sch.view = view
         self.operation_keys = operation_keys
@@ -45,7 +49,9 @@ class SwaggerAutoSchema(ViewInspector):
         operation_id = self.get_operation_id(operation_keys)
         summary, description = self.get_summary_and_description()
         security = self.get_security()
-        assert security is None or isinstance(security, list), "security must be a list of security requirement objects"
+        assert security is None or isinstance(security, list), (
+            "security must be a list of security requirement objects"
+        )
         deprecated = self.is_deprecated()
         tags = self.get_tags(operation_keys)
 
@@ -61,7 +67,7 @@ class SwaggerAutoSchema(ViewInspector):
             produces=produces,
             tags=tags,
             security=security,
-            deprecated=deprecated
+            deprecated=deprecated,
         )
 
     def get_request_body_parameters(self, consumes):
@@ -98,18 +104,21 @@ class SwaggerAutoSchema(ViewInspector):
         :return: the view's ``Serializer``
         :rtype: rest_framework.serializers.Serializer
         """
-        return call_view_method(self.view, 'get_serializer')
+        return call_view_method(self.view, "get_serializer")
 
     def _get_request_body_override(self):
         """Parse the request_body key in the override dict. This method is not public API."""
-        body_override = self.overrides.get('request_body', None)
+        body_override = self.overrides.get("request_body", None)
 
         if body_override is not None:
             if body_override is no_body:
                 return no_body
             if self.method not in self.body_methods:
-                raise SwaggerGenerationError("request_body can only be applied to (" + ','.join(self.body_methods) +
-                                             "); are you looking for query_serializer or manual_parameters?")
+                raise SwaggerGenerationError(
+                    "request_body can only be applied to ("
+                    + ",".join(self.body_methods)
+                    + "); are you looking for query_serializer or manual_parameters?"
+                )
             if isinstance(body_override, openapi.Schema.OR_REF):
                 return body_override
             return force_serializer_instance(body_override)
@@ -154,7 +163,9 @@ class SwaggerAutoSchema(ViewInspector):
         :param openapi.Schema schema: the request body schema
         :rtype: openapi.Parameter
         """
-        return openapi.Parameter(name='data', in_=openapi.IN_BODY, required=True, schema=schema)
+        return openapi.Parameter(
+            name="data", in_=openapi.IN_BODY, required=True, schema=schema
+        )
 
     def add_manual_parameters(self, parameters):
         """Add/replace parameters from the given list of automatically generated request parameters.
@@ -163,18 +174,32 @@ class SwaggerAutoSchema(ViewInspector):
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
-        manual_parameters = self.overrides.get('manual_parameters', None) or []
+        manual_parameters = self.overrides.get("manual_parameters", None) or []
 
-        if any(param.in_ == openapi.IN_BODY for param in manual_parameters):  # pragma: no cover
-            raise SwaggerGenerationError("specify the body parameter as a Schema or Serializer in request_body")
-        if any(param.in_ == openapi.IN_FORM for param in manual_parameters):  # pragma: no cover
-            has_body_parameter = any(param.in_ == openapi.IN_BODY for param in parameters)
-            if has_body_parameter or not any(is_form_media_type(encoding) for encoding in self.get_consumes()):
-                raise SwaggerGenerationError("cannot add form parameters when the request has a request body; "
-                                             "did you forget to set an appropriate parser class on the view?")
+        if any(
+            param.in_ == openapi.IN_BODY for param in manual_parameters
+        ):  # pragma: no cover
+            raise SwaggerGenerationError(
+                "specify the body parameter as a Schema or Serializer in request_body"
+            )
+        if any(
+            param.in_ == openapi.IN_FORM for param in manual_parameters
+        ):  # pragma: no cover
+            has_body_parameter = any(
+                param.in_ == openapi.IN_BODY for param in parameters
+            )
+            if has_body_parameter or not any(
+                is_form_media_type(encoding) for encoding in self.get_consumes()
+            ):
+                raise SwaggerGenerationError(
+                    "cannot add form parameters when the request has a request body; "
+                    "did you forget to set an appropriate parser class on the view?"
+                )
             if self.method not in self.body_methods:
-                raise SwaggerGenerationError("form parameters can only be applied to "
-                                             "(" + ','.join(self.body_methods) + ") HTTP methods")
+                raise SwaggerGenerationError(
+                    "form parameters can only be applied to "
+                    "(" + ",".join(self.body_methods) + ") HTTP methods"
+                )
 
         return merge_params(parameters, manual_parameters)
 
@@ -209,19 +234,23 @@ class SwaggerAutoSchema(ViewInspector):
         method = self.method.lower()
 
         default_status = guess_response_status(method)
-        default_schema = ''
-        if method in ('get', 'post', 'put', 'patch'):
+        default_schema = ""
+        if method in ("get", "post", "put", "patch"):
             default_schema = self.get_default_response_serializer()
 
-        default_schema = default_schema or ''
+        default_schema = default_schema or ""
         if default_schema and not isinstance(default_schema, openapi.Schema):
-            default_schema = self.serializer_to_schema(default_schema) or ''
+            default_schema = self.serializer_to_schema(default_schema) or ""
 
         if default_schema:
             if self.has_list_response():
-                default_schema = openapi.Schema(type=openapi.TYPE_ARRAY, items=default_schema)
+                default_schema = openapi.Schema(
+                    type=openapi.TYPE_ARRAY, items=default_schema
+                )
             if self.should_page():
-                default_schema = self.get_paginated_response(default_schema) or default_schema
+                default_schema = (
+                    self.get_paginated_response(default_schema) or default_schema
+                )
 
         return OrderedDict({str(default_status): default_schema})
 
@@ -234,11 +263,13 @@ class SwaggerAutoSchema(ViewInspector):
         :return: the response serializers
         :rtype: dict
         """
-        manual_responses = self.overrides.get('responses', None) or {}
-        manual_responses = OrderedDict((str(sc), resp) for sc, resp in manual_responses.items())
+        manual_responses = self.overrides.get("responses", None) or {}
+        manual_responses = OrderedDict(
+            (str(sc), resp) for sc, resp in manual_responses.items()
+        )
 
         responses = OrderedDict()
-        if not any(is_success(int(sc)) for sc in manual_responses if sc != 'default'):
+        if not any(is_success(int(sc)) for sc in manual_responses if sc != "default"):
             responses = self.get_default_responses()
 
         responses.update((str(sc), resp) for sc, resp in manual_responses.items())
@@ -254,19 +285,19 @@ class SwaggerAutoSchema(ViewInspector):
         responses = OrderedDict()
         for sc, serializer in response_serializers.items():
             if isinstance(serializer, str):
-                response = openapi.Response(
-                    description=force_real_str(serializer)
-                )
+                response = openapi.Response(description=force_real_str(serializer))
             elif not serializer:
                 continue
             elif isinstance(serializer, openapi.Response):
                 response = serializer
-                if hasattr(response, 'schema') and not isinstance(response.schema, openapi.Schema.OR_REF):
+                if hasattr(response, "schema") and not isinstance(
+                    response.schema, openapi.Schema.OR_REF
+                ):
                     serializer = force_serializer_instance(response.schema)
                     response.schema = self.serializer_to_schema(serializer)
             elif isinstance(serializer, openapi.Schema.OR_REF):
                 response = openapi.Response(
-                    description='',
+                    description="",
                     schema=serializer,
                 )
             elif isinstance(serializer, openapi._Ref):
@@ -274,7 +305,7 @@ class SwaggerAutoSchema(ViewInspector):
             else:
                 serializer = force_serializer_instance(serializer)
                 response = openapi.Response(
-                    description='',
+                    description="",
                     schema=self.serializer_to_schema(serializer),
                 )
 
@@ -287,7 +318,7 @@ class SwaggerAutoSchema(ViewInspector):
 
         :return: the query serializer, or ``None``
         """
-        query_serializer = self.overrides.get('query_serializer', None)
+        query_serializer = self.overrides.get("query_serializer", None)
         if query_serializer is not None:
             query_serializer = force_serializer_instance(query_serializer)
         return query_serializer
@@ -297,17 +328,28 @@ class SwaggerAutoSchema(ViewInspector):
 
         :rtype: list[openapi.Parameter]
         """
-        natural_parameters = self.get_filter_parameters() + self.get_pagination_parameters()
+        natural_parameters = (
+            self.get_filter_parameters() + self.get_pagination_parameters()
+        )
 
         query_serializer = self.get_query_serializer()
         serializer_parameters = []
         if query_serializer is not None:
-            serializer_parameters = self.serializer_to_parameters(query_serializer, in_=openapi.IN_QUERY)
+            serializer_parameters = self.serializer_to_parameters(
+                query_serializer, in_=openapi.IN_QUERY
+            )
 
-            if len(set(param_list_to_odict(natural_parameters)) & set(param_list_to_odict(serializer_parameters))) != 0:
+            if (
+                len(
+                    set(param_list_to_odict(natural_parameters))
+                    & set(param_list_to_odict(serializer_parameters))
+                )
+                != 0
+            ):
                 raise SwaggerGenerationError(
                     "your query_serializer contains fields that conflict with the "
-                    "filter_backend or paginator_class on the view - %s %s" % (self.method, self.path)
+                    "filter_backend or paginator_class on the view - %s %s"
+                    % (self.method, self.path)
                 )
 
         return natural_parameters + serializer_parameters
@@ -322,9 +364,9 @@ class SwaggerAutoSchema(ViewInspector):
         """
         operation_keys = operation_keys or self.operation_keys
 
-        operation_id = self.overrides.get('operation_id', '')
+        operation_id = self.overrides.get("operation_id", "")
         if not operation_id:
-            operation_id = '_'.join(operation_keys)
+            operation_id = "_".join(operation_keys)
         return operation_id
 
     def split_summary_from_description(self, description):
@@ -337,8 +379,10 @@ class SwaggerAutoSchema(ViewInspector):
         """
         # https://www.python.org/dev/peps/pep-0257/#multi-line-docstrings
         summary = None
-        summary_max_len = 120  # OpenAPI 2.0 spec says summary should be under 120 characters
-        sections = description.split('\n\n', 1)
+        summary_max_len = (
+            120  # OpenAPI 2.0 spec says summary should be under 120 characters
+        )
+        sections = description.split("\n\n", 1)
         if len(sections) == 2:
             sections[0] = sections[0].strip()
             if len(sections[0]) < summary_max_len:
@@ -353,11 +397,11 @@ class SwaggerAutoSchema(ViewInspector):
         :return: summary and description
         :rtype: (str,str)
         """
-        description = self.overrides.get('operation_description', None)
-        summary = self.overrides.get('operation_summary', None)
+        description = self.overrides.get("operation_description", None)
+        summary = self.overrides.get("operation_summary", None)
         if description is None:
-            description = self._sch.get_description(self.path, self.method) or ''
-            description = description.strip().replace('\r', '')
+            description = self._sch.get_description(self.path, self.method) or ""
+            description = description.strip().replace("\r", "")
 
             if description and (summary is None):
                 # description from docstring... do summary magic
@@ -373,7 +417,7 @@ class SwaggerAutoSchema(ViewInspector):
 
         :return: security requirements
         :rtype: list[dict[str,list[str]]]"""
-        return self.overrides.get('security', None)
+        return self.overrides.get("security", None)
 
     def is_deprecated(self):
         """Return ``True`` if this operation is to be marked as deprecated.
@@ -381,7 +425,7 @@ class SwaggerAutoSchema(ViewInspector):
         :return: deprecation status
         :rtype: bool
         """
-        return self.overrides.get('deprecated', None)
+        return self.overrides.get("deprecated", None)
 
     def get_tags(self, operation_keys=None):
         """Get a list of tags for this operation. Tags determine how operations relate with each other, and in the UI
@@ -394,7 +438,7 @@ class SwaggerAutoSchema(ViewInspector):
         """
         operation_keys = operation_keys or self.operation_keys
 
-        tags = self.overrides.get('tags')
+        tags = self.overrides.get("tags")
         if not tags:
             tags = [operation_keys[0]]
 

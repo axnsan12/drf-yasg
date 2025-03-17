@@ -16,28 +16,31 @@ def test_no_form_parameters_with_non_form_parsers():
     # all their parsers classes to form parsers are not allowed
     # even when the request body is empty
 
-    @method_decorator(name='post', decorator=swagger_auto_schema(
-        operation_description="Logins a user and returns a token",
-        manual_parameters=[
-            openapi.Parameter(
-                "username",
-                openapi.IN_FORM,
-                required=True,
-                type=openapi.TYPE_STRING,
-                description="Valid username or email for authentication"
-            ),
-        ]
-    ))
+    @method_decorator(
+        name="post",
+        decorator=swagger_auto_schema(
+            operation_description="Logins a user and returns a token",
+            manual_parameters=[
+                openapi.Parameter(
+                    "username",
+                    openapi.IN_FORM,
+                    required=True,
+                    type=openapi.TYPE_STRING,
+                    description="Valid username or email for authentication",
+                ),
+            ],
+        ),
+    )
     class CustomObtainAuthToken(ObtainAuthToken):
         throttle_classes = api_settings.DEFAULT_THROTTLE_CLASSES
 
     urlpatterns = [
-        path('token/', CustomObtainAuthToken.as_view()),
+        path("token/", CustomObtainAuthToken.as_view()),
     ]
 
     generator = OpenAPISchemaGenerator(
         info=openapi.Info(title="Test generator", default_version="v1"),
-        patterns=urlpatterns
+        patterns=urlpatterns,
     )
 
     with pytest.raises(SwaggerGenerationError):
