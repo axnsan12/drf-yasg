@@ -55,6 +55,7 @@ def drf_yasg_setup(**kwargs):
         install_requires=requirements,
         extras_require={
             'validation': requirements_validation,
+            'coreapi': ['coreapi>=2.3.3', 'coreschema>=0.0.4']
         },
         license='BSD License',
         description='Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code.',

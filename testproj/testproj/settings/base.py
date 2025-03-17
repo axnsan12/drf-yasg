@@ -145,19 +145,19 @@ SWAGGER_SETTINGS = {
     "DEFAULT_PAGINATOR_INSPECTORS": [
         'testproj.inspectors.UnknownPaginatorInspector',
         'drf_yasg.inspectors.DjangoRestResponsePagination',
+        'drf_yasg.inspectors.DrfAPICompatInspector',
         'drf_yasg.inspectors.CoreAPICompatInspector',
     ]
 }
 
 REDOC_SETTINGS = {
-    'SPEC_URL': ('schema-json', {'format': '.json'}),
+    'SPEC_URL': ('schema-json', {'format': 'json'}),
 }
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)

@@ -13,7 +13,7 @@ class OtherStuffSerializer(serializers.Serializer):
     foo = serializers.CharField()
 
 
-class UserSerializerrr(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all())
     article_slugs = serializers.SlugRelatedField(read_only=True, slug_field='slug', many=True, source='articles')
     last_connected_ip = serializers.IPAddressField(help_text="i'm out of ideas", protocol='ipv4', read_only=True)
@@ -74,6 +74,8 @@ class UserSerializerrr(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'articles', 'snippets',
                   'last_connected_ip', 'last_connected_at', 'article_slugs', 'other_stuff', 'hint_example',
                   'help_text_example_1', 'help_text_example_2', 'help_text_example_3')
+
+        ref_name = "UserSerializer"
 
 
 class UserListQuerySerializer(serializers.Serializer):

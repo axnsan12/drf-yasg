@@ -16,3 +16,8 @@
 .rst-content dl .versionadded p, .rst-content dl .versionchanged p {
     margin: 0 !important;
 }
+
+.align-center {
+    width: 100% !important;
+    background-color: #000000;
+}

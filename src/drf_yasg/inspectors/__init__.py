@@ -7,7 +7,7 @@ from .field import (
     InlineSerializerInspector, JSONFieldInspector, RecursiveFieldInspector, ReferencingSerializerInspector,
     RelatedFieldInspector, SerializerMethodFieldInspector, SimpleFieldInspector, StringDefaultFieldInspector
 )
-from .query import CoreAPICompatInspector, DjangoRestResponsePagination
+from .query import DrfAPICompatInspector, CoreAPICompatInspector, DjangoRestResponsePagination
 from .view import SwaggerAutoSchema
 
 # these settings must be accessed only after defining/importing all the classes in this module to avoid ImportErrors
@@ -20,7 +20,7 @@ __all__ = [
     'BaseInspector', 'FilterInspector', 'PaginatorInspector', 'FieldInspector', 'SerializerInspector', 'ViewInspector',
 
     # filter and pagination inspectors
-    'CoreAPICompatInspector', 'DjangoRestResponsePagination',
+    'DrfAPICompatInspector', 'CoreAPICompatInspector', 'DjangoRestResponsePagination',
 
     # field inspectors
     'InlineSerializerInspector', 'RecursiveFieldInspector', 'ReferencingSerializerInspector', 'RelatedFieldInspector',

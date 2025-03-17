@@ -11,11 +11,15 @@ from rest_framework.views import APIView
 
 from .app_settings import swagger_settings
 from .renderers import (
-    OpenAPIRenderer, ReDocOldRenderer, ReDocRenderer, SwaggerJSONRenderer, SwaggerUIRenderer, SwaggerYAMLRenderer,
-    _SpecRenderer
+    ReDocOldRenderer,
+    ReDocRenderer,
+    SwaggerJSONRenderer,
+    SwaggerUIRenderer,
+    SwaggerYAMLRenderer,
+    _SpecRenderer,
 )
 
-SPEC_RENDERERS = (SwaggerYAMLRenderer, SwaggerJSONRenderer, OpenAPIRenderer)
+SPEC_RENDERERS = swagger_settings.DEFAULT_SPEC_RENDERERS
 UI_RENDERERS = {
     'swagger': (SwaggerUIRenderer, ReDocRenderer),
     'redoc': (ReDocRenderer, SwaggerUIRenderer),
@@ -51,11 +55,11 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
                     generator_class=None, authentication_classes=None, permission_classes=None):
     """Create a SchemaView class with default renderers and generators.
 
-    :param .Info info: information about the API; if omitted, defaults to :ref:`DEFAULT_INFO <default-swagger-settings>`
+    :param Info info: information about the API; if omitted, defaults to :ref:`DEFAULT_INFO <default-swagger-settings>`
     :param str url: same as :class:`.OpenAPISchemaGenerator`
     :param patterns: same as :class:`.OpenAPISchemaGenerator`
     :param urlconf: same as :class:`.OpenAPISchemaGenerator`
-    :param bool public: if False, includes only the endpoints that are accesible by the user viewing the schema
+    :param bool public: if False, includes only the endpoints that are accessible by the user viewing the schema
     :param list validators: a list of validator names to apply; the only allowed value is ``ssv``, for now
     :param type generator_class: schema generator class to use; should be a subclass of :class:`.OpenAPISchemaGenerator`
     :param list authentication_classes: authentication classes for the schema view itself
@@ -74,6 +78,20 @@ def get_schema_view(info=None, url=None, patterns=None, urlconf=None, public=Fal
     info = info or swagger_settings.DEFAULT_INFO
     validators = validators or []
     _spec_renderers = tuple(renderer.with_validators(validators) for renderer in SPEC_RENDERERS)
+
+    # optionally copy renderers with the validators that are configured above
+    if swagger_settings.USE_COMPAT_RENDERERS:
+        warnings.warn(
+            "SwaggerJSONRenderer & SwaggerYAMLRenderer's `format` has changed to not include a `.` prefix, "
+            "please silence this warning by setting `SWAGGER_USE_COMPAT_RENDERERS = False` "
+            "in your Django settings and ensure your application works "
+            "(check your URLCONF and swagger/redoc URLs).",
+            DeprecationWarning)
+        _spec_renderers += tuple(
+            type(cls.__name__, (cls,), {'format': '.' + cls.format})
+            for cls in _spec_renderers
+            if issubclass(cls, (SwaggerJSONRenderer, SwaggerYAMLRenderer))
+        )
 
     class SchemaView(APIView):
         _ignore_model_permissions = True

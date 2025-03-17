@@ -1,3 +1,4 @@
+import enum
 import json
 from collections import OrderedDict
 
@@ -8,6 +9,11 @@ from drf_yasg.inspectors import FieldInspector, FilterInspector, PaginatorInspec
 
 def test_reference_schema(swagger_dict, reference_schema, compare_schemas):
     compare_schemas(swagger_dict, reference_schema)
+
+
+class VerisonEnum(enum.Enum):
+    V1 = 'v1'
+    V2 = 'v2'
 
 
 class NoOpFieldInspector(FieldInspector):
@@ -38,8 +44,8 @@ def test_noop_inspectors(swagger_settings, mock_schema_request, codec_json, refe
     set_inspectors([NoOpPaginatorInspector], 'DEFAULT_PAGINATOR_INSPECTORS')
 
     generator = OpenAPISchemaGenerator(
-        info=openapi.Info(title="Test generator", default_version="v1"),
-        version="v2",
+        info=openapi.Info(title="Test generator", default_version=VerisonEnum.V1),
+        version=VerisonEnum.V2,
     )
     swagger = generator.get_schema(mock_schema_request, True)
 

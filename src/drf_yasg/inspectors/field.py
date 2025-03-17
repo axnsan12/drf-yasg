@@ -2,23 +2,39 @@ import datetime
 import inspect
 import logging
 import operator
-import typing
 import uuid
+from contextlib import suppress
 from collections import OrderedDict
 from decimal import Decimal
-from inspect import signature as inspect_signature
 
+import typing
 from django.core import validators
 from django.db import models
+from packaging import version
 from rest_framework import serializers
 from rest_framework.settings import api_settings as rest_framework_settings
 
+from .base import call_view_method, FieldInspector, NotHandled, SerializerInspector
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
     decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
 )
-from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
+
+try:
+    from importlib import metadata
+    drf_version = metadata.version("djangorestframework")
+except ImportError:  # Python < 3.8
+    import pkg_resources
+    drf_version = pkg_resources.get_distribution("djangorestframework").version
+
+try:
+    from types import NoneType, UnionType
+
+    UNION_TYPES = (typing.Union, UnionType)
+except ImportError:  # Python < 3.10
+    NoneType = type(None)
+    UNION_TYPES = (typing.Union,)
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +53,7 @@ class InlineSerializerInspector(SerializerInspector):
         is called only when the serializer is converted into a list of parameters for use in a form data request.
 
         :param serializer: serializer instance
-        :param list[openapi.Parameter] parameters: genereated parameters
+        :param list[openapi.Parameter] parameters: generated parameters
         :return: modified parameters
         :rtype: list[openapi.Parameter]
         """
@@ -126,7 +142,7 @@ class InlineSerializerInspector(SerializerInspector):
 
             actual_serializer = getattr(actual_schema, '_NP_serializer', None)
             this_serializer = get_serializer_class(field)
-            if actual_serializer and actual_serializer != this_serializer:  # pragma: no cover
+            if actual_serializer and actual_serializer != this_serializer:
                 explicit_refs = self._has_ref_name(actual_serializer) and self._has_ref_name(this_serializer)
                 if not explicit_refs:
                     raise SwaggerGenerationError(
@@ -176,7 +192,7 @@ def get_queryset_from_view(view, serializer=None):
     """Try to get the queryset of the given view
 
     :param view: the view instance or class
-    :param serializer: if given, will check that the view's get_serializer_class return matches this serialzier
+    :param serializer: if given, will check that the view's get_serializer_class return matches this serializer
     :return: queryset or ``None``
     """
     try:
@@ -184,7 +200,7 @@ def get_queryset_from_view(view, serializer=None):
 
         if queryset is not None and serializer is not None:
             # make sure the view is actually using *this* serializer
-            assert type(serializer) == call_view_method(view, 'get_serializer_class', 'serializer_class')
+            assert type(serializer) is call_view_method(view, 'get_serializer_class', 'serializer_class')
 
         return queryset
     except Exception:  # pragma: no cover
@@ -205,6 +221,14 @@ def get_parent_serializer(field):
     return None  # pragma: no cover
 
 
+def get_model_from_descriptor(descriptor):
+    with suppress(Exception):
+        try:
+            return descriptor.rel.related_model
+        except Exception:
+            return descriptor.field.remote_field.model
+
+
 def get_related_model(model, source):
     """Try to find the other side of a model relationship given the name of a related field.
 
@@ -212,14 +236,12 @@ def get_related_model(model, source):
     :param str source: related field name
     :return: related model or ``None``
     """
-    try:
-        descriptor = getattr(model, source)
-        try:
-            return descriptor.rel.related_model
-        except Exception:
-            return descriptor.field.remote_field.model
-    except Exception:  # pragma: no cover
-        return None
+
+    with suppress(Exception):
+        if '.' in source and source.index('.'):
+            attr, source = source.split('.', maxsplit=1)
+            return get_related_model(get_model_from_descriptor(getattr(model, attr)), source)
+        return get_model_from_descriptor(getattr(model, source))
 
 
 class RelatedFieldInspector(FieldInspector):
@@ -277,7 +299,7 @@ class RelatedFieldInspector(FieldInspector):
         elif isinstance(field, serializers.HyperlinkedRelatedField):
             return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)
 
-        return SwaggerType(type=openapi.TYPE_STRING)
+        return NotHandled  # pragma: no cover
 
 
 def find_regex(regex_field):
@@ -376,7 +398,6 @@ model_field_to_basic_type = [
     (models.AutoField, (openapi.TYPE_INTEGER, None)),
     (models.BinaryField, (openapi.TYPE_STRING, openapi.FORMAT_BINARY)),
     (models.BooleanField, (openapi.TYPE_BOOLEAN, None)),
-    (models.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (models.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (models.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
@@ -403,7 +424,6 @@ serializer_field_to_basic_type = [
     (serializers.RegexField, (openapi.TYPE_STRING, None)),
     (serializers.CharField, (openapi.TYPE_STRING, None)),
     (serializers.BooleanField, (openapi.TYPE_BOOLEAN, None)),
-    (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
     (serializers.IntegerField, (openapi.TYPE_INTEGER, None)),
     (serializers.FloatField, (openapi.TYPE_NUMBER, None)),
     (serializers.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
@@ -412,6 +432,15 @@ serializer_field_to_basic_type = [
     (serializers.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (serializers.ModelField, (openapi.TYPE_STRING, None)),
 ]
+
+if version.parse(drf_version) < version.parse("3.14.0"):
+    model_field_to_basic_type.append(
+        (models.NullBooleanField, (openapi.TYPE_BOOLEAN, None))
+    )
+
+    serializer_field_to_basic_type.append(
+        (serializers.NullBooleanField, (openapi.TYPE_BOOLEAN, None)),
+    )
 
 basic_type_info = serializer_field_to_basic_type + model_field_to_basic_type
 
@@ -458,15 +487,6 @@ def decimal_return_type():
     return openapi.TYPE_STRING if rest_framework_settings.COERCE_DECIMAL_TO_STRING else openapi.TYPE_NUMBER
 
 
-def get_origin_type(hint_class):
-    return getattr(hint_class, '__origin__', None) or hint_class
-
-
-def hint_class_issubclass(hint_class, check_class):
-    origin_type = get_origin_type(hint_class)
-    return inspect.isclass(origin_type) and issubclass(origin_type, check_class)
-
-
 hinting_type_info = [
     (bool, (openapi.TYPE_BOOLEAN, None)),
     (int, (openapi.TYPE_INTEGER, None)),
@@ -483,10 +503,14 @@ hinting_type_info = [
 if hasattr(typing, 'get_args'):
     # python >=3.8
     typing_get_args = typing.get_args
+    typing_get_origin = typing.get_origin
 else:
     # python <3.8
     def typing_get_args(tp):
         return getattr(tp, '__args__', ())
+
+    def typing_get_origin(tp):
+        return getattr(tp, '__origin__', None)
 
 
 def inspect_collection_hint_class(hint_class):
@@ -503,12 +527,6 @@ def inspect_collection_hint_class(hint_class):
 hinting_type_info.append(((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class))
 
 
-def _get_union_types(hint_class):
-    origin_type = get_origin_type(hint_class)
-    if origin_type is typing.Union:
-        return hint_class.__args__
-
-
 def get_basic_type_info_from_hint(hint_class):
     """Given a class (eg from a SerializerMethodField's return type hint,
     return its basic type information - ``type``, ``format``, ``pattern``,
@@ -518,12 +536,12 @@ def get_basic_type_info_from_hint(hint_class):
     :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
     :rtype: OrderedDict
     """
-    union_types = _get_union_types(hint_class)
 
-    if union_types:
+    if typing_get_origin(hint_class) in UNION_TYPES:
         # Optional is implemented as Union[T, None]
-        if len(union_types) == 2 and isinstance(None, union_types[1]):
-            result = get_basic_type_info_from_hint(union_types[0])
+        filtered_types = [t for t in typing_get_args(hint_class) if t is not NoneType]
+        if len(filtered_types) == 1:
+            result = get_basic_type_info_from_hint(filtered_types[0])
             if result:
                 result['x-nullable'] = True
 
@@ -531,8 +549,15 @@ def get_basic_type_info_from_hint(hint_class):
 
         return None
 
+    # resolve the origin class if the class is generic
+    resolved_class = typing_get_origin(hint_class) or hint_class
+
+    # bail out early
+    if not inspect.isclass(resolved_class):
+        return None
+
     for check_class, info in hinting_type_info:
-        if hint_class_issubclass(hint_class, check_class):
+        if issubclass(resolved_class, check_class):
             if callable(info):
                 return info(hint_class)
 
@@ -595,17 +620,19 @@ class SerializerMethodFieldInspector(FieldInspector):
             return self.probe_field_inspectors(serializer, swagger_object_type, use_references, read_only=True)
         else:
             # look for Python 3.5+ style type hinting of the return value
-            hint_class = inspect_signature(method).return_annotation
+            hint_class = typing.get_type_hints(method).get('return')
 
-            if not inspect.isclass(hint_class) and hasattr(hint_class, '__args__'):
-                hint_class = hint_class.__args__[0]
-            if inspect.isclass(hint_class) and not issubclass(hint_class, inspect._empty):
-                type_info = get_basic_type_info_from_hint(hint_class)
+            # annotations such as typing.Optional have an __instancecheck__
+            # hook and will not look like classes, but `issubclass` needs
+            # a class as its first argument, so only in that case abort
+            if inspect.isclass(hint_class) and issubclass(hint_class, inspect._empty):
+                return NotHandled
 
-                if type_info is not None:
-                    SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type,
-                                                                            use_references, **kwargs)
-                    return SwaggerType(**type_info)
+            type_info = get_basic_type_info_from_hint(hint_class)
+            if type_info is not None:
+                SwaggerType, ChildSwaggerType = self._get_partial_types(field, swagger_object_type,
+                                                                        use_references, **kwargs)
+                return SwaggerType(**type_info)
 
         return NotHandled
 

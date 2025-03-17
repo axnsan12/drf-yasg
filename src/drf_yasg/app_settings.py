@@ -20,11 +20,19 @@ SWAGGER_DEFAULTS = {
         'drf_yasg.inspectors.StringDefaultFieldInspector',
     ],
     'DEFAULT_FILTER_INSPECTORS': [
+        'drf_yasg.inspectors.DrfAPICompatInspector',
         'drf_yasg.inspectors.CoreAPICompatInspector',
     ],
     'DEFAULT_PAGINATOR_INSPECTORS': [
         'drf_yasg.inspectors.DjangoRestResponsePagination',
+        'drf_yasg.inspectors.DrfAPICompatInspector',
         'drf_yasg.inspectors.CoreAPICompatInspector',
+    ],
+
+    'DEFAULT_SPEC_RENDERERS': [
+        'drf_yasg.renderers.SwaggerYAMLRenderer',
+        'drf_yasg.renderers.SwaggerJSONRenderer',
+        'drf_yasg.renderers.OpenAPIRenderer',
     ],
 
     'EXCLUDED_MEDIA_TYPES': ['html'],
@@ -33,6 +41,9 @@ SWAGGER_DEFAULTS = {
     'DEFAULT_API_URL': None,
 
     'USE_SESSION_AUTH': True,
+    'USE_COMPAT_RENDERERS': getattr(settings, 'SWAGGER_USE_COMPAT_RENDERERS', True),
+    'CSRF_COOKIE_NAME': settings.CSRF_COOKIE_NAME,
+    'CSRF_HEADER_NAME': settings.CSRF_HEADER_NAME,
     'SECURITY_DEFINITIONS': {
         'Basic': {
             'type': 'basic'
@@ -89,11 +100,12 @@ IMPORT_STRINGS = [
     'DEFAULT_FIELD_INSPECTORS',
     'DEFAULT_FILTER_INSPECTORS',
     'DEFAULT_PAGINATOR_INSPECTORS',
+    'DEFAULT_SPEC_RENDERERS',
     'DEFAULT_INFO',
 ]
 
 
-class AppSettings(object):
+class AppSettings:
     """
     Stolen from Django Rest Framework, removed caching for easier testing
     """

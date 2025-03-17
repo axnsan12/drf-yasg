@@ -1,8 +1,6 @@
-coreapi>=2.3.3
-coreschema>=0.0.4
 djangorestframework>=3.10.3
 django>=2.2.16
-ruamel.yaml>=0.16.13
+pyyaml>=5.1
 inflection>=0.3.1
 packaging>=21.0
 pytz>=2021.1
