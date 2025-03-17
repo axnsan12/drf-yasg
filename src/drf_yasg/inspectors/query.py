@@ -8,7 +8,7 @@ except ImportError:
 
 from .. import openapi
 from ..utils import force_real_str
-from .base import FilterInspector, PaginatorInspector, NotHandled
+from .base import FilterInspector, NotHandled, PaginatorInspector
 
 
 def ignore_assert_decorator(func):

@@ -2,24 +2,28 @@ import datetime
 import inspect
 import logging
 import operator
+import typing
 import uuid
-from contextlib import suppress
 from collections import OrderedDict
+from contextlib import suppress
 from decimal import Decimal
 
-import typing
 from django.core import validators
 from django.db import models
 from packaging import version
 from rest_framework import serializers
 from rest_framework.settings import api_settings as rest_framework_settings
 
-from .base import call_view_method, FieldInspector, NotHandled, SerializerInspector
 from .. import openapi
 from ..errors import SwaggerGenerationError
 from ..utils import (
-    decimal_as_float, field_value_to_representation, filter_none, get_serializer_class, get_serializer_ref_name
+    decimal_as_float,
+    field_value_to_representation,
+    filter_none,
+    get_serializer_class,
+    get_serializer_ref_name,
 )
+from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
 
 try:
     from importlib import metadata

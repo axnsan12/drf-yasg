@@ -12,7 +12,12 @@ from articles import serializers
 from articles.models import Article
 from drf_yasg import openapi
 from drf_yasg.app_settings import swagger_settings
-from drf_yasg.inspectors import DrfAPICompatInspector, FieldInspector, NotHandled, SwaggerAutoSchema
+from drf_yasg.inspectors import (
+    DrfAPICompatInspector,
+    FieldInspector,
+    NotHandled,
+    SwaggerAutoSchema,
+)
 from drf_yasg.utils import no_body, swagger_auto_schema
 
 
