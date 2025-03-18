@@ -1,11 +1,11 @@
-from django.urls import re_path
 import coreapi
 import coreschema
+from django.urls import re_path
 from rest_framework import pagination
 
 from testproj.urls import required_urlpatterns
 
-from .url_versioning import SnippetList, VersionedSchemaView, VERSION_PREFIX_URL
+from .url_versioning import VERSION_PREFIX_URL, SnippetList, VersionedSchemaView
 
 
 class FilterBackendWithoutParams:

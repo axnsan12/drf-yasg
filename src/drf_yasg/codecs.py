@@ -3,8 +3,8 @@ import json
 import logging
 from collections import OrderedDict
 
-from django.utils.encoding import force_bytes
 import yaml
+from django.utils.encoding import force_bytes
 
 try:
     from swagger_spec_validator.common import SwaggerValidationError as SSVErr

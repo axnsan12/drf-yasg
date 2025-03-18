@@ -1,13 +1,33 @@
 from ..app_settings import swagger_settings
 from .base import (
-    BaseInspector, FieldInspector, FilterInspector, NotHandled, PaginatorInspector, SerializerInspector, ViewInspector
+    BaseInspector,
+    FieldInspector,
+    FilterInspector,
+    NotHandled,
+    PaginatorInspector,
+    SerializerInspector,
+    ViewInspector,
 )
 from .field import (
-    CamelCaseJSONFilter, ChoiceFieldInspector, DictFieldInspector, FileFieldInspector, HiddenFieldInspector,
-    InlineSerializerInspector, JSONFieldInspector, RecursiveFieldInspector, ReferencingSerializerInspector,
-    RelatedFieldInspector, SerializerMethodFieldInspector, SimpleFieldInspector, StringDefaultFieldInspector
+    CamelCaseJSONFilter,
+    ChoiceFieldInspector,
+    DictFieldInspector,
+    FileFieldInspector,
+    HiddenFieldInspector,
+    InlineSerializerInspector,
+    JSONFieldInspector,
+    RecursiveFieldInspector,
+    ReferencingSerializerInspector,
+    RelatedFieldInspector,
+    SerializerMethodFieldInspector,
+    SimpleFieldInspector,
+    StringDefaultFieldInspector,
 )
-from .query import DrfAPICompatInspector, CoreAPICompatInspector, DjangoRestResponsePagination
+from .query import (
+    CoreAPICompatInspector,
+    DjangoRestResponsePagination,
+    DrfAPICompatInspector,
+)
 from .view import SwaggerAutoSchema
 
 # these settings must be accessed only after defining/importing all the classes in this module to avoid ImportErrors

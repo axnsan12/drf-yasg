@@ -6,10 +6,9 @@
 import inspect
 import os
 import re
-import sys
 import shutil
+import sys
 
-import sphinx_rtd_theme
 from docutils import nodes, utils
 from docutils.parsers.rst import roles
 from docutils.parsers.rst.roles import set_classes

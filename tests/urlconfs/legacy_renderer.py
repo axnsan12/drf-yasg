@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from testproj.urls import required_urlpatterns, SchemaView
+from testproj.urls import SchemaView, required_urlpatterns
 
 urlpatterns = [
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', SchemaView.without_ui(cache_timeout=0),
