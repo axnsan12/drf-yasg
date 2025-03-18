@@ -54,8 +54,8 @@ class DrfAPICompatInspector(PaginatorInspector, FilterInspector):
 
 
 class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
-    """Converts ``coreapi.Field``\\ s to :class:`.openapi.Parameter`\\ s for filters and paginators that implement a
-    ``get_schema_fields`` method.
+    """Converts ``coreapi.Field``\\ s to :class:`.openapi.Parameter`\\ s for filters and
+    paginators that implement a ``get_schema_fields`` method.
     """
 
     @ignore_assert_decorator
@@ -74,7 +74,8 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
         return [self.coreapi_field_to_parameter(field) for field in fields]
 
     def coreapi_field_to_parameter(self, field):
-        """Convert an instance of `coreapi.Field` to a swagger :class:`.Parameter` object.
+        """Convert an instance of `coreapi.Field` to a swagger :class:`.Parameter`
+        object.
 
         :param coreapi.Field field:
         :rtype: openapi.Parameter
@@ -107,8 +108,8 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
 
 
 class DjangoRestResponsePagination(PaginatorInspector):
-    """Provides response schema pagination wrapping for django-rest-framework's LimitOffsetPagination,
-    PageNumberPagination and CursorPagination
+    """Provides response schema pagination wrapping for django-rest-framework'
+    LimitOffsetPagination, PageNumberPagination and CursorPagination
     """
 
     def fix_paginated_property(self, key: str, value: dict):

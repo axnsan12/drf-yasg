@@ -74,11 +74,14 @@ class SwaggerAutoSchema(ViewInspector):
         """Return the request body parameters for this view. |br|
         This is either:
 
-        -  a list with a single object Parameter with a :class:`.Schema` derived from the request serializer
+        -  a list with a single object Parameter with a :class:`.Schema` derived from
+            the request serializer
         -  a list of primitive Parameters parsed as form data
 
-        :param list[str] consumes: a list of accepted MIME types as returned by :meth:`.get_consumes`
-        :return: a (potentially empty) list of :class:`.Parameter`\\ s either ``in: body`` or ``in: formData``
+        :param list[str] consumes: a list of accepted MIME types as returned by
+            :meth:`.get_consumes`
+        :return: a (potentially empty) list of :class:`.Parameter`\\ s either
+            ``in: body`` or ``in: formData``
         :rtype: list[openapi.Parameter]
         """
         serializer = self.get_request_serializer()
@@ -107,7 +110,8 @@ class SwaggerAutoSchema(ViewInspector):
         return call_view_method(self.view, "get_serializer")
 
     def _get_request_body_override(self):
-        """Parse the request_body key in the override dict. This method is not public API."""
+        """Parse the request_body key in the override dict. This method is not public
+        API."""
         body_override = self.overrides.get("request_body", None)
 
         if body_override is not None:
@@ -126,9 +130,11 @@ class SwaggerAutoSchema(ViewInspector):
         return body_override
 
     def get_request_serializer(self):
-        """Return the request serializer (used for parsing the request payload) for this endpoint.
+        """Return the request serializer (used for parsing the request payload) for this
+        endpoint.
 
-        :return: the request serializer, or one of :class:`.Schema`, :class:`.SchemaRef`, ``None``
+        :return: the request serializer, or one of :class:`.Schema`,
+            :class:`.SchemaRef`, ``None``
         :rtype: rest_framework.serializers.Serializer
         """
         body_override = self._get_request_body_override()
@@ -142,17 +148,21 @@ class SwaggerAutoSchema(ViewInspector):
         return body_override
 
     def get_request_form_parameters(self, serializer):
-        """Given a Serializer, return a list of ``in: formData`` :class:`.Parameter`\\ s.
+        """Given a Serializer, return a list of ``in: formData``
+        :class:`.Parameter`\\ s.
 
-        :param serializer: the view's request serializer as returned by :meth:`.get_request_serializer`
+        :param serializer: the view's request serializer as returned by
+            :meth:`.get_request_serializer`
         :rtype: list[openapi.Parameter]
         """
         return self.serializer_to_parameters(serializer, in_=openapi.IN_FORM)
 
     def get_request_body_schema(self, serializer):
-        """Return the :class:`.Schema` for a given request's body data. Only applies to PUT, PATCH and POST requests.
+        """Return the :class:`.Schema` for a given request's body data. Only applies to
+        PUT, PATCH and POST requests.
 
-        :param serializer: the view's request serializer as returned by :meth:`.get_request_serializer`
+        :param serializer: the view's request serializer as returned by
+            :meth:`.get_request_serializer`
         :rtype: openapi.Schema
         """
         return self.serializer_to_schema(serializer)
@@ -168,7 +178,8 @@ class SwaggerAutoSchema(ViewInspector):
         )
 
     def add_manual_parameters(self, parameters):
-        """Add/replace parameters from the given list of automatically generated request parameters.
+        """Add/replace parameters from the given list of automatically generated request
+        parameters.
 
         :param list[openapi.Parameter] parameters: generated parameters
         :return: modified parameters
@@ -204,7 +215,8 @@ class SwaggerAutoSchema(ViewInspector):
         return merge_params(parameters, manual_parameters)
 
     def get_responses(self):
-        """Get the possible responses for this view as a swagger :class:`.Responses` object.
+        """Get the possible responses for this view as a swagger :class:`.Responses`
+        object.
 
         :return: the documented responses
         :rtype: openapi.Responses
@@ -215,8 +227,9 @@ class SwaggerAutoSchema(ViewInspector):
         )
 
     def get_default_response_serializer(self):
-        """Return the default response serializer for this endpoint. This is derived from either the ``request_body``
-        override or the request serializer (:meth:`.get_view_serializer`).
+        """Return the default response serializer for this endpoint. This is derived
+        from either the ``request_body`` override or the request serializer
+        (:meth:`.get_view_serializer`).
 
         :return: response serializer, :class:`.Schema`, :class:`.SchemaRef`, ``None``
         """
@@ -227,7 +240,8 @@ class SwaggerAutoSchema(ViewInspector):
         return self.get_view_serializer()
 
     def get_default_responses(self):
-        """Get the default responses determined for this view from the request serializer and request method.
+        """Get the default responses determined for this view from the request
+        serializer and request method.
 
         :type: dict[str, openapi.Schema]
         """
@@ -255,9 +269,11 @@ class SwaggerAutoSchema(ViewInspector):
         return OrderedDict({str(default_status): default_schema})
 
     def get_response_serializers(self):
-        """Return the response codes that this view is expected to return, and the serializer for each response body.
-        The return value should be a dict where the keys are possible status codes, and values are either strings,
-        ``Serializer``\\ s, :class:`.Schema`, :class:`.SchemaRef` or :class:`.Response` objects. See
+        """Return the response codes that this view is expected to return, and the
+        serializer for each response body. The return value should be a dict where the
+        keys are possible status codes, and values are either strings,
+        ``Serializer``\\ s, :class:`.Schema`, :class:`.SchemaRef` or :class:`.Response`
+        objects. See
         :func:`@swagger_auto_schema <.swagger_auto_schema>` for more details.
 
         :return: the response serializers
@@ -278,7 +294,8 @@ class SwaggerAutoSchema(ViewInspector):
     def get_response_schemas(self, response_serializers):
         """Return the :class:`.openapi.Response` objects calculated for this view.
 
-        :param dict response_serializers: response serializers as returned by :meth:`.get_response_serializers`
+        :param dict response_serializers: response serializers as returned by
+            :meth:`.get_response_serializers`
         :return: a dictionary of status code to :class:`.Response` object
         :rtype: dict[str, openapi.Response]
         """
@@ -314,7 +331,8 @@ class SwaggerAutoSchema(ViewInspector):
         return responses
 
     def get_query_serializer(self):
-        """Return the query serializer (used for parsing query parameters) for this endpoint.
+        """Return the query serializer (used for parsing query parameters) for this
+        endpoint.
 
         :return: the query serializer, or ``None``
         """
@@ -358,8 +376,9 @@ class SwaggerAutoSchema(ViewInspector):
         """Return an unique ID for this operation. The ID must be unique across
         all :class:`.Operation` objects in the API.
 
-        :param tuple[str] operation_keys: an array of keys derived from the path describing the hierarchical layout
-            of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
+        :param tuple[str] operation_keys: an array of keys derived from the path
+            describing the hierarchical layout of this view in the API; e.g.
+            ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: str
         """
         operation_keys = operation_keys or self.operation_keys
@@ -370,8 +389,9 @@ class SwaggerAutoSchema(ViewInspector):
         return operation_id
 
     def split_summary_from_description(self, description):
-        """Decide if and how to split a summary out of the given description. The default implementation
-        uses the first paragraph of the description as a summary if it is less than 120 characters long.
+        """Decide if and how to split a summary out of the given description. The
+        default implementation uses the first paragraph of the description as a summary
+        if it is less than 120 characters long.
 
         :param description: the full description to be analyzed
         :return: summary and description
@@ -392,7 +412,8 @@ class SwaggerAutoSchema(ViewInspector):
         return summary, description
 
     def get_summary_and_description(self):
-        """Return an operation summary and description determined from the view's docstring.
+        """Return an operation summary and description determined from the view's
+        docstring.
 
         :return: summary and description
         :rtype: (str,str)
@@ -412,8 +433,9 @@ class SwaggerAutoSchema(ViewInspector):
     def get_security(self):
         """Return a list of security requirements for this operation.
 
-        Returning an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
-        authentication schemes). Returning ``None`` will inherit the top-level security requirements.
+        Returning an empty list marks the endpoint as unauthenticated (i.e. removes all
+        accepted authentication schemes). Returning ``None`` will inherit the top-level
+        security requirements.
 
         :return: security requirements
         :rtype: list[dict[str,list[str]]]"""
@@ -428,12 +450,14 @@ class SwaggerAutoSchema(ViewInspector):
         return self.overrides.get("deprecated", None)
 
     def get_tags(self, operation_keys=None):
-        """Get a list of tags for this operation. Tags determine how operations relate with each other, and in the UI
-        each tag will show as a group containing the operations that use it. If not provided in overrides,
-        tags will be inferred from the operation url.
+        """Get a list of tags for this operation. Tags determine how operations relate
+        with each other, and in the UI each tag will show as a group containing the
+        operations that use it. If not provided in overrides, tags will be inferred
+        from the operation url.
 
-        :param tuple[str] operation_keys: an array of keys derived from the path describing the hierarchical layout
-            of this view in the API; e.g. ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
+        :param tuple[str] operation_keys: an array of keys derived from the path
+            describing the hierarchical layout of this view in the API; e.g.
+            ``('snippets', 'list')``, ``('snippets', 'retrieve')``, etc.
         :rtype: list[str]
         """
         operation_keys = operation_keys or self.operation_keys

@@ -79,9 +79,9 @@ def _bare_SwaggerDict(cls):
 
 
 class SwaggerDict(OrderedDict):
-    """A particular type of OrderedDict, which maps all attribute accesses to dict lookups using
-    :func:`.make_swagger_name`. Attribute names starting with ``_`` are set on the object as-is and are not included
-    in the specification output.
+    """A particular type of OrderedDict, which maps all attribute accesses to dict
+    lookups using :func:`.make_swagger_name`. Attribute names starting with ``_`` are
+    set on the object as-is and are not included in the specification output.
 
     Used as a base class for all Swagger helper models.
     """
@@ -118,11 +118,13 @@ class SwaggerDict(OrderedDict):
 
     def _insert_extras__(self):
         """
-        From an ordering perspective, it is desired that extra attributes such as vendor extensions stay at the
-        bottom of the object. However, python2.7's OrderedDict craps out if you try to insert into it before calling
-        init. This means that subclasses must call super().__init__ as the first statement of their own __init__,
-        which would result in the extra attributes being added first. For this reason, we defer the insertion of the
-        attributes and require that subclasses call ._insert_extras__ at the end of their __init__ method.
+        From an ordering perspective, it is desired that extra attributes such as vendor
+        extensions stay at the bottom of the object. However, python2.7's OrderedDict
+        craps out if you try to insert into it before calling init. This means that
+        subclasses must call super().__init__ as the first statement of their own
+        __init__, which would result in the extra attributes being added first. For this
+        reason, we defer the insertion of the attributes and require that subclasses
+        call ._insert_extras__ at the end of their __init__ method.
         """
         for attr, val in sorted(self._extras__.items()):
             setattr(self, attr, val)
@@ -167,8 +169,8 @@ class SwaggerDict(OrderedDict):
         return SwaggerDict._as_odict(self, {})
 
     def __reduce__(self):
-        # for pickle support; this skips calls to all SwaggerDict __init__ methods and relies
-        # on the already set attributes instead
+        # for pickle support; this skips calls to all SwaggerDict __init__ methods and
+        # relies on the already set attributes instead
         attrs = {k: v for k, v in vars(self).items() if not k.startswith("_NP_")}
         return _bare_SwaggerDict, (type(self),), attrs, None, iter(self.items())
 
@@ -223,7 +225,8 @@ class Info(SwaggerDict):
         """Swagger Info object
 
         :param str title: Required. API title.
-        :param str default_version: Required. API version string (not to be confused with Swagger spec version)
+        :param str default_version: Required. API version string (not to be confused
+            with Swagger spec version)
         :param str description: API description; markdown supported
         :param str terms_of_service: API terms of service; should be a URL
         :param Contact contact: contact object
@@ -266,11 +269,14 @@ class Swagger(SwaggerDict):
 
         :param Info info: info object
         :param str _url: URL used for setting the API host and scheme
-        :param str _prefix: api path prefix to use in setting basePath; this will be appended to the wsgi
-            SCRIPT_NAME prefix or Django's FORCE_SCRIPT_NAME if applicable
+        :param str _prefix: api path prefix to use in setting basePath; this will be
+            appended to the wsgi SCRIPT_NAME prefix or Django's FORCE_SCRIPT_NAME if
+            applicable
         :param str _version: version string to override Info
-        :param dict[str,dict] security_definitions: list of supported authentication mechanisms
-        :param list[dict[str,list[str]]] security: authentication mechanisms accepted globally
+        :param dict[str,dict] security_definitions: list of supported authentication
+            mechanisms
+        :param list[dict[str,list[str]]] security: authentication mechanisms accepted
+            globally
         :param list[str] consumes: consumed MIME types; can be overridden in Operation
         :param list[str] produces: produced MIME types; can be overridden in Operation
         :param Paths paths: paths object
@@ -300,9 +306,11 @@ class Swagger(SwaggerDict):
 
     @classmethod
     def get_base_path(cls, script_prefix, api_prefix):
-        """Determine an appropriate value for ``basePath`` based on the SCRIPT_NAME and the api common prefix.
+        """Determine an appropriate value for ``basePath`` based on the SCRIPT_NAME and
+        the api common prefix.
 
-        :param str script_prefix: script prefix as defined by django ``get_script_prefix``
+        :param str script_prefix: script prefix as defined by django
+            ``get_script_prefix``
         :param str api_prefix: api common prefix
         :return: joined base path
         """
@@ -376,7 +384,8 @@ class PathItem(SwaggerDict):
 
     @property
     def operations(self):
-        """A list of all standard Operations on this PathItem object. See :attr:`.OPERATION_NAMES`.
+        """A list of all standard Operations on this PathItem object. See
+        :attr:`.OPERATION_NAMES`.
 
         :return: list of (method name, Operation) tuples
         :rtype: list[tuple[str,Operation]]
@@ -406,7 +415,8 @@ class Operation(SwaggerDict):
         :param list[str] consumes: content types accepted
         :param list[str] produces: content types produced
         :param str summary: operation summary; should be < 120 characters
-        :param str description: operation description; can be of any length and supports markdown
+        :param str description: operation description; can be of any length and supports
+            markdown
         :param list[str] tags: operation tags
         :param list[dict[str,list[str]]] security: list of security requirements
         """
@@ -440,7 +450,8 @@ class Items(SwaggerDict):
     def __init__(
         self, type=None, format=None, enum=None, pattern=None, items=None, **extra
     ):
-        """Used when defining an array :class:`.Parameter` to describe the array elements.
+        """Used when defining an array :class:`.Parameter` to describe the array
+        elements.
 
         :param str type: type of the array elements; must not be ``object``
         :param str format: value format, see OpenAPI spec
@@ -475,8 +486,9 @@ class Parameter(SwaggerDict):
         default=None,
         **extra,
     ):
-        """Describe parameters accepted by an :class:`.Operation`. Each parameter should be a unique combination of
-        (`name`, `in_`). ``body`` and ``form`` parameters in the same operation are mutually exclusive.
+        """Describe parameters accepted by an :class:`.Operation`. Each parameter should
+        be a unique combination of (`name`, `in_`). ``body`` and ``form`` parameters in
+        the same operation are mutually exclusive.
 
         :param str name: parameter name
         :param str in_: parameter location
@@ -484,12 +496,14 @@ class Parameter(SwaggerDict):
         :param bool required: whether the parameter is required for the operation
         :param schema: required if `in_` is ``body``
         :type schema: Schema or SchemaRef
-        :param str type: parameter type; required if `in_` is not ``body``; must not be ``object``
+        :param str type: parameter type; required if `in_` is not ``body``; must not be
+            ``object``
         :param str format: value format, see OpenAPI spec
         :param list enum: restrict possible values
         :param str pattern: pattern if type is ``string``
         :param Items items: only valid if `type` is ``array``
-        :param default: default value if the parameter is not provided; must conform to parameter type
+        :param default: default value if the parameter is not provided; must conform to
+            parameter type
         """
         super(Parameter, self).__init__(**extra)
         self.name = name
@@ -524,7 +538,8 @@ class Parameter(SwaggerDict):
 
 
 class Schema(SwaggerDict):
-    OR_REF = ()  #: useful for type-checking, e.g ``isinstance(obj, openapi.Schema.OR_REF)``
+    #: useful for type-checking, e.g ``isinstance(obj, openapi.Schema.OR_REF)``
+    OR_REF = ()
 
     def __init__(
         self,
@@ -552,15 +567,18 @@ class Schema(SwaggerDict):
         :param str pattern: pattern if type is ``string``
         :param properties: object properties; required if `type` is ``object``
         :type properties: dict[str,Schema or SchemaRef]
-        :param additional_properties: allow wildcard properties not listed in `properties`
+        :param additional_properties: allow wildcard properties not listed in
+            `properties`
         :type additional_properties: bool or Schema or SchemaRef
         :param list[str] required: list of required property names
         :param items: type of array items, only valid if `type` is ``array``
         :type items: Schema or SchemaRef
         :param default: only valid when insider another ``Schema``\\ 's ``properties``;
-            the default value of this property if it is not provided, must conform to the type of this Schema
-        :param read_only: only valid when insider another ``Schema``\\ 's ``properties``;
-            declares the property as read only - it must only be sent as part of responses, never in requests
+            the default value of this property if it is not provided, must conform to
+            the type of this Schema
+        :param read_only: only valid when insider another ``Schema``\\ 's
+            ``properties``; declares the property as read only - it must only be sent
+            as part of responses, never in requests
         """
         super(Schema, self).__init__(**extra)
         if required is True or required is False:
@@ -597,14 +615,18 @@ class _Ref(SwaggerDict):
     ref_name_re = re.compile(r"#/(?P<scope>.+)/(?P<name>[^/]+)$")
 
     def __init__(self, resolver, name, scope, expected_type, ignore_unresolved=False):
-        """Base class for all reference types. A reference object has only one property, ``$ref``, which must be a JSON
-        reference to a valid object in the specification, e.g. ``#/definitions/Article`` to refer to an article model.
+        """Base class for all reference types. A reference object has only one property,
+        ``$ref``, which must be a JSON reference to a valid object in the specification,
+        e.g. ``#/definitions/Article`` to refer to an article model.
 
-        :param ReferenceResolver resolver: component resolver which must contain the referenced object
+        :param ReferenceResolver resolver: component resolver which must contain the
+            referenced object
         :param str name: referenced object name, e.g. "Article"
         :param str scope: reference scope, e.g. "definitions"
-        :param type[SwaggerDict] expected_type: the expected type that will be asserted on the object found in resolver
-        :param bool ignore_unresolved: do not throw if the referenced object does not exist
+        :param type[SwaggerDict] expected_type: the expected type that will be asserted
+            on the object found in resolver
+        :param bool ignore_unresolved: do not throw if the referenced object does not
+            exist
         """
         super(_Ref, self).__init__()
         assert type(self) is not _Ref, "do not instantiate _Ref directly"
@@ -622,7 +644,8 @@ class _Ref(SwaggerDict):
     def resolve(self, resolver):
         """Get the object targeted by this reference from the given component resolver.
 
-        :param ReferenceResolver resolver: component resolver which must contain the referenced object
+        :param ReferenceResolver resolver: component resolver which must contain the
+            referenced object
         :returns: the target object
         """
         ref_match = self.ref_name_re.match(self.ref)
@@ -645,9 +668,11 @@ class SchemaRef(_Ref):
     def __init__(self, resolver, schema_name, ignore_unresolved=False):
         """Adds a reference to a named Schema defined in the ``#/definitions/`` object.
 
-        :param ReferenceResolver resolver: component resolver which must contain the definition
+        :param ReferenceResolver resolver: component resolver which must contain the
+            definition
         :param str schema_name: schema name
-        :param bool ignore_unresolved: do not throw if the referenced object does not exist
+        :param bool ignore_unresolved: do not throw if the referenced object does not
+            exist
         """
         assert SCHEMA_DEFINITIONS in resolver.scopes
         super(SchemaRef, self).__init__(
@@ -676,7 +701,8 @@ class Responses(SwaggerDict):
 
         :param responses: mapping of status code to response definition
         :type responses: dict[str or int,Response]
-        :param Response default: description of the response structure to expect if another status code is returned
+        :param Response default: description of the response structure to expect if
+            another status code is returned
         """
         super(Responses, self).__init__(**extra)
         for status, response in responses.items():
@@ -717,7 +743,8 @@ class ReferenceResolver(object):
         > definitions = components.with_scope('definitions')
         > definitions.set('Article', Schema(...))
         > print(components)
-        {'definitions': OrderedDict([('Article', Schema(...)]), 'parameters': OrderedDict()}
+        {'definitions': OrderedDict([('Article', Schema(...)]),
+         'parameters': OrderedDict()}
     """
 
     def __init__(self, *scopes, **kwargs):
@@ -727,7 +754,8 @@ class ReferenceResolver(object):
         force_init = kwargs.pop("force_init", False)
         if not force_init:
             raise AssertionError(
-                "Creating an instance of ReferenceResolver almost certainly won't do what you want it to do.\n"
+                "Creating an instance of ReferenceResolver almost certainly won't do"
+                "what you want it to do.\n"
                 "See https://github.com/axnsan12/drf-yasg/issues/211, "
                 "https://github.com/axnsan12/drf-yasg/issues/271, "
                 "https://github.com/axnsan12/drf-yasg/issues/325.\n"
@@ -741,7 +769,8 @@ class ReferenceResolver(object):
             self._objects[scope] = OrderedDict()
 
     def with_scope(self, scope):
-        """Return a view into this :class:`.ReferenceResolver` whose scope is defaulted and forced to `scope`.
+        """Return a view into this :class:`.ReferenceResolver` whose scope is defaulted
+        and forced to `scope`.
 
         :param str scope: target scope, must be in this resolver's `scopes`
         :return: the bound resolver
@@ -799,7 +828,8 @@ class ReferenceResolver(object):
                 self.set(name, ret, scope)
             elif value != ret:
                 logger.debug(
-                    "during setdefault, maker for %s inserted a value and returned a different value",
+                    "during setdefault, maker for %s inserted a value and returned a "
+                    "different value",
                     name,
                 )
                 ret = value

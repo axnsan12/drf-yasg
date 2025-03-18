@@ -5,7 +5,8 @@ from drf_yasg import openapi
 
 
 def test_vendor_extensions():
-    """Any attribute starting with x_ should map to a vendor property of the form x-camelCase"""
+    """Any attribute starting with x_ should map to a vendor property of the form
+    x-camelCase"""
     sd = openapi.SwaggerDict(x_vendor_ext_1="test")
     sd.x_vendor_ext_2 = "test"
     assert "x-vendorExt1" in sd
@@ -27,7 +28,8 @@ def test_ref():
 
 
 def test_leading_underscore_ignored():
-    """Attributes with a leading underscore are set on the object as-is and are not added to its dict form"""
+    """Attributes with a leading underscore are set on the object as-is and are not
+    added to its dict form"""
     sd = openapi.SwaggerDict(_private_attr_1="not_camelized")
     initial_len = len(sd)
     sd._nope = "not camelized either"
@@ -57,7 +59,8 @@ def test_trailing_underscore_stripped():
 
 
 def test_extra_ordering():
-    """Insertion order should also be consistent when setting undeclared parameters (kwargs) in SwaggerDict"""
+    """Insertion order should also be consistent when setting undeclared parameters
+    (kwargs) in SwaggerDict"""
     extras = [("beta", 1), ("alpha", 2), ("omega", 3), ("gamma", 4)]
     shuffled_extras = list(extras)
     shuffle(shuffled_extras)

@@ -29,7 +29,6 @@ lint.select = [
   "W",     # pycodestyle warnings
   "YTT",   # flake8-2020
 ]
-lint.ignore = [ "E501" ]
 lint.isort.known-first-party = [ "drf_yasg", "testproj", "articles", "people", "snippets", "todo", "users", "urlconfs" ]
 lint.mccabe.max-complexity = 13
 lint.per-file-ignores."src/drf_yasg/inspectors/field.py" = [ "E721" ]

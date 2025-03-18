@@ -46,9 +46,11 @@ logger = logging.getLogger(__name__)
 
 
 class InlineSerializerInspector(SerializerInspector):
-    """Provides serializer conversions using :meth:`.FieldInspector.field_to_swagger_object`."""
+    """Provides serializer conversions using
+    :meth:`.FieldInspector.field_to_swagger_object`."""
 
-    #: whether to output :class:`.Schema` definitions inline or into the ``definitions`` section
+    #: whether to output :class:`.Schema` definitions inline or into the ``definitions``
+    # section
     use_definitions = False
 
     def get_schema(self, serializer):
@@ -57,8 +59,9 @@ class InlineSerializerInspector(SerializerInspector):
         )
 
     def add_manual_parameters(self, serializer, parameters):
-        """Add/replace parameters from the given list of automatically generated request parameters. This method
-        is called only when the serializer is converted into a list of parameters for use in a form data request.
+        """Add/replace parameters from the given list of automatically generated request
+        parameters. This method is called only when the serializer is converted into a
+        list of parameters for use in a form data request.
 
         :param serializer: serializer instance
         :param list[openapi.Parameter] parameters: generated parameters
@@ -161,8 +164,9 @@ class InlineSerializerInspector(SerializerInspector):
                 ) and self._has_ref_name(this_serializer)
                 if not explicit_refs:
                     raise SwaggerGenerationError(
-                        "Schema for %s would override distinct serializer %s because they implicitly share the same "
-                        "ref_name; explicitly set the ref_name attribute on both serializers' Meta classes"
+                        "Schema for %s would override distinct serializer %s because "
+                        "they implicitly share the same ref_name; explicitly set the "
+                        "ref_name attribute on both serializers' Meta classes"
                         % (actual_serializer, this_serializer)
                     )
 
@@ -180,7 +184,8 @@ def get_queryset_field(queryset, field_name):
 
     :param queryset: the queryset
     :param field_name: target field name
-    :returns: the model and target field from the queryset as a 2-tuple; both elements can be ``None``
+    :returns: the model and target field from the queryset as a 2-tuple; both elements
+        can be ``None``
     :rtype: tuple
     """
     model = getattr(queryset, "model", None)
@@ -208,7 +213,8 @@ def get_queryset_from_view(view, serializer=None):
     """Try to get the queryset of the given view
 
     :param view: the view instance or class
-    :param serializer: if given, will check that the view's get_serializer_class return matches this serializer
+    :param serializer: if given, will check that the view's get_serializer_class return
+        matches this serializer
     :return: queryset or ``None``
     """
     try:
@@ -248,7 +254,8 @@ def get_model_from_descriptor(descriptor):
 
 
 def get_related_model(model, source):
-    """Try to find the other side of a model relationship given the name of a related field.
+    """Try to find the other side of a model relationship given the name of a related
+    field.
 
     :param model: one side of the relationship
     :param str source: related field name
@@ -298,17 +305,20 @@ class RelatedFieldInspector(FieldInspector):
                 result = self.probe_field_inspectors(
                     field.pk_field, swagger_object_type, use_references, **kwargs
                 )
-                # take the type, format, etc from `pk_field`, and the field-level information
-                # like title, description, default from the PrimaryKeyRelatedField
+                # take the type, format, etc from `pk_field`, and the field-level
+                # information like title, description, default from the
+                # PrimaryKeyRelatedField
                 return SwaggerType(existing_object=result)
 
             target_field = getattr(field, "slug_field", "pk")
             if field_queryset is not None:
-                # if the RelatedField has a queryset, try to get the related model field from there
+                # if the RelatedField has a queryset, try to get the related model field
+                # from there
                 model, model_field = get_queryset_field(field_queryset, target_field)
             else:
-                # if the RelatedField has no queryset (e.g. read only), try to find the target model
-                # from the view queryset or ModelSerializer model, if present
+                # if the RelatedField has no queryset (e.g. read only), try to find the
+                # target model from the view queryset or ModelSerializer model, if
+                # present
                 parent_serializer = get_parent_serializer(field)
 
                 serializer_meta = getattr(parent_serializer, "Meta", None)
@@ -335,7 +345,8 @@ class RelatedFieldInspector(FieldInspector):
 
 
 def find_regex(regex_field):
-    """Given a ``Field``, look for a ``RegexValidator`` and try to extract its pattern and return it as a string.
+    """Given a ``Field``, look for a ``RegexValidator`` and try to extract its pattern
+    and return it as a string.
 
     :param serializers.Field regex_field: the field instance
     :return: the extracted pattern, or ``None``
@@ -348,8 +359,9 @@ def find_regex(regex_field):
                 isinstance(validator, validators.URLValidator)
                 or validator == validators.validate_ipv4_address
             ):
-                # skip the default url and IP regexes because they are complex and unhelpful
-                # validate_ipv4_address is a RegexValidator instance in Django 1.11
+                # skip the default url and IP regexes because they are complex and
+                # unhelpful validate_ipv4_address is a RegexValidator instance in
+                # Django 1.11
                 continue
             if regex_validator is not None:
                 # bail if multiple validators are found - no obvious way to choose
@@ -366,8 +378,9 @@ def find_regex(regex_field):
         return None
 
     if pattern:
-        # attempt some basic cleanup to remove regex constructs not supported by JavaScript
-        #  -- swagger uses javascript-style regexes - see https://github.com/swagger-api/swagger-editor/issues/1601
+        # attempt some basic cleanup to remove regex constructs not supported by
+        # JavaScript -- swagger uses javascript-style regexes
+        # see https://github.com/swagger-api/swagger-editor/issues/1601
         if pattern.endswith("\\Z") or pattern.endswith("\\z"):
             pattern = pattern[:-2] + "$"
 
@@ -413,7 +426,8 @@ limit_validators = [
 
 
 def find_limits(field):
-    """Given a ``Field``, look for min/max value/length validators and return appropriate limit validation attributes.
+    """Given a ``Field``, look for min/max value/length validators and return
+    appropriate limit validation attributes.
 
     :param serializers.Field field: the field instance
     :return: the extracted limits
@@ -508,11 +522,12 @@ basic_type_info = serializer_field_to_basic_type + model_field_to_basic_type
 
 
 def get_basic_type_info(field):
-    """Given a serializer or model ``Field``, return its basic type information - ``type``, ``format``, ``pattern``,
-    and any applicable min/max limit values.
+    """Given a serializer or model ``Field``, return its basic type information -
+    ``type``, ``format``, ``pattern``, and any applicable min/max limit values.
 
     :param field: the field instance
-    :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
+    :return: the extracted attributes as a dictionary, or ``None`` if the field type is
+        not known
     :rtype: OrderedDict
     """
     if field is None:
@@ -603,7 +618,8 @@ def get_basic_type_info_from_hint(hint_class):
     and any applicable min/max limit values.
 
     :param hint_class: the class
-    :return: the extracted attributes as a dictionary, or ``None`` if the field type is not known
+    :return: the extracted attributes as a dictionary, or ``None`` if the field type is
+        not known
     :rtype: OrderedDict
     """
 
@@ -646,8 +662,8 @@ def get_basic_type_info_from_hint(hint_class):
 
 
 class SerializerMethodFieldInspector(FieldInspector):
-    """Provides conversion for SerializerMethodField, optionally using information from the swagger_serializer_method
-    decorator.
+    """Provides conversion for SerializerMethodField, optionally using information from
+    the swagger_serializer_method decorator.
     """
 
     def field_to_swagger_object(
@@ -715,8 +731,8 @@ class SerializerMethodFieldInspector(FieldInspector):
 
 
 class SimpleFieldInspector(FieldInspector):
-    """Provides conversions for fields which can be described using just ``type``, ``format``, ``pattern``
-    and min/max validators.
+    """Provides conversions for fields which can be described using just ``type``,
+    ``format``, ``pattern`` and min/max validators.
     """
 
     def field_to_swagger_object(
@@ -805,8 +821,9 @@ class FileFieldInspector(FieldInspector):
         )
 
         if isinstance(field, serializers.FileField):
-            # swagger 2.0 does not support specifics about file fields, so ImageFile gets no special treatment
-            # OpenAPI 3.0 does support it, so a future implementation could handle this better
+            # swagger 2.0 does not support specifics about file fields, so ImageFile
+            # gets no special treatment OpenAPI 3.0 does support it, so a future
+            # implementation could handle this better
             err = SwaggerGenerationError(
                 "FileField is supported only in a formData Parameter or response Schema"
             )
@@ -885,7 +902,8 @@ class JSONFieldInspector(FieldInspector):
 
 
 class StringDefaultFieldInspector(FieldInspector):
-    """For otherwise unhandled fields, return them as plain :data:`.TYPE_STRING` objects."""
+    """For otherwise unhandled fields, return them as plain :data:`.TYPE_STRING`
+    objects."""
 
     def field_to_swagger_object(
         self, field, swagger_object_type, use_references, **kwargs
@@ -908,7 +926,8 @@ except ImportError:  # pragma: no cover
 
 
 class CamelCaseJSONFilter(FieldInspector):
-    """Converts property names to camelCase if ``djangorestframework_camel_case`` is used."""
+    """Converts property names to camelCase if ``djangorestframework_camel_case`` is
+    used."""
 
     def camelize_string(self, s):
         """Hack to force ``djangorestframework_camel_case`` to camelize a plain string.
@@ -920,7 +939,8 @@ class CamelCaseJSONFilter(FieldInspector):
         return next(iter(camelize({s: ""})))
 
     def camelize_schema(self, schema):
-        """Recursively camelize property names for the given schema using ``djangorestframework_camel_case``.
+        """Recursively camelize property names for the given schema using
+        ``djangorestframework_camel_case``.
         The target schema object must be modified in-place.
 
         :param openapi.Schema schema: the :class:`.Schema` object
@@ -982,7 +1002,8 @@ else:
                 and swagger_object_type == openapi.Schema
             ):
                 assert use_references is True, (
-                    "Can not create schema for RecursiveField when use_references is False"
+                    "Can not create schema for RecursiveField when use_references is "
+                    "False"
                 )
 
                 proxied = field.proxied

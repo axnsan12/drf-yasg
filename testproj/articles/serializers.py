@@ -53,8 +53,8 @@ class ArticleSerializer(serializers.ModelSerializer):
             "author": {
                 "default": serializers.CurrentUserDefault(),
                 "help_text": _(
-                    "The ID of the user that created this article; if none is provided, "
-                    "defaults to the currently logged in user."
+                    "The ID of the user that created this article; if none is "
+                    "provided, defaults to the currently logged in user."
                 ),
             },
             "read_only_nullable": {"allow_null": True},
