@@ -184,6 +184,7 @@ class ReDocRenderer(_UIRenderer):
             'nativeScrollbars': redoc_settings.NATIVE_SCROLLBARS,
             'requiredPropsFirst': redoc_settings.REQUIRED_PROPS_FIRST,
             'fetchSchemaWithQuery': redoc_settings.FETCH_SCHEMA_WITH_QUERY,
+            'hideDownloadButton': redoc_settings.HIDE_DOWNLOAD_BUTTON,
         }
 
         return filter_none(data)
