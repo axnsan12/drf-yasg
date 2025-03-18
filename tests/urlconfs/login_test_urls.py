@@ -8,6 +8,6 @@ def dummy(request):
 
 
 urlpatterns = required_urlpatterns + [
-    path('test/login', dummy, name='login'),
-    path('test/logout', dummy, name='logout'),
+    path("test/login", dummy, name="login"),
+    path("test/logout", dummy, name="logout"),
 ]

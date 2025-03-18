@@ -6,7 +6,7 @@ from .serializers import IdentitySerializer, PersonSerializer
 
 
 class UnknownPagination(BasePagination):
-    paginator_query_args = ['unknown_paginator']
+    paginator_query_args = ["unknown_paginator"]
 
 
 class PersonViewSet(viewsets.ModelViewSet):

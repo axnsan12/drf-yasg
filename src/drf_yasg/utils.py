@@ -36,18 +36,35 @@ logger = logging.getLogger(__name__)
 
 class no_body(object):
     """Used as a sentinel value to forcibly remove the body of a request via :func:`.swagger_auto_schema`."""
+
     pass
 
 
 class unset(object):
     """Used as a sentinel value for function parameters not set by the caller where ``None`` would be a valid value."""
+
     pass
 
 
-def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_body=None, query_serializer=None,
-                        manual_parameters=None, operation_id=None, operation_description=None, operation_summary=None,
-                        security=None, deprecated=None, responses=None, field_inspectors=None, filter_inspectors=None,
-                        paginator_inspectors=None, tags=None, **extra_overrides):
+def swagger_auto_schema(
+    method=None,
+    methods=None,
+    auto_schema=unset,
+    request_body=None,
+    query_serializer=None,
+    manual_parameters=None,
+    operation_id=None,
+    operation_description=None,
+    operation_summary=None,
+    security=None,
+    deprecated=None,
+    responses=None,
+    field_inspectors=None,
+    filter_inspectors=None,
+    paginator_inspectors=None,
+    tags=None,
+    **extra_overrides,
+):
     """Decorate a view method to customize the :class:`.Operation` object generated from it.
 
     `method` and `methods` are mutually exclusive and must only be present when decorating a view method that accepts
@@ -125,78 +142,104 @@ def swagger_auto_schema(method=None, methods=None, auto_schema=unset, request_bo
     """
 
     def decorator(view_method):
-        assert not any(hm in extra_overrides for hm in APIView.http_method_names), "HTTP method names not allowed here"
+        assert not any(hm in extra_overrides for hm in APIView.http_method_names), (
+            "HTTP method names not allowed here"
+        )
         data = {
-            'request_body': request_body,
-            'query_serializer': query_serializer,
-            'manual_parameters': manual_parameters,
-            'operation_id': operation_id,
-            'operation_summary': operation_summary,
-            'deprecated': deprecated,
-            'operation_description': operation_description,
-            'security': security,
-            'responses': responses,
-            'filter_inspectors': list(filter_inspectors) if filter_inspectors else None,
-            'paginator_inspectors': list(paginator_inspectors) if paginator_inspectors else None,
-            'field_inspectors': list(field_inspectors) if field_inspectors else None,
-            'tags': list(tags) if tags else None,
+            "request_body": request_body,
+            "query_serializer": query_serializer,
+            "manual_parameters": manual_parameters,
+            "operation_id": operation_id,
+            "operation_summary": operation_summary,
+            "deprecated": deprecated,
+            "operation_description": operation_description,
+            "security": security,
+            "responses": responses,
+            "filter_inspectors": list(filter_inspectors) if filter_inspectors else None,
+            "paginator_inspectors": list(paginator_inspectors)
+            if paginator_inspectors
+            else None,
+            "field_inspectors": list(field_inspectors) if field_inspectors else None,
+            "tags": list(tags) if tags else None,
         }
         data = filter_none(data)
         if auto_schema is not unset:
-            data['auto_schema'] = auto_schema
+            data["auto_schema"] = auto_schema
         data.update(extra_overrides)
         if not data:  # pragma: no cover
             # no overrides to set, no use in doing more work
             return view_method
 
         # if the method is an @action, it will have a bind_to_methods attribute, or a mapping attribute for drf>3.8
-        bind_to_methods = getattr(view_method, 'bind_to_methods', [])
-        mapping = getattr(view_method, 'mapping', {})
-        mapping_methods = [mth for mth, name in mapping.items() if name == view_method.__name__]
+        bind_to_methods = getattr(view_method, "bind_to_methods", [])
+        mapping = getattr(view_method, "mapping", {})
+        mapping_methods = [
+            mth for mth, name in mapping.items() if name == view_method.__name__
+        ]
         action_http_methods = bind_to_methods + mapping_methods
 
         # if the method is actually a function based view (@api_view), it will have a 'cls' attribute
-        view_cls = getattr(view_method, 'cls', None)
-        api_view_http_methods = [m for m in getattr(view_cls, 'http_method_names', []) if hasattr(view_cls, m)]
+        view_cls = getattr(view_method, "cls", None)
+        api_view_http_methods = [
+            m
+            for m in getattr(view_cls, "http_method_names", [])
+            if hasattr(view_cls, m)
+        ]
 
         available_http_methods = api_view_http_methods + action_http_methods
-        existing_data = getattr(view_method, '_swagger_auto_schema', {})
+        existing_data = getattr(view_method, "_swagger_auto_schema", {})
 
         _methods = methods
         if methods or method:
-            assert available_http_methods, "`method` or `methods` can only be specified on @action or @api_view views"
+            assert available_http_methods, (
+                "`method` or `methods` can only be specified on @action or @api_view views"
+            )
             assert bool(methods) != bool(method), "specify either method or methods"
-            assert not isinstance(methods, str), "`methods` expects to receive a list of methods;" \
-                                                 " use `method` for a single argument"
+            assert not isinstance(methods, str), (
+                "`methods` expects to receive a list of methods;"
+                " use `method` for a single argument"
+            )
             if method:
                 _methods = [method.lower()]
             else:
                 _methods = [mth.lower() for mth in methods]
-            assert all(mth in available_http_methods for mth in _methods), "http method not bound to view"
-            assert not any(mth in existing_data for mth in _methods), "http method defined multiple times"
+            assert all(mth in available_http_methods for mth in _methods), (
+                "http method not bound to view"
+            )
+            assert not any(mth in existing_data for mth in _methods), (
+                "http method defined multiple times"
+            )
 
         if available_http_methods:
             # action or api_view
-            assert bool(api_view_http_methods) != bool(action_http_methods), "this should never happen"
+            assert bool(api_view_http_methods) != bool(action_http_methods), (
+                "this should never happen"
+            )
 
             if len(available_http_methods) > 1:
-                assert _methods, \
-                    "on multi-method api_view or action, you must specify " \
+                assert _methods, (
+                    "on multi-method api_view or action, you must specify "
                     "swagger_auto_schema on a per-method basis using one of the `method` or `methods` arguments"
+                )
             else:
                 # for a single-method view we assume that single method as the decorator target
                 _methods = _methods or available_http_methods
 
-            assert not any(hasattr(getattr(view_cls, mth, None), '_swagger_auto_schema') for mth in _methods), \
+            assert not any(
+                hasattr(getattr(view_cls, mth, None), "_swagger_auto_schema")
+                for mth in _methods
+            ), "swagger_auto_schema applied twice to method"
+            assert not any(mth in existing_data for mth in _methods), (
                 "swagger_auto_schema applied twice to method"
-            assert not any(mth in existing_data for mth in _methods), "swagger_auto_schema applied twice to method"
+            )
             existing_data.update((mth.lower(), data) for mth in _methods)
             view_method._swagger_auto_schema = existing_data
         else:
-            assert not _methods, \
-                "the methods argument should only be specified when decorating an action; " \
-                "you should also ensure that you put the swagger_auto_schema decorator " \
+            assert not _methods, (
+                "the methods argument should only be specified when decorating an action; "
+                "you should also ensure that you put the swagger_auto_schema decorator "
                 "AFTER (above) the _route decorator"
+            )
             assert not existing_data, "swagger_auto_schema applied twice to method"
             view_method._swagger_auto_schema = data
 
@@ -231,14 +274,18 @@ def is_list_view(path, method, view):
     :rtype: bool
     """
     # for ViewSets, it could be the default 'list' action, or an @action(detail=False)
-    action = getattr(view, 'action', '')
+    action = getattr(view, "action", "")
     method = getattr(view, action, None) or method
-    detail = getattr(method, 'detail', None)
-    suffix = getattr(view, 'suffix', None)
-    if action in ('list', 'create') or detail is False or suffix == 'List':
+    detail = getattr(method, "detail", None)
+    suffix = getattr(view, "suffix", None)
+    if action in ("list", "create") or detail is False or suffix == "List":
         return True
 
-    if action in ('retrieve', 'update', 'partial_update', 'destroy') or detail is True or suffix == 'Instance':
+    if (
+        action in ("retrieve", "update", "partial_update", "destroy")
+        or detail is True
+        or suffix == "Instance"
+    ):
         # a detail action is surely not a list route
         return False
 
@@ -250,8 +297,8 @@ def is_list_view(path, method, view):
         return False
 
     # if the last component in the path is parameterized it's probably not a list view
-    path_components = path.strip('/').split('/')
-    if path_components and '{' in path_components[-1]:
+    path_components = path.strip("/").split("/")
+    if path_components and "{" in path_components[-1]:
         return False
 
     # otherwise assume it's a list view
@@ -259,9 +306,9 @@ def is_list_view(path, method, view):
 
 
 def guess_response_status(method):
-    if method == 'post':
+    if method == "post":
         return status.HTTP_201_CREATED
-    elif method == 'delete':
+    elif method == "delete":
         return status.HTTP_204_NO_CONTENT
     else:
         return status.HTTP_200_OK
@@ -308,7 +355,9 @@ def filter_none(obj):
         return None
     new_obj = None
     if isinstance(obj, dict):
-        new_obj = type(obj)((k, v) for k, v in obj.items() if k is not None and v is not None)
+        new_obj = type(obj)(
+            (k, v) for k, v in obj.items() if k is not None and v is not None
+        )
     if isinstance(obj, (list, tuple)):
         new_obj = type(obj)(v for v in obj if v is not None)
     if new_obj is not None and len(new_obj) != len(obj):
@@ -326,11 +375,14 @@ def force_serializer_instance(serializer):
     :rtype: serializers.BaseSerializer
     """
     if inspect.isclass(serializer):
-        assert issubclass(serializer, serializers.BaseSerializer), "Serializer required, not %s" % serializer.__name__
+        assert issubclass(serializer, serializers.BaseSerializer), (
+            "Serializer required, not %s" % serializer.__name__
+        )
         return serializer()
 
-    assert isinstance(serializer, serializers.BaseSerializer), \
+    assert isinstance(serializer, serializers.BaseSerializer), (
         "Serializer class or instance required, not %s" % type(serializer).__name__
+    )
     return serializer
 
 
@@ -346,11 +398,14 @@ def get_serializer_class(serializer):
         return None
 
     if inspect.isclass(serializer):
-        assert issubclass(serializer, serializers.BaseSerializer), "Serializer required, not %s" % serializer.__name__
+        assert issubclass(serializer, serializers.BaseSerializer), (
+            "Serializer required, not %s" % serializer.__name__
+        )
         return serializer
 
-    assert isinstance(serializer, serializers.BaseSerializer), \
+    assert isinstance(serializer, serializers.BaseSerializer), (
         "Serializer class or instance required, not %s" % type(serializer).__name__
+    )
     return type(serializer)
 
 
@@ -386,9 +441,13 @@ def get_consumes(parser_classes):
     :rtype: list[str]
     """
     parser_classes = get_object_classes(parser_classes)
-    parser_classes = [pc for pc in parser_classes if not issubclass(pc, FileUploadParser)]
+    parser_classes = [
+        pc for pc in parser_classes if not issubclass(pc, FileUploadParser)
+    ]
     media_types = [parser.media_type for parser in parser_classes or []]
-    non_form_media_types = [encoding for encoding in media_types if not is_form_media_type(encoding)]
+    non_form_media_types = [
+        encoding for encoding in media_types if not is_form_media_type(encoding)
+    ]
     # Because swagger Parameter objects don't support complex data types (nested objects, arrays),
     # we can't use those unless we are sure the view *only* accepts form data
     # This means that a view won't support file upload in swagger unless it explicitly
@@ -411,8 +470,13 @@ def get_produces(renderer_classes):
     """
     renderer_classes = get_object_classes(renderer_classes)
     media_types = [renderer.media_type for renderer in renderer_classes or []]
-    media_types = [encoding for encoding in media_types
-                   if not any(excluded in encoding for excluded in swagger_settings.EXCLUDED_MEDIA_TYPES)]
+    media_types = [
+        encoding
+        for encoding in media_types
+        if not any(
+            excluded in encoding for excluded in swagger_settings.EXCLUDED_MEDIA_TYPES
+        )
+    ]
     return media_types
 
 
@@ -422,8 +486,12 @@ def decimal_as_float(field):
 
     :rtype: bool
     """
-    if isinstance(field, serializers.DecimalField) or isinstance(field, models.DecimalField):
-        return not getattr(field, 'coerce_to_string', rest_framework_settings.COERCE_DECIMAL_TO_STRING)
+    if isinstance(field, serializers.DecimalField) or isinstance(
+        field, models.DecimalField
+    ):
+        return not getattr(
+            field, "coerce_to_string", rest_framework_settings.COERCE_DECIMAL_TO_STRING
+        )
     return False
 
 
@@ -434,21 +502,26 @@ def get_serializer_ref_name(serializer):
     :return: Serializer's ``ref_name`` or ``None`` for inline serializer
     :rtype: str or None
     """
-    serializer_meta = getattr(serializer, 'Meta', None)
+    serializer_meta = getattr(serializer, "Meta", None)
     serializer_name = type(serializer).__name__
-    if hasattr(serializer_meta, 'ref_name'):
+    if hasattr(serializer_meta, "ref_name"):
         ref_name = serializer_meta.ref_name
-    elif serializer_name == 'NestedSerializer' and isinstance(serializer, serializers.ModelSerializer):
-        logger.debug("Forcing inline output for ModelSerializer named 'NestedSerializer':\n" + str(serializer))
+    elif serializer_name == "NestedSerializer" and isinstance(
+        serializer, serializers.ModelSerializer
+    ):
+        logger.debug(
+            "Forcing inline output for ModelSerializer named 'NestedSerializer':\n"
+            + str(serializer)
+        )
         ref_name = None
     else:
         ref_name = serializer_name
-        if ref_name.endswith('Serializer'):
-            ref_name = ref_name[:-len('Serializer')]
+        if ref_name.endswith("Serializer"):
+            ref_name = ref_name[: -len("Serializer")]
     return ref_name
 
 
-def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
+def force_real_str(s, encoding="utf-8", strings_only=False, errors="strict"):
     """
     Force `s` into a ``str`` instance.
 
@@ -457,7 +530,7 @@ def force_real_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     if s is not None:
         s = force_str(s, encoding, strings_only, errors)
         if not isinstance(s, str):
-            s = '' + s
+            s = "" + s
 
         # Remove common indentation to get the correct Markdown rendering
         s = textwrap.dedent(s)
@@ -497,27 +570,35 @@ def get_field_default(field):
     :param field: field instance
     :return: default value
     """
-    default = getattr(field, 'default', serializers.empty)
+    default = getattr(field, "default", serializers.empty)
     if default is not serializers.empty:
         if callable(default):
             try:
-                if hasattr(default, 'set_context'):
+                if hasattr(default, "set_context"):
                     default.set_context(field)
-                if getattr(default, 'requires_context', False):
+                if getattr(default, "requires_context", False):
                     default = default(field)
                 else:
                     default = default()
             except Exception:  # pragma: no cover
-                logger.warning("default for %s is callable but it raised an exception when "
-                               "called; 'default' will not be set on schema", field, exc_info=True)
+                logger.warning(
+                    "default for %s is callable but it raised an exception when "
+                    "called; 'default' will not be set on schema",
+                    field,
+                    exc_info=True,
+                )
                 default = serializers.empty
 
         if default is not serializers.empty and default is not None:
             try:
                 default = field_value_to_representation(field, default)
             except Exception:  # pragma: no cover
-                logger.warning("'default' on schema for %s will not be set because "
-                               "to_representation raised an exception", field, exc_info=True)
+                logger.warning(
+                    "'default' on schema for %s will not be set because "
+                    "to_representation raised an exception",
+                    field,
+                    exc_info=True,
+                )
                 default = serializers.empty
 
     return default

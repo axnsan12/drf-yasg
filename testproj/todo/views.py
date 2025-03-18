@@ -19,8 +19,8 @@ class TodoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
 
-    lookup_field = 'id'
-    lookup_value_regex = '[0-9]+'
+    lookup_field = "id"
+    lookup_value_regex = "[0-9]+"
 
 
 class TodoAnotherViewSet(viewsets.ReadOnlyModelViewSet):
@@ -41,7 +41,7 @@ class TodoTreeView(viewsets.ReadOnlyModelViewSet):
     queryset = TodoTree.objects.all()
 
     def get_serializer_class(self):
-        if getattr(self, 'swagger_fake_view', False):
+        if getattr(self, "swagger_fake_view", False):
             return TodoTreeSerializer
 
         raise NotImplementedError("must not call this")
@@ -63,7 +63,7 @@ class TodoRecursiveView(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         return super(TodoRecursiveView, self).create(request, *args, **kwargs)
 
-    @swagger_auto_schema(responses={200: None, 302: 'Redirect somewhere'})
+    @swagger_auto_schema(responses={200: None, 302: "Redirect somewhere"})
     def retrieve(self, request, *args, **kwargs):
         return super(TodoRecursiveView, self).retrieve(request, *args, **kwargs)
 
@@ -83,10 +83,9 @@ class TodoRecursiveView(viewsets.ModelViewSet):
         return super(TodoRecursiveView, self).list(request, *args, **kwargs)
 
 
-class HarvestViewSet(mixins.ListModelMixin,
-                     mixins.UpdateModelMixin,
-                     viewsets.GenericViewSet):
-
+class HarvestViewSet(
+    mixins.ListModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet
+):
     queryset = Pack.objects.all()
     serializer_class = HarvestSerializer
     permission_classes = (permissions.IsAuthenticated,)
