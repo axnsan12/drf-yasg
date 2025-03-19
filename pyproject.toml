@@ -1,7 +1,6 @@
 [build-system]
+requires = [ "setuptools >= 77.0.3", "setuptools-scm ~= 7.0" ]
 build-backend = "setuptools.build_meta"
-
-requires = [ "setuptools>=68", "setuptools-scm>=3.0.3", "wheel" ]
 
 [tool.ruff]
 exclude = [ "**/migrations/*" ]
