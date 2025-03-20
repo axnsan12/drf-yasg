@@ -31,8 +31,9 @@ class _SpecRenderer(BaseRenderer):
         codec = self.codec_class(self.validators)
 
         if not isinstance(data, Swagger):  # pragma: no cover
-            # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
-            # in that case, it's probably better to let the default ``JSONRenderer`` render it
+            # if `swagger` is not a ``Swagger`` object, it means we somehow got a
+            # non-success ``Response`` in that case, it's probably better to let the
+            # default ``JSONRenderer`` render it
             # see https://github.com/axnsan12/drf-yasg/issues/58
             return JSONRenderer().render(data, media_type, renderer_context)
 
@@ -40,7 +41,8 @@ class _SpecRenderer(BaseRenderer):
 
 
 class OpenAPIRenderer(_SpecRenderer):
-    """Renders the schema as a JSON document with the ``application/openapi+json`` specific mime type."""
+    """Renders the schema as a JSON document with the ``application/openapi+json``
+    specific mime type."""
 
     media_type = "application/openapi+json"
     format = "openapi"
@@ -48,7 +50,8 @@ class OpenAPIRenderer(_SpecRenderer):
 
 
 class SwaggerJSONRenderer(_SpecRenderer):
-    """Renders the schema as a JSON document with the generic ``application/json`` mime type."""
+    """Renders the schema as a JSON document with the generic ``application/json`` mime
+    type."""
 
     media_type = "application/json"
     format = "json"
@@ -64,7 +67,8 @@ class SwaggerYAMLRenderer(_SpecRenderer):
 
 
 class _UIRenderer(BaseRenderer):
-    """Base class for web UI renderers. Handles loading and passing settings to the appropriate template."""
+    """Base class for web UI renderers. Handles loading and passing settings to the
+    appropriate template."""
 
     media_type = "text/html"
     charset = "utf-8"
@@ -73,8 +77,9 @@ class _UIRenderer(BaseRenderer):
     def render(self, swagger, accepted_media_type=None, renderer_context=None):
         if not isinstance(swagger, Swagger):  # pragma: no cover
             try:
-                # if `swagger` is not a ``Swagger`` object, it means we somehow got a non-success ``Response``
-                # in that case, it's probably better to let the default ``TemplateHTMLRenderer`` render it
+                # if `swagger` is not a ``Swagger`` object, it means we somehow got a
+                # non-success ``Response`` in that case, it's probably better to let the
+                # default ``TemplateHTMLRenderer`` render it
                 # see https://github.com/axnsan12/drf-yasg/issues/58
                 return TemplateHTMLRenderer().render(
                     swagger, accepted_media_type, renderer_context

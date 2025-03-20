@@ -17,7 +17,10 @@ class Article(models.Model):
         "auth.User", related_name="articles", on_delete=models.CASCADE
     )
     article_type = models.PositiveSmallIntegerField(
-        help_text="IntegerField declared on model with choices=(...) and exposed via ModelSerializer",
+        help_text=(
+            "IntegerField declared on model with choices=(...) and exposed via "
+            "ModelSerializer"
+        ),
         choices=((1, "first"), (2, "second"), (3, "third"), (7, "seven"), (8, "eight")),
         null=True,
     )

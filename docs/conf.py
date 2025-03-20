@@ -58,9 +58,9 @@ except NameError:  # Python < 3.8
 if "noscm" in release:
     raise AssertionError(
         "Invalid package version string: %s. \n"
-        "The documentation must be built with drf_yasg installed from a distribution package, "
-        "which must have been built with a proper version number (i.e. from a full source checkout)."
-        % (release,)
+        "The documentation must be built with drf_yasg installed from a distribution "
+        "package, which must have been built with a proper version number (i.e. from "
+        "a full source checkout)." % (release,)
     )
 
 # The short X.Y.Z version.
@@ -227,9 +227,9 @@ import drf_yasg.views  # noqa: E402
 
 drf_yasg.views.SchemaView = drf_yasg.views.get_schema_view(None)
 
-# monkey patch to stop sphinx from trying to find classes by their real location instead of the
-# top-level __init__ alias; this allows us to document only `drf_yasg.inspectors` and avoid broken references or
-# double documenting
+# monkey patch to stop sphinx from trying to find classes by their real location instead
+# of the top-level __init__ alias; this allows us to document only `drf_yasg.inspectors`
+# and avoid broken references or double documenting
 
 import drf_yasg.inspectors  # noqa: E402
 
@@ -252,7 +252,8 @@ for cls_name in drf_yasg.inspectors.__all__:
     setattr(drf_yasg.inspectors, cls_name, patched_cls)
 
 for cls_name in drf_yasg.inspectors.__all__:
-    # second pass - replace the inheritance bases for all classes to point to the new clean classes
+    # second pass - replace the inheritance bases for all classes to point to the new
+    # clean classes
     real_cls = getattr(drf_yasg.inspectors, cls_name)
     if not inspect.isclass(real_cls):
         continue
@@ -309,8 +310,8 @@ def role_github_pull_request_or_issue(
             inliner,
             lineno,
             rawtext,
-            'GitHub pull request or issue number must be a number greater than or equal to 1; "%s" is invalid.'
-            % text,
+            "GitHub pull request or issue number must be a number greater than or equal"
+            ' to 1; "%s" is invalid.' % text,
         )
 
     if name == "pr":

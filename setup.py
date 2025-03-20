@@ -62,14 +62,15 @@ def drf_yasg_setup(**kwargs):
             "coreapi": ["coreapi>=2.3.3", "coreschema>=0.0.4"],
         },
         license="BSD License",
-        description="Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code.",
+        description="Automated generation of real Swagger/OpenAPI 2.0 schemas from "
+        "Django Rest Framework code.",
         long_description=description,
         long_description_content_type="text/x-rst",
         url="https://github.com/axnsan12/drf-yasg",
         author="Cristi V.",
         author_email="cristi@cvjd.me",
-        keywords="drf django django-rest-framework schema swagger openapi codegen swagger-codegen "
-        "documentation drf-yasg django-rest-swagger drf-openapi",
+        keywords="drf django django-rest-framework schema swagger openapi codegen "
+        "swagger-codegen documentation drf-yasg django-rest-swagger drf-openapi",
         python_requires=python_requires,
         classifiers=[
             "Intended Audience :: Developers",
@@ -93,7 +94,8 @@ try:
     drf_yasg_setup(use_scm_version=True)
 except (ImportError, LookupError) as e:
     if os.getenv("CI", "false") == "true":
-        # don't silently fail on CI - we don't want to accidentally push a dummy version to PyPI
+        # don't silently fail on CI - we don't want to accidentally push a dummy version
+        # to PyPI
         raise
 
     err_msg = str(e)
