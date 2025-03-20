@@ -1,4 +1,5 @@
 import json
+import sys
 import typing
 from collections import OrderedDict
 
@@ -34,7 +35,7 @@ def test_invalid_schema_fails(codec_json, mock_schema_request):
         version="v2",
     )
 
-    swagger = bad_generator.get_schema(mock_schema_request, True)
+    swagger = bad_generator.get_schema(mock_schema_request, public=True)
     with pytest.raises(codecs.SwaggerValidationError):
         codec_json.encode(swagger)
 
@@ -149,7 +150,7 @@ def test_replaced_serializer():
     )
 
     for _ in range(3):
-        swagger = generator.get_schema(None, True)
+        swagger = generator.get_schema(public=True)
         assert "Detail" in swagger["definitions"]
         assert "detail" in swagger["definitions"]["Detail"]["properties"]
         responses = swagger["paths"]["/details/{id}/"]["get"]["responses"]
@@ -182,7 +183,7 @@ def test_url_order():
     )
 
     # description override is successful
-    swagger = generator.get_schema(None, True)
+    swagger = generator.get_schema(public=True)
     assert swagger["paths"]["/test/"]["get"]["description"] == "description override"
 
     # get_endpoints only includes one endpoint
@@ -226,7 +227,7 @@ def test_action_mapping():
     )
 
     for _ in range(3):
-        swagger = generator.get_schema(None, True)
+        swagger = generator.get_schema(public=True)
         action_ops = swagger["paths"]["/test/"]
         methods = ["get", "post", "delete"]
         assert all(mth in action_ops for mth in methods)
@@ -265,7 +266,7 @@ def test_choice_field(choices, expected_type):
         patterns=router.urls,
     )
 
-    swagger = generator.get_schema(None, True)
+    swagger = generator.get_schema(public=True)
     property_schema = swagger["definitions"]["Detail"]["properties"]["detail"]
 
     assert property_schema == openapi.Schema(
@@ -310,7 +311,7 @@ def test_nested_choice_in_array_field(choices, field, expected_type):
         patterns=router.urls,
     )
 
-    swagger = generator.get_schema(None, True)
+    swagger = generator.get_schema(public=True)
     property_schema = swagger["definitions"]["Array"]["properties"]["array"]["items"]
     assert property_schema == openapi.Schema(
         title="Array", type=expected_type, enum=choices
@@ -332,7 +333,7 @@ def test_json_field():
         patterns=router.urls,
     )
 
-    swagger = generator.get_schema(None, True)
+    swagger = generator.get_schema(public=True)
     property_schema = swagger["definitions"]["TestJSONField"]["properties"]["json"]
     assert property_schema == openapi.Schema(title="Json", type=openapi.TYPE_OBJECT)
 
@@ -350,11 +351,8 @@ def test_optional_return_type(py_type, expected_type):
     class OptionalMethodSerializer(serializers.Serializer):
         x = serializers.SerializerMethodField()
 
-        def get_x(self, instance):
+        def get_x(self, instance) -> typing.Optional[py_type]:
             pass
-
-        # Add the type annotation here in order to avoid a SyntaxError in py27
-        get_x.__annotations__["return"] = typing.Optional[py_type]
 
     class OptionalMethodViewSet(viewsets.ViewSet):
         @swagger_auto_schema(
@@ -372,10 +370,26 @@ def test_optional_return_type(py_type, expected_type):
         info=openapi.Info(title="Test optional parameter", default_version="v1"),
         patterns=router.urls,
     )
-    swagger = generator.get_schema(None, True)
+    swagger = generator.get_schema(public=True)
     property_schema = swagger["definitions"]["OptionalMethod"]["properties"]["x"]
     assert property_schema == openapi.Schema(
         title="X", type=expected_type, readOnly=True, x_nullable=True
+    )
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 12), reason="PEP-695 requires Python 3.12 or higher"
+)
+def test_pep695_with_pep563():
+    from pep695_with_pep563 import RetrieveView
+
+    swagger = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test", default_version="v1"),
+        patterns=[path("/int/", RetrieveView[int].as_view())],
+    ).get_schema(public=True)
+    property_schema = swagger["definitions"]["Generic"]["properties"]["value"]
+    assert property_schema == openapi.Schema(
+        title="Value", type=openapi.TYPE_STRING, readOnly=True
     )
 
 
