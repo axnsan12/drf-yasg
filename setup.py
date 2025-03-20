@@ -44,6 +44,7 @@ python_requires = ">=" + python_versions[0]
 python_classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
 ] + ["Programming Language :: Python :: {}".format(v) for v in python_versions]
 django_classifiers = [
     "Framework :: Django",
