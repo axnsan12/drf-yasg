@@ -48,10 +48,11 @@ def call_view_method(view, method_name, fallback_attr=None, default=None):
                 return view_method()
         except Exception:  # pragma: no cover
             logger.warning(
-                "view's %s raised exception during schema generation; use "
+                "view's %s.%s raised exception during schema generation; use "
                 "`getattr(self, 'swagger_fake_view', False)` to detect and "
                 "short-circuit this",
                 type(view).__name__,
+                method_name,
                 exc_info=True,
             )
 
