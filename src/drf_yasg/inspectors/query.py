@@ -50,7 +50,32 @@ class DrfAPICompatInspector(PaginatorInspector, FilterInspector):
                     filter_backend.get_schema_operation_parameters(self.view),
                 )
             )
+
+        if hasattr(filter_backend, "get_filterset_class"):
+            return self.get_filter_backend_params(filter_backend)
+
         return NotHandled
+
+    def get_filter_backend_params(self, filter_backend):
+
+        filterset_class = filter_backend.get_filterset_class(
+            self.view,
+            self.view.queryset,
+        )
+
+        if filterset_class is None:
+            return NotHandled
+
+        return [
+            openapi.Parameter(
+                name=field_name,
+                in_=openapi.IN_QUERY,
+                required=field.extra.get("required", False),
+                type=openapi.TYPE_STRING,
+                description=str(field.label) if field.label else "",
+            )
+            for field_name, field in filterset_class.base_filters.items()
+        ]
 
 
 class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
