@@ -3,9 +3,9 @@ name: Review
 on: [push, pull_request]
 
 jobs:
-  review:
+  tests:
     name: Run linters and tests
-    runs-on: "ubuntu-20.04"
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -41,3 +41,15 @@ jobs:
           pip install -r requirements/publish.txt
           python setup.py sdist
           twine check dist/*
+
+  review:
+    name: Run linters and tests
+    runs-on: ubuntu-latest
+    needs: tests
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.6", "3.7", "3.8", "3.9"]
+
+    steps:
+      - run: echo "tests passed!"
