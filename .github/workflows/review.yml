@@ -3,7 +3,7 @@ name: Review
 on: [push, pull_request]
 
 jobs:
-  review:
+  test:
     name: Run linters and tests
     runs-on: ubuntu-latest
     strategy:
@@ -36,8 +36,19 @@ jobs:
           coverage report
 
       - name: Check for incompatibilities with publishing to PyPi
-        if: ${{ matrix.python == 3.11 }}
+        if: ${{ matrix.python == 3.12 }}
         run: |
           pip install -r requirements/publish.txt
           python setup.py sdist
           twine check dist/*
+
+  # Return successful statuses for python {3.6...8}
+  # These are required for branch protection rules that cannot be removed yet
+  # https://github.com/axnsan12/drf-yasg/pull/922#issuecomment-2739945046
+  review:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.6", "3.7", "3.8", "3.9"]
+    steps:
+      run: exit 0
