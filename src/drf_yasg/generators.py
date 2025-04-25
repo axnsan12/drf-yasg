@@ -87,8 +87,9 @@ class EndpointEnumerator(_EndpointEnumerator):
         return True
 
     def replace_version(self, path, callback):
-        """If ``request.version`` is not ``None`` and `callback` uses ``URLPathVersioning``, this function replaces
-        the ``version`` parameter in `path` with the actual version.
+        """If ``request.version`` is not ``None`` and `callback` uses
+        ``URLPathVersioning``, this function replaces the ``version`` parameter in
+        `path` with the actual version.
 
         :param str path: the templated path
         :param callback: the view callback
@@ -181,15 +182,17 @@ class EndpointEnumerator(_EndpointEnumerator):
         :param str s: string with backslash escapes
         :rtype: str
         """
-        # unlike .replace('\\', ''), this correctly transforms a double backslash into a single backslash
+        # unlike .replace('\\', ''), this correctly transforms a double backslash into a
+        # single backslash
         return re.sub(r"\\(.)", r"\1", s)
 
     def unescape_path(self, path):
-        """Remove backslashes escapes from all path components outside {parameters}. This is needed because
-        ``simplify_regex`` does not handle this correctly.
+        """Remove backslashes escapes from all path components outside {parameters}.
+        This is needed because ``simplify_regex`` does not handle this correctly.
 
-        **NOTE:** this might destructively affect some url regex patterns that contain metacharacters (e.g. \\w, \\d)
-        outside path parameter groups; if you are in this category, God help you
+        **NOTE:** this might destructively affect some url regex patterns that contain
+        metacharacters (e.g. \\w, \\d) outside path parameter groups; if you are in this
+        category, God help you
 
         :param str path: path possibly containing
         :return: the unescaped path
@@ -210,8 +213,9 @@ class EndpointEnumerator(_EndpointEnumerator):
 
 class OpenAPISchemaGenerator:
     """
-    This class iterates over all registered API endpoints and returns an appropriate OpenAPI 2.0 compliant schema.
-    Method implementations shamelessly stolen and adapted from rest-framework ``SchemaGenerator``.
+    This class iterates over all registered API endpoints and returns an appropriate
+    OpenAPI 2.0 compliant schema. Method implementations shamelessly stolen and adapted
+    from rest-framework ``SchemaGenerator``.
     """
 
     endpoint_enumerator_class = EndpointEnumerator
@@ -230,18 +234,24 @@ class OpenAPISchemaGenerator:
         """
 
         :param openapi.Info info: information about the API
-        :param str version: API version string; if omitted, `info.default_version` will be used
-        :param str url: API scheme, host and port; if ``None`` is passed and ``DEFAULT_API_URL`` is not set, the url
-            will be inferred from the request made against the schema view, so you should generally not need to set
-            this parameter explicitly; if the empty string is passed, no host and scheme will be emitted
+        :param str version: API version string; if omitted, `info.default_version` will
+            be used
+        :param str url: API scheme, host and port; if ``None`` is passed and
+            ``DEFAULT_API_URL`` is not set, the url will be inferred from the request
+            made against the schema view, so you should generally not need to set this
+            parameter explicitly; if the empty string is passed, no host and scheme will
+            be emitted
 
-            If `url` is not ``None`` or the empty string, it must be a scheme-absolute uri (i.e. starting with http://
-            or https://), and any path component is ignored;
+            If `url` is not ``None`` or the empty string, it must be a scheme-absolute
+            uri (i.e. starting with http:// or https://), and any path component is
+            ignored;
 
-            See also: :ref:`documentation on base URL construction <custom-spec-base-url>`
-        :param patterns: if given, only these patterns will be enumerated for inclusion in the API spec
-        :param urlconf: if patterns is not given, use this urlconf to enumerate patterns;
-            if not given, the default urlconf is used
+            See also:
+            :ref:`documentation on base URL construction <custom-spec-base-url>`
+        :param patterns: if given, only these patterns will be enumerated for inclusion
+            in the API spec
+        :param urlconf: if patterns is not given, use this urlconf to enumerate
+            patterns; if not given, the default urlconf is used
         """
         self._gen = SchemaGenerator(
             info.title, url, info.get("description", ""), patterns, urlconf
@@ -261,8 +271,8 @@ class OpenAPISchemaGenerator:
                 raise SwaggerGenerationError("`url` must be an absolute HTTP(S) url")
             if parsed_url.path:
                 logger.warning(
-                    "path component of api base URL %s is ignored; use FORCE_SCRIPT_NAME instead"
-                    % url
+                    "path component of api base URL %s is ignored; use "
+                    "FORCE_SCRIPT_NAME instead" % url
                 )
             else:
                 self._gen.url = url
@@ -272,8 +282,9 @@ class OpenAPISchemaGenerator:
         return self._gen.url
 
     def get_security_definitions(self):
-        """Get the security schemes for this API. This determines what is usable in security requirements,
-        and helps clients configure their authorization credentials.
+        """Get the security schemes for this API. This determines what is usable in
+        security requirements, and helps clients configure their authorization
+        credentials.
 
         :return: the security schemes usable with this API
         :rtype: dict[str,dict] or None
@@ -285,10 +296,11 @@ class OpenAPISchemaGenerator:
         return security_definitions
 
     def get_security_requirements(self, security_definitions):
-        """Get the base (global) security requirements of the API. This is never called if
-        :meth:`.get_security_definitions` returns `None`.
+        """Get the base (global) security requirements of the API. This is never called
+        if :meth:`.get_security_definitions` returns `None`.
 
-        :param security_definitions: security definitions as returned by :meth:`.get_security_definitions`
+        :param security_definitions: security definitions as returned by
+            :meth:`.get_security_definitions`
         :return: the security schemes accepted by default
         :rtype: list[dict[str,list[str]]] or None
         """
@@ -307,9 +319,11 @@ class OpenAPISchemaGenerator:
     def get_schema(self, request=None, public=False):
         """Generate a :class:`.Swagger` object representing the API schema.
 
-        :param request: the request used for filtering accessible endpoints and finding the spec URI
+        :param request: the request used for filtering accessible endpoints and finding
+            the spec URI
         :type request: rest_framework.request.Request or None
-        :param bool public: if True, all endpoints are included regardless of access through `request`
+        :param bool public: if True, all endpoints are included regardless of access
+            through `request`
 
         :return: the generated Swagger specification
         :rtype: openapi.Swagger
@@ -357,7 +371,8 @@ class OpenAPISchemaGenerator:
         view = self._gen.create_view(callback, method, request)
         overrides = getattr(callback, "_swagger_auto_schema", None)
         if overrides is not None:
-            # decorated function based view must have its decorator information passed on to the re-instantiated view
+            # decorated function based view must have its decorator information passed
+            # on to the re-instantiated view
             for method, _ in overrides.items():
                 view_method = getattr(view, method, None)
                 if view_method is not None:  # pragma: no cover
@@ -367,8 +382,9 @@ class OpenAPISchemaGenerator:
         return view
 
     def coerce_path(self, path, view):
-        """Coerce {pk} path arguments into the name of the model field, where possible. This is cleaner for an
-        external representation (i.e. "this is an identifier", not "this is a database primary key").
+        """Coerce {pk} path arguments into the name of the model field, where possible.
+        This is cleaner for an external representation (i.e. "this is an identifier",
+        not "this is a database primary key").
 
         :param str path: the path
         :param rest_framework.views.APIView view: associated view
@@ -385,7 +401,8 @@ class OpenAPISchemaGenerator:
         return path.replace("{pk}", "{%s}" % field_name)
 
     def get_endpoints(self, request):
-        """Iterate over all the registered endpoints in the API and return a fake view with the right parameters.
+        """Iterate over all the registered endpoints in the API and return a fake view
+        with the right parameters.
 
         :param request: request to bind to the endpoint views
         :type request: rest_framework.request.Request or None
@@ -420,7 +437,7 @@ class OpenAPISchemaGenerator:
         :param str method: HTTP method
         :param view: the view associated with the operation
         :rtype: list[str]
-        """
+        """  # noqa: E501
         if hasattr(view, "action"):
             # Viewsets have explicitly named actions.
             action = view.action
@@ -499,7 +516,8 @@ class OpenAPISchemaGenerator:
         :param str path: request path
         :param str method: http request method
         :param view: instantiated view callback
-        :param bool public: if True, all endpoints are included regardless of access through `request`
+        :param bool public: if True, all endpoints are included regardless of access
+            through `request`
         :returns: true if the view should be excluded
         :rtype: bool
         """
@@ -508,7 +526,8 @@ class OpenAPISchemaGenerator:
     def get_paths_object(self, paths):
         """Construct the Swagger Paths object.
 
-        :param OrderedDict[str,openapi.PathItem] paths: mapping of paths to :class:`.PathItem` objects
+        :param OrderedDict[str,openapi.PathItem] paths: mapping of paths to
+            :class:`.PathItem` objects
         :returns: the :class:`.Paths` object
         :rtype: openapi.Paths
         """
@@ -520,8 +539,10 @@ class OpenAPISchemaGenerator:
         :param dict endpoints: endpoints as returned by get_endpoints
         :param ReferenceResolver components: resolver/container for Swagger References
         :param Request request: the request made against the schema view; can be None
-        :param bool public: if True, all endpoints are included regardless of access through `request`
-        :returns: the :class:`.Paths` object and the longest common path prefix, as a 2-tuple
+        :param bool public: if True, all endpoints are included regardless of access
+            through `request`
+        :returns: the :class:`.Paths` object and the longest common path prefix, as a
+            2-tuple
         :rtype: tuple[openapi.Paths,str]
         """
         if not endpoints:
@@ -544,8 +565,9 @@ class OpenAPISchemaGenerator:
                     operations[method.lower()] = operation
 
             if operations:
-                # since the common prefix is used as the API basePath, it must be stripped
-                # from individual paths when writing them into the swagger document
+                # since the common prefix is used as the API basePath, it must be
+                # stripped from individual paths when writing them into the swagger
+                # document
                 path_suffix = path[len(prefix) :]
                 if not path_suffix.startswith("/"):
                     path_suffix = "/" + path_suffix
@@ -554,9 +576,10 @@ class OpenAPISchemaGenerator:
         return self.get_paths_object(paths), prefix
 
     def get_operation(self, view, path, prefix, method, components, request):
-        """Get an :class:`.Operation` for the given API endpoint (path, method). This method delegates to
-        :meth:`~.inspectors.ViewInspector.get_operation` of a :class:`~.inspectors.ViewInspector` determined
-        according to settings and :func:`@swagger_auto_schema <.swagger_auto_schema>` overrides.
+        """Get an :class:`.Operation` for the given API endpoint (path, method). This
+        method delegates to :meth:`~.inspectors.ViewInspector.get_operation` of a
+        :class:`~.inspectors.ViewInspector` determined according to settings and
+        :func:`@swagger_auto_schema <.swagger_auto_schema>` overrides.
 
         :param view: the view associated with this endpoint
         :param str path: the path component of the operation URL
@@ -594,12 +617,13 @@ class OpenAPISchemaGenerator:
         return operation
 
     def get_path_item(self, path, view_cls, operations):
-        """Get a :class:`.PathItem` object that describes the parameters and operations related to a single path in the
-        API.
+        """Get a :class:`.PathItem` object that describes the parameters and operations
+        related to a single path in the API.
 
         :param str path: the path
         :param type view_cls: the view that was bound to this path in urlpatterns
-        :param dict[str,openapi.Operation] operations: operations defined on this path, keyed by lowercase HTTP method
+        :param dict[str,openapi.Operation] operations: operations defined on this path,
+            keyed by lowercase HTTP method
         :rtype: openapi.PathItem
         """
         path_parameters = self.get_path_parameters(path, view_cls)
@@ -610,7 +634,8 @@ class OpenAPISchemaGenerator:
 
         :param view: the view associated with the operation
         :param str method: HTTP method
-        :return: a dictionary containing any overrides set by :func:`@swagger_auto_schema <.swagger_auto_schema>`
+        :return: a dictionary containing any overrides set by
+            :func:`@swagger_auto_schema <.swagger_auto_schema>`
         :rtype: dict
         """
         method = method.lower()
@@ -623,7 +648,8 @@ class OpenAPISchemaGenerator:
         return copy.deepcopy(overrides)
 
     def get_path_parameters(self, path, view_cls):
-        """Return a list of Parameter instances corresponding to any templated path variables.
+        """Return a list of Parameter instances corresponding to any templated path
+        variables.
 
         :param str path: templated request path
         :param type view_cls: the view class associated with the path

@@ -388,7 +388,7 @@ EXPECTED_DESCRIPTION = """\
     The swagger YAML document can be found [here](/cached/swagger.yaml).
 
     You can log in using the pre-existing `admin` user with password `passwordadmin`.
-"""
+"""  # noqa: E501
 
 
 def test_multiline_strings(call_generate_swagger):

@@ -41,7 +41,8 @@ class Command(BaseCommand):
             default="",
             choices=["json", "yaml"],
             type=str,
-            help="Output format. If not given, it is guessed from the output file extension and defaults to json.",
+            help="Output format. If not given, it is guessed from the output file "
+            "extension and defaults to json.",
         )
         parser.add_argument(
             "-u",
@@ -49,7 +50,8 @@ class Command(BaseCommand):
             dest="api_url",
             default="",
             type=str,
-            help="Base API URL - sets the host and scheme attributes of the generated document.",
+            help="Base API URL - sets the host and scheme attributes of the generated "
+            "document.",
         )
         parser.add_argument(
             "-m",
@@ -57,27 +59,31 @@ class Command(BaseCommand):
             dest="mock",
             default=False,
             action="store_true",
-            help="Use a mock request when generating the swagger schema. This is useful if your views or serializers "
-            "depend on context from a request in order to function.",
+            help="Use a mock request when generating the swagger schema. This is "
+            "useful if your views or serializers depend on context from a request in "
+            "order to function.",
         )
         parser.add_argument(
             "--api-version",
             dest="api_version",
             type=str,
-            help="Version to use to generate schema. This option implies --mock-request.",
+            help="Version to use to generate schema. This option implies "
+            "--mock-request.",
         )
         parser.add_argument(
             "--user",
             dest="user",
-            help="Username of an existing user to use for mocked authentication. This option implies --mock-request.",
+            help="Username of an existing user to use for mocked authentication. This "
+            "option implies --mock-request.",
         )
         parser.add_argument(
             "-p",
             "--private",
             default=False,
             action="store_true",
-            help="Hides endpoints not accessible to the target user. If --user is not given, only shows endpoints that "
-            "are accessible to unauthenticated users.\n"
+            help="Hides endpoints not accessible to the target user. If --user is not "
+            "given, only shows endpoints that are accessible to unauthenticated users."
+            "\n"
             "This has the same effect as passing public=False to get_schema_view() or "
             "OpenAPISchemaGenerator.get_schema().\n"
             "This option implies --mock-request.",
@@ -87,7 +93,8 @@ class Command(BaseCommand):
             "--generator-class",
             dest="generator_class_name",
             default="",
-            help="Import string pointing to an OpenAPISchemaGenerator subclass to use for schema generation.",
+            help="Import string pointing to an OpenAPISchemaGenerator subclass to use "
+            "for schema generation.",
         )
 
     def write_schema(self, schema, stream, format):
