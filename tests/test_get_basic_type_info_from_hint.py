@@ -34,7 +34,7 @@ if sys.version_info >= (3, 10):
                 "x-nullable": True,
             },
         ),
-        # Following cases are not 100% correct, but it should work somehow and not crash.
+        # Following cases are not 100% correct, but it should work somehow and not crash
         (int | float, None),
     ]
 
@@ -88,7 +88,7 @@ if sys.version_info >= (3, 10):
                 "x-nullable": True,
             },
         ),
-        # Following cases are not 100% correct, but it should work somehow and not crash.
+        # Following cases are not 100% correct, but it should work somehow and not crash
         (Union[int, float], None),
         (
             List,

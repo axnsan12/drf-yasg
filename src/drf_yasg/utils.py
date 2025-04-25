@@ -35,13 +35,15 @@ logger = logging.getLogger(__name__)
 
 
 class no_body(object):
-    """Used as a sentinel value to forcibly remove the body of a request via :func:`.swagger_auto_schema`."""
+    """Used as a sentinel value to forcibly remove the body of a request via
+    :func:`.swagger_auto_schema`."""
 
     pass
 
 
 class unset(object):
-    """Used as a sentinel value for function parameters not set by the caller where ``None`` would be a valid value."""
+    """Used as a sentinel value for function parameters not set by the caller where
+    ``None`` would be a valid value."""
 
     pass
 
@@ -65,80 +67,106 @@ def swagger_auto_schema(
     tags=None,
     **extra_overrides,
 ):
-    """Decorate a view method to customize the :class:`.Operation` object generated from it.
+    """Decorate a view method to customize the :class:`.Operation` object generated from
+    it.
 
-    `method` and `methods` are mutually exclusive and must only be present when decorating a view method that accepts
-    more than one HTTP request method.
+    `method` and `methods` are mutually exclusive and must only be present when
+    decorating a view method that accepts more than one HTTP request method.
 
-    The `auto_schema` and `operation_description` arguments take precedence over view- or method-level values.
+    The `auto_schema` and `operation_description` arguments take precedence over view-
+    or method-level values.
 
-    :param str method: for multi-method views, the http method the options should apply to
-    :param list[str] methods: for multi-method views, the http methods the options should apply to
-    :param drf_yasg.inspectors.SwaggerAutoSchema auto_schema: custom class to use for generating the Operation object;
-        this overrides both the class-level ``swagger_schema`` attribute and the ``DEFAULT_AUTO_SCHEMA_CLASS``
-        setting, and can be set to ``None`` to prevent this operation from being generated
-    :param request_body: custom request body which will be used as the ``schema`` property of a
-        :class:`.Parameter` with ``in: 'body'``.
+    :param str method: for multi-method views, the http method the options should apply
+        to
+    :param list[str] methods: for multi-method views, the http methods the options
+        should apply to
+    :param drf_yasg.inspectors.SwaggerAutoSchema auto_schema: custom class to use for
+        generating the Operation object;
+        this overrides both the class-level ``swagger_schema`` attribute and the
+        ``DEFAULT_AUTO_SCHEMA_CLASS`` setting, and can be set to ``None`` to prevent
+        this operation from being generated
+    :param request_body: custom request body which will be used as the ``schema``
+        property of a :class:`.Parameter` with ``in: 'body'``.
 
-        A Schema or SchemaRef is not valid if this request consumes form-data, because ``form`` and ``body`` parameters
-        are mutually exclusive in an :class:`.Operation`. If you need to set custom ``form`` parameters, you can use
+        A Schema or SchemaRef is not valid if this request consumes form-data, because
+        ``form`` and ``body`` parameters are mutually exclusive in an
+        :class:`.Operation`. If you need to set custom ``form`` parameters, you can use
         the `manual_parameters` argument.
 
-        If a ``Serializer`` class or instance is given, it will be automatically converted into a :class:`.Schema`
-        used as a ``body`` :class:`.Parameter`, or into a list of ``form`` :class:`.Parameter`\\ s, as appropriate.
-    :type request_body: drf_yasg.openapi.Schema or drf_yasg.openapi.SchemaRef  or rest_framework.serializers.Serializer
-        or type[no_body]
+        If a ``Serializer`` class or instance is given, it will be automatically
+        converted into a :class:`.Schema` used as a ``body`` :class:`.Parameter`, or
+        into a list of ``form`` :class:`.Parameter`\\ s, as appropriate.
+    :type request_body: drf_yasg.openapi.Schema or drf_yasg.openapi.SchemaRef or
+        rest_framework.serializers.Serializer or type[no_body]
 
-    :param rest_framework.serializers.Serializer query_serializer: if you use a ``Serializer`` to parse query
-        parameters, you can pass it here and have :class:`.Parameter` objects be generated automatically from it.
+    :param rest_framework.serializers.Serializer query_serializer: if you use a
+        ``Serializer`` to parse query parameters, you can pass it here and have
+        :class:`.Parameter` objects be generated automatically from it.
 
-        If any ``Field`` on the serializer cannot be represented as a ``query`` :class:`.Parameter`
-        (e.g. nested Serializers, file fields, ...), the schema generation will fail with an error.
+        If any ``Field`` on the serializer cannot be represented as a ``query``
+        :class:`.Parameter` (e.g. nested Serializers, file fields, ...), the schema
+        generation will fail with an error.
 
-        Schema generation will also fail if the name of any Field on the `query_serializer` conflicts with parameters
-        generated by ``filter_backends`` or ``paginator``.
+        Schema generation will also fail if the name of any Field on the
+        `query_serializer` conflicts with parameters generated by ``filter_backends`` or
+        ``paginator``.
 
-    :param list[drf_yasg.openapi.Parameter] manual_parameters: a list of manual parameters to override the
-        automatically generated ones
+    :param list[drf_yasg.openapi.Parameter] manual_parameters: a list of manual
+        parameters to override the automatically generated ones
 
-        :class:`.Parameter`\\ s are identified by their (``name``, ``in``) combination, and any parameters given
-        here will fully override automatically generated parameters if they collide.
+        :class:`.Parameter`\\ s are identified by their (``name``, ``in``) combination,
+            and any parameters given here will fully override automatically generated
+            parameters if they collide.
 
-        It is an error to supply ``form`` parameters when the request does not consume form-data.
+        It is an error to supply ``form`` parameters when the request does not consume
+        form-data.
 
-    :param str operation_id: operation ID override; the operation ID must be unique across the whole API
+    :param str operation_id: operation ID override; the operation ID must be unique
+        across the whole API
     :param str operation_description: operation description override
     :param str operation_summary: operation summary string
-    :param list[dict] security: security requirements override; used to specify which authentication mechanism
-        is required to call this API; an empty list marks the endpoint as unauthenticated (i.e. removes all accepted
-        authentication schemes), and ``None`` will inherit the top-level security requirements
+    :param list[dict] security: security requirements override; used to specify which
+        authentication mechanism is required to call this API; an empty list marks the
+        endpoint as unauthenticated (i.e. removes all accepted authentication schemes),
+        and ``None`` will inherit the top-level security requirements
     :param bool deprecated: deprecation status for operation
-    :param responses: a dict of documented manual responses
-        keyed on response status code. If no success (``2xx``) response is given, one will automatically be
-        generated from the request body and http method. If any ``2xx`` response is given the automatic response is
-        suppressed.
+    :param responses: a dict of documented manual responses keyed on response status
+        code. If no success (``2xx``) response is given, one will automatically be
+        generated from the request body and http method. If any ``2xx`` response is
+        given the automatic response is suppressed.
 
-        * if a plain string is given as value, a :class:`.Response` with no body and that string as its description
-          will be generated
-        * if ``None`` is given as a value, the response is ignored; this is mainly useful for disabling default
-          2xx responses, i.e. ``responses={200: None, 302: 'something'}``
-        * if a :class:`.Schema`, :class:`.SchemaRef` is given, a :class:`.Response` with the schema as its body and
-          an empty description will be generated
-        * a ``Serializer`` class or instance will be converted into a :class:`.Schema` and treated as above
-        * a :class:`.Response` object will be used as-is; however if its ``schema`` attribute is a ``Serializer``,
-          it will automatically be converted into a :class:`.Schema`
-    :type responses: dict[int or str, (drf_yasg.openapi.Schema or drf_yasg.openapi.SchemaRef or
-        drf_yasg.openapi.Response or str or rest_framework.serializers.Serializer)]
+        * if a plain string is given as value, a :class:`.Response` with no body and
+          that string as its description will be generated
+        * if ``None`` is given as a value, the response is ignored; this is mainly
+          useful for disabling default 2xx responses, i.e.
+          ``responses={200: None, 302: 'something'}``
+        * if a :class:`.Schema`, :class:`.SchemaRef` is given, a :class:`.Response`
+          with the schema as its body and an empty description will be generated
+        * a ``Serializer`` class or instance will be converted into a :class:`.Schema`
+          and treated as above
+        * a :class:`.Response` object will be used as-is; however if its ``schema``
+          attribute is a ``Serializer``, it will automatically be converted into a
+          :class:`.Schema`
+    :type responses: dict[int or str, (drf_yasg.openapi.Schema or
+        drf_yasg.openapi.SchemaRef or drf_yasg.openapi.Response or str or
+        rest_framework.serializers.Serializer)]
 
-    :param list[type[drf_yasg.inspectors.FieldInspector]] field_inspectors: extra serializer and field inspectors; these
-        will be tried before :attr:`.ViewInspector.field_inspectors` on the :class:`.inspectors.SwaggerAutoSchema`
-    :param list[type[drf_yasg.inspectors.FilterInspector]] filter_inspectors: extra filter inspectors; these will be
-        tried before :attr:`.ViewInspector.filter_inspectors` on the :class:`.inspectors.SwaggerAutoSchema`
-    :param list[type[drf_yasg.inspectors.PaginatorInspector]] paginator_inspectors: extra paginator inspectors; these
-        will be tried before :attr:`.ViewInspector.paginator_inspectors` on the :class:`.inspectors.SwaggerAutoSchema`
+    :param list[type[drf_yasg.inspectors.FieldInspector]] field_inspectors: extra
+        serializer and field inspectors; these will be tried before
+        :attr:`.ViewInspector.field_inspectors` on the
+        :class:`.inspectors.SwaggerAutoSchema`
+    :param list[type[drf_yasg.inspectors.FilterInspector]] filter_inspectors: extra
+        filter inspectors; these will be tried before
+        :attr:`.ViewInspector.filter_inspectors` on the
+        :class:`.inspectors.SwaggerAutoSchema`
+    :param list[type[drf_yasg.inspectors.PaginatorInspector]] paginator_inspectors:
+        extra paginator inspectors; these will be tried before
+        :attr:`.ViewInspector.paginator_inspectors` on the
+        :class:`.inspectors.SwaggerAutoSchema`
     :param list[str] tags: tags override
-    :param extra_overrides: extra values that will be saved into the ``overrides`` dict; these values will be available
-        in the handling :class:`.inspectors.SwaggerAutoSchema` instance via ``self.overrides``
+    :param extra_overrides: extra values that will be saved into the ``overrides`` dict;
+        these values will be available in the handling
+        :class:`.inspectors.SwaggerAutoSchema` instance via ``self.overrides``
     """
 
     def decorator(view_method):
@@ -170,7 +198,8 @@ def swagger_auto_schema(
             # no overrides to set, no use in doing more work
             return view_method
 
-        # if the method is an @action, it will have a bind_to_methods attribute, or a mapping attribute for drf>3.8
+        # if the method is an @action, it will have a bind_to_methods attribute, or a
+        # mapping attribute for drf>3.8
         bind_to_methods = getattr(view_method, "bind_to_methods", [])
         mapping = getattr(view_method, "mapping", {})
         mapping_methods = [
@@ -178,7 +207,8 @@ def swagger_auto_schema(
         ]
         action_http_methods = bind_to_methods + mapping_methods
 
-        # if the method is actually a function based view (@api_view), it will have a 'cls' attribute
+        # if the method is actually a function based view (@api_view), it will have a
+        # 'cls' attribute
         view_cls = getattr(view_method, "cls", None)
         api_view_http_methods = [
             m
@@ -192,7 +222,8 @@ def swagger_auto_schema(
         _methods = methods
         if methods or method:
             assert available_http_methods, (
-                "`method` or `methods` can only be specified on @action or @api_view views"
+                "`method` or `methods` can only be specified on @action or @api_view "
+                "views"
             )
             assert bool(methods) != bool(method), "specify either method or methods"
             assert not isinstance(methods, str), (
@@ -219,10 +250,12 @@ def swagger_auto_schema(
             if len(available_http_methods) > 1:
                 assert _methods, (
                     "on multi-method api_view or action, you must specify "
-                    "swagger_auto_schema on a per-method basis using one of the `method` or `methods` arguments"
+                    "swagger_auto_schema on a per-method basis using one of the "
+                    "`method` or `methods` arguments"
                 )
             else:
-                # for a single-method view we assume that single method as the decorator target
+                # for a single-method view we assume that single method as the decorator
+                # target
                 _methods = _methods or available_http_methods
 
             assert not any(
@@ -236,9 +269,9 @@ def swagger_auto_schema(
             view_method._swagger_auto_schema = existing_data
         else:
             assert not _methods, (
-                "the methods argument should only be specified when decorating an action; "
-                "you should also ensure that you put the swagger_auto_schema decorator "
-                "AFTER (above) the _route decorator"
+                "the methods argument should only be specified when decorating an "
+                "action; you should also ensure that you put the swagger_auto_schema "
+                "decorator AFTER (above) the _route decorator"
             )
             assert not existing_data, "swagger_auto_schema applied twice to method"
             view_method._swagger_auto_schema = data
@@ -266,7 +299,8 @@ def swagger_serializer_method(serializer_or_field):
 
 
 def is_list_view(path, method, view):
-    """Check if the given path/method appears to represent a list view (as opposed to a detail/instance view).
+    """Check if the given path/method appears to represent a list view (as opposed to a
+    detail/instance view).
 
     :param str path: view path
     :param str method: http method
@@ -315,10 +349,11 @@ def guess_response_status(method):
 
 
 def param_list_to_odict(parameters):
-    """Transform a list of :class:`.Parameter` objects into an ``OrderedDict`` keyed on the ``(name, in_)`` tuple of
-    each parameter.
+    """Transform a list of :class:`.Parameter` objects into an ``OrderedDict`` keyed on
+    the ``(name, in_)`` tuple of each parameter.
 
-    Raises an ``AssertionError`` if `parameters` contains duplicate parameters (by their name + in combination).
+    Raises an ``AssertionError`` if `parameters` contains duplicate parameters (by their
+    name + in combination).
 
     :param list[drf_yasg.openapi.Parameter] parameters: the list of parameters
     :return: `parameters` keyed by ``(name, in_)``
@@ -330,8 +365,9 @@ def param_list_to_odict(parameters):
 
 
 def merge_params(parameters, overrides):
-    """Merge `overrides` into `parameters`. This is the same as appending `overrides` to `parameters`, but any element
-    of `parameters` whose ``(name, in_)`` tuple collides with an element in `overrides` is replaced by it.
+    """Merge `overrides` into `parameters`. This is the same as appending `overrides` to
+    `parameters`, but any element of `parameters` whose ``(name, in_)`` tuple collides
+    with an element in `overrides` is replaced by it.
 
     Raises an ``AssertionError`` if either list contains duplicate parameters.
 
@@ -346,7 +382,8 @@ def merge_params(parameters, overrides):
 
 
 def filter_none(obj):
-    """Remove ``None`` values from tuples, lists or dictionaries. Return other objects as-is.
+    """Remove ``None`` values from tuples, lists or dictionaries. Return other objects
+    as-is.
 
     :param obj: the object
     :return: collection with ``None`` values removed
@@ -366,8 +403,8 @@ def filter_none(obj):
 
 
 def force_serializer_instance(serializer):
-    """Force `serializer` into a ``Serializer`` instance. If it is not a ``Serializer`` class or instance, raises
-    an assertion error.
+    """Force `serializer` into a ``Serializer`` instance. If it is not a ``Serializer``
+    class or instance, raises an assertion error.
 
     :param serializer: serializer class or instance
     :type serializer: serializers.BaseSerializer or type[serializers.BaseSerializer]
@@ -388,7 +425,8 @@ def force_serializer_instance(serializer):
 
 def get_serializer_class(serializer):
     """Given a ``Serializer`` class or instance, return the ``Serializer`` class.
-    If `serializer` is not a ``Serializer`` class or instance, raises an assertion error.
+    If `serializer` is not a ``Serializer`` class or instance, raises an assertion
+    error.
 
     :param serializer: serializer class or instance, or ``None``
     :return: serializer class
@@ -414,7 +452,8 @@ def get_object_classes(classes_or_instances, expected_base_class=None):
 
     :param classes_or_instances: mixed list to parse
     :type classes_or_instances: list[type or object]
-    :param expected_base_class: if given, only subclasses or instances of this type will be returned
+    :param expected_base_class: if given, only subclasses or instances of this type will
+        be returned
     :type expected_base_class: type
     :return: list of classes
     :rtype: list
@@ -436,7 +475,8 @@ def get_consumes(parser_classes):
     """Extract ``consumes`` MIME types from a list of parser classes.
 
     :param list parser_classes: parser classes
-    :type parser_classes: list[rest_framework.parsers.BaseParser or type[rest_framework.parsers.BaseParser]]
+    :type parser_classes: list[rest_framework.parsers.BaseParser or
+        type[rest_framework.parsers.BaseParser]]
     :return: MIME types for ``consumes``
     :rtype: list[str]
     """
@@ -448,15 +488,16 @@ def get_consumes(parser_classes):
     non_form_media_types = [
         encoding for encoding in media_types if not is_form_media_type(encoding)
     ]
-    # Because swagger Parameter objects don't support complex data types (nested objects, arrays),
-    # we can't use those unless we are sure the view *only* accepts form data
-    # This means that a view won't support file upload in swagger unless it explicitly
-    # sets its parser classes to include only form parsers
+    # Because swagger Parameter objects don't support complex data types
+    # (nested objects, arrays), we can't use those unless we are sure the view *only*
+    # accepts form data. This means that a view won't support file upload in swagger
+    # unless it explicitly sets its parser classes to include only form parsers
     if len(non_form_media_types) == 0:
         return media_types
 
-    # If the form accepts both form data and another type, like json (which is the default config),
-    # we will render its input as a Schema and thus it file parameters will be read-only
+    # If the form accepts both form data and another type, like json (which is the
+    # default config), we will render its input as a Schema and thus it file parameters
+    # will be read-only
     return non_form_media_types
 
 
@@ -464,7 +505,8 @@ def get_produces(renderer_classes):
     """Extract ``produces`` MIME types from a list of renderer classes.
 
     :param list renderer_classes: renderer classes
-    :type renderer_classes: list[rest_framework.renderers.BaseRenderer or type[rest_framework.renderers.BaseRenderer]]
+    :type renderer_classes: list[rest_framework.renderers.BaseRenderer or
+        type[rest_framework.renderers.BaseRenderer]]
     :return: MIME types for ``produces``
     :rtype: list[str]
     """
@@ -481,8 +523,9 @@ def get_produces(renderer_classes):
 
 
 def decimal_as_float(field):
-    """Returns true if ``field`` is a django-rest-framework DecimalField and its ``coerce_to_string`` attribute or the
-    ``COERCE_DECIMAL_TO_STRING`` setting is set to ``False``.
+    """Returns true if ``field`` is a django-rest-framework DecimalField and its
+    ``coerce_to_string`` attribute or the ``COERCE_DECIMAL_TO_STRING`` setting is set to
+    ``False``.
 
     :rtype: bool
     """
@@ -496,7 +539,8 @@ def decimal_as_float(field):
 
 
 def get_serializer_ref_name(serializer):
-    """Get serializer's ref_name (or None for ModelSerializer if it is named 'NestedSerializer')
+    """Get serializer's ref_name (or None for ModelSerializer if it is named
+    'NestedSerializer')
 
     :param serializer: Serializer instance
     :return: Serializer's ``ref_name`` or ``None`` for inline serializer
@@ -539,7 +583,8 @@ def force_real_str(s, encoding="utf-8", strings_only=False, errors="strict"):
 
 
 def field_value_to_representation(field, value):
-    """Convert a python value related to a field (default, choices, etc.) into its OpenAPI-compatible representation.
+    """Convert a python value related to a field (default, choices, etc.) into its
+    OpenAPI-compatible representation.
 
     :param serializers.Field field: field associated with the value
     :param object value: value
@@ -565,7 +610,8 @@ def field_value_to_representation(field, value):
 
 def get_field_default(field):
     """
-    Get the default value for a field, converted to a JSON-compatible value while properly handling callables.
+    Get the default value for a field, converted to a JSON-compatible value while
+    properly handling callables.
 
     :param field: field instance
     :return: default value

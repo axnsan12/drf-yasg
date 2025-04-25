@@ -54,7 +54,8 @@ class NoSchemaTitleInspector(FieldInspector):
             # no ``return schema`` here, because it would mean we always generate
             # an inline `object` instead of a definition reference
 
-        # return back the same object that we got - i.e. a reference if we got a reference
+        # return back the same object that we got - i.e. a reference if we got a
+        # reference
         return result
 
 
@@ -77,7 +78,9 @@ class ArticlePagination(LimitOffsetPagination):
 @method_decorator(
     name="list",
     decorator=swagger_auto_schema(
-        operation_description="description from swagger_auto_schema via method_decorator",
+        operation_description=(
+            "description from swagger_auto_schema via method_decorator"
+        ),
         filter_inspectors=[DjangoFilterDescriptionInspector],
     ),
 )

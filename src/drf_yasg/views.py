@@ -64,14 +64,19 @@ def get_schema_view(
 ):
     """Create a SchemaView class with default renderers and generators.
 
-    :param Info info: information about the API; if omitted, defaults to :ref:`DEFAULT_INFO <default-swagger-settings>`
+    :param Info info: information about the API; if omitted, defaults to
+        :ref:`DEFAULT_INFO <default-swagger-settings>`
     :param str url: same as :class:`.OpenAPISchemaGenerator`
     :param patterns: same as :class:`.OpenAPISchemaGenerator`
     :param urlconf: same as :class:`.OpenAPISchemaGenerator`
-    :param bool public: if False, includes only the endpoints that are accessible by the user viewing the schema
-    :param list validators: a list of validator names to apply; the only allowed value is ``ssv``, for now
-    :param type generator_class: schema generator class to use; should be a subclass of :class:`.OpenAPISchemaGenerator`
-    :param list authentication_classes: authentication classes for the schema view itself
+    :param bool public: if False, includes only the endpoints that are accessible by the
+        user viewing the schema
+    :param list validators: a list of validator names to apply; the only allowed value
+        is ``ssv``, for now
+    :param type generator_class: schema generator class to use; should be a subclass of
+        :class:`.OpenAPISchemaGenerator`
+    :param list authentication_classes: authentication classes for the schema view
+        itself
     :param list permission_classes: permission classes for the schema view itself
     :return: SchemaView class
     :rtype: type[drf_yasg.views.SchemaView]
@@ -93,10 +98,10 @@ def get_schema_view(
     # optionally copy renderers with the validators that are configured above
     if swagger_settings.USE_COMPAT_RENDERERS:
         warnings.warn(
-            "SwaggerJSONRenderer & SwaggerYAMLRenderer's `format` has changed to not include a `.` prefix, "
-            "please silence this warning by setting `SWAGGER_USE_COMPAT_RENDERERS = False` "
-            "in your Django settings and ensure your application works "
-            "(check your URLCONF and swagger/redoc URLs).",
+            "SwaggerJSONRenderer & SwaggerYAMLRenderer's `format` has changed to not "
+            "include a `.` prefix, please silence this warning by setting "
+            "`SWAGGER_USE_COMPAT_RENDERERS = False` in your Django settings and ensure "
+            "your application works (check your URLCONF and swagger/redoc URLs).",
             DeprecationWarning,
         )
         _spec_renderers += tuple(
@@ -161,8 +166,8 @@ def get_schema_view(
         @classmethod
         def without_ui(cls, cache_timeout=0, cache_kwargs=None):
             """
-            Instantiate this view with just JSON and YAML renderers, optionally wrapped with cache_page.
-            See https://docs.djangoproject.com/en/dev/topics/cache/.
+            Instantiate this view with just JSON and YAML renderers, optionally wrapped
+            with cache_page.  See https://docs.djangoproject.com/en/dev/topics/cache/.
 
             :param int cache_timeout: same as cache_page; set to 0 for no cache
             :param dict cache_kwargs: dictionary of kwargs to be passed to cache_page
@@ -175,8 +180,8 @@ def get_schema_view(
         @classmethod
         def with_ui(cls, renderer="swagger", cache_timeout=0, cache_kwargs=None):
             """
-            Instantiate this view with a Web UI renderer, optionally wrapped with cache_page.
-            See https://docs.djangoproject.com/en/dev/topics/cache/.
+            Instantiate this view with a Web UI renderer, optionally wrapped with
+            cache_page.  See https://docs.djangoproject.com/en/dev/topics/cache/.
 
             :param str renderer: UI renderer; allowed values are ``swagger``, ``redoc``
             :param int cache_timeout: same as cache_page; set to 0 for no cache

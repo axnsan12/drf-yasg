@@ -48,7 +48,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     @swagger_serializer_method(
         serializer_or_field=serializers.IntegerField(
-            help_text="decorated instance help_text shouldn't appear in swagger because field has priority"
+            help_text=(
+                "decorated instance help_text shouldn't appear in swagger because "
+                "field has priority"
+            )
         )
     )
     def get_help_text_example_1(self):
