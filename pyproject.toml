@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "drf-yasg"
 requires-python = ">= 3.9"
-dynamic = [ "dependencies", "optional-dependencies", "version" ]
+dynamic = [ "version" ]
 
 authors = [
   { name = "Cristi V.", email = "cristi@cvjd.me" },
@@ -33,6 +33,15 @@ classifiers = [
   "Topic :: Documentation",
   "Topic :: Software Development :: Code Generators",
 ]
+dependencies = [
+  "django >= 4.0",
+  "djangorestframework >= 3.13",
+  "inflection >= 0.3.1",
+  "packaging >= 21.0",
+  "pytz >= 2021.1",
+  "pyyaml >= 5.1",
+  "uritemplate >= 3.0.0",
+]
 description = """Automated generation of real Swagger/OpenAPI 2.0 schemas \
 from Django Rest Framework code."""
 keywords = [
@@ -52,6 +61,10 @@ keywords = [
 license = "BSD-3-Clause"
 license-files = [ "LICENSE.rst" ]
 readme =  "README.rst"
+
+[project.optional-dependencies]
+coreapi = [ "coreapi >= 2.3.3", "coreschema >= 0.0.4" ]
+validation = [ "swagger-spec-validator >= 2.1.0" ]
 
 [project.urls]
 Changelog = "https://drf-yasg.readthedocs.io/en/stable/changelog.html"

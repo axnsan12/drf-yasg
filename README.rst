@@ -395,6 +395,8 @@ for display the Base64 fields correctly.
 Contributing
 ************
 
+See https://drf-yasg.readthedocs.io/en/stable/contributing.html for details.
+
 This repository adheres to semantic versioning standards. For more
 information on semantic versioning visit `SemVer <https://semver.org>`_.
 
