@@ -2,6 +2,64 @@
 requires = [ "setuptools >= 77.0.3", "setuptools-scm ~= 7.0" ]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "drf-yasg"
+requires-python = ">= 3.9"
+dynamic = [ "dependencies", "optional-dependencies", "version" ]
+
+authors = [
+  { name = "Cristi V.", email = "cristi@cvjd.me" },
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Web Environment",
+  "Framework :: Django :: 4.0",
+  "Framework :: Django :: 4.1",
+  "Framework :: Django :: 4.2",
+  "Framework :: Django :: 5.0",
+  "Framework :: Django :: 5.1",
+  "Framework :: Django :: 5.2",
+  "Framework :: Django",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python",
+  "Topic :: Documentation",
+  "Topic :: Software Development :: Code Generators",
+]
+description = """Automated generation of real Swagger/OpenAPI 2.0 schemas \
+from Django Rest Framework code."""
+keywords = [
+  "codegen",
+  "django",
+  "django-rest-framework",
+  "django-rest-swagger",
+  "documentation",
+  "drf",
+  "drf-openapi",
+  "drf-yasg",
+  "openapi",
+  "schema",
+  "swagger",
+  "swagger-codegen",
+]
+license = "BSD-3-Clause"
+license-files = [ "LICENSE.rst" ]
+readme =  "README.rst"
+
+[project.urls]
+Changelog = "https://drf-yasg.readthedocs.io/en/stable/changelog.html"
+Documentation = "https://drf-yasg.readthedocs.io/en/stable/"
+Homepage = "https://github.com/axnsan12/drf-yasg"
+Issues = "https://github.com/axnsan12/drf-yasg/issues"
+Repository = "https://github.com/axnsan12/drf-yasg"
+
 [tool.ruff]
 exclude = [ "**/migrations/*" ]
 line-length = 88

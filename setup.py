@@ -1,12 +1,8 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from __future__ import print_function
-
-import io
 import os
 import sys
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 
 def read_req(req_file):
@@ -18,72 +14,17 @@ def read_req(req_file):
         ]
 
 
-with io.open("README.rst", encoding="utf-8") as readme:
-    description = readme.read()
-
 requirements = read_req("base.txt")
 requirements_validation = read_req("validation.txt")
 
 
-def find_versions_from_readme(prefix):
-    for line in description.splitlines():
-        line = line.strip()
-        if line.startswith(prefix):
-            versions = [v.strip() for v in line[len(prefix) :].split(",")]
-            if versions:
-                return versions
-
-    raise RuntimeError("failed to find supported versions list for '{}'".format(prefix))
-
-
-python_versions = find_versions_from_readme("- **Python**: ")
-django_versions = find_versions_from_readme("- **Django**: ")
-
-python_requires = ">=" + python_versions[0]
-
-python_classifiers = [
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-] + ["Programming Language :: Python :: {}".format(v) for v in python_versions]
-django_classifiers = [
-    "Framework :: Django",
-] + ["Framework :: Django :: {}".format(v) for v in django_versions]
-
-
 def drf_yasg_setup(**kwargs):
     setup(
-        name="drf-yasg",
-        packages=find_packages("src"),
-        package_dir={"": "src"},
-        include_package_data=True,
         install_requires=requirements,
         extras_require={
             "validation": requirements_validation,
             "coreapi": ["coreapi>=2.3.3", "coreschema>=0.0.4"],
         },
-        license="BSD License",
-        description="Automated generation of real Swagger/OpenAPI 2.0 schemas from "
-        "Django Rest Framework code.",
-        long_description=description,
-        long_description_content_type="text/x-rst",
-        url="https://github.com/axnsan12/drf-yasg",
-        author="Cristi V.",
-        author_email="cristi@cvjd.me",
-        keywords="drf django django-rest-framework schema swagger openapi codegen "
-        "swagger-codegen documentation drf-yasg django-rest-swagger drf-openapi",
-        python_requires=python_requires,
-        classifiers=[
-            "Intended Audience :: Developers",
-            "License :: OSI Approved :: BSD License",
-            "Development Status :: 5 - Production/Stable",
-            "Operating System :: OS Independent",
-            "Environment :: Web Environment",
-            "Topic :: Documentation",
-            "Topic :: Software Development :: Code Generators",
-        ]
-        + python_classifiers
-        + django_classifiers,
         **kwargs,
     )
 
