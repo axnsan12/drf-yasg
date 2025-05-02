@@ -122,6 +122,41 @@ def _basename_or_base_name(basename):
         return {"base_name": basename}
 
 
+@pytest.mark.parametrize(
+    "key,value,override_schema_key",
+    (
+        ("consumes", ["application/vnd.x-override"], None),
+        ("deprecated", True, None),
+        ("operation_description", "description override", "description"),
+        ("operation_id", "id override", "operationId"),
+        ("operation_summary", "summary override", "summary"),
+        ("produces", ["application/vnd.x-override"], None),
+        ("tags", ["tag override"], None),
+    ),
+)
+def test_overrides(key, value, override_schema_key):
+    @swagger_auto_schema(method="get", **{key: value})
+    @api_view()
+    def test_override(request, pk=None):
+        return Response({"message": "Hello, world!"})
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        version="v2",
+        url="",
+        patterns=[path("test/", test_override)],
+    )
+
+    assert generator.get_schema(None, True)["paths"]["/test/"]["get"] == {
+        "description": "",
+        "operationId": "test_list",
+        "parameters": [],
+        "responses": openapi.Responses({200: openapi.Response("")}),
+        "tags": ["test"],
+        (key if override_schema_key is None else override_schema_key): value,
+    }
+
+
 def test_replaced_serializer():
     class DetailSerializer(serializers.Serializer):
         detail = serializers.CharField()

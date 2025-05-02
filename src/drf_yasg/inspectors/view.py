@@ -473,11 +473,13 @@ class SwaggerAutoSchema(ViewInspector):
 
         :rtype: list[str]
         """
-        return get_consumes(self.get_parser_classes())
+        return self.overrides.get("consumes") or get_consumes(self.get_parser_classes())
 
     def get_produces(self):
         """Return the MIME types this endpoint can produce.
 
         :rtype: list[str]
         """
-        return get_produces(self.get_renderer_classes())
+        return self.overrides.get("produces") or get_produces(
+            self.get_renderer_classes()
+        )

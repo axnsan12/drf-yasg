@@ -65,6 +65,8 @@ def swagger_auto_schema(
     filter_inspectors=None,
     paginator_inspectors=None,
     tags=None,
+    produces=None,
+    consumes=None,
     **extra_overrides,
 ):
     """Decorate a view method to customize the :class:`.Operation` object generated from
@@ -164,6 +166,8 @@ def swagger_auto_schema(
         :attr:`.ViewInspector.paginator_inspectors` on the
         :class:`.inspectors.SwaggerAutoSchema`
     :param list[str] tags: tags override
+    :param list[str] produces: produces override
+    :param list[str] consumes: consumes override
     :param extra_overrides: extra values that will be saved into the ``overrides`` dict;
         these values will be available in the handling
         :class:`.inspectors.SwaggerAutoSchema` instance via ``self.overrides``
@@ -174,20 +178,22 @@ def swagger_auto_schema(
             "HTTP method names not allowed here"
         )
         data = {
-            "request_body": request_body,
-            "query_serializer": query_serializer,
+            "consumes": consumes,
+            "deprecated": deprecated,
+            "field_inspectors": list(field_inspectors) if field_inspectors else None,
+            "filter_inspectors": list(filter_inspectors) if filter_inspectors else None,
             "manual_parameters": manual_parameters,
+            "operation_description": operation_description,
             "operation_id": operation_id,
             "operation_summary": operation_summary,
-            "deprecated": deprecated,
-            "operation_description": operation_description,
-            "security": security,
-            "responses": responses,
-            "filter_inspectors": list(filter_inspectors) if filter_inspectors else None,
             "paginator_inspectors": list(paginator_inspectors)
             if paginator_inspectors
             else None,
-            "field_inspectors": list(field_inspectors) if field_inspectors else None,
+            "produces": produces,
+            "query_serializer": query_serializer,
+            "request_body": request_body,
+            "responses": responses,
+            "security": security,
             "tags": list(tags) if tags else None,
         }
         data = filter_none(data)
