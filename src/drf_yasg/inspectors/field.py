@@ -71,6 +71,14 @@ class InlineSerializerInspector(SerializerInspector):
         return parameters
 
     def get_request_parameters(self, serializer, in_):
+        # Check if this is a ModelSerializer with an abstract model
+        if isinstance(serializer, serializers.ModelSerializer):
+            serializer_meta = getattr(serializer, 'Meta', None)
+            model = getattr(serializer_meta, 'model', None)
+            if model and getattr(model._meta, 'abstract', False):
+                # Return empty parameters for abstract models
+                return []
+        
         fields = getattr(serializer, "fields", {})
         parameters = [
             self.probe_field_inspectors(
@@ -124,6 +132,19 @@ class InlineSerializerInspector(SerializerInspector):
             def make_schema_definition(serializer=field):
                 properties = OrderedDict()
                 required = []
+                
+                # Check if this is a ModelSerializer with an abstract model
+                if isinstance(serializer, serializers.ModelSerializer):
+                    serializer_meta = getattr(serializer, 'Meta', None)
+                    model = getattr(serializer_meta, 'model', None)
+                    if model and getattr(model._meta, 'abstract', False):
+                        # Return empty schema for abstract models
+                        return SwaggerType(
+                            type=openapi.TYPE_OBJECT,
+                            properties=properties,
+                            required=None,
+                        )
+                
                 for property_name, child in serializer.fields.items():
                     property_name = self.get_property_name(property_name)
                     prop_kwargs = {"read_only": bool(child.read_only) or None}
@@ -200,6 +221,8 @@ def get_model_field(model, field_name):
     :param field_name: target field name
     :return: model field or ``None``
     """
+    if model and getattr(model._meta, 'abstract', False):
+        return None
     try:
         if field_name == "pk":
             return model._meta.pk
