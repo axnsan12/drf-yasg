@@ -221,6 +221,8 @@ def get_model_field(model, field_name):
     :param field_name: target field name
     :return: model field or ``None``
     """
+    if model and getattr(model._meta, 'abstract', False):
+        return None
     try:
         if field_name == "pk":
             return model._meta.pk
