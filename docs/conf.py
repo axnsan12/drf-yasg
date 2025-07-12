@@ -16,7 +16,7 @@ from docutils.parsers.rst.roles import set_classes
 try:
     from importlib import metadata
 except ImportError:  # Python < 3.8
-    from pkg_resources import get_distribution
+    import importlib_metadata as metadata
 
 # -- General configuration ------------------------------------------------
 
@@ -51,10 +51,7 @@ author = "Cristi V."
 # built documents.
 
 # The full version, including alpha/beta/rc tags.
-try:
-    release = metadata.version("drf_yasg")
-except NameError:  # Python < 3.8
-    release = get_distribution("drf_yasg").version
+release = metadata.version("drf_yasg")
 if "noscm" in release:
     raise AssertionError(
         "Invalid package version string: %s. \n"
