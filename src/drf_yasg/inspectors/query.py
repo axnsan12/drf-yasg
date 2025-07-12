@@ -57,7 +57,6 @@ class DrfAPICompatInspector(PaginatorInspector, FilterInspector):
         return NotHandled
 
     def get_filter_backend_params(self, filter_backend):
-
         filterset_class = filter_backend.get_filterset_class(
             self.view,
             self.view.queryset,
