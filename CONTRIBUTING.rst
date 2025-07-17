@@ -36,8 +36,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
       $ python -m venv venv
       $ source venv/bin/activate
       (venv) $ python -m pip install -U pip setuptools
-      (venv) $ pip install -U -e '.[validation]'
-      (venv) $ pip install -U -r requirements/dev.txt
+      (venv) $ pip install -U -r requirements/dev.txt -e '.[validation]'
 
 #. **Make your changes and check them against the test project**
 

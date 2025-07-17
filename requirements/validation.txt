@@ -1,2 +1,0 @@
-# requirements for the validation feature
-swagger-spec-validator>=2.1.0

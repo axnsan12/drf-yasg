@@ -1,11 +1,10 @@
 # requirements for running the tests via pytest
-pytest>=4.0
-pytest-pythonpath>=0.7.1
-pytest-cov>=2.6.0
-pytest-xdist>=1.25.0
-pytest-django>=3.4.4
-datadiff==2.0.0
-psycopg2-binary==2.9.5
+datadiff>=2
 django-fake-model==0.1.4
+psycopg2-binary>=2.9.5
+pytest-cov>=4
+pytest-django>=4
+pytest-xdist>=3
+pytest>=7
 
 -r testproj.txt
