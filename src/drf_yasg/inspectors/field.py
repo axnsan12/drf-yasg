@@ -27,12 +27,10 @@ from .base import FieldInspector, NotHandled, SerializerInspector, call_view_met
 
 try:
     from importlib import metadata
-
-    drf_version = metadata.version("djangorestframework")
 except ImportError:  # Python < 3.8
-    import pkg_resources
+    import importlib_metadata as metadata
 
-    drf_version = pkg_resources.get_distribution("djangorestframework").version
+drf_version = metadata.version("djangorestframework")
 
 try:
     from types import NoneType, UnionType
