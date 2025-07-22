@@ -9,7 +9,8 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
-from .app_settings import swagger_settings
+from .app_settings import redoc_settings as _redoc_settings
+from .app_settings import swagger_settings as _swagger_settings
 from .renderers import (
     ReDocOldRenderer,
     ReDocRenderer,
@@ -19,7 +20,6 @@ from .renderers import (
     _SpecRenderer,
 )
 
-SPEC_RENDERERS = swagger_settings.DEFAULT_SPEC_RENDERERS
 UI_RENDERERS = {
     "swagger": (SwaggerUIRenderer, ReDocRenderer),
     "redoc": (ReDocRenderer, SwaggerUIRenderer),
@@ -61,6 +61,8 @@ def get_schema_view(
     generator_class=None,
     authentication_classes=None,
     permission_classes=None,
+    swagger_settings=_swagger_settings,
+    redoc_settings=_redoc_settings,
 ):
     """Create a SchemaView class with default renderers and generators.
 
@@ -92,7 +94,8 @@ def get_schema_view(
     info = info or swagger_settings.DEFAULT_INFO
     validators = validators or []
     _spec_renderers = tuple(
-        renderer.with_validators(validators) for renderer in SPEC_RENDERERS
+        renderer.with_validators(validators)
+        for renderer in swagger_settings.DEFAULT_SPEC_RENDERERS
     )
 
     # optionally copy renderers with the validators that are configured above
@@ -122,9 +125,13 @@ def get_schema_view(
         def get(self, request, version="", format=None):
             version = request.version or version or ""
             if isinstance(request.accepted_renderer, _SpecRenderer):
-                generator = self.generator_class(info, version, url, patterns, urlconf)
+                generator = self.generator_class(
+                    info, version, url, patterns, urlconf, swagger_settings
+                )
             else:
-                generator = self.generator_class(info, version, url, patterns=[])
+                generator = self.generator_class(
+                    info, version, url, patterns=[], swagger_settings=swagger_settings
+                )
 
             schema = generator.get_schema(request, self.public)
             if schema is None:
@@ -191,8 +198,32 @@ def get_schema_view(
             assert renderer in UI_RENDERERS, (
                 "supported default renderers are " + ", ".join(UI_RENDERERS)
             )
-            renderer_classes = UI_RENDERERS[renderer] + _spec_renderers
 
+            _local_swagger_settings = swagger_settings
+            _local_redoc_settings = redoc_settings
+            renderer_classes = []
+            for renderer_class in UI_RENDERERS[renderer]:
+                if issubclass(renderer_class, SwaggerUIRenderer):
+                    if _local_swagger_settings is _swagger_settings:
+                        renderer_classes.append(renderer_class)
+                    else:
+
+                        class CustomSettingsSwaggerRenderer(renderer_class):
+                            swagger_settings = _local_swagger_settings
+
+                        renderer_classes.append(CustomSettingsSwaggerRenderer)
+
+                elif issubclass(renderer_class, ReDocRenderer):
+                    if _local_redoc_settings is _redoc_settings:
+                        renderer_classes.append(renderer_class)
+                    else:
+
+                        class CustomSettingsRedDocRenderer(renderer_class):
+                            redoc_settings = _local_redoc_settings
+
+                        renderer_classes.append(CustomSettingsRedDocRenderer)
+
+            renderer_classes.extend(_spec_renderers)
             return cls.as_cached_view(
                 cache_timeout, cache_kwargs, renderer_classes=renderer_classes
             )
