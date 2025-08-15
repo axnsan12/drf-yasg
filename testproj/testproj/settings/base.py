@@ -15,8 +15,7 @@ ALLOWED_HOSTS = [
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-assert SECRET_KEY, "DJANGO_SECRET_KEY environment variable must be set"
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 # Application definition
 
