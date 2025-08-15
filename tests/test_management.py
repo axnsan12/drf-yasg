@@ -12,12 +12,12 @@ from drf_yasg.codecs import yaml_sane_load
 from drf_yasg.generators import OpenAPISchemaGenerator
 
 
-def test_reference_schema(call_generate_swagger, db, reference_schema):
+def test_reference_schema(call_generate_swagger, db, reference_schema, compare_schemas):
     output = call_generate_swagger(
         format="yaml", api_url="http://test.local:8002/", user="admin"
     )
     output_schema = yaml_sane_load(output)
-    assert output_schema == reference_schema
+    compare_schemas(output_schema, reference_schema)
 
 
 def test_non_public(call_generate_swagger, db):
