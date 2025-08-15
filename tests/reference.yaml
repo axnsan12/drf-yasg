@@ -448,7 +448,7 @@ paths:
     parameters: []
   /snippets/views/{snippet_pk}/:
     get:
-      operationId: snippetsViewsRead
+      operationId: snippetsViewsList
       description: SnippetViewerList classdoc
       parameters:
         - name: page

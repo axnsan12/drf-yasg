@@ -21,7 +21,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/requirements/*.txt') }}
         restore-keys: ${{ runner.os }}-pip-
 
     - name: Install dependencies
