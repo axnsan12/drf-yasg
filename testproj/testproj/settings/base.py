@@ -1,17 +1,17 @@
 import os
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from django.urls import reverse_lazy
-
 from testproj.util import static_lazy
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 ALLOWED_HOSTS = [
+    "0.0.0.0",
     "127.0.0.1",
     "localhost",
     "test.local",
 ]
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
@@ -48,6 +48,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "testproj.urls"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TEMPLATES = [
     {
