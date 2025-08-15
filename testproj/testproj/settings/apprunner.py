@@ -8,9 +8,6 @@ DEBUG = True
 
 ALLOWED_HOSTS.append(".awsapprunner.com")
 
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-assert SECRET_KEY, "DJANGO_SECRET_KEY environment variable must be set"
-
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
