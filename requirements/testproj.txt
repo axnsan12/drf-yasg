@@ -7,4 +7,3 @@ dj-database-url>=0.4.2
 user_agents>=1.1.0
 django-cors-headers
 django-oauth-toolkit>=1.3.0
-
