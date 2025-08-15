@@ -29,16 +29,9 @@ Resources:
 * `Changelog <https://drf-yasg.readthedocs.io/en/stable/changelog.html>`_
 * `Discussion <https://app.gitter.im/#/room/#drf-yasg:gitter.im>`_
 
-.. raw:: html
-
-   <a 
-      href="https://dp7rvf6azp.eu-west-2.awsapprunner.com" 
-      target="_blank" 
-      style="display: inline-block; padding: 0.5em 1.5em; background: #0078d4; color: #ffffff; border-radius: 10px; font-weight: bold; text-decoration: none;"
-    >
-      🚀 Live Demo
-   </a>
-
+.. image:: https://img.shields.io/badge/live%20demo-blue?style=for-the-badge&logo=django
+   :target: https://dp7rvf6azp.eu-west-2.awsapprunner.com
+   :alt: Live Demo
 
 ****************
 OpenAPI 3.0 note
