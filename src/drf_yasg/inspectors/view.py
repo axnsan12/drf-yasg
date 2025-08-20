@@ -6,6 +6,7 @@ from rest_framework.schemas import AutoSchema
 from rest_framework.status import is_success
 
 from .. import openapi
+from ..app_settings import swagger_settings as _swagger_settings
 from ..errors import SwaggerGenerationError
 from ..utils import (
     filter_none,
@@ -25,10 +26,18 @@ logger = logging.getLogger(__name__)
 
 class SwaggerAutoSchema(ViewInspector):
     def __init__(
-        self, view, path, method, components, request, overrides, operation_keys=None
+        self,
+        view,
+        path,
+        method,
+        components,
+        request,
+        overrides,
+        operation_keys=None,
+        swagger_settings=_swagger_settings,
     ):
         super(SwaggerAutoSchema, self).__init__(
-            view, path, method, components, request, overrides
+            view, path, method, components, request, overrides, swagger_settings
         )
         self._sch = AutoSchema()
         self._sch.view = view
@@ -481,5 +490,5 @@ class SwaggerAutoSchema(ViewInspector):
         :rtype: list[str]
         """
         return self.overrides.get("produces") or get_produces(
-            self.get_renderer_classes()
+            self.get_renderer_classes(), swagger_settings=self.swagger_settings
         )
