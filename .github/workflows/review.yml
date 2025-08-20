@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout the source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set the python version
         uses: actions/setup-python@v5
