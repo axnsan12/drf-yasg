@@ -81,20 +81,18 @@ Repository = "https://github.com/axnsan12/drf-yasg"
 exclude = ["**/migrations/*"]
 line-length = 88
 lint.select = [
-    "AIR",   # Airflow
     "ASYNC", # flake8-async
+    "C90",   # mccabe
     "C4",    # flake8-comprehensions
     "E",     # pycodestyle errors
-    "F",     # Pyflakes
-    "FA102", # flake8-future-annotations
+    "F",     # pyflakes
+    "FA",    # flake8-future-annotations
     "FLY",   # flynt
     "I",     # isort
     "ICN",   # flake8-import-conventions
     "INT",   # flake8-gettext
     "LOG",   # flake8-logging
-    "NPY",   # NumPy-specific rules
-    "PD",    # pandas-vet
-    "PLE",   # Pylint errors
+    "PLE",   # pylint errors
     "PYI",   # flake8-pyi
     "SLOT",  # flake8-slots
     "T10",   # flake8-debugger
@@ -114,6 +112,7 @@ lint.isort.known-first-party = [
     "urlconfs",
 ]
 
+lint.mccabe.max-complexity = 13
 lint.per-file-ignores."src/drf_yasg/inspectors/field.py" = ["E721"]
 lint.per-file-ignores."src/drf_yasg/openapi.py" = ["E721"]
 lint.per-file-ignores."testproj/testproj/settings/*" = ["F405"]
