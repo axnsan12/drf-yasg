@@ -665,7 +665,7 @@ class SerializerMethodFieldInspector(FieldInspector):
     the swagger_serializer_method decorator.
     """
 
-    def field_to_swagger_object(
+    def field_to_swagger_object(  # noqa: C901
         self, field, swagger_object_type, use_references, **kwargs
     ):
         if not isinstance(field, serializers.SerializerMethodField):
