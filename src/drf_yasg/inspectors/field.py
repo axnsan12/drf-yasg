@@ -2,6 +2,7 @@ import datetime
 import inspect
 import logging
 import operator
+import sys
 import typing
 import uuid
 from collections import OrderedDict
@@ -664,7 +665,7 @@ class SerializerMethodFieldInspector(FieldInspector):
     the swagger_serializer_method decorator.
     """
 
-    def field_to_swagger_object(
+    def field_to_swagger_object(  # noqa: C901
         self, field, swagger_object_type, use_references, **kwargs
     ):
         if not isinstance(field, serializers.SerializerMethodField):
@@ -710,7 +711,34 @@ class SerializerMethodFieldInspector(FieldInspector):
             )
         else:
             # look for Python 3.5+ style type hinting of the return value
-            hint_class = typing.get_type_hints(method).get("return")
+            try:
+                annotations = typing.get_type_hints(method)
+            except NameError:
+                # try handling forward references with Python 3.12 type parameters
+                # (PEP-695), which are not defined in the module scope and will not
+                # resolve if postponed evaluation of annotations (PEP-563) is enabled.
+                localns = {
+                    t.__name__: t
+                    # include any class or method type parameters
+                    for scope in (field.parent, method)
+                    for t in getattr(scope, "__type_params__", ())
+                }
+                module_name = field.parent.__module__
+
+                # bail now if there are no type parameters or the module isn't loaded
+                if not localns or module_name not in sys.modules:
+                    return NotHandled
+
+                try:
+                    annotations = typing.get_type_hints(
+                        method, vars(sys.modules[module_name]), localns
+                    )
+                except Exception:
+                    return NotHandled
+            except Exception:
+                return NotHandled
+
+            hint_class = annotations.get("return")
 
             # annotations such as typing.Optional have an __instancecheck__
             # hook and will not look like classes, but `issubclass` needs
