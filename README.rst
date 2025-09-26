@@ -27,10 +27,11 @@ Resources:
 * `Sources <https://github.com/axnsan12/drf-yasg>`_
 * `Documentation <https://drf-yasg.readthedocs.io>`_
 * `Changelog <https://drf-yasg.readthedocs.io/en/stable/changelog.html>`_
-* `Live demo <https://drf-yasg-demo.herokuapp.com>`_
 * `Discussion <https://app.gitter.im/#/room/#drf-yasg:gitter.im>`_
 
-|heroku-button|
+.. image:: https://img.shields.io/badge/live%20demo-blue?style=for-the-badge&logo=django
+   :target: https://dp7rvf6azp.eu-west-2.awsapprunner.com
+   :alt: Live Demo
 
 ****************
 OpenAPI 3.0 note
@@ -355,10 +356,6 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
 .. |rtd-badge| image:: https://img.shields.io/readthedocs/drf-yasg.svg
    :target: https://drf-yasg.readthedocs.io/
    :alt: ReadTheDocs
-
-.. |heroku-button| image:: https://www.herokucdn.com/deploy/button.svg
-   :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg
-   :alt: Heroku deploy button
 
 .. |nbsp| unicode:: 0xA0
    :trim:

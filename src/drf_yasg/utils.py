@@ -315,18 +315,18 @@ def is_list_view(path, method, view):
     """
     # for ViewSets, it could be the default 'list' action, or an @action(detail=False)
     action = getattr(view, "action", "")
-    method = getattr(view, action, None) or method
-    detail = getattr(method, "detail", None)
+    detail = getattr(view, "detail", None)
     suffix = getattr(view, "suffix", None)
     if action in ("list", "create") or detail is False or suffix == "List":
         return True
 
     if (
         action in ("retrieve", "update", "partial_update", "destroy")
+        or method.lower() != "get"
+        # a detail action is surely not a list route
         or detail is True
         or suffix == "Instance"
     ):
-        # a detail action is surely not a list route
         return False
 
     if isinstance(view, ListModelMixin):

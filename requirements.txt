@@ -1,4 +1,0 @@
-# this file is only used when deploying to heroku, because heroku insists on having a root-level requirements.txt
-# for normal usage see the requirements/ directory
-.[validation]
--r requirements/heroku.txt
