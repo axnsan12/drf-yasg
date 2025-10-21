@@ -4,6 +4,6 @@ sphinx_rtd_theme>=0.2.4
 Pillow>=4.3.0
 readme_renderer[md]>=24.0
 twine>=1.12.1
-cmarkgfm==2025.10.20
+cmarkgfm>=0.8.0,<0.9.0
 Django>=2.0
 djangorestframework_camel_case>=0.2.0
