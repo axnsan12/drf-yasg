@@ -724,7 +724,7 @@ class SerializerMethodFieldInspector(FieldInspector):
 
                     return SwaggerType(
                         type=openapi.TYPE_STRING,
-                        description=f"Return type: {hint_class}"
+                        description=f"Return type: {hint_class}",
                     )
 
             # annotations such as typing.Optional have an __instancecheck__
