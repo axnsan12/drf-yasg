@@ -716,7 +716,7 @@ class SerializerMethodFieldInspector(FieldInspector):
 
             except NameError:
                 hint_class = inspect_signature(method).return_annotation
-                
+
                 if hint_class is not None and hint_class != inspect._empty:
                     SwaggerType, _ = self._get_partial_types(
                         field, swagger_object_type, use_references, **kwargs

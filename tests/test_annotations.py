@@ -30,6 +30,6 @@ def test_missing_runtime_annotations():
     )
 
     schema = inspector.field_to_swagger_object(field, openapi.Schema, True)
-    
+
     assert schema.type == "string"
     assert schema.description == "Return type: UUID"
