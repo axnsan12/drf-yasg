@@ -337,7 +337,7 @@ djangorestframework-recursive
 Integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_ is
 provided out of the box - if you have ``djangorestframework-recursive`` installed.
 
-.. |actions| image:: https://img.shields.io/github/actions/workflow/status/axnsan12/drf-yasg/review.yml?branch=master
+.. |actions| image:: https://img.shields.io/github/actions/workflow/status/axnsan12/drf-yasg/review.yaml?branch=master
    :target: https://github.com/axnsan12/drf-yasg/actions
    :alt: GitHub Workflow Status
 
