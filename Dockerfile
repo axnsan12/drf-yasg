@@ -8,9 +8,10 @@ RUN apt-get update
 RUN apt-get install -y --no-install-recommends gcc libpq-dev
 RUN rm -rf /var/lib/apt/lists/*
 
+COPY pyproject.toml .
 COPY requirements requirements
 RUN pip install --upgrade pip
-RUN pip install -r requirements/base.txt
+RUN pip install .
 RUN pip install -r requirements/testproj.txt
 RUN pip install drf-yasg psycopg2-binary gunicorn whitenoise
 
