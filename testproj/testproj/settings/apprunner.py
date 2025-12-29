@@ -10,6 +10,7 @@ ALLOWED_HOSTS.append(".awsapprunner.com")
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = ["https://*.awsapprunner.com"]
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
