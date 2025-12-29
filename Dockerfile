@@ -9,11 +9,12 @@ RUN apt-get install -y --no-install-recommends gcc libpq-dev
 RUN rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml .
-COPY requirements requirements
-RUN pip install --upgrade pip
+COPY src src
 RUN pip install .
+
+COPY requirements requirements
 RUN pip install -r requirements/testproj.txt
-RUN pip install drf-yasg psycopg2-binary gunicorn whitenoise
+RUN pip install psycopg2-binary gunicorn whitenoise
 
 COPY testproj .
 RUN python manage.py collectstatic --noinput
