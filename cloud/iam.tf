@@ -1,5 +1,6 @@
 resource "aws_iam_role" "service" {
   name = "drf-yasg-demo-apprunner-service-access-role"
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

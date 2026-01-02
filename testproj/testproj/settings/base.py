@@ -1,23 +1,13 @@
 import os
+from pathlib import Path
 
 from django.urls import reverse_lazy
 
 from testproj.util import static_lazy
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-ALLOWED_HOSTS = [
-    "0.0.0.0",
-    "127.0.0.1",
-    "localhost",
-    "test.local",
-]
-
-CORS_ORIGIN_ALLOW_ALL = True
+BASE_DIR = Path(__file__).resolve().parents[2]
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
-
-# Application definition
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -73,7 +63,6 @@ WSGI_APPLICATION = "testproj.wsgi.application"
 
 LOGIN_URL = reverse_lazy("admin:login")
 
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa: E501
@@ -89,7 +78,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Django Rest Framework
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -101,13 +89,12 @@ OAUTH2_CLIENT_SECRET = (
     "5FvYALo7W4uNnWE2ySw7Yzpkxh9PSf5GuY37RvOys00ydEyph64dbl1ECOKI9ceQ"
     "AKoz0JpiVQtq0DUnsxNhU3ubrJgZ9YbtiXymbLGJq8L7n4fiER7gXbXaNSbze3BN"
 )
-OAUTH2_APP_NAME = "drf-yasg OAuth2 provider"
 
+OAUTH2_APP_NAME = "drf-yasg OAuth2 provider"
 OAUTH2_REDIRECT_URL = static_lazy("drf-yasg/swagger-ui-dist/oauth2-redirect.html")
 OAUTH2_AUTHORIZE_URL = reverse_lazy("oauth2_provider:authorize")
 OAUTH2_TOKEN_URL = reverse_lazy("oauth2_provider:token")
 
-# drf-yasg
 SWAGGER_SETTINGS = {
     "LOGIN_URL": reverse_lazy("admin:login"),
     "LOGOUT_URL": "/admin/logout",
@@ -152,26 +139,28 @@ SWAGGER_SETTINGS = {
 }
 
 REDOC_SETTINGS = {
-    "SPEC_URL": ("schema-json", {"format": "json"}),
+    "SPEC_URL": (
+        "schema-json",
+        {
+            "format": "json",
+        },
+    ),
 }
 
-# Internationalization
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
+
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "testproj", "static"),
 ]
 
-# Testing
 TEST_RUNNER = "testproj.runner.PytestTestRunner"
 
-# Logging configuration
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": True,

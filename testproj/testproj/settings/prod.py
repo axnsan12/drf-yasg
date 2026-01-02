@@ -4,20 +4,27 @@ import dj_database_url
 
 from .base import *  # noqa: F403
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS.append(".awsapprunner.com")
+ALLOWED_HOSTS = (
+    os.environ["DJANGO_ALLOWED_HOSTS"].split(",")
+    if "DJANGO_ALLOWED_HOSTS" in os.environ
+    else []
+)
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = ["https://*.awsapprunner.com"]
+
+CSRF_TRUSTED_ORIGINS = (
+    os.environ["DJANGO_CSRF_TRUSTED_ORIGINS"].split(",")
+    if "DJANGO_CSRF_TRUSTED_ORIGINS" in os.environ
+    else []
+)
 
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = "DENY"
 
-# Simplified static file serving.
-# https://warehouse.python.org/project/whitenoise/
+X_FRAME_OPTIONS = "DENY"
 
 STORAGES = {
     "default": {
@@ -28,14 +35,13 @@ STORAGES = {
     },
 }
 
-# Database
 DATABASES = {
     "default": dj_database_url.config(default="sqlite:///db.sqlite3", conn_max_age=600)
 }
 
 SILENCED_SYSTEM_CHECKS = [
-    "security.W004",  # SECURE_HSTS_SECONDS
-    "security.W008",  # SECURE_SSL_REDIRECT
+    "security.W004",
+    "security.W008",
 ]
 
 MIDDLEWARE.insert(2, "whitenoise.middleware.WhiteNoiseMiddleware")

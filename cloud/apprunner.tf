@@ -23,8 +23,10 @@ resource "aws_apprunner_service" "demo" {
         port = "80"
 
         runtime_environment_variables = {
-          DJANGO_SETTINGS_MODULE = "testproj.settings.apprunner"
-          DJANGO_SECRET_KEY      = random_password.django_secret_key.result
+          DJANGO_SETTINGS_MODULE      = "testproj.settings.prod"
+          DJANGO_ALLOWED_HOSTS        = ".awsapprunner.com"
+          DJANGO_CSRF_TRUSTED_ORIGINS = "https://*.${data.aws_region.current.name}.awsapprunner.com"
+          DJANGO_SECRET_KEY           = random_password.django_secret_key.result
         }
       }
     }

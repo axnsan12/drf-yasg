@@ -1,9 +1,6 @@
 FROM python:3.11-slim
 WORKDIR /build
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends gcc libpq-dev
 RUN rm -rf /var/lib/apt/lists/*
