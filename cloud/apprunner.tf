@@ -23,10 +23,10 @@ resource "aws_apprunner_service" "demo" {
         port = "80"
 
         runtime_environment_variables = {
-          DJANGO_SETTINGS_MODULE      = "testproj.settings.prod"
-          DJANGO_SECRET_KEY           = random_password.django_secret_key.result
-          DJANGO_HOST_DOMAIN          = aws_route53_zone.drf_yasg.name
-          DJANGO_HOST_URL             = "https://${aws_route53_zone.drf_yasg.name}"
+          DJANGO_SETTINGS_MODULE = "testproj.settings.prod"
+          DJANGO_SECRET_KEY      = random_password.django_secret_key.result
+          DJANGO_HOST_DOMAIN     = aws_route53_zone.drf_yasg.name
+          DJANGO_HOST_URL        = "https://${aws_route53_zone.drf_yasg.name}"
         }
       }
     }
@@ -46,5 +46,5 @@ resource "aws_apprunner_custom_domain_association" "demo" {
   domain_name = aws_route53_zone.drf_yasg.name
   service_arn = aws_apprunner_service.demo.arn
 
-  enable_www_subdomain = true
+  enable_www_subdomain = false
 }

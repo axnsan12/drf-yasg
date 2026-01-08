@@ -12,4 +12,9 @@ locals {
     }
     if dvo.domain_name == aws_route53_zone.drf_yasg.name
   ])
+
+  demo_validation = {
+    for record in aws_apprunner_custom_domain_association.demo.certificate_validation_records
+    : record.name => record
+  }
 }
