@@ -15,9 +15,7 @@ swagger_info = openapi.Info(
 
 The `swagger-ui` view can be found [here](/cached/swagger).
 The `ReDoc` view can be found [here](/cached/redoc).
-The swagger YAML document can be found [here](/cached/swagger.yaml).
-
-You can log in using the pre-existing `admin` user with password `passwordadmin`.""",  # noqa
+The swagger YAML document can be found [here](/cached/swagger.yaml).""",  # noqa
     terms_of_service="https://www.google.com/policies/terms/",
     contact=openapi.Contact(email="contact@snippets.local"),
     license=openapi.License(name="BSD License"),
@@ -49,7 +47,6 @@ def root_redirect(request):
 
 # urlpatterns required for settings values
 required_urlpatterns = [
-    path("admin/", admin.site.urls),
     path("o/", include("oauth2_provider.urls", namespace="oauth2_provider")),
 ]
 
