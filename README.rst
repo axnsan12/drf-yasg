@@ -30,7 +30,7 @@ Resources:
 * `Discussion <https://app.gitter.im/#/room/#drf-yasg:gitter.im>`_
 
 .. image:: https://img.shields.io/badge/live%20demo-blue?style=for-the-badge&logo=django
-   :target: https://dp7rvf6azp.eu-west-2.awsapprunner.com
+   :target: https://drf-yasg.com
    :alt: Live Demo
 
 ****************
