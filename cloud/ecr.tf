@@ -1,17 +1,25 @@
-resource "aws_ecr_lifecycle_policy" "demo" {
+resource "aws_ecr_lifecycle_policy" "delete_images" {
   repository = aws_ecr_repository.demo.name
 
   policy = jsonencode({
     rules = [
-      {
-        rulePriority = 1
-        description  = "Expire images older than a day"
-        selection = {
+      for i, selection in [
+        {
           tagStatus   = "untagged"
           countType   = "sinceImagePushed"
           countUnit   = "days"
           countNumber = 1
+        },
+        {
+          tagStatus      = "tagged"
+          tagPatternList = ["*"]
+          countType      = "imageCountMoreThan"
+          countNumber    = 5
         }
+      ]
+      : {
+        rulePriority = i + 1
+        selection    = selection
         action = {
           type = "expire"
         }
@@ -22,8 +30,6 @@ resource "aws_ecr_lifecycle_policy" "demo" {
 
 resource "aws_ecr_repository" "demo" {
   name = "drf-yasg-demo"
-
-  image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true

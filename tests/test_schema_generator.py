@@ -421,8 +421,6 @@ EXPECTED_DESCRIPTION = """\
     The `swagger-ui` view can be found [here](/cached/swagger).
     The `ReDoc` view can be found [here](/cached/redoc).
     The swagger YAML document can be found [here](/cached/swagger.yaml).
-
-    You can log in using the pre-existing `admin` user with password `passwordadmin`.
 """  # noqa: E501
 
 
