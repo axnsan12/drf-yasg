@@ -3,6 +3,15 @@ Changelog
 #########
 
 ***********
+**1.21.12**
+***********
+
+**FIXED:** Bring the bundled swagger ui up to date (:pr:`944`)
+**IMPROVED:** Update the logout button to use a POST request. (:pr:`945`)
+**ADDED:** Add a live demo domain (:pr:`946`)
+**ADDED:** Handle annotations that are not available at runtime (:pr:`941`)
+
+***********
 **1.21.11**
 ***********
 
