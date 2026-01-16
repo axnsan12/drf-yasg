@@ -16,7 +16,7 @@ from docutils.parsers.rst.roles import set_classes
 try:
     from importlib import metadata
 except ImportError:  # Python < 3.8
-    from pkg_resources import get_distribution
+    import importlib_metadata as metadata
 
 # -- General configuration ------------------------------------------------
 
@@ -51,10 +51,7 @@ author = "Cristi V."
 # built documents.
 
 # The full version, including alpha/beta/rc tags.
-try:
-    release = metadata.version("drf_yasg")
-except NameError:  # Python < 3.8
-    release = get_distribution("drf_yasg").version
+release = metadata.version("drf_yasg")
 if "noscm" in release:
     raise AssertionError(
         "Invalid package version string: %s. \n"
@@ -216,7 +213,7 @@ sys.path.insert(0, os.path.abspath("../src"))
 
 # activate the Django testproj to be able to successfully import drf_yasg
 sys.path.insert(0, os.path.abspath("../testproj"))
-os.putenv("DJANGO_SETTINGS_MODULE", "testproj.settings.local")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "testproj.settings.local")
 
 from django.conf import settings  # noqa: E402
 

@@ -11,9 +11,9 @@ Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framewor
 
 Compatible with
 
-- **Django Rest Framework**: 3.10, 3.11, 3.12, 3.13, 3.14
-- **Django**: 2.2, 3.0, 3.1, 3.2, 4.0, 4.1, 4.2
-- **Python**: 3.6, 3.7, 3.8, 3.9, 3.10, 3.11, 3.12
+- **Django Rest Framework**: 3.13, 3.14, 3.15
+- **Django**: 4.0, 4.1, 4.2, 5.0, 5.1, 5.2
+- **Python**: 3.9, 3.10, 3.11, 3.12, 3.13
 
 Only the latest patch version of each ``major.minor`` series of Python, Django and Django REST Framework is supported.
 
@@ -27,10 +27,11 @@ Resources:
 * `Sources <https://github.com/axnsan12/drf-yasg>`_
 * `Documentation <https://drf-yasg.readthedocs.io>`_
 * `Changelog <https://drf-yasg.readthedocs.io/en/stable/changelog.html>`_
-* `Live demo <https://drf-yasg-demo.herokuapp.com>`_
 * `Discussion <https://app.gitter.im/#/room/#drf-yasg:gitter.im>`_
 
-|heroku-button|
+.. image:: https://img.shields.io/badge/live%20demo-blue?style=for-the-badge&logo=django
+   :target: https://drf-yasg.com
+   :alt: Live Demo
 
 ****************
 OpenAPI 3.0 note
@@ -336,7 +337,7 @@ djangorestframework-recursive
 Integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_ is
 provided out of the box - if you have ``djangorestframework-recursive`` installed.
 
-.. |actions| image:: https://img.shields.io/github/actions/workflow/status/axnsan12/drf-yasg/review.yml?branch=master
+.. |actions| image:: https://img.shields.io/github/actions/workflow/status/axnsan12/drf-yasg/review.yaml?branch=master
    :target: https://github.com/axnsan12/drf-yasg/actions
    :alt: GitHub Workflow Status
 
@@ -355,10 +356,6 @@ provided out of the box - if you have ``djangorestframework-recursive`` installe
 .. |rtd-badge| image:: https://img.shields.io/readthedocs/drf-yasg.svg
    :target: https://drf-yasg.readthedocs.io/
    :alt: ReadTheDocs
-
-.. |heroku-button| image:: https://www.herokucdn.com/deploy/button.svg
-   :target: https://heroku.com/deploy?template=https://github.com/axnsan12/drf-yasg
-   :alt: Heroku deploy button
 
 .. |nbsp| unicode:: 0xA0
    :trim:
@@ -394,6 +391,8 @@ for display the Base64 fields correctly.
 ************
 Contributing
 ************
+
+See https://drf-yasg.readthedocs.io/en/stable/contributing.html for details.
 
 This repository adheres to semantic versioning standards. For more
 information on semantic versioning visit `SemVer <https://semver.org>`_.

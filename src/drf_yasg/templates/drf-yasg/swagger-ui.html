@@ -59,26 +59,25 @@
             {% block user_context_message %}
                 {% if request.user.is_authenticated %}
                     <div class="hello">
-                        <span class="django-session">Django</span> <span
-                            class="label label-primary">{{ request.user }}</span>
+                        <span class="django-session">Django</span>
+                        <span class="label label-primary">{{ request.user }}</span>
                     </div>
                 {% endif %}
             {% endblock %}
 
             {% if request.user.is_authenticated %}
                 <div class='btn authorize'>
-                    <a id="auth" class="header__btn" href="{{ LOGOUT_URL }}?next={{ request.path }}" data-sw-translate>
-                        {% block django_logout_message %}
-                            Django Logout
-                        {% endblock %}
-                    </a>
+                    <form method="post" action="{{ LOGOUT_URL }}?next={{ request.path }}">
+                        {% csrf_token %}
+                        <button type="submit" id="auth" class="header__btn" data-sw-translate>
+                        {% block django_logout_message %}Django Logout{% endblock %}
+                        </button>
+                    </form>
                 </div>
             {% else %}
                 <div class='btn authorize'>
                     <a id="auth" class="header__btn" href="{{ LOGIN_URL }}?next={{ request.path }}" data-sw-translate>
-                        {% block django_login_message %}
-                            Django Login
-                        {% endblock %}
+                        {% block django_login_message %}Django Login{% endblock %}
                     </a>
                 </div>
             {% endif %}

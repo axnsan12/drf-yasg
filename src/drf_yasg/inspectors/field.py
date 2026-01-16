@@ -7,6 +7,7 @@ import uuid
 from collections import OrderedDict
 from contextlib import suppress
 from decimal import Decimal
+from inspect import signature as inspect_signature
 
 from django.core import validators
 from django.db import models
@@ -27,12 +28,10 @@ from .base import FieldInspector, NotHandled, SerializerInspector, call_view_met
 
 try:
     from importlib import metadata
-
-    drf_version = metadata.version("djangorestframework")
 except ImportError:  # Python < 3.8
-    import pkg_resources
+    import importlib_metadata as metadata
 
-    drf_version = pkg_resources.get_distribution("djangorestframework").version
+drf_version = metadata.version("djangorestframework")
 
 try:
     from types import NoneType, UnionType
@@ -712,8 +711,22 @@ class SerializerMethodFieldInspector(FieldInspector):
                 serializer, swagger_object_type, use_references, read_only=True
             )
         else:
-            # look for Python 3.5+ style type hinting of the return value
-            hint_class = typing.get_type_hints(method).get("return")
+            try:
+                # look for Python 3.5+ style type hinting of the return value
+                hint_class = typing.get_type_hints(method).get("return")
+
+            except NameError:
+                hint_class = inspect_signature(method).return_annotation
+
+                if hint_class is not None and hint_class != inspect._empty:
+                    SwaggerType, _ = self._get_partial_types(
+                        field, swagger_object_type, use_references, **kwargs
+                    )
+
+                    return SwaggerType(
+                        type=openapi.TYPE_STRING,
+                        description=f"Return type: {hint_class}",
+                    )
 
             # annotations such as typing.Optional have an __instancecheck__
             # hook and will not look like classes, but `issubclass` needs

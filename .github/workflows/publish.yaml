@@ -11,23 +11,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set the python version
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: 3.11
+          python-version: 3.13
 
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
-          python-version: 3.11
+          python-version: 3.13
 
       - name: Install builders for publishing
         run: pip install -r requirements/publish.txt
 
       - name: Build the distributions
-        run: python setup.py sdist bdist_wheel
+        run: python -m build --sdist --wheel
 
       - name: Publish the package
         uses: pypa/gh-action-pypi-publish@release/v1

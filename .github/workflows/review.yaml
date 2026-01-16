@@ -1,0 +1,58 @@
+name: Review
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Run linters and tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@v6
+
+      - name: Set the python version
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        uses: ./.github/actions/install
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Run tests
+        run: tox -e $(tox -l | grep py${PYTHON_VERSION//.} | paste -sd "," -)
+        env:
+          PYTHON_VERSION: ${{ matrix.python }}
+
+      - name: Report coverage
+        run: |
+          pip install coverage
+          coverage report
+
+      - name: Check for incompatibilities with publishing to PyPi
+        if: ${{ matrix.python == 3.13 }}
+        run: |
+          pip install -r requirements/publish.txt
+          python -m build --sdist
+          twine check dist/*
+
+  # Return successful statuses "Run linters and tests" for python {3.6...8}
+  # These are required for branch protection rules that cannot be removed yet
+  # https://github.com/axnsan12/drf-yasg/pull/922#issuecomment-2739945046
+  review:
+    name: Run linters and tests
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.6", "3.7", "3.8", "3.9"]
+
+    steps:
+      - run: echo "Deprecated tests skipped 🧪"

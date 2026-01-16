@@ -36,8 +36,7 @@ You want to contribute some code? Great! Here are a few steps to get you started
       $ python -m venv venv
       $ source venv/bin/activate
       (venv) $ python -m pip install -U pip setuptools
-      (venv) $ pip install -U -e '.[validation]'
-      (venv) $ pip install -U -r requirements/dev.txt
+      (venv) $ pip install -U -r requirements/dev.txt -e '.[validation]'
 
 #. **Make your changes and check them against the test project**
 
@@ -111,11 +110,8 @@ Release checklist
 * verify that `Actions`_ has built the tag and successfully published the release to `PyPI`_
 * publish release notes `on GitHub`_
 * start the `ReadTheDocs build`_ if it has not already started
-* deploy the live demo `on Heroku`_
-
 
 .. _Actions: https://github.com/axnsan12/drf-yasg/actions
 .. _PyPI: https://pypi.org/project/drf-yasg/
 .. _on GitHub: https://github.com/axnsan12/drf-yasg/releases
 .. _ReadTheDocs build: https://readthedocs.org/projects/drf-yasg/builds/
-.. _on Heroku: https://dashboard.heroku.com/pipelines/412d1cae-6a95-4f5e-810b-94869133f36a

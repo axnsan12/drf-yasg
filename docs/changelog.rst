@@ -3,6 +3,38 @@ Changelog
 #########
 
 ***********
+**1.21.14**
+***********
+
+***********
+**1.21.13**
+***********
+
+**FIXED:** Fix missing swagger-ui sourcemaps (:pr:`950`)
+
+***********
+**1.21.12**
+***********
+
+**FIXED:** Bring the bundled swagger ui up to date (:pr:`944`)
+**IMPROVED:** Update the logout button to use a POST request. (:pr:`945`)
+**ADDED:** Add a live demo domain (:pr:`946`)
+**ADDED:** Handle annotations that are not available at runtime (:pr:`941`)
+
+***********
+**1.21.11**
+***********
+
+**FIXED:** Fix list views with parameters in last path segment not named "list" views (:pr:`917`)
+**ADDED:** Allow overriding produces/consumes with @swagger_auto_schema decorator (:pr:`916`)
+**FIXED:** Fix filter parameters not appearing in swagger with django-filter>=25 (:pr:`926`)
+**IMPROVED:** Update Python, Django, and DRF versions and packaging configuration (:pr:`922`)
+**IMPROVED:** Remove usage of pkg_resources (:pr:`928`)
+**FIXED:** Fix call_view_method warning to include the method name again (:pr:`923`)
+**ADDED:** Add a hide download button option (:pr:`848`)
+**ADDED:** Add ruff linters (:pr:`903`)
+
+***********
 **1.21.10**
 ***********
 
