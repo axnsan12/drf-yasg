@@ -428,3 +428,48 @@ def test_multiline_strings(call_generate_swagger):
     output = call_generate_swagger(format="yaml")
     print("|\n|".join(output.splitlines()[:20]))
     assert EXPECTED_DESCRIPTION in output
+
+
+def test_big_auto_field():
+    class BigAutoFieldModel(fake_models.FakeModel):
+        id = models.BigAutoField(
+            primary_key=True,
+            help_text="This is a big auto field",
+        )
+        __module__ = "test_models"
+
+    class BigAutoFieldSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = BigAutoFieldModel
+            fields = ("id",)
+            swagger_schema_fields = {
+                "id": {
+                    "format": "int64",
+                }
+            }
+
+    class BigAutoFieldViewSet(viewsets.ModelViewSet):
+        serializer_class = BigAutoFieldSerializer
+
+        def get_queryset(self):
+            return BigAutoFieldModel.objects.all()
+
+    router = routers.DefaultRouter()
+    router.register(
+        r"big-auto", BigAutoFieldViewSet, **_basename_or_base_name("big-auto")
+    )
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test big auto field generator", default_version="v1"),
+        patterns=router.urls,
+    )
+
+    swagger = generator.get_schema(None, True)
+    property_schema = swagger["definitions"]["BigAutoField"]["properties"]["id"]
+    assert property_schema == openapi.Schema(
+        title="Id",
+        type=openapi.TYPE_INTEGER,
+        format=openapi.FORMAT_INT64,
+        readOnly=True,
+        description="This is a big auto field",
+    )

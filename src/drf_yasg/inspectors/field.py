@@ -468,6 +468,7 @@ def decimal_field_type(field):
 
 model_field_to_basic_type = [
     (models.AutoField, (openapi.TYPE_INTEGER, None)),
+    (models.BigAutoField, (openapi.TYPE_INTEGER, None)),
     (models.BinaryField, (openapi.TYPE_STRING, openapi.FORMAT_BINARY)),
     (models.BooleanField, (openapi.TYPE_BOOLEAN, None)),
     (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
