@@ -2,7 +2,7 @@ import enum
 import logging
 import re
 import urllib.parse as urlparse
-from collections import OrderedDict
+import warnings
 from collections import abc as collections_abc
 
 from django.urls import get_script_prefix
@@ -74,12 +74,12 @@ def make_swagger_name(attribute_name):
 def _bare_SwaggerDict(cls):
     assert issubclass(cls, SwaggerDict)
     result = cls.__new__(cls)
-    OrderedDict.__init__(result)  # no __init__ called for SwaggerDict subclasses!
+    dict.__init__(result)  # no __init__ called for SwaggerDict subclasses!
     return result
 
 
-class SwaggerDict(OrderedDict):
-    """A particular type of OrderedDict, which maps all attribute accesses to dict
+class SwaggerDict(dict):
+    """A particular type of dict, which maps all attribute accesses to dict
     lookups using :func:`.make_swagger_name`. Attribute names starting with ``_`` are
     set on the object as-is and are not included in the specification output.
 
@@ -130,8 +130,8 @@ class SwaggerDict(OrderedDict):
             setattr(self, attr, val)
 
     @staticmethod
-    def _as_odict(obj, memo):
-        """Implementation detail of :meth:`.as_odict`"""
+    def _as_dict(obj, memo):
+        """Implementation detail of :meth:`.as_dict`"""
         if id(obj) in memo:
             return memo[id(obj)]
 
@@ -140,13 +140,13 @@ class SwaggerDict(OrderedDict):
             obj = obj._proxy____cast()
 
         if isinstance(obj, collections_abc.Mapping):
-            result = OrderedDict()
+            result = {}
             memo[id(obj)] = result
             items = obj.items()
             if not isinstance(obj, dict):
                 items = sorted(items)
             for attr, val in items:
-                result[SwaggerDict._as_odict(attr, memo)] = SwaggerDict._as_odict(
+                result[SwaggerDict._as_dict(attr, memo)] = SwaggerDict._as_dict(
                     val, memo
                 )
             return result
@@ -155,18 +155,22 @@ class SwaggerDict(OrderedDict):
         elif isinstance(obj, collections_abc.Iterable) and not isinstance(
             obj, collections_abc.Iterator
         ):
-            return type(obj)(SwaggerDict._as_odict(elem, memo) for elem in obj)
+            return type(obj)(SwaggerDict._as_dict(elem, memo) for elem in obj)
         elif isinstance(obj, enum.Enum):
             return obj.value
 
         return obj
 
-    def as_odict(self):
-        """Convert this object into an ``OrderedDict`` instance.
+    def as_dict(self):
+        """Convert this object into an ``dict`` instance.
 
-        :rtype: OrderedDict
+        :rtype: dict
         """
-        return SwaggerDict._as_odict(self, {})
+        return SwaggerDict._as_dict(self, {})
+
+    def as_odict(self):
+        warnings.warn("as_odict has been renamed to as_dict", DeprecationWarning)
+        return self.as_dict()
 
     def __reduce__(self):
         # for pickle support; this skips calls to all SwaggerDict __init__ methods and
@@ -743,8 +747,7 @@ class ReferenceResolver(object):
         > definitions = components.with_scope('definitions')
         > definitions.set('Article', Schema(...))
         > print(components)
-        {'definitions': OrderedDict([('Article', Schema(...)]),
-         'parameters': OrderedDict()}
+        {'definitions': {'Article': Schema(...)}, 'parameters': {}}
     """
 
     def __init__(self, *scopes, **kwargs):
@@ -762,11 +765,11 @@ class ReferenceResolver(object):
                 "Pass `force_init=True` to override this."
             )
 
-        self._objects = OrderedDict()
+        self._objects = {}
         self._force_scope = None
         for scope in scopes:
             assert isinstance(scope, str), "scope names must be strings"
-            self._objects[scope] = OrderedDict()
+            self._objects[scope] = {}
 
     def with_scope(self, scope):
         """Return a view into this :class:`.ReferenceResolver` whose scope is defaulted

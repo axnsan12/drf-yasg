@@ -3,12 +3,11 @@ import os
 import random
 import string
 import tempfile
-from collections import OrderedDict
 
 import pytest
 
 from drf_yasg import openapi
-from drf_yasg.codecs import yaml_sane_load
+from drf_yasg.codecs import yaml_load
 from drf_yasg.generators import OpenAPISchemaGenerator
 
 
@@ -16,7 +15,7 @@ def test_reference_schema(call_generate_swagger, db, reference_schema, compare_s
     output = call_generate_swagger(
         format="yaml", api_url="http://test.local:8002/", user="admin"
     )
-    output_schema = yaml_sane_load(output)
+    output_schema = yaml_load(output)
     compare_schemas(output_schema, reference_schema)
 
 
@@ -24,13 +23,13 @@ def test_non_public(call_generate_swagger, db):
     output = call_generate_swagger(
         format="yaml", api_url="http://test.local:8002/", private=True
     )
-    output_schema = yaml_sane_load(output)
+    output_schema = yaml_load(output)
     assert len(output_schema["paths"]) == 0
 
 
 def test_no_mock(call_generate_swagger, db):
     output = call_generate_swagger()
-    output_schema = json.loads(output, object_pairs_hook=OrderedDict)
+    output_schema = json.loads(output)
     assert len(output_schema["paths"]) > 0
 
 
@@ -43,7 +42,7 @@ def test_generator_class(call_generate_swagger, db):
     output = call_generate_swagger(
         generator_class_name="test_management.EmptySchemaGenerator"
     )
-    output_schema = json.loads(output, object_pairs_hook=OrderedDict)
+    output_schema = json.loads(output)
     assert len(output_schema["paths"]) == 0
 
 
@@ -82,11 +81,11 @@ def test_file_output(call_generate_swagger, db):
             # the file is really YAML and not just JSON parsed by the YAML parser
             with pytest.raises(ValueError):
                 json.loads(content)
-            output_yaml = yaml_sane_load(content)
+            output_yaml = yaml_load(content)
         with open(json_file) as f:
-            output_json = json.load(f, object_pairs_hook=OrderedDict)
+            output_json = json.load(f)
         with open(other_file) as f:
-            output_other = json.load(f, object_pairs_hook=OrderedDict)
+            output_other = json.load(f)
 
         assert output_yaml == output_json == output_other
     finally:

@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from functools import wraps
 
 try:
@@ -125,9 +124,7 @@ class CoreAPICompatInspector(PaginatorInspector, FilterInspector):
             required=field.required,
             description=force_real_str(schema.description) if schema else None,
             type=coreapi_types.get(type(schema), openapi.TYPE_STRING),
-            **OrderedDict(
-                (attr, getattr(schema, attr, None)) for attr in coreschema_attrs
-            ),
+            **{attr: getattr(schema, attr, None) for attr in coreschema_attrs},
         )
 
 
