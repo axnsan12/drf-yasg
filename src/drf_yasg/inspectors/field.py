@@ -11,9 +11,11 @@ from decimal import Decimal
 
 from django.core import validators
 from django.db import models
+from importlib import metadata
 from packaging import version
 from rest_framework import serializers
 from rest_framework.settings import api_settings as rest_framework_settings
+from types import NoneType, UnionType
 
 from .. import openapi
 from ..errors import SwaggerGenerationError
@@ -26,21 +28,9 @@ from ..utils import (
 )
 from .base import FieldInspector, NotHandled, SerializerInspector, call_view_method
 
-try:
-    from importlib import metadata
-except ImportError:  # Python < 3.8
-    import importlib_metadata as metadata
-
 drf_version = metadata.version("djangorestframework")
 
-try:
-    from types import NoneType, UnionType
-
-    UNION_TYPES = (typing.Union, UnionType)
-except ImportError:  # Python < 3.10
-    NoneType = type(None)
-    UNION_TYPES = (typing.Union,)
-
+UNION_TYPES = (typing.Union, UnionType)
 DEFAULT_TYPE = openapi.TYPE_STRING
 
 logger = logging.getLogger(__name__)
@@ -577,19 +567,8 @@ hinting_type_info = [
     (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
 ]
 
-
-if hasattr(typing, "get_args"):
-    # python >=3.8
-    typing_get_args = typing.get_args
-    typing_get_origin = typing.get_origin
-else:
-    # python <3.8
-    def typing_get_args(tp):
-        return getattr(tp, "__args__", ())
-
-    def typing_get_origin(tp):
-        return getattr(tp, "__origin__", None)
-
+typing_get_args = typing.get_args
+typing_get_origin = typing.get_origin
 
 def inspect_collection_hint_class(hint_class):
     args = typing_get_args(hint_class)
