@@ -42,7 +42,7 @@ jobs:
           python -m build --sdist
           twine check dist/*
 
-  # Return successful statuses "Run linters and tests" for python {3.6...8}
+  # Return successful statuses "Run linters and tests" for python {3.6...9}
   # These are required for branch protection rules that cannot be removed yet
   # https://github.com/axnsan12/drf-yasg/pull/922#issuecomment-2739945046
   review:
@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.6", "3.7", "3.8"]
+        python: ["3.6", "3.7", "3.8", "3.9"]
 
     steps:
       - run: echo "Deprecated tests skipped 🧪"
