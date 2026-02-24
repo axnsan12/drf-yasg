@@ -6,8 +6,8 @@ Changelog
 **1.21.15**
 ***********
 
-**IMPROVED:** Use Python's native `dict` instead of `OrderedDict` (#954)
-**FIXED:** Fix Python 3.12 type parameter syntax with ``from __future__ import annotations`` (#921)
+**IMPROVED:** Use Python's native `dict` instead of `OrderedDict` (:pr:`954`)
+**FIXED:** Fix Python 3.12 type parameter syntax with `from __future__ import annotations` (:pr:`921`)
 
 ***********
 **1.21.14**
