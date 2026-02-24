@@ -1,6 +1,5 @@
 import enum
 import json
-from collections import OrderedDict
 
 from drf_yasg import openapi
 from drf_yasg.generators import OpenAPISchemaGenerator
@@ -60,8 +59,7 @@ def test_noop_inspectors(
     )
     swagger = generator.get_schema(mock_schema_request, True)
 
-    json_bytes = codec_json.encode(swagger)
-    swagger_dict = json.loads(json_bytes.decode("utf-8"), object_pairs_hook=OrderedDict)
+    swagger_dict = json.loads(codec_json.encode(swagger))
     compare_schemas(swagger_dict, reference_schema)
 
 

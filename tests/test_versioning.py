@@ -1,13 +1,13 @@
 import pytest
 
-from drf_yasg.codecs import yaml_sane_load
+from drf_yasg.codecs import yaml_load
 from drf_yasg.errors import SwaggerGenerationError
 
 
 def _get_versioned_schema(prefix, client, validate_schema, path="/snippets/"):
     response = client.get(prefix + "/swagger.yaml")
     assert response.status_code == 200
-    swagger = yaml_sane_load(response.content.decode("utf-8"))
+    swagger = yaml_load(response.content)
     _check_base(swagger, prefix, validate_schema, path)
     return swagger
 
@@ -18,7 +18,7 @@ def _get_versioned_schema_management(
     output = call_generate_swagger(
         format="yaml", api_url="http://localhost" + prefix + "/swagger.yaml", **kwargs
     )
-    swagger = yaml_sane_load(output)
+    swagger = yaml_load(output)
     _check_base(swagger, prefix, validate_schema, path)
     return swagger
 

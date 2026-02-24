@@ -1,5 +1,4 @@
 import logging
-from collections import OrderedDict
 
 from rest_framework.request import is_form_media_type
 from rest_framework.schemas import AutoSchema
@@ -16,7 +15,7 @@ from ..utils import (
     guess_response_status,
     merge_params,
     no_body,
-    param_list_to_odict,
+    param_list_to_dict,
 )
 from .base import ViewInspector, call_view_method
 
@@ -266,7 +265,7 @@ class SwaggerAutoSchema(ViewInspector):
                     self.get_paginated_response(default_schema) or default_schema
                 )
 
-        return OrderedDict({str(default_status): default_schema})
+        return {str(default_status): default_schema}
 
     def get_response_serializers(self):
         """Return the response codes that this view is expected to return, and the
@@ -280,11 +279,9 @@ class SwaggerAutoSchema(ViewInspector):
         :rtype: dict
         """
         manual_responses = self.overrides.get("responses", None) or {}
-        manual_responses = OrderedDict(
-            (str(sc), resp) for sc, resp in manual_responses.items()
-        )
+        manual_responses = {str(sc): resp for sc, resp in manual_responses.items()}
 
-        responses = OrderedDict()
+        responses = {}
         if not any(is_success(int(sc)) for sc in manual_responses if sc != "default"):
             responses = self.get_default_responses()
 
@@ -299,7 +296,7 @@ class SwaggerAutoSchema(ViewInspector):
         :return: a dictionary of status code to :class:`.Response` object
         :rtype: dict[str, openapi.Response]
         """
-        responses = OrderedDict()
+        responses = {}
         for sc, serializer in response_serializers.items():
             if isinstance(serializer, str):
                 response = openapi.Response(description=force_real_str(serializer))
@@ -359,8 +356,8 @@ class SwaggerAutoSchema(ViewInspector):
 
             if (
                 len(
-                    set(param_list_to_odict(natural_parameters))
-                    & set(param_list_to_odict(serializer_parameters))
+                    set(param_list_to_dict(natural_parameters))
+                    & set(param_list_to_dict(serializer_parameters))
                 )
                 != 0
             ):

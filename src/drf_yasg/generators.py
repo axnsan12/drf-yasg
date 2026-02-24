@@ -2,7 +2,7 @@ import copy
 import logging
 import re
 import urllib.parse as urlparse
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 
 import uritemplate
 from django.urls import URLPattern, URLResolver
@@ -291,7 +291,7 @@ class OpenAPISchemaGenerator:
         """
         security_definitions = swagger_settings.SECURITY_DEFINITIONS
         if security_definitions is not None:
-            security_definitions = SwaggerDict._as_odict(security_definitions, {})
+            security_definitions = SwaggerDict._as_dict(security_definitions, {})
 
         return security_definitions
 
@@ -311,7 +311,7 @@ class OpenAPISchemaGenerator:
             ]
 
         security_requirements = [
-            SwaggerDict._as_odict(sr, {}) for sr in security_requirements
+            SwaggerDict._as_dict(sr, {}) for sr in security_requirements
         ]
         security_requirements = sorted(security_requirements, key=list)
         return security_requirements
@@ -526,7 +526,7 @@ class OpenAPISchemaGenerator:
     def get_paths_object(self, paths):
         """Construct the Swagger Paths object.
 
-        :param OrderedDict[str,openapi.PathItem] paths: mapping of paths to
+        :param dict[str,openapi.PathItem] paths: mapping of paths to
             :class:`.PathItem` objects
         :returns: the :class:`.Paths` object
         :rtype: openapi.Paths
@@ -551,7 +551,7 @@ class OpenAPISchemaGenerator:
         prefix = self.determine_path_prefix(list(endpoints.keys())) or ""
         assert "{" not in prefix, "base path cannot be templated in swagger 2.0"
 
-        paths = OrderedDict()
+        paths = {}
         for path, (view_cls, methods) in sorted(endpoints.items()):
             operations = {}
             for method, view in methods:

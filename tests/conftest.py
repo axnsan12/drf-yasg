@@ -1,7 +1,6 @@
 import copy
 import json
 import os
-from collections import OrderedDict
 from io import StringIO
 
 import pytest
@@ -12,7 +11,7 @@ from rest_framework.test import APIRequestFactory
 from rest_framework.views import APIView
 
 from drf_yasg import codecs, openapi
-from drf_yasg.codecs import yaml_sane_dump, yaml_sane_load
+from drf_yasg.codecs import yaml_dump, yaml_load
 from drf_yasg.generators import OpenAPISchemaGenerator
 
 
@@ -49,8 +48,7 @@ def swagger(mock_schema_request):
 
 @pytest.fixture
 def swagger_dict(swagger, codec_json):
-    json_bytes = codec_json.encode(swagger)
-    return json.loads(json_bytes.decode("utf-8"), object_pairs_hook=OrderedDict)
+    return json.loads(codec_json.encode(swagger))
 
 
 @pytest.fixture
@@ -105,17 +103,13 @@ def call_generate_swagger():
 @pytest.fixture
 def compare_schemas():
     def compare_schemas(schema1, schema2):
-        schema1 = OrderedDict(schema1)
-        schema2 = OrderedDict(schema2)
         ignore = ["info", "host", "schemes", "basePath", "securityDefinitions"]
         for attr in ignore:
             schema1.pop(attr, None)
             schema2.pop(attr, None)
 
         # print diff between YAML strings because it's prettier
-        assert_equal(
-            yaml_sane_dump(schema1, binary=False), yaml_sane_dump(schema2, binary=False)
-        )
+        assert_equal(yaml_dump(schema1, binary=False), yaml_dump(schema2, binary=False))
 
     return compare_schemas
 
@@ -137,4 +131,4 @@ def redoc_settings(settings):
 @pytest.fixture
 def reference_schema():
     with open(os.path.join(os.path.dirname(__file__), "reference.yaml")) as reference:
-        return yaml_sane_load(reference)
+        return yaml_load(reference)

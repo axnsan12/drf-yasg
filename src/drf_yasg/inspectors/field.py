@@ -6,7 +6,6 @@ import sys
 import typing
 import uuid
 import warnings
-from collections import OrderedDict
 from contextlib import suppress
 from decimal import Decimal
 
@@ -124,7 +123,7 @@ class InlineSerializerInspector(SerializerInspector):
             ref_name = self.get_serializer_ref_name(field)
 
             def make_schema_definition(serializer=field):
-                properties = OrderedDict()
+                properties = {}
                 required = []
                 for property_name, child in serializer.fields.items():
                     property_name = self.get_property_name(property_name)
@@ -433,7 +432,7 @@ def find_limits(field):
 
     :param serializers.Field field: the field instance
     :return: the extracted limits
-    :rtype: OrderedDict
+    :rtype: dict
     """
     limits = {}
     applicable_limits = [
@@ -462,7 +461,7 @@ def find_limits(field):
         if limits.get("min_length", 0) < 1:
             limits["min_length"] = 1
 
-    return OrderedDict(sorted(limits.items()))
+    return dict(sorted(limits.items()))
 
 
 def decimal_field_type(field):
@@ -530,7 +529,7 @@ def get_basic_type_info(field):
     :param field: the field instance
     :return: the extracted attributes as a dictionary, or ``None`` if the field type is
         not known
-    :rtype: OrderedDict
+    :rtype: dict
     """
     if field is None:
         return None
@@ -552,9 +551,7 @@ def get_basic_type_info(field):
 
     limits = find_limits(field)
 
-    result = OrderedDict(
-        [("type", swagger_type), ("format", format), ("pattern", pattern)]
-    )
+    result = {"type": swagger_type, "format": format, "pattern": pattern}
     result.update(limits)
     result = filter_none(result)
     return result
@@ -601,12 +598,7 @@ def inspect_collection_hint_class(hint_class):
         "type": DEFAULT_TYPE
     }
 
-    return OrderedDict(
-        [
-            ("type", openapi.TYPE_ARRAY),
-            ("items", openapi.Items(**child_type_info)),
-        ]
-    )
+    return {"type": openapi.TYPE_ARRAY, "items": openapi.Items(**child_type_info)}
 
 
 hinting_type_info.extend(
@@ -623,7 +615,7 @@ def get_basic_type_info_from_hint(hint_class):
     :param hint_class: the class
     :return: the extracted attributes as a dictionary, or ``None`` if the field type is
         not known
-    :rtype: OrderedDict
+    :rtype: dict
     """
 
     if typing_get_origin(hint_class) in UNION_TYPES:
@@ -643,7 +635,7 @@ def get_basic_type_info_from_hint(hint_class):
 
     # `typing.Any` is not represented as a class until Python 3.11
     if sys.version_info < (3, 11) and resolved_class is typing.Any:
-        return OrderedDict([("type", DEFAULT_TYPE)])
+        return {"type": DEFAULT_TYPE}
 
     # bail out early
     if not inspect.isclass(resolved_class):
@@ -658,12 +650,7 @@ def get_basic_type_info_from_hint(hint_class):
             if callable(swagger_type):
                 swagger_type = swagger_type()
 
-            return OrderedDict(
-                [
-                    ("type", swagger_type),
-                    ("format", format),
-                ]
-            )
+            return {"type": swagger_type, "format": format}
 
     return None
 
@@ -1003,14 +990,13 @@ class CamelCaseJSONFilter(FieldInspector):
         :param openapi.Schema schema: the :class:`.Schema` object
         """
         if getattr(schema, "properties", {}):
-            schema.properties = OrderedDict(
-                (
-                    self.camelize_string(key),
-                    self.camelize_schema(openapi.resolve_ref(val, self.components))
-                    or val,
+            schema.properties = {
+                self.camelize_string(key): self.camelize_schema(
+                    openapi.resolve_ref(val, self.components)
                 )
+                or val
                 for key, val in schema.properties.items()
-            )
+            }
 
             if getattr(schema, "required", []):
                 schema.required = [self.camelize_string(p) for p in schema.required]
