@@ -2,12 +2,13 @@ import datetime
 import inspect
 import logging
 import operator
+import sys
 import typing
 import uuid
+import warnings
 from collections import OrderedDict
 from contextlib import suppress
 from decimal import Decimal
-from inspect import signature as inspect_signature
 
 from django.core import validators
 from django.db import models
@@ -40,6 +41,8 @@ try:
 except ImportError:  # Python < 3.10
     NoneType = type(None)
     UNION_TYPES = (typing.Union,)
+
+DEFAULT_TYPE = openapi.TYPE_STRING
 
 logger = logging.getLogger(__name__)
 
@@ -335,7 +338,7 @@ class RelatedFieldInspector(FieldInspector):
                 model = get_related_model(this_model, source)
                 model_field = get_model_field(model, target_field)
 
-            attrs = get_basic_type_info(model_field) or {"type": openapi.TYPE_STRING}
+            attrs = get_basic_type_info(model_field) or {"type": DEFAULT_TYPE}
             return SwaggerType(**attrs)
         elif isinstance(field, serializers.HyperlinkedRelatedField):
             return SwaggerType(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI)
@@ -595,7 +598,7 @@ def inspect_collection_hint_class(hint_class):
     args = typing_get_args(hint_class)
     child_class = args[0] if args else str
     child_type_info = get_basic_type_info_from_hint(child_class) or {
-        "type": openapi.TYPE_STRING
+        "type": DEFAULT_TYPE
     }
 
     return OrderedDict(
@@ -606,8 +609,9 @@ def inspect_collection_hint_class(hint_class):
     )
 
 
-hinting_type_info.append(
-    ((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class)
+hinting_type_info.extend(
+    [((typing.Sequence, typing.AbstractSet), inspect_collection_hint_class)]
+    + ([(typing.Any, (DEFAULT_TYPE, None))] if sys.version_info >= (3, 11) else [])
 )
 
 
@@ -637,6 +641,10 @@ def get_basic_type_info_from_hint(hint_class):
     # resolve the origin class if the class is generic
     resolved_class = typing_get_origin(hint_class) or hint_class
 
+    # `typing.Any` is not represented as a class until Python 3.11
+    if sys.version_info < (3, 11) and resolved_class is typing.Any:
+        return OrderedDict([("type", DEFAULT_TYPE)])
+
     # bail out early
     if not inspect.isclass(resolved_class):
         return None
@@ -665,14 +673,22 @@ class SerializerMethodFieldInspector(FieldInspector):
     the swagger_serializer_method decorator.
     """
 
-    def field_to_swagger_object(
+    def field_to_swagger_object(  # noqa: C901
         self, field, swagger_object_type, use_references, **kwargs
     ):
         if not isinstance(field, serializers.SerializerMethodField):
             return NotHandled
 
+        def method_path() -> str:
+            return f"""{field.parent.__class__.__module__}.{
+                field.parent.__class__.__qualname__
+            }.{field.method_name}"""
+
         method = getattr(field.parent, field.method_name, None)
         if method is None:
+            warnings.warn(
+                f"SerializerMethodField method {method_path()} does not exist!"
+            )
             return NotHandled
 
         # attribute added by the swagger_serializer_method decorator
@@ -710,35 +726,63 @@ class SerializerMethodFieldInspector(FieldInspector):
                 serializer, swagger_object_type, use_references, read_only=True
             )
         else:
+            # look for Python 3.5+ style type hinting of the return value
+            annotations = {"return": typing.Any}
+            return_annotation = inspect.signature(method).return_annotation
+
             try:
-                # look for Python 3.5+ style type hinting of the return value
-                hint_class = typing.get_type_hints(method).get("return")
-
+                if return_annotation is not inspect._empty:
+                    annotations = typing.get_type_hints(method)
             except NameError:
-                hint_class = inspect_signature(method).return_annotation
+                # try handling forward references with Python 3.12 type parameters
+                # (PEP-695), which are not defined in the module scope and will not
+                # resolve if postponed evaluation of annotations (PEP-563) is enabled.
+                localns = {
+                    t.__name__: t
+                    # include any class or method type parameters
+                    for scope in (field.parent, method)
+                    for t in getattr(scope, "__type_params__", ())
+                }
+                module_name = field.parent.__module__
 
-                if hint_class is not None and hint_class != inspect._empty:
-                    SwaggerType, _ = self._get_partial_types(
-                        field, swagger_object_type, use_references, **kwargs
+                try:
+                    # bail if there are no type parameters or the module isn't loaded
+                    if not localns or module_name not in sys.modules:
+                        raise
+
+                    annotations = typing.get_type_hints(
+                        method, vars(sys.modules[module_name]), localns
+                    )
+                except NameError:
+                    warnings.warn(
+                        f"Cannot resolve return annotation: {return_annotation!r} "
+                        f"({method_path()}); Is this expression not imported, or only "
+                        "imported in a TYPE_CHECKING block? Use "
+                        "`swagger_serializer_method` to define the return type."
                     )
 
-                    return SwaggerType(
-                        type=openapi.TYPE_STRING,
-                        description=f"Return type: {hint_class}",
-                    )
-
-            # annotations such as typing.Optional have an __instancecheck__
-            # hook and will not look like classes, but `issubclass` needs
-            # a class as its first argument, so only in that case abort
-            if inspect.isclass(hint_class) and issubclass(hint_class, inspect._empty):
-                return NotHandled
+            hint_class = annotations.get("return")
+            if hint_class is None:
+                warnings.warn(
+                    f"{method_path()} has no return type annotation and is not "
+                    "decorated with `swagger_serializer_method`; "
+                    "Using `Any` as its return type."
+                )
+                hint_class = typing.Any
 
             type_info = get_basic_type_info_from_hint(hint_class)
-            if type_info is not None:
-                SwaggerType, ChildSwaggerType = self._get_partial_types(
-                    field, swagger_object_type, use_references, **kwargs
+            if type_info is None:
+                warnings.warn(
+                    f"Cannot coerce return annotation {return_annotation!r} from "
+                    f"{method_path()} to any valid type; Using `Any` as its return "
+                    "type. Use `swagger_serializer_method` to change this behavior."
                 )
-                return SwaggerType(**type_info)
+                type_info = get_basic_type_info_from_hint(typing.Any)
+
+            SwaggerType, ChildSwaggerType = self._get_partial_types(
+                field, swagger_object_type, use_references, **kwargs
+            )
+            return SwaggerType(**type_info)
 
         return NotHandled
 
@@ -925,7 +969,7 @@ class StringDefaultFieldInspector(FieldInspector):
         SwaggerType, ChildSwaggerType = self._get_partial_types(
             field, swagger_object_type, use_references, **kwargs
         )
-        return SwaggerType(type=openapi.TYPE_STRING)
+        return SwaggerType(type=DEFAULT_TYPE)
 
 
 try:

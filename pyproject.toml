@@ -116,3 +116,7 @@ lint.mccabe.max-complexity = 13
 lint.per-file-ignores."src/drf_yasg/inspectors/field.py" = ["E721"]
 lint.per-file-ignores."src/drf_yasg/openapi.py" = ["E721"]
 lint.per-file-ignores."testproj/testproj/settings/*" = ["F405"]
+lint.per-file-ignores."tests/test_schema_generator.py" = ["FA100"]
+
+[tool.ruff.per-file-target-version]
+"tests/pep695_with_pep563.py" = "py312"

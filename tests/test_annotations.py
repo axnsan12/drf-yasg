@@ -1,9 +1,10 @@
 from typing import TYPE_CHECKING
 
+import pytest
 from rest_framework import serializers
 
 from drf_yasg import openapi
-from drf_yasg.inspectors.field import SerializerMethodFieldInspector
+from drf_yasg.inspectors import SerializerMethodFieldInspector
 from drf_yasg.openapi import ReferenceResolver
 
 if TYPE_CHECKING:
@@ -29,7 +30,8 @@ def test_missing_runtime_annotations():
         field_inspectors=[],
     )
 
-    schema = inspector.field_to_swagger_object(field, openapi.Schema, True)
-
-    assert schema.type == "string"
-    assert schema.description == "Return type: UUID"
+    with pytest.warns(UserWarning, match="Use `swagger_serializer_method`"):
+        assert (
+            inspector.field_to_swagger_object(field, openapi.Schema, True).type
+            == "string"
+        )
