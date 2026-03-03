@@ -1,4 +1,4 @@
-const { groupBy, toPairs, head, values, pluck } = require("ramda");
+import { groupBy, toPairs, values, pluck } from "ramda";
 
 const versions = {
   3.16: {
@@ -33,21 +33,19 @@ const groups = values(
   groupBy(({ python, django }) => [python, django].join("-"))(matrix),
 );
 
-const environments = groups.map((group) => {
-  const [{ python, django }] = group;
-  const drf = pluck("drf", group);
+const environments = groups
+  .map((group) => {
+    const [{ python, django }] = group;
+    const drf = pluck("drf", group);
 
-  return [
-    "py".concat(python),
-    "django".concat(django),
-    drf.length > 1 ? `drf{${drf.join(",")}}` : "drf".concat(drf[0]),
-  ]
-    .join("-")
-    .replaceAll(".", "");
-});
+    return [
+      "py".concat(python),
+      "django".concat(django),
+      drf.length > 1 ? `drf{${drf.join(",")}}` : "drf".concat(drf[0]),
+    ]
+      .join("-")
+      .replaceAll(".", "");
+  })
+  .sort();
 
-console.log(
-    environments
-    .sort()
-    .join("\n")
-);
+console.log(environments.join("\n"));
