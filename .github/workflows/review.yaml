@@ -20,6 +20,9 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
+      - name: Run linters
+        run: uv run ruff check
+
       - name: Run tests
         run: uv run tox
 
