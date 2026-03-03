@@ -21,7 +21,7 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Run tests
-        run: uv run tox --parallel
+        run: uv run tox
 
   # Return successful statuses "Run linters and tests" for python {3.6...9}
   # These are required for branch protection rules that cannot be removed yet
