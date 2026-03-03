@@ -85,7 +85,9 @@ all = [
     "ruff >= 0.11.0",
     "Sphinx >= 1.7.0",
     "sphinx_rtd_theme >= 0.2.4",
-    "tox ~= 4.0",
+    "tox >= 4.0",
+    "tox-gh >= 1.7.1",
+    "tox-uv >= 1.33.1",
     "twine >= 5.0.0",
     "user_agents >= 1.1.0",
 ]
