@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "drf-yasg"
 description = "Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code."
 
-requires-python = ">= 3.9"
+requires-python = ">= 3.10"
 dynamic = ["version"]
 
 license = "BSD-3-Clause"
@@ -52,7 +52,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",

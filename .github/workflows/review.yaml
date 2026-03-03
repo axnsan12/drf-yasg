@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Checkout the source code
@@ -42,7 +42,7 @@ jobs:
           python -m build --sdist
           twine check dist/*
 
-  # Return successful statuses "Run linters and tests" for python {3.6...8}
+  # Return successful statuses "Run linters and tests" for python {3.6...9}
   # These are required for branch protection rules that cannot be removed yet
   # https://github.com/axnsan12/drf-yasg/pull/922#issuecomment-2739945046
   review:
