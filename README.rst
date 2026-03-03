@@ -11,9 +11,9 @@ Generate **real** Swagger/OpenAPI 2.0 specifications from a Django Rest Framewor
 
 Compatible with
 
-- **Django Rest Framework**: 3.13, 3.14, 3.15
-- **Django**: 4.0, 4.1, 4.2, 5.0, 5.1, 5.2
-- **Python**: 3.9, 3.10, 3.11, 3.12, 3.13
+- **Django Rest Framework**: 3.13+
+- **Django**: 4.0+
+- **Python**: 3.10+
 
 Only the latest patch version of each ``major.minor`` series of Python, Django and Django REST Framework is supported.
 
