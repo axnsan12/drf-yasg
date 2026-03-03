@@ -15,32 +15,16 @@ jobs:
       - name: Checkout the source code
         uses: actions/checkout@v6
 
-      - name: Set the python version
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python }}
-
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
           python-version: ${{ matrix.python }}
 
+      - name: Run linters
+        run: uv run ruff check
+
       - name: Run tests
-        run: tox -e $(tox -l | grep py${PYTHON_VERSION//.} | paste -sd "," -)
-        env:
-          PYTHON_VERSION: ${{ matrix.python }}
-
-      - name: Report coverage
-        run: |
-          pip install coverage
-          coverage report
-
-      - name: Check for incompatibilities with publishing to PyPi
-        if: ${{ matrix.python == 3.13 }}
-        run: |
-          pip install -r requirements/publish.txt
-          python -m build --sdist
-          twine check dist/*
+        run: uv run tox
 
   # Return successful statuses "Run linters and tests" for python {3.6...9}
   # These are required for branch protection rules that cannot be removed yet
@@ -50,7 +34,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     strategy:
-      fail-fast: false
       matrix:
         python: ["3.6", "3.7", "3.8", "3.9"]
 

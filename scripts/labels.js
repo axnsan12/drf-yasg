@@ -1,4 +1,4 @@
-import { DateTime, Duration } from "luxon";
+import { DateTime } from "luxon";
 import { Octokit } from "octokit";
 
 const token = process.env.GITHUB_TOKEN;

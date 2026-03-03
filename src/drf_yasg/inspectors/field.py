@@ -8,14 +8,14 @@ import uuid
 import warnings
 from contextlib import suppress
 from decimal import Decimal
+from importlib import metadata
+from types import NoneType, UnionType
 
 from django.core import validators
 from django.db import models
-from importlib import metadata
 from packaging import version
 from rest_framework import serializers
 from rest_framework.settings import api_settings as rest_framework_settings
-from types import NoneType, UnionType
 
 from .. import openapi
 from ..errors import SwaggerGenerationError
