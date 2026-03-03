@@ -1,2 +1,0 @@
-# used by the 'lint' tox env for linting via ruff
-ruff>=0.11.0

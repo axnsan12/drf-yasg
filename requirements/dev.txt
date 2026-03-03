@@ -1,6 +1,0 @@
-# requirements for local development to be installed via pip install -U -r requirements/dev.txt
--r tox.txt
--r test.txt
--r lint.txt
-
-tox-battery>=0.5
