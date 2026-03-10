@@ -8,11 +8,11 @@ import os
 import re
 import shutil
 import sys
+from importlib import metadata
 
 from docutils import nodes, utils
 from docutils.parsers.rst import roles
 from docutils.parsers.rst.roles import set_classes
-from importlib import metadata
 
 # -- General configuration ------------------------------------------------
 

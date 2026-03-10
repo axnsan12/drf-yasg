@@ -1,4 +1,0 @@
-# requirements for the CI test runner
-codecov>=2.0.9
-
--r tox.txt
