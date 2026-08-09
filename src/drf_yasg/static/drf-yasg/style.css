@@ -80,3 +80,8 @@ button.header__btn {
     font: inherit;
     color: inherit;
 }
+
+/* RTL/LTR support for paragraph text */
+p[dir="auto"] {
+    text-align: justify;
+}
