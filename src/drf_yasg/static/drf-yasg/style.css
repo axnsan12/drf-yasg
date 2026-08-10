@@ -81,7 +81,10 @@ button.header__btn {
     color: inherit;
 }
 
-/* RTL/LTR support for paragraph text */
-p[dir="auto"] {
-    text-align: justify;
+/* RTL/LTR support: unicode-bidi: plaintext makes the browser determine
+   text direction for all block-level descendants from their first strong
+   character, without needing dir="auto" on each element. */
+#swagger-ui,
+redoc {
+    unicode-bidi: plaintext;
 }

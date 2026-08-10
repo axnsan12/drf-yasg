@@ -28,6 +28,7 @@ if (redocSettings.fetchSchemaWithQuery) {
 delete redocSettings.fetchSchemaWithQuery;
 
 redoc.setAttribute("spec-url", specURL);
+redoc.setAttribute("dir", "auto");
 
 function camelToKebab(str) {
     return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
@@ -72,35 +73,4 @@ else {
     insertionQ('div.api-info span').every(hideEmptyVersion);
 }
 
-/**
- * Add dir="auto" to all <p> tags for proper RTL/LTR text direction.
- */
-function addDirAutoToPTags(root) {
-    var pTags = root.querySelectorAll('p:not([dir])');
-    pTags.forEach(function (p) {
-        p.setAttribute('dir', 'auto');
-    });
-}
 
-function observeForDirAuto() {
-    // Process existing <p> tags
-    addDirAutoToPTags(document.body);
-
-    // Observe for dynamically added <p> tags
-    var observer = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-            mutation.addedNodes.forEach(function (node) {
-                if (node.nodeType === 1) {
-                    if (node.tagName === 'P' && !node.hasAttribute('dir')) {
-                        node.setAttribute('dir', 'auto');
-                    }
-                    addDirAutoToPTags(node);
-                }
-            });
-        });
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-}
-
-observeForDirAuto();

@@ -155,10 +155,22 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
     }
     swaggerUiConfig.url = specURL;
 
+    // Ensure dir="auto" is set on the container after Swagger UI renders
+    var oldOnComplete = swaggerUiConfig.onComplete;
+    swaggerUiConfig.onComplete = function () {
+        var swaggerContainer = document.getElementById('swagger-ui');
+        if (swaggerContainer) {
+            swaggerContainer.setAttribute('dir', 'auto');
+        }
+        if (oldOnComplete) {
+            oldOnComplete();
+        }
+    };
+
     if (persistAuth || refetchWithAuth) {
         var hookedAuth = false;
 
-        var oldOnComplete = swaggerUiConfig.onComplete;
+        var previousOnComplete = swaggerUiConfig.onComplete;
         swaggerUiConfig.onComplete = function () {
             if (persistAuth) {
                 preauthorizeAll(savedAuth, window.ui);
@@ -168,8 +180,8 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
                 hookAuthActions(window.ui, persistAuth, refetchWithAuth, refetchOnLogout);
                 hookedAuth = true;
             }
-            if (oldOnComplete) {
-                oldOnComplete();
+            if (previousOnComplete) {
+                previousOnComplete();
             }
         };
 
@@ -403,41 +415,6 @@ function hookAuthActions(sui, persistAuth, refetchWithAuth, refetchOnLogout) {
     };
 }
 
-/**
- * Add dir="auto" to all <p> tags for proper RTL/LTR text direction.
- */
-function addDirAutoToPTags(root) {
-    var pTags = root.querySelectorAll('p:not([dir])');
-    pTags.forEach(function (p) {
-        p.setAttribute('dir', 'auto');
-    });
-}
-
-function observeForDirAuto() {
-    var target = document.getElementById('swagger-ui');
-    if (!target) return;
-
-    // Process existing <p> tags
-    addDirAutoToPTags(target);
-
-    // Observe for dynamically added <p> tags
-    var observer = new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-            mutation.addedNodes.forEach(function (node) {
-                if (node.nodeType === 1) {
-                    if (node.tagName === 'P' && !node.hasAttribute('dir')) {
-                        node.setAttribute('dir', 'auto');
-                    }
-                    addDirAutoToPTags(node);
-                }
-            });
-        });
-    });
-
-    observer.observe(target, { childList: true, subtree: true });
-}
-
 window.addEventListener('load', function () {
     initSwaggerUi();
-    observeForDirAuto();
 });
