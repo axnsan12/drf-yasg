@@ -146,3 +146,6 @@ lint.per-file-ignores."tests/test_schema_generator.py" = ["FA100"]
 
 [tool.ruff.per-file-target-version]
 "tests/pep695_with_pep563.py" = "py312"
+
+[tool.coverage.run]
+parallel = true
