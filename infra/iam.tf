@@ -1,5 +1,5 @@
 resource "aws_iam_role" "service" {
-  name = "drf-yasg-demo-apprunner-service-access-role"
+  name = "drf-yasg-apprunner"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -18,7 +18,7 @@ resource "aws_iam_role" "service" {
 }
 
 resource "aws_iam_role_policy" "service" {
-  name = "drf-yasg-demo-apprunner-service-access-policy"
+  name = "drf-yasg-apprunner"
   role = aws_iam_role.service.id
 
   policy = jsonencode({
