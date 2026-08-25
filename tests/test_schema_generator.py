@@ -438,3 +438,41 @@ def test_multiline_strings(call_generate_swagger):
     output = call_generate_swagger(format="yaml")
     print("|\n|".join(output.splitlines()[:20]))
     assert EXPECTED_DESCRIPTION in output
+
+
+def test_response_headers(validate_schema):
+    @swagger_auto_schema(
+        method="get",
+        responses={
+            200: openapi.Response(
+                "OK",
+                headers={
+                    "X-Rate-Limit": openapi.Schema(
+                        type=openapi.TYPE_INTEGER,
+                        description="allowed requests in the current period",
+                    ),
+                    "X-Request-Id": openapi.Schema(type=openapi.TYPE_STRING),
+                },
+            )
+        },
+    )
+    @api_view(["GET"])
+    def rate_limited(request):
+        return Response({"message": "Hello, world!"})
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        version="v2",
+        url="",
+        patterns=[path("rate-limited/", rate_limited)],
+    )
+
+    swagger = generator.get_schema(public=True)
+    headers = swagger["paths"]["/rate-limited/"]["get"]["responses"]["200"]["headers"]
+    assert headers["X-Rate-Limit"] == {
+        "type": "integer",
+        "description": "allowed requests in the current period",
+    }
+    assert headers["X-Request-Id"] == {"type": "string"}
+
+    validate_schema(json.loads(codecs.OpenAPICodecJson([]).encode(swagger)))

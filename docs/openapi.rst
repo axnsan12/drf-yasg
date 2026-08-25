@@ -117,10 +117,22 @@ This section describes where information is sourced from when using the default 
       - if the view is also paginated, the response schema is then wrapped in the appropriate paging response structure
       - the description of the response is left blank
 
-* :class:`.Response` headers are supported by the OpenAPI specification but not currently supported by this library;
-  you can still add them manually by providing an `appropriately structured dictionary
-  <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#headersObject>`_
-  to the ``headers`` property of a :class:`.Response` object
+* :class:`.Response` headers can be documented by passing a ``headers`` argument to the :class:`.Response`
+  constructor. It should be a dictionary mapping each header name to a :class:`.Schema` describing that header,
+  following the `Headers Object
+  <https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#headersObject>`_ structure:
+
+   .. code-block:: python
+
+      response = openapi.Response(
+          description="rate limited response",
+          headers={
+              "X-Rate-Limit": openapi.Schema(
+                  type=openapi.TYPE_INTEGER,
+                  description="number of allowed requests in the current period",
+              ),
+          },
+      )
 * *descriptions* for :class:`.Operation`\ s, :class:`.Parameter`\ s and :class:`.Schema`\ s are picked up from
   docstrings and ``help_text`` attributes in the same manner as the `default DRF SchemaGenerator
   <http://www.django-rest-framework.org/api-guide/schemas/#schemas-as-documentation>`_
