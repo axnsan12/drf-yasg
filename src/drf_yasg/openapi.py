@@ -726,7 +726,7 @@ class Response(SwaggerDict):
             or type[rest_framework.serializers.Serializer]
         :param dict examples: example bodies mapped by mime type
         :param headers: headers returned alongside the response, mapped by name
-        :type headers: dict[str,Schema]
+        :type headers: dict[str, Schema]
         """
         super(Response, self).__init__(**extra)
         self.description = description
