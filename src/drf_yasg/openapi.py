@@ -717,7 +717,7 @@ class Responses(SwaggerDict):
 
 
 class Response(SwaggerDict):
-    def __init__(self, description, schema=None, examples=None, **extra):
+    def __init__(self, description, schema=None, examples=None, headers=None, **extra):
         """Describes the structure of an operation's response.
 
         :param str description: response description
@@ -725,11 +725,14 @@ class Response(SwaggerDict):
         :type schema: Schema or SchemaRef or rest_framework.serializers.Serializer
             or type[rest_framework.serializers.Serializer]
         :param dict examples: example bodies mapped by mime type
+        :param headers: headers returned alongside the response, mapped by name
+        :type headers: dict[str, Schema]
         """
         super(Response, self).__init__(**extra)
         self.description = description
         self.schema = schema
         self.examples = examples
+        self.headers = headers
         self._insert_extras__()
         if schema and isinstance(schema, Schema):
             schema._remove_read_only()
