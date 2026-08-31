@@ -155,10 +155,22 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
     }
     swaggerUiConfig.url = specURL;
 
+    // Ensure dir="auto" is set on the container after Swagger UI renders
+    var oldOnComplete = swaggerUiConfig.onComplete;
+    swaggerUiConfig.onComplete = function () {
+        var swaggerContainer = document.getElementById('swagger-ui');
+        if (swaggerContainer) {
+            swaggerContainer.setAttribute('dir', 'auto');
+        }
+        if (oldOnComplete) {
+            oldOnComplete();
+        }
+    };
+
     if (persistAuth || refetchWithAuth) {
         var hookedAuth = false;
 
-        var oldOnComplete = swaggerUiConfig.onComplete;
+        var previousOnComplete = swaggerUiConfig.onComplete;
         swaggerUiConfig.onComplete = function () {
             if (persistAuth) {
                 preauthorizeAll(savedAuth, window.ui);
@@ -168,8 +180,8 @@ function initSwaggerUiConfig(swaggerSettings, oauth2Settings) {
                 hookAuthActions(window.ui, persistAuth, refetchWithAuth, refetchOnLogout);
                 hookedAuth = true;
             }
-            if (oldOnComplete) {
-                oldOnComplete();
+            if (previousOnComplete) {
+                previousOnComplete();
             }
         };
 
@@ -403,4 +415,6 @@ function hookAuthActions(sui, persistAuth, refetchWithAuth, refetchOnLogout) {
     };
 }
 
-window.addEventListener('load', initSwaggerUi);
+window.addEventListener('load', function () {
+    initSwaggerUi();
+});

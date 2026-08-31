@@ -28,6 +28,7 @@ if (redocSettings.fetchSchemaWithQuery) {
 delete redocSettings.fetchSchemaWithQuery;
 
 redoc.setAttribute("spec-url", specURL);
+redoc.setAttribute("dir", "auto");
 
 function camelToKebab(str) {
     return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
@@ -71,3 +72,5 @@ else {
     insertionQ('span.api-info-version').every(hideEmptyVersion);
     insertionQ('div.api-info span').every(hideEmptyVersion);
 }
+
+
