@@ -18,7 +18,6 @@ dependencies = [
     "djangorestframework >= 3.13",
     "inflection >= 0.3.1",
     "packaging >= 21.0",
-    "pytz >= 2021.1",
     "pyyaml >= 5.1",
     "swagger-spec-validator >= 2.1.0",
     "uritemplate >= 3.0.0",

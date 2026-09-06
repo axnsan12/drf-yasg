@@ -4,7 +4,6 @@ import textwrap
 import zoneinfo
 from decimal import Decimal
 
-import pytz
 from django.db import models
 from django.utils.encoding import force_str
 from rest_framework import serializers, status
@@ -21,6 +20,11 @@ from rest_framework.utils import encoders, json
 from rest_framework.views import APIView
 
 from .app_settings import swagger_settings
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 logger = logging.getLogger(__name__)
 
@@ -594,7 +598,7 @@ def field_value_to_representation(field, value):
         else:
             value = str(value)
 
-    elif isinstance(value, pytz.BaseTzInfo):
+    elif pytz is not None and isinstance(value, pytz.BaseTzInfo):
         value = str(value)
 
     elif isinstance(value, zoneinfo.ZoneInfo):
