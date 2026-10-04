@@ -1222,12 +1222,11 @@ definitions:
       rateAsString:
         title: Rate as string
         type: string
-        format: decimal
         default: '0.000'
       rate:
         title: Rate
         type: number
-        format: decimal
+        format: double
         default: 0.0
         minimum: 0.0
       nullableSecondaryLanguage:
@@ -1420,7 +1419,6 @@ definitions:
         title: Hinted decimal
         description: the type hint on the method should determine this to be a decimal
         type: string
-        format: decimal
         readOnly: true
       hinted_datetime:
         title: Hinted datetime
