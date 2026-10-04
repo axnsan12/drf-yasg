@@ -8,5 +8,9 @@
     "luxon": "^3.5.0",
     "octokit": "^4.1.2",
     "ramda": "^0.32.0"
+  },
+  "overrides": {
+    "openapi-sampler": "^1.7.6",
+    "fast-xml-parser": "^5.5.1"
   }
 }
