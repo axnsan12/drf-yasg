@@ -1,5 +1,6 @@
 import sys
 import uuid
+from decimal import Decimal
 from typing import Dict, List, Optional, Set, Union
 
 import pytest
@@ -126,6 +127,15 @@ resolutions = [
     (
         Union[int, float],
         None,
+    ),
+    (
+        # ``decimal`` is not a valid OpenAPI format; with the default
+        # COERCE_DECIMAL_TO_STRING a Decimal is a string with no numeric format.
+        Decimal,
+        {
+            "type": openapi.TYPE_STRING,
+            "format": None,
+        },
     ),
     (
         uuid.UUID,
