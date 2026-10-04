@@ -458,13 +458,20 @@ def decimal_field_type(field):
     return openapi.TYPE_NUMBER if decimal_as_float(field) else openapi.TYPE_STRING
 
 
+def decimal_field_format(field):
+    # ``decimal`` is not a valid OpenAPI number format. When the field is
+    # rendered as a number, emit a spec-valid numeric format; when it is
+    # rendered as a string (the default), do not attach a numeric format.
+    return openapi.FORMAT_DOUBLE if decimal_as_float(field) else None
+
+
 model_field_to_basic_type = [
     (models.AutoField, (openapi.TYPE_INTEGER, None)),
     (models.BinaryField, (openapi.TYPE_STRING, openapi.FORMAT_BINARY)),
     (models.BooleanField, (openapi.TYPE_BOOLEAN, None)),
     (models.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (models.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
-    (models.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
+    (models.DecimalField, (decimal_field_type, decimal_field_format)),
     (models.DurationField, (openapi.TYPE_STRING, None)),
     (models.FloatField, (openapi.TYPE_NUMBER, None)),
     (models.IntegerField, (openapi.TYPE_INTEGER, None)),
@@ -493,7 +500,7 @@ serializer_field_to_basic_type = [
     (serializers.BooleanField, (openapi.TYPE_BOOLEAN, None)),
     (serializers.IntegerField, (openapi.TYPE_INTEGER, None)),
     (serializers.FloatField, (openapi.TYPE_NUMBER, None)),
-    (serializers.DecimalField, (decimal_field_type, openapi.FORMAT_DECIMAL)),
+    (serializers.DecimalField, (decimal_field_type, decimal_field_format)),
     (serializers.DurationField, (openapi.TYPE_STRING, None)),
     (serializers.DateField, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
     (serializers.DateTimeField, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
@@ -555,13 +562,23 @@ def decimal_return_type():
     )
 
 
+def decimal_return_format():
+    # ``decimal`` is not a valid OpenAPI number format. Only attach a numeric
+    # format when the value is rendered as a number.
+    return (
+        None
+        if rest_framework_settings.COERCE_DECIMAL_TO_STRING
+        else openapi.FORMAT_DOUBLE
+    )
+
+
 hinting_type_info = [
     (bool, (openapi.TYPE_BOOLEAN, None)),
     (int, (openapi.TYPE_INTEGER, None)),
     (str, (openapi.TYPE_STRING, None)),
     (float, (openapi.TYPE_NUMBER, None)),
     (dict, (openapi.TYPE_OBJECT, None)),
-    (Decimal, (decimal_return_type, openapi.FORMAT_DECIMAL)),
+    (Decimal, (decimal_return_type, decimal_return_format)),
     (uuid.UUID, (openapi.TYPE_STRING, openapi.FORMAT_UUID)),
     (datetime.datetime, (openapi.TYPE_STRING, openapi.FORMAT_DATETIME)),
     (datetime.date, (openapi.TYPE_STRING, openapi.FORMAT_DATE)),
@@ -628,6 +645,8 @@ def get_basic_type_info_from_hint(hint_class):
             swagger_type, format = info
             if callable(swagger_type):
                 swagger_type = swagger_type()
+            if callable(format):
+                format = format()
 
             return {"type": swagger_type, "format": format}
 
