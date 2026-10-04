@@ -3,6 +3,15 @@ Changelog
 #########
 
 ***********
+**1.21.16**
+***********
+
+**FIXED:** Emit spec-valid OpenAPI formats for ``DecimalField`` (:pr:`974`)
+**IMPROVED:** Update ReDoc to version 2.5.2 (:pr:`973`)
+**ADDED:** Add support for documenting response headers (:pr:`970`)
+**REMOVED:** Drop Python 3.9 support (:pr:`957`)
+
+***********
 **1.21.15**
 ***********
 
