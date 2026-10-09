@@ -10,7 +10,7 @@ cp node_modules/redoc/bundles/redoc.standalone.js.map src/drf_yasg/static/drf-ya
 cp node_modules/redoc/LICENSE src/drf_yasg/static/drf-yasg/redoc/LICENSE
 
 curl -o src/drf_yasg/static/drf-yasg/redoc-old/redoc.min.js https://rebilly.github.io/ReDoc/releases/v1.x.x/redoc.min.js
-curl -o src/drf_yasg/static/drf-yasg/redoc-old/redoc.min.js.map https://rebilly.github.io/ReDoc/releases/v1.x.x/redoc.min.js.map
+curl -fSL -o src/drf_yasg/static/drf-yasg/redoc-old/redoc.min.map https://unpkg.com/redoc@1.22.3/dist/redoc.min.map
 curl -o src/drf_yasg/static/drf-yasg/redoc-old/LICENSE https://raw.githubusercontent.com/Redocly/redoc/v1.x/LICENSE
 
 cp -r node_modules/swagger-ui-dist src/drf_yasg/static/drf-yasg/
