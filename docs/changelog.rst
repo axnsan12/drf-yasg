@@ -3,6 +3,12 @@ Changelog
 #########
 
 ***********
+**1.21.18**
+***********
+
+**FIXED:** Fix `redoc.min.map`'s sourcemap and the redoc download script (:pr:`981`)
+
+***********
 **1.21.17**
 ***********
 
