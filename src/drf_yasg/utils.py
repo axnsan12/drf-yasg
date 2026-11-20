@@ -615,6 +615,17 @@ def get_field_default(field):
     """
     default = getattr(field, "default", serializers.empty)
     if default is not serializers.empty:
+        parent = getattr(field, "parent", None)
+        if (
+            isinstance(
+                parent, (serializers.ListSerializer, serializers.ManyRelatedField)
+            )
+            and default is parent.default
+        ):
+            # DRF passes the many=True default to both the list and its child.
+            # Only the list should serialize that default.
+            return serializers.empty
+
         if callable(default):
             try:
                 if hasattr(default, "set_context"):
