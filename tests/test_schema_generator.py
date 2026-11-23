@@ -3,6 +3,7 @@ import sys
 import typing
 
 import pytest
+from django.contrib.auth.models import User
 from django.contrib.postgres import fields as postgres_fields
 from django.db import models
 from django.urls import path
@@ -367,6 +368,53 @@ def test_json_field():
     swagger = generator.get_schema(public=True)
     property_schema = swagger["definitions"]["TestJSONField"]["properties"]["json"]
     assert property_schema == openapi.Schema(title="Json", type=openapi.TYPE_OBJECT)
+
+
+def test_many_field_defaults(caplog):
+    class ChildSerializer(serializers.Serializer):
+        name = serializers.CharField()
+
+        class Meta:
+            ref_name = None
+
+    class DefaultsSerializer(serializers.Serializer):
+        users = serializers.SlugRelatedField(
+            many=True,
+            slug_field="username",
+            queryset=User.objects.none(),
+            write_only=True,
+            default=list,
+        )
+        reviewers = serializers.SlugRelatedField(
+            many=True,
+            slug_field="username",
+            queryset=User.objects.none(),
+            default=lambda: [User(username="sam")],
+        )
+        members = serializers.PrimaryKeyRelatedField(
+            many=True, queryset=User.objects.none(), default=list
+        )
+        children = ChildSerializer(many=True, default=[])
+
+    @swagger_auto_schema(method="post", request_body=DefaultsSerializer)
+    @api_view(["POST"])
+    def create(request):
+        return Response()
+
+    generator = OpenAPISchemaGenerator(
+        info=openapi.Info(title="Test generator", default_version="v1"),
+        patterns=[path("defaults/", create)],
+    )
+    swagger = generator.get_schema(public=True)
+    properties = swagger["definitions"]["Defaults"]["properties"]
+
+    assert properties["users"]["default"] == []
+    assert properties["reviewers"]["default"] == ["sam"]
+    assert properties["members"]["default"] == []
+    assert properties["children"]["default"] == []
+    for name in ("users", "reviewers", "members", "children"):
+        assert "default" not in properties[name]["items"]
+    assert "'default' on schema" not in caplog.text
 
 
 @pytest.mark.parametrize(
