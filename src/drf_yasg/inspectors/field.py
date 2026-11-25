@@ -1,4 +1,5 @@
 import datetime
+import importlib
 import inspect
 import logging
 import operator
@@ -1022,47 +1023,56 @@ class CamelCaseJSONFilter(FieldInspector):
             return False
 
 
-try:
-    from rest_framework_recursive.fields import RecursiveField
-except ImportError:  # pragma: no cover
+def _import_recursive_field_classes():
+    classes = []
+    for module_name in (
+        "rest_framework_recursive.fields",
+        "django_rest_framework_recursive.fields",
+    ):
+        try:
+            module = importlib.import_module(module_name)
+            recursive_field = getattr(module, "RecursiveField")
+        except (ImportError, AttributeError):  # pragma: no cover
+            continue
+        classes.append(recursive_field)
+    return tuple(classes)
 
-    class RecursiveFieldInspector(FieldInspector):
-        """Provides conversion for RecursiveField (https://github.com/heywbj/django-rest-framework-recursive)"""
 
-        pass
-else:
+RECURSIVE_FIELD_CLASSES = _import_recursive_field_classes()
 
-    class RecursiveFieldInspector(FieldInspector):
-        """Provides conversion for RecursiveField (https://github.com/heywbj/django-rest-framework-recursive)"""
 
-        def field_to_swagger_object(
-            self, field, swagger_object_type, use_references, **kwargs
+class RecursiveFieldInspector(FieldInspector):
+    """Provides conversion for RecursiveField from djangorestframework-recursive
+    (https://github.com/heywbj/django-rest-framework-recursive) and drf-recursive
+    (https://github.com/kraken-tech/django-rest-framework-recursive)."""
+
+    def field_to_swagger_object(
+        self, field, swagger_object_type, use_references, **kwargs
+    ):
+        if (
+            RECURSIVE_FIELD_CLASSES
+            and isinstance(field, RECURSIVE_FIELD_CLASSES)
+            and swagger_object_type == openapi.Schema
         ):
-            if (
-                isinstance(field, RecursiveField)
-                and swagger_object_type == openapi.Schema
-            ):
-                assert use_references is True, (
-                    "Can not create schema for RecursiveField when use_references is "
-                    "False"
-                )
+            assert use_references is True, (
+                "Can not create schema for RecursiveField when use_references is False"
+            )
 
-                proxied = field.proxied
-                if isinstance(field.proxied, serializers.ListSerializer):
-                    proxied = proxied.child
+            proxied = field.proxied
+            if isinstance(field.proxied, serializers.ListSerializer):
+                proxied = proxied.child
 
-                ref_name = get_serializer_ref_name(proxied)
-                assert ref_name is not None, (
-                    "Can't create RecursiveField schema for inline "
-                    + str(type(proxied))
-                )
+            ref_name = get_serializer_ref_name(proxied)
+            assert ref_name is not None, (
+                "Can't create RecursiveField schema for inline " + str(type(proxied))
+            )
 
-                definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
+            definitions = self.components.with_scope(openapi.SCHEMA_DEFINITIONS)
 
-                ref = openapi.SchemaRef(definitions, ref_name, ignore_unresolved=True)
-                if isinstance(field.proxied, serializers.ListSerializer):
-                    ref = openapi.Items(type=openapi.TYPE_ARRAY, items=ref)
+            ref = openapi.SchemaRef(definitions, ref_name, ignore_unresolved=True)
+            if isinstance(field.proxied, serializers.ListSerializer):
+                ref = openapi.Items(type=openapi.TYPE_ARRAY, items=ref)
 
-                return ref
+            return ref
 
-            return NotHandled
+        return NotHandled
