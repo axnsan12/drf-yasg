@@ -331,11 +331,12 @@ Integration with `djangorestframework-camel-case <https://github.com/vbabiy/djan
 provided out of the box - if you have ``djangorestframework-camel-case`` installed and your ``APIView`` uses
 ``CamelCaseJSONParser`` or ``CamelCaseJSONRenderer``, all property names will be converted to *camelCase* by default.
 
-djangorestframework-recursive
-===============================
+djangorestframework-recursive / drf-recursive
+=============================================
 
-Integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_ is
-provided out of the box - if you have ``djangorestframework-recursive`` installed.
+Integration with `djangorestframework-recursive <https://github.com/heywbj/django-rest-framework-recursive>`_ and
+`drf-recursive <https://github.com/kraken-tech/django-rest-framework-recursive>`_ is provided out of the box - if you
+have ``djangorestframework-recursive`` or ``drf-recursive`` installed.
 
 .. |actions| image:: https://img.shields.io/github/actions/workflow/status/axnsan12/drf-yasg/review.yaml?branch=master
    :target: https://github.com/axnsan12/drf-yasg/actions
